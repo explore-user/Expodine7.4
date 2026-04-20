@@ -1,0 +1,7973 @@
+<?php
+include('../includes/session.php');		
+include("../database.class.php"); 
+$database	= new Database();
+
+if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='add_vendor'){
+    
+
+        $insertion['v_name'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_name']);
+        $insertion['v_branchid'] 		=  mysqli_real_escape_string($database->DatabaseLink,1);
+        $insertion['v_address'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_address']);
+        if($_REQUEST['v_city']!=''){
+        $insertion['v_city'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_city']);
+        $insertion['v_state'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_state']);
+        $insertion['v_country'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_country']);
+        }
+        $insertion['v_email'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_mail']);
+        $insertion['v_contact_no'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_number']);
+        $insertion['v_open_bal'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_open_bal']); 
+        $insertion['v_tin_no'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_st_tin']);
+        $insertion['gst'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_st_gst']);
+        $insertion['v_srvctax_reg_no'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_st_servicetax_no']);
+        $insertion['v_pan'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_st_pan']);
+        $insertion['v_bank_name'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_bnk_name']);
+        $insertion['v_branch_name'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_bnk_branch']);
+        $insertion['v_acct_no'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_bnk_accno']);
+        $insertion['v_ifsc'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_bnk_ifsc']);
+        $insertion['v_mode_of_pay'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_bnk_modepay']);
+        $insertion['v_credit_period'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_bnk_credit_period']);
+        $insertion['v_favour'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_bnk_favour']); 
+        $insertion['v_conc_name'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_con_name']);
+        $insertion['v_conc_desg'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_con_desg']);
+        $insertion['v_conc_contact'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_con_number']);
+        $insertion['v_conc_email'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_con_mail']);
+        $insertion['v_entry_type'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_type_entry']);       
+        $vdate=date('Y-m-d');
+        $insertion['v_entry_date'] 		=  mysqli_real_escape_string($database->DatabaseLink,$vdate);       
+        $sql=$database->check_duplicate_entry('tbl_vendor_master',$insertion);
+	 if($sql!=1)
+	 {     
+	  $insertid =  $database->insert('tbl_vendor_master',$insertion);
+         } 
+         
+         if($_SESSION['s_invtorylink']!=''){ 
+             
+                $sql_kotlist665  =  $database->mysqlQuery("SELECT MAX(v_id) as v_new_id from tbl_vendor_master "); 
+		$num_kotlist665  = $database->mysqlNumRows($sql_kotlist665);
+		if($num_kotlist665){
+		while($result_kotlist665  = $database->mysqlFetchArray($sql_kotlist665)) 
+		{ 
+                       $cr_vendor5=$result_kotlist665['v_new_id'];
+                } }
+                  
+                  
+                if($_REQUEST['v_city']!=''){
+                    
+                    $city=$_REQUEST['v_city'];
+                    if($_REQUEST['v_state']!=''){
+                    $state=$_REQUEST['v_state'];
+                    
+                } else{
+                   $state=0; 
+                }   
+                if($_REQUEST['v_country']!=''){
+                    $country=$_REQUEST['v_country'];                   
+                } else{
+                   $country=0; 
+                }                      
+                } else{
+                    
+                   $city=0; 
+                   $state=0;
+                   $country=0;
+                }        
+                
+                if($_REQUEST['v_bnk_name']!=''){
+                    $bankname=$_REQUEST['v_bnk_name'];
+                } else{
+                   $bankname=0; 
+                }   
+                
+                if($_REQUEST['v_mode_of_pay']!=''){
+                    $mode_of_pay=$_REQUEST['v_mode_of_pay'];
+                    
+                } else{
+                   $mode_of_pay=0; 
+                }     
+                
+          $localhost=mysqli_connect(HOST_NAME, USER_NAME, PASSWORD,$_SESSION['s_inv_db']);  
+          
+          $log_data_print=mysqli_query($localhost,"INSERT INTO `tbl_vendor_master`(`exp_v_id`, `v_name`, `v_branchid`, `v_address`,"
+                  . " `v_city`, `v_state`, `v_country`, `v_email`, `v_contact_no`, `v_tin_no`, `gst`, `v_srvctax_reg_no`,"
+                  . " `v_pan`, `v_bank_name`, `v_branch_name`, `v_acct_no`, `v_ifsc`, `v_mode_of_pay`, `v_credit_period`, "
+                  . "`v_favour`, `v_conc_name`, `v_conc_desg`, `v_conc_contact`, `v_conc_email`, `v_active`, `cloud_sync`) "
+                  
+                  . "VALUES ('".$cr_vendor5."','".$_REQUEST['v_name']."','1','".$_REQUEST['v_address']."','".$city."',"
+                  . "'".$state."','".$country."',"
+                  . "'".$_REQUEST['v_mail']."','".$_REQUEST['v_number']."','".$_REQUEST['v_st_tin']."','".$_REQUEST['v_st_gst']."',"
+                  . "'".$_REQUEST['v_st_servicetax_no']."','".$_REQUEST['v_st_pan']."','".$bankname."','".$_REQUEST['v_bnk_branch']."',"
+                  . "'".$_REQUEST['v_bnk_accno']."','".$_REQUEST['v_bnk_ifsc']."','".$mode_of_pay."','".$_REQUEST['v_bnk_credit_period']."','".$_REQUEST['v_bnk_favour']."',"
+                  . "'".$_REQUEST['v_con_name']."','".$_REQUEST['v_con_desg']."','".$_REQUEST['v_con_number']."',"
+                  . "'".$_REQUEST['v_con_mail']."','Y','N')");                     
+            }   
+            
+        $sql_kotlist6  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where tlm_ledger_name='".$_REQUEST['v_name']."' "); 
+					$num_kotlist6  = $database->mysqlNumRows($sql_kotlist6);
+					if($num_kotlist6){ 
+                                            
+        $sql_kotlist66  =  $database->mysqlQuery("SELECT MAX(v_id) as v_new_id from tbl_vendor_master "); 
+	$num_kotlist66  = $database->mysqlNumRows($sql_kotlist66);
+	if($num_kotlist66){
+	while($result_kotlist66  = $database->mysqlFetchArray($sql_kotlist66)) 
+	{ 
+                           $cr_vendor=$result_kotlist66['v_new_id'];
+        }
+        }
+                               
+ $sql_kotlist7  =  $database->mysqlQuery("update tbl_ledger_master set tlm_vendor_id='".$cr_vendor."' where tlm_ledger_name='".$_REQUEST['v_name']."' ");
+ 
+          }else{
+                              
+         if($_REQUEST['v_type_entry']=='Credit' || $_REQUEST['v_type_entry']=='Normal' ){            
+             
+             $sql_kotlist  =  $database->mysqlQuery("SELECT MAX(v_id) as v_new_id from tbl_vendor_master "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){$i=0;
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+						  { 
+                                                        $cr_vendor=$result_kotlist['v_new_id'];
+                                                  }
+                                                  }        
+    $cr_id='';
+   
+    $sql_kotlist1  =  $database->mysqlQuery("SELECT tlg_id  from tbl_ledger_group where tlg_name='Sundry Creditors' "); 
+					$num_kotlist1  = $database->mysqlNumRows($sql_kotlist1);
+					if($num_kotlist1){$i=0;
+					while($result_kotlist1  = $database->mysqlFetchArray($sql_kotlist1)) 
+					{ 
+                                               $cr_id=$result_kotlist1['tlg_id'];
+                }
+        }
+        
+      $insertion1['tlm_ledger_name'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_name']);
+      $insertion1['tlm_group'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$cr_id);
+      $insertion1['tlm_vendor_id'] 		=  mysqli_real_escape_string($database->DatabaseLink,$cr_vendor);
+      $insertion1['tlm_open_bal'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_open_bal']);
+      $sql=$database->check_duplicate_entry('tbl_ledger_master',$insertion1);
+	 if($sql!=1)
+	{
+	    $insertid1  =  $database->insert('tbl_ledger_master',$insertion1);
+        } 
+        
+        
+        }
+          }      
+}
+
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='search_vendor'){
+    $string='';
+    if($_REQUEST['v_name']!=''){
+    $string.=" and v_name like '%".$_REQUEST['v_name']."%'   ";
+    }
+     if($_REQUEST['v_num']!=''){
+    $string.=" and v_contact_no like '%".$_REQUEST['v_num']."%'   ";
+     }
+    $tot_bal=0;
+    $sql_kotlist  =  $database->mysqlQuery("SELECT v_id,v_name,v_entry_date,v_entry_type,v_contact_no,v_address from tbl_vendor_master  where v_name!='' $string order by v_entry_date desc"); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){$i=0;
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  { $i++;   
+?>
+                   <tr>
+                   <td style="min-width:50px"><?=$i?></td>
+                   <td  style="min-width:50px"><a onclick="return edit_vendor('<?=$result_kotlist['v_id']?>');" href="#"> <div class="action_button printer_delete"><i class="glyphicon glyphicon-pencil"></i></div></a></td>
+                   <td style="min-width:150px;text-transform: uppercase" title=<?=str_replace(' ', '_',trim($result_kotlist['v_name']));?>><?=substr($result_kotlist['v_name'],0,20)?></td>
+                    <td style="min-width:100px;text-transform: uppercase"><?=$result_kotlist['v_entry_date']?></td>
+                   <td style="min-width:70px"><?=$result_kotlist['v_id']?></td>
+                   <td style="min-width:100px"><?=$result_kotlist['v_entry_type']?></td>
+                   <td style="min-width:100px"><?=$result_kotlist['v_contact_no']?></td>
+                   <td style="min-width:100px"><a onclick="return show_voucher('<?=$result_kotlist['v_id']?>','<?=$result_kotlist['v_name']?>','<?=$result_kotlist['v_entry_type']?>','<?=$result_kotlist['v_address']?>');" class="md-trigger voucher_btn" data-modal="modal-18" href="#">Voucher</a></td>
+                   <td style="min-width:150px;"><?=$result_kotlist['v_address']?></td>
+                   <?php
+                   $inv_amt=0; $return_amt=0; $paid_amt=0;
+                    $sql_kotlist7  =  $database->mysqlQuery("select distinct(sv_invoice_no), sv_invoice_amount  from tbl_supplier_voucher where  sv_vendor_id='".$result_kotlist['v_id']."' "); 
+					$num_kotlist7  = $database->mysqlNumRows($sql_kotlist7);
+					if($num_kotlist7){
+						  while($result_kotlist3  = $database->mysqlFetchArray($sql_kotlist7)) 
+							  { 
+                     $inv_amt=$inv_amt+$result_kotlist3['sv_invoice_amount'];
+              } }
+                                        
+            $sql_kotlist8  =  $database->mysqlQuery("select sum(sv_paid_amount) as paid,sum(sv_return_amount) as return_amount from tbl_supplier_voucher where  sv_vendor_id='".$result_kotlist['v_id']."' group by sv_invoice_no,sv_vendor_id "); 
+					$num_kotlist8  = $database->mysqlNumRows($sql_kotlist8);
+					if($num_kotlist8){
+						  while($result_kotlist35  = $database->mysqlFetchArray($sql_kotlist8)) 
+							  { 
+                  $paid_amt=$paid_amt+$result_kotlist35['paid'];                                                  
+                  $return_amt=$return_amt+$result_kotlist35['return_amount'];                                                
+                } }                
+                $tot_bal=$tot_bal+($inv_amt-$paid_amt-$return_amt);
+                ?>
+               <td style="min-width:100px"><?php  echo number_format(($inv_amt-$paid_amt-$return_amt),$_SESSION['be_decimal']) ?></td>
+                </tr>
+<?php
+} ?>
+                    <tr>
+                                         <td style="min-width:50px">Bal</td>
+                                                 <td style="min-width:50px"></td>
+                                                <td style="min-width:150px"> </td>
+                                                 <td style="min-width:100px"> </td>
+                                                <td style="min-width:70px"> </td>                                              
+                                                 <td style="min-width:100px"></td>
+                                                  <td style="min-width:100px"></td>
+                                                <td style="min-width:100px"></td>
+                                                <td style="min-width:150px"></td>                                          
+                                    <td style="min-width:100px"><?=number_format($tot_bal,$_SESSION['be_decimal'])?></td>                          
+                                 </tr>
+<?php
+ }
+else{
+    ?>
+                  <tr>
+                  <td style="width:5%"></td>
+                  <td  style="width:10%"></td>
+                  <td style="width:20%"></td>
+                  <td style="width:10%"></td>
+                  <td style="width:10%;color: red;font-weight:bold ">NO DATA FOUND</td>
+                  <td style="width:10%;"></td>
+                  <td style="width:10%;"></td>
+                  <td style="width:20%"></td>
+                  <td style="width:10%"></td>
+                  </tr>
+<?php
+}
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='edit_vendor'){
+    $sql_kotlist  =  $database->mysqlQuery("SELECT v_name,v_address,v_email,v_contact_no,v_open_bal,v_tin_no,gst,v_srvctax_reg_no,v_pan,
+    v_bank_name,v_branch_name,v_acct_no,v_ifsc,v_mode_of_pay,v_credit_period,v_favour,v_conc_name,v_conc_desg,v_conc_contact,v_conc_email,
+    v_city,v_state,v_country,v_entry_type from tbl_vendor_master  where v_id='".$_REQUEST['edit_id']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                                          echo  $result_kotlist['v_name'].'*'.$result_kotlist['v_address'].'*'.$result_kotlist['v_email']
+                                       .'*'.$result_kotlist['v_contact_no'].'*'.$result_kotlist['v_open_bal'].'*'.$result_kotlist['v_tin_no']
+                                       .'*'.$result_kotlist['gst'].'*'.$result_kotlist['v_srvctax_reg_no'].'*'.$result_kotlist['v_pan']
+                                        .'*'.$result_kotlist['v_bank_name'].'*'.$result_kotlist['v_branch_name'].'*'.$result_kotlist['v_acct_no']
+                                        .'*'.$result_kotlist['v_ifsc'].'*'.$result_kotlist['v_mode_of_pay'].'*'.$result_kotlist['v_credit_period']
+                                        .'*'.$result_kotlist['v_favour'].'*'.$result_kotlist['v_conc_name'].'*'.$result_kotlist['v_conc_desg']
+                                       .'*'.$result_kotlist['v_conc_contact'].'*'.$result_kotlist['v_conc_email']
+                                         .'*'.$result_kotlist['v_city'].'*'.$result_kotlist['v_state'].'*'.$result_kotlist['v_country'].'*'.$result_kotlist['v_entry_type']  ;               
+      
+          $sql_kotlist  =  $database->mysqlQuery("SELECT se_statename from tbl_state  where se_stateid='".$result_kotlist['v_state']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist1  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                 echo '*'.$result_kotlist1['se_statename'];
+                 }
+              }                                  
+          $sql_kotlist  =  $database->mysqlQuery("SELECT cy_countryname from tbl_country  where cy_countyid='".$result_kotlist['v_country']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist2  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                  echo '*'.$result_kotlist2['cy_countryname'];
+                  }
+                 }   }}
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='update_vendor'){
+    if($_REQUEST['v_city']!=''){    
+       $query3=$database->mysqlQuery("UPDATE `tbl_vendor_master` SET `v_name`='".$_REQUEST['v_name']."',
+           `v_address`='".$_REQUEST['v_address']."',`v_city`='".$_REQUEST['v_city']."',`v_state`='".$_REQUEST['v_state']."',"
+               . "`v_country`='".$_REQUEST['v_country']."',
+               `v_email`='".$_REQUEST['v_mail']."',
+           `v_contact_no`='".$_REQUEST['v_number']."',`v_open_bal`='".$_REQUEST['v_open_bal']."',`v_tin_no`='".$_REQUEST['v_st_tin']."',
+               `gst`='".$_REQUEST['v_st_gst']."',
+           `v_srvctax_reg_no`='".$_REQUEST['v_st_servicetax_no']."',`v_pan`='".$_REQUEST['v_st_pan']."',`v_bank_name`='".$_REQUEST['v_bnk_name']."',"
+               . "`v_branch_name`='".$_REQUEST['v_bnk_branch']."',
+           `v_acct_no`='".$_REQUEST['v_bnk_accno']."',`v_ifsc`='".$_REQUEST['v_bnk_ifsc']."',`v_mode_of_pay`='".$_REQUEST['v_bnk_modepay']."',
+               `v_credit_period`='".$_REQUEST['v_bnk_credit_period']."',
+           `v_favour`='".$_REQUEST['v_bnk_favour']."',`v_conc_name`='".$_REQUEST['v_con_name']."',`v_conc_desg`='".$_REQUEST['v_con_desg']."',"
+               . "`v_conc_contact`='".$_REQUEST['v_con_number']."',
+           `v_conc_email`='".$_REQUEST['v_con_mail']."',v_entry_type='".$_REQUEST['v_type_entry']."'  WHERE v_id='".$_REQUEST['v_id']."' ");
+
+         if($_SESSION['s_invtorylink']!=''){
+                if($_REQUEST['v_city']!=''){
+                    $city=$_REQUEST['v_city'];                                       
+                    if($_REQUEST['v_state']!=''){
+                    $state=$_REQUEST['v_state'];                   
+                } else{
+                   $state=0; 
+                }                                 
+                if($_REQUEST['v_country']!=''){
+                    $country=$_REQUEST['v_country'];                  
+                } else{
+                   $country=0; 
+                }                     
+                } else{
+                   $city=0; 
+                   $state=0;
+                   $country=0;
+                }                     
+                if($_REQUEST['v_bnk_name']!=''){
+                    $bankname=$_REQUEST['v_bnk_name'];                  
+                } else{
+                   $bankname=0; 
+                }                  
+                if($_REQUEST['v_mode_of_pay']!=''){
+                    $mode_of_pay=$_REQUEST['v_mode_of_pay'];                   
+                } else{
+                   $mode_of_pay=0; 
+                }              
+        $localhost=mysqli_connect(HOST_NAME, USER_NAME, PASSWORD,$_SESSION['s_inv_db']);             
+          $log_data_print=mysqli_query($localhost,"update tbl_vendor_master set v_name='".$_REQUEST['v_name']."', v_address='".$_REQUEST['v_address']."' ,"
+                  . " v_city='".$city."', v_state='".$state."', v_country='".$country."', v_email='".$_REQUEST['v_mail']."', "
+                  . "v_contact_no='".$_REQUEST['v_number']."', v_tin_no='".$_REQUEST['v_st_tin']."', gst='".$_REQUEST['v_st_gst']."', "
+                  . "v_srvctax_reg_no='".$_REQUEST['v_st_servicetax_no']."',"
+                  . " v_pan='".$_REQUEST['v_st_pan']."', v_bank_name='".$bankname."', v_branch_name='".$_REQUEST['v_bnk_branch']."', "
+                  . "v_acct_no='".$_REQUEST['v_bnk_accno']."', v_ifsc='".$_REQUEST['v_bnk_ifsc']."', v_mode_of_pay='".$mode_of_pay."',"
+                  . " v_credit_period='".$_REQUEST['v_bnk_credit_period']."', "
+             . "v_favour='".$_REQUEST['v_bnk_favour']."', v_conc_name='".$_REQUEST['v_con_name']."', v_conc_desg='".$_REQUEST['v_con_desg']."',"
+                  . " v_conc_contact='".$_REQUEST['v_con_number']."', v_conc_email='".$_REQUEST['v_con_mail']."'  where exp_v_id='".$_REQUEST['v_id']."' ");                 
+            }      
+    }else{
+       $query3=$database->mysqlQuery("UPDATE `tbl_vendor_master` SET `v_name`='".$_REQUEST['v_name']."',
+           `v_address`='".$_REQUEST['v_address']."',`v_city`=NULL,`v_state`=NULL,"
+               . "`v_country`=NULL,
+               `v_email`='".$_REQUEST['v_mail']."',
+           `v_contact_no`='".$_REQUEST['v_number']."',`v_open_bal`='".$_REQUEST['v_open_bal']."',`v_tin_no`='".$_REQUEST['v_st_tin']."',
+               `gst`='".$_REQUEST['v_st_gst']."',
+           `v_srvctax_reg_no`='".$_REQUEST['v_st_servicetax_no']."',`v_pan`='".$_REQUEST['v_st_pan']."',`v_bank_name`='".$_REQUEST['v_bnk_name']."',"
+               . "`v_branch_name`='".$_REQUEST['v_bnk_branch']."',
+           `v_acct_no`='".$_REQUEST['v_bnk_accno']."',`v_ifsc`='".$_REQUEST['v_bnk_ifsc']."',`v_mode_of_pay`='".$_REQUEST['v_bnk_modepay']."',
+               `v_credit_period`='".$_REQUEST['v_bnk_credit_period']."',
+           `v_favour`='".$_REQUEST['v_bnk_favour']."',`v_conc_name`='".$_REQUEST['v_con_name']."',`v_conc_desg`='".$_REQUEST['v_con_desg']."',"
+               . "`v_conc_contact`='".$_REQUEST['v_con_number']."',
+           `v_conc_email`='".$_REQUEST['v_con_mail']."',v_entry_type='".$_REQUEST['v_type_entry']."'  WHERE v_id='".$_REQUEST['v_id']."' ");
+
+       if($_SESSION['s_invtorylink']!=''){
+                if($_REQUEST['v_city']!=''){
+                    $city=$_REQUEST['v_city'];
+                    if($_REQUEST['v_state']!=''){
+                    $state=$_REQUEST['v_state'];                 
+                } else{
+                   $state=0; 
+                }   
+                if($_REQUEST['v_country']!=''){
+                    $country=$_REQUEST['v_country'];
+                    
+                } else{
+                   $country=0; 
+                }                    
+                } else{
+                   $city=0; 
+                   $state=0;
+                   $country=0;
+                }                     
+                if($_REQUEST['v_bnk_name']!=''){
+                    $bankname=$_REQUEST['v_bnk_name'];                  
+                } else{
+                   $bankname=0; 
+                }                 
+                if($_REQUEST['v_mode_of_pay']!=''){
+                    $mode_of_pay=$_REQUEST['v_mode_of_pay'];
+                    
+                } else{
+                   $mode_of_pay=0; 
+                }   
+              $localhost=mysqli_connect(HOST_NAME, USER_NAME, PASSWORD,$_SESSION['s_inv_db']);            
+          $log_data_print=mysqli_query($localhost,"update tbl_vendor_master set v_name='".$_REQUEST['v_name']."', v_address='".$_REQUEST['v_address']."' ,"
+                  . " v_city=NULL, v_state=NULL, v_country=NULL, v_email='".$_REQUEST['v_mail']."', "
+                  . "v_contact_no='".$_REQUEST['v_number']."', v_tin_no='".$_REQUEST['v_st_tin']."', gst='".$_REQUEST['v_st_gst']."', "
+                  . "v_srvctax_reg_no='".$_REQUEST['v_st_servicetax_no']."',"
+                  . " v_pan='".$_REQUEST['v_st_pan']."', v_bank_name='".$bankname."', v_branch_name='".$_REQUEST['v_bnk_branch']."', "
+                  . "v_acct_no='".$_REQUEST['v_bnk_accno']."', v_ifsc='".$_REQUEST['v_bnk_ifsc']."', v_mode_of_pay='".$mode_of_pay."',"
+                  . " v_credit_period='".$_REQUEST['v_bnk_credit_period']."', "
+             . "v_favour='".$_REQUEST['v_bnk_favour']."', v_conc_name='".$_REQUEST['v_con_name']."', v_conc_desg='".$_REQUEST['v_con_desg']."',"
+                  . " v_conc_contact='".$_REQUEST['v_con_number']."', v_conc_email='".$_REQUEST['v_con_mail']."'  where exp_v_id='".$_REQUEST['v_id']."' ");
+            }      
+    }
+    if($_REQUEST['v_type_entry']=='Credit'){  
+     $query3=$database->mysqlQuery("UPDATE `tbl_ledger_master` SET `tlm_ledger_name`='".$_REQUEST['v_name']."' WHERE tlm_vendor_id='".$_REQUEST['v_id']."' ");
+    }
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='update_vendor_balance'){ 
+
+        $date=date('Y-m-d');   
+        $insertion['sv_vendor_id'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['update_id']);
+        if($_REQUEST['v_date']!=''){
+         $insertion['sv_date'] 		               =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_date']);
+        }
+        $insertion['sv_address'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_address']);
+        $insertion['sv_invoice_no'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_inv']);
+        $insertion['sv_invoice_amount'] 	        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_inv_amount']);
+        $insertion['sv_from'] 		               =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_from']);
+        $insertion['sv_paid_amount'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_paid_amt']);
+        $insertion['sv_trn_detail'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_trn_detail']); 
+        $insertion['sv_remarks'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_remark']);
+        $insertion['sv_entry_type'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['vendor_typ']);        
+        $insertion['sv_entry_date'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$date);
+        $insertion['sv_credit_amount'] 	       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_credit_amount']);        
+        $insertion['sv_purchase_type'] 	       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_purchase_type']);   
+        
+         if($_REQUEST['v_credit_amount']>0){
+              $insertion['sv_paid_fully'] 		       =  mysqli_real_escape_string($database->DatabaseLink,'N');              
+         }else{              
+               $insertion['sv_paid_fully'] 		       =  mysqli_real_escape_string($database->DatabaseLink,'Y');
+               $sql_kotlist  =  $database->mysqlQuery("update tbl_supplier_voucher set sv_paid_fully='Y' where sv_vendor_id='".$_REQUEST['update_id']."' and sv_invoice_no='".$_REQUEST['v_inv']."' "); 
+        }
+           
+         $entry_time=date('Y-m-d H:i:s'); 
+         $insertion['sv_entry_time'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$entry_time); 
+         $insertion['sv_login'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_SESSION['expodine_id']); 
+         $insertion['sv_type_pay'] 		       =  mysqli_real_escape_string($database->DatabaseLink,'Partial');  
+         
+         $sql=$database->check_duplicate_entry('tbl_supplier_voucher',$insertion);
+	 if($sql!=1)
+	 {
+             $insertid =  $database->insert('tbl_supplier_voucher',$insertion);
+         }   
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='add_vendor_voucher'){
+    
+    
+    
+        $date=date('Y-m-d');   
+        $insertion['sv_vendor_id'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['vendor_id']);
+        if($_REQUEST['v_date']!=''){
+        $insertion['sv_date'] 		               =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_date']);
+        }
+        $insertion['sv_address'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_address']);
+        $insertion['sv_invoice_no'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_invoice']);
+        $insertion['sv_invoice_amount'] 	        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_invoice_amount']);
+        $insertion['sv_from'] 		               =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_from']);
+        $insertion['sv_paid_amount'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_paid_amount']);
+        $insertion['sv_trn_detail'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_trn_detail']); 
+        $insertion['sv_remarks'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_remarks']);
+        $insertion['sv_entry_type'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['vendor_typ']);
+        $insertion['sv_entry_date'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$date);
+         $insertion['sv_credit_amount'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_credit_amount']);
+       $insertion['sv_purchase_type'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_purchase_type']);
+        if($_REQUEST['v_dis']!=''){
+         $insertion['sv_discount'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_dis']);
+           }          
+           if($_REQUEST['v_subtotal']!=''){
+                 $insertion['sv_subtotal'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_subtotal']);
+           }            
+           if($_REQUEST['v_tax']!=''){
+         $insertion['sv_tax'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['v_tax']);
+           } 
+           if($_REQUEST['v_credit_amount']>0){              
+               $insertion['sv_paid_fully'] 		       =  mysqli_real_escape_string($database->DatabaseLink,'N');              
+           }else{
+               
+               $insertion['sv_paid_fully'] 		       =  mysqli_real_escape_string($database->DatabaseLink,'Y');
+               
+           }
+            $insertion['sv_type_pay'] 		       =  mysqli_real_escape_string($database->DatabaseLink,'First');  
+             
+            
+             $entry_time=date('Y-m-d H:i:s'); 
+         $insertion['sv_entry_time'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$entry_time); 
+        
+        $insertion['sv_login'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_SESSION['expodine_id']);  
+         
+        $sql=$database->check_duplicate_entry('tbl_supplier_voucher',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_supplier_voucher',$insertion);
+         } 
+    
+  
+    
+}else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='search_multi_voucher'){
+    
+  
+    $string='';
+    
+    if($_REQUEST['v_name']!=''){
+        $string.=" and tv.v_name like '%".$_REQUEST['v_name']."%'   ";
+    }
+    
+     if($_REQUEST['search_inv_no']!=''){
+        $string.=" and ts.sv_invoice_no like '%".$_REQUEST['search_inv_no']."%'   ";
+    }
+    
+     if($_REQUEST['search_type']!=''){
+        $string.=" and ts.sv_purchase_type = '".$_REQUEST['search_type']."'   ";
+    }
+    
+     if($_REQUEST['search_tax_type']!=''){
+         
+     if($_REQUEST['search_tax_type']=='vat'){
+         
+         $string.=" and ts.sv_tax > '0' and ts.sv_type_pay='First'  ";
+    
+    }else{
+        
+        $string.=" and ts.sv_tax = '0' and ts.sv_type_pay='First'  ";
+    }
+     }
+
+    $pd='yes';
+    if($_REQUEST['search_payment_type']!=''){
+    
+    if($_REQUEST['search_payment_type']=='paid'){
+        
+        $string.=" and ts.sv_paid_amount > '0' ";
+        
+        $pd='no';
+    
+       }else{
+           $string.=" and  ts.sv_entry_type='Credit'  and ts.sv_paid_fully= 'N' and ts.sv_type_pay='First'  "; 
+       }
+     }
+    
+    if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{
+			$string.= " and  ts.sv_date between '".$_REQUEST['fromdt']."' and '".$_REQUEST['todt']."' ";            
+		}
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{
+			$to=date("Y-m-d");
+			$string.= " and  ts.sv_date between '".$_REQUEST['fromdt']."' and '".$to."' ";            
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");
+			$string.= " and ts.sv_date between '".$from."' and '".$_REQUEST['todt']."' ";            
+		}
+                else
+                {
+                  $to=date("Y-m-d"); $from=date("Y-m-d");
+                  $string.= " and  ts.sv_date between '".$from."' and '".$to."' ";
+                  $string .="";
+                }
+    
+    
+    $inv_amount=0; $sub_amount=0; $tax_amount=0;
+    $bal=''; $show=''; $pagination=''; $bal_sv=0;
+    ////multi voucher////   
+    $tot_paid_sup=0; $tot_sv_invoice_amount=0; $tot_credit=0;
+   
+    $sql_kotlist  =  $database->mysqlQuery("SELECT sv_date,sv_id,sv_entry_type,sv_credit_amount,sv_return_amount,
+    sv_invoice_no,sv_vendor_id,v_name,sv_remarks,sv_subtotal,sv_tax,sv_invoice_amount,sv_address,sv_entry_date,
+    tlm_ledger_name,sv_paid_amount,sv_type_pay from tbl_supplier_voucher ts  left join  tbl_vendor_master tv on tv.v_id=ts.sv_vendor_id 
+    left join tbl_ledger_master tm on tm.tlm_id=ts.sv_from  where ts.sv_type_pay='First' and ts.sv_paid_fully= 'N'
+    and tv.v_name!='' $string order by ts.sv_id desc "); 
+    
+    $num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+ 
+    $data="";	
+    
+		  if($num_kotlist){
+                                
+                    $data.= '<tr  style=" text-decoration:underline">'.
+                    '<td style="min-width: 61px;max-width: 61px"><input style="margin-left: 9px;" type="checkbox" id="toggleCheck"> &nbsp;Sl</td>'.
+                  
+                     '<td style="min-width: 100px;max-width: 100px;">Supplier</td>'.
+                            
+                    '<td style="min-width: 100px;max-width: 100px;">Date</td>'.
+                    
+                    '<td style="min-width: 80px;max-width: 80px;">Invoice</td>'.
+                            
+                    '<td style="min-width: 80px;max-width: 80px;">Balance</td>'.
+                            
+                    '<td style="min-width: 80px;max-width: 80px;">Amount To Pay</td>'.
+                 
+                    '</tr>'; 
+                                
+                    $i=1;
+		    while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+		    {    
+                     
+                    $paid_sv=0;    
+                    $sql_kotlist8  =  $database->mysqlQuery("SELECT sum(sv_paid_amount) as paid from tbl_supplier_voucher
+                    where sv_invoice_no='".$result_kotlist['sv_invoice_no']."' "); 
+                    $num_kotlist8  = $database->mysqlNumRows($sql_kotlist8);
+                    if($num_kotlist8){
+                    while($result_kotlist8  = $database->mysqlFetchArray($sql_kotlist8)) 
+		    {  
+                      
+                         $paid_sv=$result_kotlist8['paid'];
+                    }  
+                       
+                    }
+                    
+                    
+                    $bal_sv=($result_kotlist['sv_invoice_amount']-$paid_sv);
+                        
+                    $v_name_escaped = htmlspecialchars($result_kotlist['v_name'], ENT_QUOTES);      
+                  
+                    $data.= '<tr class="bill-item" data-inv='.$result_kotlist['sv_invoice_no'].' data-paid='.$bal_sv.' '
+                    . ' data-address='.$result_kotlist['sv_address'].'   data-inv_amount='.$result_kotlist['sv_invoice_amount'].' '
+                    . ' data-vendor='.$result_kotlist['sv_vendor_id'].'  data-svid='.$result_kotlist['sv_id'].'  >'.
+                      
+                     '<td style="min-width: 61px;max-width: 61px"><input class="bill-check" type="checkbox" id=""> &nbsp;'.$i.'</td>'.
+                            
+                     '<td style="min-width: 100px;max-width: 100px;">'.$result_kotlist['v_name'].'</td>'.        
+                            
+                     '<td style="min-width: 100px;max-width: 100px;">'.$result_kotlist['sv_date'].'</td>'.
+                    
+                     '<td style="min-width: 80px;max-width: 80px;">'.$result_kotlist['sv_invoice_no'].'</td>'.
+                            
+                      '<td style="min-width: 80px;max-width: 80px;">'.$bal_sv.'</td>'.      
+                            
+                     '<td style="min-width: 80px;max-width: 80px;"><input style="width:50px" type="text" value="'.$bal_sv.'" id="bal_multi_'.$result_kotlist['sv_id'].'">    </td>'.
+                 
+                    '</tr>';
+                    
+                    $inv_amount=$inv_amount+($result_kotlist['sv_invoice_amount']-$paid_sv);
+      
+                    $i++;
+
+             }
+ 
+            $data .='<tr>'.
+            '<td style=" min-width: 61px;max-width: 61px;" >Total</td>'.
+            '<td style=" min-width: 100px;max-width: 100px;"></td>'.
+            '<td style=" min-width: 100px;max-width: 100px;"></td>'.
+            '<td style=" min-width: 85px;max-width: 85px;"></td>'.
+            '<td style=" min-width: 80px;max-width: 80px;">'.$inv_amount.'</td>'.
+            '<td style=" min-width: 80px;max-width: 80px;"></td>'.        
+            '</tr>';  
+            
+  
+   }else{
+       
+      $data .='<tr>'.
+      '<td colspan="10" style="min-width:200px;color: darkred;font-weight: bold;padding-right: 0px;"> *** NO INVOICES TO PAY ON SELECTED DATE ***</td>'.
+      '</tr>';
+   }
+        $satas = array('data' => $data, 'show' => $show,'pagination'=>$pagination);
+
+        echo json_encode($satas);
+}    
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='search_vendor_voucher'){
+    
+  $limit = 100;
+  if(isset($_REQUEST['page']))
+  {
+  $page = $_REQUEST['page'];
+  }
+  else
+  {
+  $page= 1;
+  }
+
+  $start_from = ($page-1)*$limit;
+    $string='';
+    if($_REQUEST['v_name']!=''){
+    $string.=" and tv.v_name like '%".$_REQUEST['v_name']."%'   ";
+    }
+    
+     if($_REQUEST['search_inv_no']!=''){
+    $string.=" and ts.sv_invoice_no like '%".$_REQUEST['search_inv_no']."%'   ";
+    }
+    
+     if($_REQUEST['search_type']!=''){
+    $string.=" and ts.sv_purchase_type = '".$_REQUEST['search_type']."'   ";
+    }
+    
+     if($_REQUEST['search_tax_type']!=''){
+         
+     if($_REQUEST['search_tax_type']=='vat'){
+         
+    $string.=" and ts.sv_tax > '0' and ts.sv_type_pay='First'  ";
+    
+    }else{
+        
+        $string.=" and ts.sv_tax = '0' and ts.sv_type_pay='First'  ";
+    }
+     }
+
+    $pd='yes';
+     if($_REQUEST['search_payment_type']!=''){
+    
+    if($_REQUEST['search_payment_type']=='paid'){
+        
+        $string.=" and ts.sv_paid_amount > '0' ";
+        
+        $pd='no';
+    
+       }else{
+       $string.=" and  ts.sv_entry_type='Credit'  and ts.sv_paid_fully= 'N' and ts.sv_type_pay='First'  "; 
+        }
+     }
+    
+    if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{
+			$string.= " and  ts.sv_date between '".$_REQUEST['fromdt']."' and '".$_REQUEST['todt']."' ";            
+		}
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{
+			$to=date("Y-m-d");
+			$string.= " and  ts.sv_date between '".$_REQUEST['fromdt']."' and '".$to."' ";            
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");
+			$string.= " and ts.sv_date between '".$from."' and '".$_REQUEST['todt']."' ";            
+		}
+    else
+    {
+      $to=date("Y-m-d");
+      $from=date("Y-m-d");
+      $string.= " and  ts.sv_date between '".$from."' and '".$to."' ";
+      $string .="";
+    }
+       $inv_amount=0;
+       $sub_amount=0;
+       $tax_amount=0;
+
+       
+    $tot_paid_sup=0; $tot_sv_invoice_amount=0; $tot_credit=0;
+    $sql_kotlist  =  $database->mysqlQuery("SELECT sv_date,sv_id,sv_entry_type,sv_credit_amount,sv_return_amount,
+    sv_invoice_no,sv_vendor_id,v_name,sv_remarks,sv_subtotal,sv_tax,sv_invoice_amount,sv_address,sv_entry_date,
+    tlm_ledger_name,sv_paid_amount,sv_type_pay from tbl_supplier_voucher ts  left join  tbl_vendor_master tv on tv.v_id=ts.sv_vendor_id 
+    left join tbl_ledger_master tm on tm.tlm_id=ts.sv_from  where tv.v_name!='' $string order by ts.sv_id desc LIMIT $start_from,$limit"); 
+    $num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+ 
+    $sql_kotlist_toal  =  $database->mysqlQuery("SELECT sv_date,sv_id from tbl_supplier_voucher ts  left join  
+    tbl_vendor_master tv on tv.v_id=ts.sv_vendor_id 
+    left join tbl_ledger_master tm on tm.tlm_id=ts.sv_from  where tv.v_name!='' $string order by ts.sv_id desc"); 
+    $num_kotlist_total   = $database->mysqlNumRows($sql_kotlist_toal);
+    $total_pages = ceil($num_kotlist_total/$limit);
+
+    $show="";
+    $data="";	
+    $pagination ="";
+			    if($num_kotlist){$i=0;
+                            $i=$start_from+1;
+			    while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {    
+                  $v_name_escaped = htmlspecialchars($result_kotlist['v_name'], ENT_QUOTES);             
+                  $data.= '<tr>'.
+                   '<td style="min-width: 61px;max-width: 61px">'.$i.'</td>'.
+                   '<td  style="min-width: 100px;max-width: 100px;">'.
+                   '<a onclick="return edit_vendor('.$result_kotlist['sv_id'].');" href="#"> <div class="action_button printer_delete"><i class="glyphicon glyphicon-pencil"></i>'.
+                   '</div></a>';
+
+                       if($result_kotlist['sv_entry_type']=='Credit'  && $result_kotlist['sv_credit_amount'] > 0 && $result_kotlist['sv_return_amount']==0 ){
+                           
+                       error_reporting(0);
+                       if(($aa!=$result_kotlist['sv_invoice_no'] || $bb!=$result_kotlist['sv_vendor_id']) && $pd=='yes'){       
+                           
+                           $aa=$result_kotlist['sv_invoice_no'];
+                           $bb=$result_kotlist['sv_vendor_id'];    
+                           
+                               $sql_kotlist9  =  $database->mysqlQuery("SELECT sum(sv_paid_amount) as paid,sv_invoice_amount,sum(sv_return_amount) as rt from tbl_supplier_voucher where sv_invoice_no='".$result_kotlist['sv_invoice_no']."' and sv_vendor_id='".$result_kotlist['sv_vendor_id']."'  "); 
+			        $num_kotlist9  = $database->mysqlNumRows($sql_kotlist9);
+				if($num_kotlist9){
+				while($result_kotlist9  = $database->mysqlFetchArray($sql_kotlist9)) 
+				{    
+                                    
+                if(($result_kotlist9['paid']+$result_kotlist9['rt']) != $result_kotlist9['sv_invoice_amount']){ 
+                
+                $data .='<a onclick="return add_bal_pay(\''.$result_kotlist['sv_invoice_no'].'\','.$result_kotlist['sv_vendor_id'].')" href="#"> <div class="action_button printer_delete"><i class="glyphicon glyphicon-plus"></i>'.
+                '</div></a>';    
+                
+                  }   }}    } else{ 
+                       
+                $data .='<a  href="#"> <div class="action_button printer_delete"><i class="glyphicon glyphicon- "></i>'.
+                           '</div></a>';
+                       
+                       } } else{ 
+                $data .='<a  href="#"> <div class="action_button printer_delete"><i class="glyphicon glyphicon- "></i>'.
+                           '</div></a>';
+                         }
+                         
+                         if($result_kotlist['sv_return_amount'] > 0 ){
+                         
+                       $data .='<a style="background-color: darkred " onclick="return return_pay('.$result_kotlist['sv_id'].','.$result_kotlist['sv_invoice_no'].','.$result_kotlist['sv_vendor_id'].','.$result_kotlist['sv_return_amount']. ',\''
+                       . $v_name_escaped . '\')" href="#"> <div class="action_button printer_delete"><i class="glyphicon glyphicon-plus "></i></div></a>';
+                         } 
+        
+                  
+                       $data .='<a target="_blank"  href="print_voucher.php?type=supplier_voucher&id='.$result_kotlist['sv_id'].'" > <div class="action_button printer_delete"><i class="glyphicon glyphicon-print"></i> </div> </a>';
+                       
+                       
+                       if($_SESSION['expodine_id']=='admin'){ 
+                        $data .='<a onclick="return delete_supplier_voucher('.$result_kotlist['sv_id'].');" href="#"> <div style="color:red" class="action_button printer_delete"><i class="glyphicon glyphicon-remove"></i>'.
+                         '</div></a>';
+                        }      
+              $data .='</td>'.
+                   '<td style="min-width: 150px;max-width: 150px;text-transform: uppercase">'.$result_kotlist['v_name'].'</td>'.  
+                    '<td style="min-width: 100px;max-width: 100px;">'.$result_kotlist['sv_date'].'</td>'.
+                    '<td style="min-width:200px;max-width:200px;overflow-wrap: break-word;word-break: break-word;">'.$result_kotlist['sv_remarks'].'</td>'.
+                    '<td style="min-width: 80px;max-width: 80px;">'.$result_kotlist['sv_invoice_no'].'</td>'.
+                    '<td style="min-width: 80px;max-width: 80px;">'.$result_kotlist['sv_subtotal'].'</td>'.
+                    '<td style="min-width: 80px;max-width: 80px;">'.$result_kotlist['sv_tax'].'</td>'.
+                    '<td style="min-width: 80px;max-width: 80px;">'.$result_kotlist['sv_invoice_amount'].'</td>'.
+                    '<td style="min-width: 80px;max-width: 80px;">'.$result_kotlist['sv_paid_amount'].'</td>';
+                    $data .=   '<td style="min-width: 80px;max-width: 80px;">'.$result_kotlist['sv_credit_amount'].'</td>';     
+//                       if($result_kotlist['sv_entry_type']=='Credit'){  
+//                        $data .= '<td style="min-width: 80px;max-width: 80px;">0</td>';   
+//                       }else{
+//                         $data .=   '<td style="min-width: 80px;max-width: 80px;">'.$result_kotlist['sv_credit_amount'].'</td>';   
+//                       }
+                      
+                    $data .= '<td style="min-width: 80px;max-width: 80px;">'.$result_kotlist['sv_entry_type'].'</td>'.
+                    '<td style="min-width: 200px;max-width: 200px;">'.$result_kotlist['sv_address'].'</td>'.                  
+                    '<td style="min-width:70px;max-width: 70px;">'.$result_kotlist['sv_entry_date'].'</td>'.
+                    '<td style="min-width:70px;max-width: 70px;">'.$result_kotlist['sv_id'].'</td>'.
+                    '<td style="min-width:70px;max-width: 70px;">'.$result_kotlist['tlm_ledger_name'].'</td>'.
+                    '<td style="min-width:70px;max-width: 70px;">'.$result_kotlist['sv_return_amount'].'</td>'.
+                    '</tr>';
+                    
+   if($result_kotlist['sv_type_pay']=='First'){
+       
+       $inv_amount=$inv_amount+$result_kotlist['sv_invoice_amount'];
+       $sub_amount=$sub_amount+$result_kotlist['sv_subtotal'];
+       $tax_amount=$tax_amount+$result_kotlist['sv_tax'];
+   }
+        $tot_paid_sup=$tot_paid_sup+$result_kotlist['sv_paid_amount'];
+        $tot_sv_invoice_amount=$tot_sv_invoice_amount+$result_kotlist['sv_invoice_amount'];
+        $tot_credit = $tot_credit+$result_kotlist['sv_credit_amount'];
+        $i++;
+
+   }
+ 
+    $data .='<tr>'.
+            '<td style=" min-width: 61px">Total</td>'.
+            '<td style=" min-width: 100px;"></td>'.
+            '<td style=" min-width: 150px;"> </td>'.
+            '<td style=" min-width: 100px;"> </td>'.
+            '<td style="min-width:200px"></td>'.
+            '<td style=" min-width: 80px"> </td>'.
+            '<td style=" min-width: 80px">'.$sub_amount.'</td>'.
+            '<td style=" min-width: 80px">'.$tax_amount.'</td>'.
+            '<td style=" min-width: 80px">'.$inv_amount.'</td>'.
+            '<td style=" min-width: 80px">'.$tot_paid_sup.'</td>';
+                                               
+            if($pd=='no'){
+            $data .='<td style=" min-width: 80px"></td>';
+            }else{ 
+            $bal = $tot_credit;
+           
+            $data .='<td style=" min-width: 80px">'.($inv_amount-$tot_paid_sup).'</td>';
+            } 
+            $data .='<td style=" min-width: 80px"> </td>'.
+                    '<td style=" min-width: 200px"></td>'.
+                    '<td style="min-width:70px;"> </td>'.
+                    '<td style="min-width:70px;"> </td>'.
+                    '<td style="min-width:70px;"> </td>'.
+                    '<td style="min-width:70px;"> </td>'.
+                  
+                    '</tr>';                 
+  $start = $start_from+1;
+  $end = $i-1;
+  if($num_kotlist_total>$limit){
+  $show = '<div>'
+  .'<p style="width: auto;color: #333;font-size: 15px;font-weight:bold" >Showing '.$start.' to '.$end.' of '.$num_kotlist_total.'</p> </div>';
+      $page_1=$page-1;
+      $page_2=$page-2;
+      $page_4 = $page-4;
+      $page_3 = $page-3;
+      $page_p1=$page+1;
+      $page_p2=$page+2;
+      $page_p3=$page+3;
+      $page_p4=$page+4;
+      $last = $total_pages-4;
+     $pagination .='<nav class="pagination_1" aria-label="Page navigation example" style="">'.
+                  '<ul class="pagination justify-content-end">';
+      if($total_pages==1)
+     { 
+      $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>'.
+                    '<li class="page-item active "><a class="page-link" onClick="search_vendor('.$page.')">'.$page.'</a></li>'.  
+                    '<li class="page-item disabled"><a class="page-link" >>></a></li>';
+     }
+     else if($total_pages==2)
+     { 
+      $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>';
+      for($i=1; $i<=2; $i++){ 
+        if($i==$page)
+        {
+          $active ='active';
+        }
+        else{
+          $active = '';
+        }
+      $pagination .='<li class="page-item '.$active.'"><a class="page-link" onClick="search_vendor('.$i.')">'.$i.'</a></li>';
+      } 
+        $pagination .='<li class="page-item disabled"><a class="page-link" onClick="search_vendor('.$page_p1.')">>></a></li>';
+      }
+      else if($total_pages==3)
+      { 
+         $pagination .='<li class="page-item disabled"><a class="page-link" onClick="search_vendor('.$page_1.')"><<</a></li>';
+      
+        for($i=1; $i<=3; $i++){ 
+         if($i==$page)
+         {
+           $active ='active';
+         }
+         else{
+           $active ='';
+         }
+       $pagination .='<li class="page-item '.$active.'"><a class="page-link" onClick="search_vendor('.$i.')">'.$i.'</a></li>';
+       } 
+         $pagination .='<li class="page-item disabled"><a class="page-link" >>></a></li>';
+       }
+     else if($page==$total_pages){ 
+        $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor(1)">First</a></li>'.
+                      '<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_4.')"><<</a></li>'.
+                      '<li class="page-item "><a class="page-link" onClick="search_vendor('.$page_2.')">'.$page_2.'</a></li>'.
+                      '<li class="page-item  "><a class="page-link" onClick="search_vendor('.$page_1.')">'.$page_1.'</a></li>'. 
+                       '<li class="page-item active"><a class="page-link" onClick="search_vendor('.$page.')">'.$page.'</a></li>';
+   }
+   else { 
+    if($page==1)
+    {     
+      $pagination .='<li class="page-item active "><a class="page-link" onClick="search_vendor('.$page.')">'.$page.'</a></li>'.
+                    '<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_p1.')">'.$page_p1.'</a></li>'.
+                    '<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_p2.')">'.$page_p2.'</a></li>';
+      } 
+      else 
+      {
+      $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor(1)">First</a></li>';
+      if($page>2){
+      $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_3.')"><<</a></li>';
+      }
+      else{
+        $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_1.')"><<</a></li>';
+      }
+      $pagination .='<li class="page-item "><a class="page-link" onClick="search_vendor('.$page_1.')">'.$page_1.'</a></li>'.
+                    '<li class="page-item active"><a class="page-link" onClick="search_vendor('.$page.')">'.$page.'</a></li>'.
+                    '<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_p1.')">'.$page_p1.'</a></li>';
+          } 
+       if($page==1) {
+        $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_p4.')">>></a></li>';
+       } 
+      else if($page>1 && $page<$last) {
+            $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_p3.')">>></a></li>';
+      }
+      else{
+        $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_p1.')">>></a></li>';
+      }
+   
+          $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor('.$total_pages.')">Last</a></li>';
+  }
+  $pagination .='</ul></nav>';
+}
+else{
+  $pagination="";
+  $show ="";
+}
+}else{
+      $data .='<tr>'.
+              '<td colspan="10" style="min-width:200px;color: darkred;font-weight: bold;padding-right: 643px;">NO DATA</td>'.
+              '</tr>';
+}
+$satas = array('data' => $data, 'show' => $show,'pagination'=>$pagination);
+
+echo json_encode($satas);
+}                                        
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='edit_vendor_voucher'){
+    $sql_kotlist  =  $database->mysqlQuery("SELECT v_name,v_id,sv_date,sv_address,sv_invoice_no,sv_invoice_amount,sv_from,sv_paid_amount,sv_trn_detail,sv_remarks,sv_credit_amount,sv_entry_type,sv_discount,sv_purchase_type
+     from tbl_supplier_voucher ts  left join  tbl_vendor_master tv on tv.v_id=ts.sv_vendor_id where ts.sv_id='".$_REQUEST['edit_id']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                                           echo $result_kotlist['v_name'].'*'.$result_kotlist['v_id'].'*'.$result_kotlist['sv_date'].'*'.$result_kotlist['sv_address'].'*'
+                                                   .$result_kotlist['sv_invoice_no'].'*'.$result_kotlist['sv_invoice_amount'].'*'.$result_kotlist['sv_from'].'*'
+                                                   .$result_kotlist['sv_paid_amount'].'*'.$result_kotlist['sv_trn_detail'].'*'.$result_kotlist['sv_remarks'].'*'
+                                                   .$result_kotlist['sv_credit_amount'].'*'.$result_kotlist['sv_entry_type'].'*'.$result_kotlist['sv_discount'].'*'
+                                                   .$result_kotlist['sv_purchase_type'];               
+                                        }}
+}
+
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='add_balance_voucher'){
+    
+    $sql_kotlist  =  $database->mysqlQuery("SELECT v_name,v_id,sv_date,sv_address,sv_invoice_no,sv_invoice_amount,sv_from,sv_paid_amount,sv_trn_detail,sv_remarks,
+    sv_credit_amount,sv_entry_type,sv_discount,sv_purchase_type from tbl_supplier_voucher ts  left join  tbl_vendor_master tv on tv.v_id=ts.sv_vendor_id where ts.sv_invoice_no='".$_REQUEST['edit_inv']."' and ts.sv_vendor_id='".$_REQUEST['vendor']."' and sv_pr_return='N'  limit 1"); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                                           echo $result_kotlist['v_name'].'*'.$result_kotlist['v_id'].'*'.$result_kotlist['sv_date'].'*'.$result_kotlist['sv_address'].'*'
+                                                   .$result_kotlist['sv_invoice_no'].'*'.$result_kotlist['sv_invoice_amount'].'*'.$result_kotlist['sv_from'].'*'
+                                                   .$result_kotlist['sv_paid_amount'].'*'.$result_kotlist['sv_trn_detail'].'*'.$result_kotlist['sv_remarks'].'*'.$result_kotlist['sv_credit_amount'].'*'.$result_kotlist['sv_entry_type'].'*'.$result_kotlist['sv_discount'].'*'.$result_kotlist['sv_purchase_type'];               
+                                        }}
+                               $bal=0;         
+                        $sql_kotlist1  =  $database->mysqlQuery("SELECT sum(sv_paid_amount) as paid, sv_invoice_amount from tbl_supplier_voucher  where sv_invoice_no='".$_REQUEST['edit_inv']."' and sv_vendor_id='".$_REQUEST['vendor']."'  and sv_pr_return='N' "); 
+					$num_kotlist1  = $database->mysqlNumRows($sql_kotlist1);
+					if($num_kotlist1){
+						  while($result_kotlist1  = $database->mysqlFetchArray($sql_kotlist1)) 
+							  {                                                   
+                                                 $bal=   $result_kotlist1['sv_invoice_amount']-$result_kotlist1['paid'];                                                      
+                                           echo '*'.$bal;               
+                                        }}                                                       
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='update_vendor_voucher'){ 
+    if($_REQUEST['discount']!=''){       
+        $dis=$_REQUEST['discount'];
+    }else{
+         $dis='0';
+    }
+    
+    if($_REQUEST['v_date']!=''){
+     $query3=$database->mysqlQuery("UPDATE `tbl_supplier_voucher` SET sv_date='".$_REQUEST['v_date']."',`sv_address`='".$_REQUEST['v_address']."',"
+             . "`sv_invoice_no`='".$_REQUEST['v_inv']."',"
+             . "`sv_invoice_amount`='".$_REQUEST['v_inv_amount']."',`sv_from`='".$_REQUEST['v_from']."',`sv_paid_amount`='".$_REQUEST['v_paid_amt']."',"
+             . "`sv_trn_detail`='".$_REQUEST['v_trn_detail']."',"
+             . "`sv_remarks`='".$_REQUEST['v_remark']."',sv_credit_amount='".$_REQUEST['v_credit_amount']."',sv_purchase_type='".$_REQUEST['v_purchase_type']."',sv_discount='".$dis."'  where sv_id='".$_REQUEST['update_id']."' ");
+    }else{
+       $query3=$database->mysqlQuery("UPDATE `tbl_supplier_voucher` SET sv_date=NULL,`sv_address`='".$_REQUEST['v_address']."',"
+             . "`sv_invoice_no`='".$_REQUEST['v_inv']."',"
+             . "`sv_invoice_amount`='".$_REQUEST['v_inv_amount']."',`sv_from`='".$_REQUEST['v_from']."',`sv_paid_amount`='".$_REQUEST['v_paid_amt']."',"
+             . "`sv_trn_detail`='".$_REQUEST['v_trn_detail']."',"
+             . "`sv_remarks`='".$_REQUEST['v_remark']."',sv_credit_amount='".$_REQUEST['v_credit_amount']."',sv_purchase_type='".$_REQUEST['v_purchase_type']."' ,sv_discount='".$dis."'   where sv_id='".$_REQUEST['update_id']."' "); 
+    } 
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='add_contra_voucher'){
+       
+        $date=date('Y-m-d');
+        if($_REQUEST['cv_date']!=''){
+        $insertion['cv_date'] 		               =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_date']);
+        }
+        $insertion['cv_from_acc'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_from']);
+        $insertion['cv_to_acc'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_to']);
+        $insertion['cv_amount'] 	        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_amount']);
+        $insertion['cv_transaction_data'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_trans']);
+        $insertion['cv_remarks'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_remarks']); 
+        $insertion['cv_entry_date'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$date); 
+        $sql=$database->check_duplicate_entry('tbl_contra_voucher',$insertion);
+	 if($sql!=1)
+	 {
+    $insertid =  $database->insert('tbl_contra_voucher',$insertion);
+     $sql_kotlist22  =  $database->mysqlQuery("SELECT max(tps_id) as mxid from tbl_ledger_setting where tps_ledger_id='".$_REQUEST['cv_to']."' limit 1 "); 
+					$num_kotlist22 = $database->mysqlNumRows($sql_kotlist22);
+					if($num_kotlist22){
+						  while($result_kotlist256  = $database->mysqlFetchArray($sql_kotlist22)) 
+							  { 
+             $sql_kotlist2  =  $database->mysqlQuery("update tbl_ledger_setting set tps_closing_balance=(tps_closing_balance+'".$_REQUEST['cv_amount']."')  where tps_id='".$result_kotlist256['mxid']."'  "); 
+					}
+            }   
+         } 
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='search_contra_voucher'){
+
+  $limit = 100;
+  if(isset($_REQUEST['page']))
+  {
+  $page = $_REQUEST['page'];
+  }
+  else
+  {
+  $page= 1;
+  }
+  $start_from = ($page-1)*$limit;
+    
+    $string='';
+    
+   if($_REQUEST['toacc']!="")
+		{
+			$string.= " and  cv_to_acc = '".$_REQUEST['toacc']."'  ";
+                        
+		}
+    
+    if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{
+			$string.= " and  cv_date between '".$_REQUEST['fromdt']."' and '".$_REQUEST['todt']."' ";
+                        
+		}
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{
+			
+			$to=date("Y-m-d");
+			$string.= " and  cv_date between '".$_REQUEST['fromdt']."' and '".$to."' ";
+                        
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");
+			
+			$string.= " and cv_date between '".$from."' and '".$_REQUEST['todt']."' ";
+                        
+		}
+    else{
+      $from=date("Y-m-d");
+      $to=date("Y-m-d");
+      $string.= " and cv_date between '".$from."' and '".$to."' ";
+      $string.= "";
+    }
+     
+    $sql_kotlist  =  $database->mysqlQuery("SELECT cv_id,cv_date,cv_amount,cv_from_acc,cv_transaction_data,cv_entry_date,cv_remarks,cv_to_acc from tbl_contra_voucher  where cv_id!='' $string order by cv_date asc LIMIT $start_from,$limit"); 
+		$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+
+    $sql_contra_voucher  =  $database->mysqlQuery("SELECT cv_id from tbl_contra_voucher  where cv_id!='' $string order by cv_date asc"); 
+		$num_contra_voucher  = $database->mysqlNumRows($sql_contra_voucher);
+    $total_pages = ceil($num_contra_voucher/$limit);
+    $show="";
+    $data="";	
+    $pagination ="";
+
+					if($num_kotlist){$i=0;
+            $i=$start_from+1; 
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {    
+
+                 $data .= '<tr>'.
+                   '<td style="min-width:50px">'.$i.'</td>'.
+                   '<td  style="min-width:50px"><a onclick="return edit_contra_voucher('.$result_kotlist['cv_id'].');" href="#"> <div class="action_button printer_delete"><i class="glyphicon glyphicon-pencil"></i></div></a></td>'.
+                   '<td style="min-width:75px">'.$result_kotlist['cv_date'].'</td>'.
+                    '<td style="min-width:100px">'.$result_kotlist['cv_amount'].'</td>';
+
+      $sql_kotlist1  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where tlm_id='".$result_kotlist['cv_from_acc']."' "); 
+					$num_kotlist1  = $database->mysqlNumRows($sql_kotlist1);
+					if($num_kotlist1){
+						  while($result_kotlist1  = $database->mysqlFetchArray($sql_kotlist1)) 
+							  {
+                
+                  $data .= '<td style="min-width:125px">'.$result_kotlist1['tlm_ledger_name'].' </td>';
+                         } }
+                    
+      $sql_kotlist2  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where tlm_id='".$result_kotlist['cv_to_acc']."' "); 
+					$num_kotlist2  = $database->mysqlNumRows($sql_kotlist2);
+					if($num_kotlist2){
+						  while($result_kotlist2 = $database->mysqlFetchArray($sql_kotlist2)) 
+							  {
+                                                  
+                  $data .= '<td style="min-width:125px">'.$result_kotlist2['tlm_ledger_name'].'</td>';
+                  
+              } } 
+
+              $data .= '<td style="min-width:175px;">'.$result_kotlist['cv_transaction_data'].'</td>'.
+                        '<td style="min-width:100px">'.$result_kotlist['cv_entry_date'].'</td>'.
+                        '<td style="min-width:250px">'.$result_kotlist['cv_remarks'].'</td>'.
+                        '</tr>';
+                $i++;
+    }
+    $start = $start_from+1;
+    $end = $i-1;
+
+    if($num_contra_voucher>$limit){
+    $show = '<div >'
+    .'<p style="width: auto;color: #333;position: absolute;bottom: 0px;left: 10px;font-size: 15px;font-weight:bold">Showing '.$start.' to '.$end.' of '.$num_contra_voucher.'</p> </div>'; 
+    $page_1=$page-1;
+    $page_2=$page-2;
+    $page_4 = $page-4;
+    $page_3 = $page-3;
+    $page_p1=$page+1;
+    $page_p2=$page+2;
+    $page_p3=$page+3;
+    $page_p4=$page+4;
+
+    $last = $total_pages-4;
+
+   $pagination .='<nav class="pagination_1" aria-label="Page navigation example" style="">'.
+                '<ul class="pagination justify-content-end">';
+    if($total_pages==1)
+   { 
+    $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>'.
+                  '<li class="page-item active "><a class="page-link" onClick="search_contra('.$page.')">'.$page.'</a></li>'.  
+                  '<li class="page-item disabled"><a class="page-link" >>></a></li>';
+   }
+
+   else if($total_pages==2)
+   { 
+    $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>';
+    for($i=1; $i<=2; $i++){ 
+      if($i==$page)
+      {
+        $active ='active';
+      }
+      else{
+        $active = '';
+      }
+    $pagination .='<li class="page-item '.$active.'"><a class="page-link" onClick="search_contra('.$i.')">'.$i.'</a></li>';
+    } 
+      $pagination .='<li class="page-item disabled"><a class="page-link" >>></a></li>';
+    }
+
+
+    else if($total_pages==3)
+    { 
+       $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>';
+    
+      for($i=1; $i<=3; $i++){ 
+       if($i==$page)
+       {
+         $active ='active';
+       }
+       else{
+         $active = '';
+       }
+  
+     $pagination .='<li class="page-item '.$active.'"><a class="page-link" onClick="search_contra('.$i.')">'.$i.'</a></li>';
+     } 
+       $pagination .='<li class="page-item disabled"><a class="page-link" >>></a></li>';
+     }
+   else if($page==$total_pages){ 
+      $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra(1)">First</a></li>'.
+                    '<li class="page-item"><a class="page-link" onClick="search_contra('.$page_4.')"><<</a></li>'.
+                    '<li class="page-item "><a class="page-link" onClick="search_contra('.$page_2.')">'.$page_2.'</a></li>'.
+                    '<li class="page-item  "><a class="page-link" onClick="search_contra('.$page_1.')">'.$page_1.'</a></li>'. 
+                     '<li class="page-item active"><a class="page-link" onClick="search_contra('.$page.')">'.$page.'</a></li>';
+ }
+ else { 
+  if($page==1)
+  {     
+    $pagination .='<li class="page-item active "><a class="page-link" onClick="search_contra('.$page.')">'.$page.'</a></li>'.
+                  '<li class="page-item"><a class="page-link" onClick="search_contra('.$page_p1.')">'.$page_p1.'</a></li>'.
+                  '<li class="page-item"><a class="page-link" onClick="search_contra('.$page_p2.')">'.$page_p2.'</a></li>';
+    } 
+    else 
+    {
+    $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra(1)">First</a></li>';
+    if($page>2){
+    $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra('.$page_3.')"><<</a></li>';
+    }
+    else{
+      $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra('.$page_1.')"><<</a></li>';
+    }
+    $pagination .='<li class="page-item "><a class="page-link" onClick="search_contra('.$page_1.')">'.$page_1.'</a></li>'.
+                  '<li class="page-item active"><a class="page-link" onClick="search_contra('.$page.')">'.$page.'</a></li>'.
+                  '<li class="page-item"><a class="page-link" onClick="search_contra('.$page_p1.')">'.$page_p1.'</a></li>';
+        } 
+     if($page==1) {
+      $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra('.$page_p4.')">>></a></li>';
+     } 
+    else if($page>1 && $page<$last) {
+          $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra('.$page_p3.')">>></a></li>';
+    }
+    else{
+      $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra('.$page_p1.')">>></a></li>';
+    }
+ 
+        $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra('.$total_pages.')">Last</a></li>';
+}
+$pagination .='</ul></nav>';
+          }
+          else{
+            $pagination ="";
+            $show="";
+          }
+   
+  }else{
+    
+      $data .= '<tr>'.
+                '<td colspan="9" style="width:10%;color: red;font-weight:bold ">No Records to Display</td>'.
+                  '</tr>';
+    $show ="";
+    $pagination ="";
+}
+$satas = array('data' => $data, 'show' => $show,'pagination'=>$pagination);
+echo json_encode($satas);
+                                        
+}
+
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='edit_contra_voucher'){
+    
+    $sql_kotlist  =  $database->mysqlQuery("SELECT cv_date,cv_from_acc,cv_to_acc,cv_transaction_data,cv_remarks,cv_amount from tbl_contra_voucher where  cv_id='".$_REQUEST['edit_id']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                 echo $result_kotlist['cv_date'].'*'.$result_kotlist['cv_from_acc'].'*'.$result_kotlist['cv_to_acc'].'*'.$result_kotlist['cv_amount'].'*'
+                                                   .$result_kotlist['cv_transaction_data'].'*'.$result_kotlist['cv_remarks'];               
+                                        }}
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='update_contra_voucher'){
+    
+    
+    
+    if($_REQUEST['cv_date']!=''){
+     $query3=$database->mysqlQuery("UPDATE `tbl_contra_voucher` SET cv_date='".$_REQUEST['cv_date']."',`cv_from_acc`='".$_REQUEST['cv_from']."',"
+             . "`cv_to_acc`='".$_REQUEST['cv_to']."',"
+             . "`cv_amount`='".$_REQUEST['cv_amount']."',`cv_transaction_data`='".$_REQUEST['cv_trans']."',`cv_remarks`='".$_REQUEST['cv_remarks']."' where cv_id='".$_REQUEST['update_id']."' ");
+             
+    }else{
+      $query3=$database->mysqlQuery("UPDATE `tbl_contra_voucher` SET cv_date=NULL,`cv_from_acc`='".$_REQUEST['cv_from']."',"
+             . "`cv_to_acc`='".$_REQUEST['cv_to']."',"
+             . "`cv_amount`='".$_REQUEST['cv_amount']."',`cv_transaction_data`='".$_REQUEST['cv_trans']."',`cv_remarks`='".$_REQUEST['cv_remarks']."' where cv_id='".$_REQUEST['update_id']."' ");
+    }
+    
+     
+    $sql_kotlist22  =  $database->mysqlQuery("SELECT max(tps_id) as mxid from tbl_ledger_setting where tps_ledger_id='".$_REQUEST['cv_to']."' limit 1 "); 
+					$num_kotlist22 = $database->mysqlNumRows($sql_kotlist22);
+					if($num_kotlist22){
+						  while($result_kotlist256  = $database->mysqlFetchArray($sql_kotlist22)) 
+							  { 
+                                                      
+             $sql_kotlist2  =  $database->mysqlQuery("update tbl_ledger_setting set tps_closing_balance=(tps_closing_balance+'".$_REQUEST['cv_amount']."')  where tps_id='".$result_kotlist256['mxid']."'  "); 
+					
+                                                  
+                                                   }
+                                                  }
+    
+    
+    
+    
+    
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='add_expense_voucher'){
+    
+     $entry_time=date('Y-m-d H:i:s'); 
+      
+    $date=date('Y-m-d');
+        
+        if($_REQUEST['cv_date']!=''){
+        $insertion['ev_date'] 		               =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_date']);
+        }
+        $insertion['ev_from_acc'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_from']);
+        $insertion['ev_to_acc'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_to']);
+        $insertion['ev_amount'] 	        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_amount']);
+        
+        $insertion['ev_transaction_data'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_trans']);
+        $insertion['ev_remarks'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_remarks']); 
+        $insertion['ev_acc_type'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_type']); 
+        
+        $insertion['ev_entry_date'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$date); 
+        
+         $insertion['ev_entry_time'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$entry_time); 
+        
+       
+           $insertion['ev_login'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_SESSION['expodine_id']); 
+        
+        $sql=$database->check_duplicate_entry('tbl_expense_voucher',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_expense_voucher',$insertion);
+         } 
+
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='search_expense_voucher'){
+    
+  $limit = 100;
+  if(isset($_REQUEST['page']))
+  {
+  $page = $_REQUEST['page'];
+  }
+  else
+  {
+  $page= 1;
+  }
+   
+  $start_from = ($page-1)*$limit;
+
+    $string='';
+    
+    if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{
+			$string.= " and  ev_date between '".$_REQUEST['fromdt']."' and '".$_REQUEST['todt']."' ";
+                        
+		}
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{
+			
+			$to=date("Y-m-d");
+			$string.= " and  ev_date between '".$_REQUEST['fromdt']."' and '".$to."' ";
+                        
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");
+			
+			$string.= " and ev_date between '".$from."' and '".$_REQUEST['todt']."' ";
+                        
+		}
+    else{
+      $from=date("Y-m-d");
+      $to=date("Y-m-d");
+      $string.= " and  ev_date between '".$from."' and '".$to."' ";
+      $sting.="";
+    }
+    
+    
+    if($_REQUEST['type_exp']=='Direct'){
+    $string.=" and ev_acc_type = 'Direct Expense'   ";
+    }
+     if($_REQUEST['type_exp']=='Indirect'){
+    $string.=" and ev_acc_type = 'Indirect Expense'   ";
+    }
+     
+     if($_REQUEST['type_src']!=''){
+    $string.=" and ev_acc_type = '".$_REQUEST['type_src']."'  ";
+    }
+     
+    
+     if($_REQUEST['toacc']!=''){
+    $string.=" and ev_to_acc = '".$_REQUEST['toacc']."'  ";
+    }
+    
+    $tot_exp_bal=0;
+
+
+    $sql_kotlist  =  $database->mysqlQuery("SELECT ev_id,ev_date,ev_from_acc,ev_to_acc,ev_amount,ev_transaction_data,
+    ev_entry_date,ev_remarks,ev_acc_type from tbl_expense_voucher  where ev_id!='' $string order by ev_date asc LIMIT $start_from,$limit"); 
+		$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+
+    $sql_voucher_total  =  $database->mysqlQuery("SELECT ev_id from tbl_expense_voucher  where ev_id!='' $string order by ev_date asc"); 
+
+    $num_voucher_total   = $database->mysqlNumRows($sql_voucher_total);
+
+    $total_pages = ceil($num_voucher_total/$limit);
+
+    $show="";
+    $data="";	
+    $pagination ="";
+
+					if($num_kotlist>0){
+            $i=0;
+            $i=$start_from+1; 
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {                                                       
+
+                  $data .= '<tr>'.
+                  '<td style="width:5%">'.$i.'</td>'.
+                  '<td  style="width:10%">'.
+                  '<a onclick="return edit_expense_voucher('.$result_kotlist['ev_id'].');" href="#"> <div class="action_button printer_delete"><i class="glyphicon glyphicon-pencil"></i>'.
+                  '</div></a>'.
+                  '<a target="_blank"  href="print_voucher.php?type=expense_voucher&id='.$result_kotlist['ev_id'].'" > <div class="action_button printer_delete"><i class="glyphicon glyphicon-print"></i>'.
+                  '</div></a>';
+
+                  if($_SESSION['expodine_id']=='admin'){ 
+                    $data .= '<a onclick="return delete_expense_voucher('.$result_kotlist['ev_id'].',\''.$result_kotlist['ev_date'].'\');" href="#"> <div style="color:red" class="action_button printer_delete"><i class="glyphicon glyphicon-remove"></i>'.
+                             '</div></a>';
+                    }
+                       
+                   $data .= '</td>'.
+                   
+                   '<td style="width:10%">'.$result_kotlist['ev_date'].'</td>';
+                   
+                 
+          $sql_kotlist1  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where tlm_id='".$result_kotlist['ev_from_acc']."' "); 
+					$num_kotlist1  = $database->mysqlNumRows($sql_kotlist1);
+					if($num_kotlist1){
+						  while($result_kotlist1  = $database->mysqlFetchArray($sql_kotlist1)) 
+							  {
+                   $data .='<td style="width:10%;">'.$result_kotlist1['tlm_ledger_name'].'</td>';
+                } } 
+          else {
+                   $data .=' <td style="width:10%;"></td>';
+              }
+                 
+    $sql_kotlist2  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where tlm_id='".$result_kotlist['ev_to_acc']."' "); 
+					$num_kotlist2  = $database->mysqlNumRows($sql_kotlist2);
+					if($num_kotlist2){
+						  while($result_kotlist2 = $database->mysqlFetchArray($sql_kotlist2)) 
+							  {                                  
+                 $data .=' <td style="width:10%;">'.$result_kotlist2['tlm_ledger_name'].'</td>';
+
+                    } }  else { 
+                      $data .='<td style="width:10%;"></td>';  } 
+                   $data .= '<td style="width:10%;">'.$result_kotlist['ev_amount'].'</td>'.
+                            '<td style="width:10%;overflow-wrap: break-word;word-break: break-word;">'.$result_kotlist['ev_transaction_data'].'</td>'.
+                      '<td style="width:10%;">'.$result_kotlist['ev_entry_date'].'</td>'.
+                       '<td style="width:10%;overflow-wrap: break-word;word-break: break-word;">'.$result_kotlist['ev_remarks'].'</td>'.
+                       '<td style="width:10%;">'.$result_kotlist['ev_acc_type'].'</td>'.
+                   '</tr>';
+$i++;
+$tot_exp_bal=$tot_exp_bal+$result_kotlist['ev_amount'];
+}
+                  $data .='<tr>'.
+                   '<td style="width:5%;font-weight: bold">Total</td>'.
+                   '<td  style="width:10%"></td>'.
+                   '<td style="width:10%"></td>'.
+                  '<td style="width:10%"></td>'.
+                 '<td style="width:10%;"></td>'.
+                     '<td style="width:10%;font-weight: bold">'.$tot_exp_bal.'</td>'.
+                      '<td style="width:10%;"></td>'.
+                       '<td style="width:10%;"></td>'.
+                       '<td style="width:10%;"></td>'.
+                        '<td style="width:10%;"></td>'.
+                   '</tr>';
+                   $start = $start_from+1;
+                   $end = $i-1;
+                   if($num_voucher_total>$limit){
+        $show = '<div><p  style="width: auto;color: #333;position: absolute;bottom: 0px;left: 10px;font-size: 15px;font-weight:bold">Showing '.$start.' to '.$end.' of '.$num_voucher_total.'</p> </div>';  
+
+                            $page_1=$page-1;
+                            $page_2=$page-2;
+                            $page_4 = $page-4;
+                            $page_3 = $page-3;
+                            $page_p1=$page+1;
+                            $page_p2=$page+2;
+                            $page_p3=$page+3;
+                            $page_p4=$page+4;
+                      
+                            $last = $total_pages-4;
+                      
+                           $pagination .='<nav class="pagination_1" aria-label="Page navigation example" style="">'.
+                                        '<ul class="pagination justify-content-end">';
+                            if($total_pages==1)
+                           { 
+                            $pagination .='<li class="page-item disabled"><a class="page-link"><<</a></li>'.
+                                          '<li class="page-item active "><a class="page-link" onClick="search_expense('.$page.')">'.$page.'</a></li>'.  
+                                          '<li class="page-item disabled"><a class="page-link">>></a></li>';
+                           }
+                      
+                           else if($total_pages==2)
+                           { 
+                            $pagination .='<li class="page-item disabled"><a class="page-link"><<</a></li>';
+                            for($i=1; $i<=2; $i++){ 
+                              if($i==$page)
+                              {
+                                $active ='active';
+                              }
+                              else{
+                                $active = '';
+                              }
+                            $pagination .='<li class="page-item '.$active.'"><a class="page-link" onClick="search_expense('.$i.')">'.$i.'</a></li>';
+                            } 
+                              $pagination .='<li class="page-item disabled"><a class="page-link" >>></a></li>';
+                            }
+                      
+                      
+                            else if($total_pages==3)
+                            { 
+                               $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>';
+                            
+                              for($i=1; $i<=3; $i++){ 
+                               if($i==$page)
+                               {
+                                 $active ='active';
+                               }
+                               else{
+                                 $active = '';
+                               }
+                          
+                             $pagination .='<li class="page-item '.$active.'"><a class="page-link" onClick="search_expense('.$i.')">'.$i.'</a></li>';
+                             } 
+                               $pagination .='<li class="page-item disabled"><a class="page-link" >>></a></li>';
+                             }
+                           else if($page==$total_pages){ 
+                              $pagination .='<li class="page-item"><a class="page-link" onClick="search_expense(1)">First</a></li>'.
+                                            '<li class="page-item"><a class="page-link" onClick="search_expense('.$page_4.')"><<</a></li>'.
+                                            '<li class="page-item "><a class="page-link" onClick="search_expense('.$page_2.')">'.$page_2.'</a></li>'.
+                                            '<li class="page-item  "><a class="page-link" onClick="search_expense('.$page_1.')">'.$page_1.'</a></li>'. 
+                                             '<li class="page-item active"><a class="page-link" onClick="search_expense('.$page.')">'.$page.'</a></li>';
+                         }
+                         else { 
+                          if($page==1)
+                          {     
+                            $pagination .='<li class="page-item active "><a class="page-link" onClick="search_expense('.$page.')">'.$page.'</a></li>'.
+                                          '<li class="page-item"><a class="page-link" onClick="search_expense('.$page_p1.')">'.$page_p1.'</a></li>'.
+                                          '<li class="page-item"><a class="page-link" onClick="search_expense('.$page_p2.')">'.$page_p2.'</a></li>';
+                            } 
+                            else 
+                            {
+                            $pagination .='<li class="page-item"><a class="page-link" onClick="search_expense(1)">First</a></li>';
+                            if($page>2){
+                            $pagination .='<li class="page-item"><a class="page-link" onClick="search_expense('.$page_3.')"><<</a></li>';
+                            }
+                            else{
+                              $pagination .='<li class="page-item"><a class="page-link" onClick="search_expense('.$page_1.')"><<</a></li>';
+                            }
+                            $pagination .='<li class="page-item "><a class="page-link" onClick="search_expense('.$page_1.')">'.$page_1.'</a></li>'.
+                                          '<li class="page-item active"><a class="page-link" onClick="search_expense('.$page.')">'.$page.'</a></li>'.
+                                          '<li class="page-item"><a class="page-link" onClick="search_expense('.$page_p1.')">'.$page_p1.'</a></li>';
+                                } 
+                             if($page==1) {
+                              $pagination .='<li class="page-item"><a class="page-link" onClick="search_expense('.$page_p4.')">>></a></li>';
+                             } 
+                            else if($page>1 && $page<$last) {
+                                  $pagination .='<li class="page-item"><a class="page-link" onClick="search_expense('.$page_p3.')">>></a></li>';
+                            }
+                            else{
+                              $pagination .='<li class="page-item"><a class="page-link" onClick="search_expense('.$page_p1.')">>></a></li>';
+                            }
+                         
+                                $pagination .='<li class="page-item"><a class="page-link" onClick="search_expense('.$total_pages.')">Last</a></li>';
+                        }
+                        $pagination .='</ul></nav>';
+                      }
+                      else{
+                        $pagination="";
+                        $show="";
+                      }                                                      
+}else{
+    
+                   $data .='<tr>'.
+                   '<td colspan="10" style="width:10%;color: red;font-weight:bold ">NO DATA FOUND</td>'.   
+                   '</tr>';
+
+                   $show ="";
+                   $pagination ="";
+                 
+}
+$satas = array('data' => $data, 'show' => $show,'pagination'=>$pagination);
+echo json_encode($satas);                                      
+}
+
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='edit_expense_voucher'){
+    
+    $sql_kotlist  =  $database->mysqlQuery("SELECT ev_date,ev_from_acc,ev_to_acc,ev_transaction_data,ev_remarks,ev_amount,ev_acc_type from tbl_expense_voucher where  ev_id='".$_REQUEST['edit_id']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                 echo $result_kotlist['ev_date'].'*'.$result_kotlist['ev_from_acc'].'*'.$result_kotlist['ev_to_acc'].'*'.$result_kotlist['ev_amount'].'*'
+                                                   .$result_kotlist['ev_transaction_data'].'*'.$result_kotlist['ev_remarks'].'*'.$result_kotlist['ev_acc_type'];               
+                                        }}
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='update_expense_voucher'){
+    
+    
+    
+    if($_REQUEST['cv_date']!=''){
+     $query3=$database->mysqlQuery("UPDATE `tbl_expense_voucher` SET ev_acc_type='".$_REQUEST['cv_type']."', ev_date='".$_REQUEST['cv_date']."',`ev_from_acc`='".$_REQUEST['cv_from']."',"
+             . "`ev_to_acc`='".$_REQUEST['cv_to']."',"
+             . "`ev_amount`='".$_REQUEST['cv_amount']."',`ev_transaction_data`='".$_REQUEST['cv_trans']."',`ev_remarks`='".$_REQUEST['cv_remarks']."' where ev_id='".$_REQUEST['update_id']."' ");
+             
+    }else{
+      $query3=$database->mysqlQuery("UPDATE `tbl_expense_voucher`  SET  ev_acc_type='".$_REQUEST['cv_type']."', ev_date=NULL,`ev_from_acc`='".$_REQUEST['cv_from']."',"
+             . "`ev_to_acc`='".$_REQUEST['cv_to']."',"
+             . "`ev_amount`='".$_REQUEST['cv_amount']."',`ev_transaction_data`='".$_REQUEST['cv_trans']."',`ev_remarks`='".$_REQUEST['cv_remarks']."' where ev_id='".$_REQUEST['update_id']."' ");
+    }
+    
+     
+    
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='load_expense_type'){
+
+?>
+    <select class="add_printer_drop" id="cv_to"> 
+                             <option value=""> Select</option>
+                           <?php 
+                                         $sql_kotlist  =  $database->mysqlQuery("SELECT tlm_id,tlm_ledger_name from tbl_ledger_master tl left join tbl_ledger_group tg on tl.tlm_group=tg.tlg_id where tg.tlg_name='".$_REQUEST['typ']."'   "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                    ?>
+
+                   <option value="<?=$result_kotlist['tlm_id'] ?> "><?=$result_kotlist['tlm_ledger_name'] ?> </option>
+                                        
+                                                      <?php 
+                                                  }
+                                                  }
+                                                ?>
+                          
+                            </select>
+                            <label style="top:-5px;color: #414141;font-size: 14px" id="lab_grp">To ACC</label>                   
+    
+    <?php
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='add_employee'){
+    
+    
+    
+        if($_REQUEST['e_dob']!=''){
+        $insertion['emp_dob'] 		                       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_dob']);
+        }
+        if($_REQUEST['e_join']!=''){
+        $insertion['emp_join_date'] 		               =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_join']);
+        }
+        
+        $insertion['emp_first_name'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_name']);
+        
+        if($_REQUEST['e_lastname']!=''){
+        $insertion['emp_last_name'] 		                =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_lastname']);
+        }
+        
+        $insertion['emp_employee_id'] 	                =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_id']);
+        
+        $insertion['emp_vendor'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_vendor']);
+        $insertion['emp_department'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_dept']); 
+        $insertion['emp_designation'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_desg']); 
+        $insertion['emp_status'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_status']); 
+        
+        $insertion['emp_mail'] 		                =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_mail']); 
+        $insertion['emp_number'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_number']); 
+        
+        if($_REQUEST['e_salary']!=''){
+        $insertion['emp_salary'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_salary']); 
+        }else{
+            $insertion['emp_salary'] 		        =  mysqli_real_escape_string($database->DatabaseLink,0);  
+        }
+        $insertion['emp_mode'] 		                =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_mode']); 
+             
+             $insertion['emp_alternate_no'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_alt_no']); 
+             $insertion['emp_id_no'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_idno']); 
+             $insertion['emp_id_type'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_idtype']); 
+             $insertion['emp_address'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_address']); 
+             $insertion['emp_remarks'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_remarks']); 
+             
+        
+        $sql=$database->check_duplicate_entry('tbl_employee_master',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_employee_master',$insertion);
+         } 
+         
+         
+         
+         
+         $sql_kotlist6  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where tlm_ledger_name='".$_REQUEST['e_name']."' "); 
+					$num_kotlist6  = $database->mysqlNumRows($sql_kotlist6);
+					if($num_kotlist6){ 
+                                            
+                          $sql_kotlist66  =  $database->mysqlQuery("SELECT MAX(emp_id) as v_new_id from tbl_employee_master "); 
+					$num_kotlist66  = $database->mysqlNumRows($sql_kotlist66);
+					if($num_kotlist66){
+						  while($result_kotlist66  = $database->mysqlFetchArray($sql_kotlist66)) 
+							  { 
+                                                      
+                                                      $cr_staff=$result_kotlist66['v_new_id'];
+                                                  }
+                                                  
+                                                  
+                                                  }                  
+                                           
+            $sql_kotlist7  =  $database->mysqlQuery("update tbl_ledger_master set tlm_staff_id='".$cr_staff."' where tlm_ledger_name='".$_REQUEST['e_name']."' ");                                 
+                                            
+                                            
+                                            
+                                        }else{
+                                            
+        
+             
+             $sql_kotlist  =  $database->mysqlQuery("SELECT MAX(emp_id) as v_new_id from tbl_employee_master "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){$i=0;
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  { 
+                                                      
+                                                      $cr_staff=$result_kotlist['v_new_id'];
+                                                  }
+                                                  }
+             
+             
+     $cr_id='56';
+    $insertion1['tlm_ledger_name'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['e_name']);
+     $insertion1['tlm_group'] 		=  mysqli_real_escape_string($database->DatabaseLink,$cr_id);
+      $insertion1['tlm_staff_id'] 		=  mysqli_real_escape_string($database->DatabaseLink,$cr_staff);
+      
+       $insertion1['tlm_open_bal'] 		=  mysqli_real_escape_string($database->DatabaseLink,0);
+    $sql=$database->check_duplicate_entry('tbl_ledger_master',$insertion1);
+	 if($sql!=1)
+	{
+	$insertid1              			=  $database->insert('tbl_ledger_master',$insertion1);
+        }
+         
+         
+         
+         
+                                        }
+         
+         
+         
+         
+    
+   // echo $insertid;
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='search_employee'){
+    
+    $string='';
+    
+    if($_REQUEST['fname']!=''){
+    $string.=" and emp_first_name like '%".$_REQUEST['fname']."%'   ";
+    }
+    
+    if($_REQUEST['fnum']!=''){
+    $string.=" and emp_number like '%".$_REQUEST['fnum']."%'   ";
+    }
+    
+    if($_REQUEST['fdesg']!=''){
+    $string.=" and emp_designation = '".$_REQUEST['fdesg']."'   ";
+    }
+    
+     $tot_bal=0;
+     
+    $sql_kotlist  =  $database->mysqlQuery("SELECT emp_id,emp_first_name,emp_last_name,emp_designation,emp_number,emp_mail,emp_salary,emp_status,emp_department from tbl_employee_master  where emp_id!='' $string order by emp_status asc"); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){$i=0;
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  { $i++;   
+                  
+?>
+                  <tr>
+                                            <td style="min-width:50px"><?=$i?></td>
+                                            <td  style="min-width:50px"><a href="#" onclick="edit_employee('<?=$result_kotlist['emp_id']?>');"> <div class="action_button printer_delete"><i class="glyphicon glyphicon-pencil"></i></div></a></td>
+                                            <td style="min-width:150px;"><?=$result_kotlist['emp_first_name'].' '.$result_kotlist['emp_last_name']?></td>
+                                             <td style="min-width:100px;"><?=$result_kotlist['emp_designation']?></td>
+                                            <td style="min-width:50px"><?=$result_kotlist['emp_id']?></td>
+                                            <td style="min-width:150px"><?=$result_kotlist['emp_number']?></td>
+                                            <td style="min-width:150px"><?=$result_kotlist['emp_mail']?></td>
+                                            <td style="min-width:100px"><?=$result_kotlist['emp_salary']?></td>
+                                            <td style="min-width:80px"><?=$result_kotlist['emp_status']?></td>
+                                            
+                                            
+                                            <?php if($result_kotlist['emp_status']=='Active'){
+                                                ?>
+                                            <td style="min-width:80px"><a onclick="return employee_voucher_view('<?=$result_kotlist['emp_id']?>','<?=$result_kotlist['emp_first_name'].' '.$result_kotlist['emp_last_name']?>','<?=$result_kotlist['emp_department']?>','<?=$result_kotlist['emp_salary']?>');" class="md-trigger voucher_btn" data-modal="modal-18" href="#">Voucher</a></td>
+                                            <?php } else { ?>
+                                            <td style="min-width:80px;color:red;font-weight: bold;cursor: pointer"><a title="Inactive employee can't add voucher" >[X]</a> </td>
+                                             <?php }  ?>
+                                            
+                                            
+                                            <?php
+                                            $net=0; 
+                                      $sql_kotlist5  =  $database->mysqlQuery("SELECT sum(tes_netsalary) as net from tbl_employee_salary  where tes_emp_id='".$result_kotlist['emp_id']."' $string "); 
+					$num_kotlist5  = $database->mysqlNumRows($sql_kotlist5);
+					if($num_kotlist5){
+						  while($result_kotlist5  = $database->mysqlFetchArray($sql_kotlist5)) 
+							  { 
+                                                      
+                                                      $net=$result_kotlist5['net'];
+                                        }}
+                                        
+                                        $paid=0;
+                                        $sql_kotlist4  =  $database->mysqlQuery("SELECT sum(ev_amount) as paid from tbl_employee_voucher  where ev_employee_id='".$result_kotlist['emp_id']."' $string "); 
+					$num_kotlist4  = $database->mysqlNumRows($sql_kotlist4);
+					if($num_kotlist4){
+						  while($result_kotlist4  = $database->mysqlFetchArray($sql_kotlist4)) 
+							  { 
+                                                      
+                                                      $paid=$result_kotlist4['paid'];
+                                        }}
+                                        
+                                        
+                                        $tot_bal=$tot_bal+($net-$paid);
+                                                          ?>
+                                           
+                                             <td style="min-width:80px;"><?=($net-$paid)?></td>
+                                        </tr>                                       
+<?php
+}
+?>                                  
+                                         <tr>                                     
+                                         <td style="min-width:50px">Balance</td>
+                                                 <td style="min-width:50px"></td>
+                                                <td style="min-width:150px"></td>
+                                                <td style="min-width:100px"></td>
+                                                <td style="min-width:50px"> </td>
+                                                <td style="min-width:150px"> </td>
+                                                <td style="min-width:150px"></td>
+                                                 <td style="min-width:100px"></td>
+                                                <td style="min-width:80px"></td>
+                                                <td style="min-width:80px"></td>
+                                                 <td style="min-width:80px"><?=($tot_bal)?></td>
+                                        
+                                        </tr>    
+                                        <?php
+}else{
+    ?><tr>
+        <td colspan="10" style="width:10%;color:red;font-weight: bold">NO DATA FOUND</td>
+      </tr>                                                             
+     <?php
+}
+
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='edit_employee'){
+    $sql_kotlist  =  $database->mysqlQuery("SELECT emp_first_name,emp_last_name,emp_employee_id,emp_vendor,emp_department,
+    emp_designation,emp_status,emp_mail,emp_number,emp_salary,emp_mode,emp_alternate_no,emp_dob,emp_join_date,emp_id_no,emp_id_type,
+    emp_address,emp_remarks from tbl_employee_master where  emp_id='".$_REQUEST['edit_id']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+            echo $result_kotlist['emp_first_name'].'*'.$result_kotlist['emp_last_name'].'*'.$result_kotlist['emp_employee_id'].'*'
+                    .$result_kotlist['emp_vendor'].'*'
+            .$result_kotlist['emp_department'].'*'.$result_kotlist['emp_designation'].'*'.$result_kotlist['emp_status'].'*'
+                    .$result_kotlist['emp_mail'].'*'
+            .$result_kotlist['emp_number'].'*'.$result_kotlist['emp_salary'].'*'.$result_kotlist['emp_mode'].'*'
+                    .$result_kotlist['emp_alternate_no'].'*'
+            .$result_kotlist['emp_dob'].'*'.$result_kotlist['emp_join_date'].'*'.$result_kotlist['emp_id_no'].'*'
+                    .$result_kotlist['emp_id_type'].'*'
+            .$result_kotlist['emp_address'].'*'.$result_kotlist['emp_remarks'];  
+
+                                        }}
+}
+
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='update_employee'){
+    
+    
+    if($_REQUEST['e_dob']!=''){
+    $dob='"'.$_REQUEST['e_dob'].'"';
+    }else{
+      $dob='NULL';  
+    }
+    
+    if($_REQUEST['e_join']!=''){
+    $join='"'.$_REQUEST['e_join'].'"';
+    }else{
+      $join='NULL';  
+    }
+    
+     $query3=$database->mysqlQuery("UPDATE `tbl_employee_master` SET `emp_first_name`='".$_REQUEST['e_name']."',"
+             . "`emp_last_name`='".$_REQUEST['e_lastname']."',`emp_vendor`='".$_REQUEST['e_vendor']."',`emp_department`='".$_REQUEST['e_dept']."',"
+             . "`emp_designation`='".$_REQUEST['e_desg']."',`emp_status`='".$_REQUEST['e_status']."',`emp_mail`='".$_REQUEST['e_mail']."',"
+             . "`emp_number`='".$_REQUEST['e_number']."',"
+             . "`emp_salary`='".$_REQUEST['e_salary']."',`emp_mode`='".$_REQUEST['e_mode']."',`emp_alternate_no`='".$_REQUEST['e_alt_no']."',"
+             . "`emp_dob`=$dob,"
+             . "`emp_join_date`=$join,`emp_id_no`='".$_REQUEST['e_idno']."',`emp_id_type`='".$_REQUEST['e_idtype']."',"
+             . "`emp_address`='".$_REQUEST['e_address']."',"
+             . "`emp_remarks`='".$_REQUEST['e_remarks']."' WHERE emp_id='".$_REQUEST['update_id']."' "); 
+    
+    
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='add_employee_voucher'){
+    
+        $date=date('Y-m-d');
+        $insertion['ev_employee_id'] 		                =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_emp_id']); 
+        $insertion['ev_department'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_dept']); 
+        $insertion['ev_pay_type'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_pay_type']); 
+        
+         if($_REQUEST['ev_date']!=''){
+        $insertion['ev_date'] 		                =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_date']); 
+         }   
+             $insertion['ev_amount'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_amount']); 
+             $insertion['ev_from'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_from']); 
+             $insertion['ev_approved_by'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_approved']); 
+             $insertion['ev_trans'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_tran']); 
+             $insertion['ev_remarks'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_remarks']); 
+             
+             $insertion['ev_entry_date'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$date); 
+             $insertion['ev_entry_login'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_SESSION['expodine_id']); 
+             
+        
+             $insertion['ev_month'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_month']); 
+             $insertion['ev_year'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_year']); 
+             
+             if($_REQUEST['ev_paid_now'] ==0){ 
+             $insertion['ev_pay_type_acc'] 		        =  mysqli_real_escape_string($database->DatabaseLink,'First'); 
+             
+              $insertion['ev_net_salary_new'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_netsalary']); 
+             }else{
+                $insertion['ev_pay_type_acc'] 		        =  mysqli_real_escape_string($database->DatabaseLink,'Partial');  
+                 $insertion['ev_net_salary_new'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ev_netsalary']); 
+             }
+             
+              $entry_time=date('Y-m-d H:i:s'); 
+         $insertion['ev_entry_time'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$entry_time); 
+           
+         $insertion['ev_login'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_SESSION['expodine_id']); 
+         
+        $sql=$database->check_duplicate_entry('tbl_employee_voucher',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_employee_voucher',$insertion);
+         } 
+    
+    
+    
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='search_employee_voucher'){
+
+  $limit = 100;
+  if(isset($_REQUEST['page']))
+  {
+  $page = $_REQUEST['page'];
+  }
+  else
+  {
+  $page= 1;
+  }
+   
+  $start_from = ($page-1)*$limit;
+
+    $string='';
+    
+    if($_REQUEST['fname']!=''){
+    $string.=" and te.emp_first_name like '%".$_REQUEST['fname']."%'   ";
+    }
+    
+   
+
+    if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{
+			$string.= " and  tv.ev_date between '".$_REQUEST['fromdt']."' and '".$_REQUEST['todt']."' ";
+                        
+		}
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{
+			
+			$to=date("Y-m-d");
+			$string.= " and  tv.ev_date between '".$_REQUEST['fromdt']."' and '".$to."' ";
+                        
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");
+			
+			$string.= " and tv.ev_date between '".$from."' and '".$_REQUEST['todt']."' ";
+                        
+		}
+    else{
+        
+      $from=date("Y-m-d");
+      $to=date("Y-m-d");
+      $string.= " and  tv.ev_date between '".$from."' and '".$to."' ";
+      $string .="";
+      
+    }
+    
+    $tot_emp_paid=0;
+    
+    $sql_kotlist  =  $database->mysqlQuery("SELECT ev_id,emp_first_name,emp_last_name,ev_date,ev_amount,ev_pay_type,
+    tlm_ledger_name,ev_approved_by,ev_entry_date,ev_month,ev_year,ev_remarks from tbl_employee_master te left join 
+    tbl_employee_voucher tv on tv.ev_employee_id=te.emp_id left join tbl_ledger_master tm on tm.tlm_id=tv.ev_from 
+    where tv.ev_id!='' $string order by ev_date asc LIMIT $start_from,$limit"); 
+
+    $num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+
+    $sql_kotlist_total  =  $database->mysqlQuery("SELECT ev_id from tbl_employee_master te left join 
+    tbl_employee_voucher tv on tv.ev_employee_id=te.emp_id left join tbl_ledger_master tm on tm.tlm_id=tv.ev_from 
+    where tv.ev_id!='' $string order by ev_date asc"); 
+    $num_kotlist_total   = $database->mysqlNumRows($sql_kotlist_total);
+    $total_pages = ceil($num_kotlist_total/$limit);
+    $show="";
+    $data="";	
+    $pagination ="";
+        
+	    if($num_kotlist>0){
+           
+            $i=0;
+            $i=$start_from+1;  
+	    while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+		{ 
+                  $data .='<tr>'. 
+                          '<td style="min-width:50px">'.$i.'</td>'.
+                          '<td  style="min-width:70px">'.
+                          '<a href="#" onclick="edit_voucher_employee('.$result_kotlist['ev_id'].',\''.$result_kotlist['emp_first_name'].'\',\''.$result_kotlist['emp_last_name'].'\');"> <div class="action_button printer_delete"><i class="glyphicon glyphicon-pencil"></i></div></a>'.            
+                          '<a target="_blank"  href="print_voucher.php?type=employee_voucher&id='.$result_kotlist['ev_id'].'" > <div class="action_button printer_delete"><i class="glyphicon glyphicon-print"></i> </div> </a>';     
+                                            
+                  if($_SESSION['expodine_id']=='admin'){ 
+                  $data .='<a onclick="return delete_employee_voucher('.$result_kotlist['ev_id'].');" href="#"> <div style="color:red" class="action_button printer_delete"><i class="glyphicon glyphicon-remove"></i>'.
+                         '</div></a>';
+                       } 
+                                            
+                      $data .='</td>'.
+                              '<td style="min-width:100px">'.$result_kotlist['ev_date'].'</td>'.
+                               '<td style="min-width:150px">'.$result_kotlist['emp_first_name'].' '.$result_kotlist['emp_last_name'].'</td>'.
+                               '<td style="min-width:100px">'.$result_kotlist['ev_amount'].'</td>'.
+                               '<td style="min-width:80px">'.$result_kotlist['ev_pay_type'].'</td>'.
+                               '<td style="min-width:80px">'.$result_kotlist['tlm_ledger_name'].'</td>'.
+                              '<td style="min-width:80px">'.$result_kotlist['ev_approved_by'].'</td>'.
+                              '<td style="min-width:80px;">'.$result_kotlist['ev_entry_date'].'</td>'.
+                              '<td style="min-width:80px;">'.$result_kotlist['ev_month'].'</td>'.
+                              '<td style="min-width:80px;">'.$result_kotlist['ev_year'].'</td>'.
+                              '<td style="min-width:80px;overflow-wrap: break-word;word-break: break-word;">'.$result_kotlist['ev_remarks'].'</td>'.             
+                              '</tr>';
+$i++;
+$tot_emp_paid=$tot_emp_paid+$result_kotlist['ev_amount'];
+}
+
+
+                      $data .='<tr>'.
+                              '<td style="width:5%;;font-weight: bold">Paid</td>'.
+                               '<td  style="width:10%"></td>'.
+                               '<td style="width:20%;"></td>'.
+                               '<td style="width:10%;"></td>'.
+                               '<td style="width:10%;font-weight: bold">'.$tot_emp_paid.'</td>'.
+                                '<td style="width:10%;"></td>'.
+                                '<td style="width:10%"></td>'.
+                                '<td style="width:10%;"></td>'.
+                                '<td style="width:10%;"></td>'.
+                                '<td style="width:10%;"></td>'.
+                                '<td style="width:10%;"></td>'.
+                                '<td style="width:10%;"></td>'.
+                                '</tr>';  
+                                
+  $start = $start_from+1;
+  $end = $i-1;
+ 
+  if($num_kotlist_total>$limit){
+  $show = '<div>'
+         .'<p style="width: auto;color: #333;font-size: 15px;font-weight:bold;position: absolute;bottom: 0px;
+         left: 10px;" >Showing '.$start.' to '.$end.' of '.$num_kotlist_total.'</p> </div>';
+
+
+       $page_1=$page-1;
+      $page_2=$page-2;
+      $page_4 = $page-4;
+      $page_3 = $page-3;
+      $page_p1=$page+1;
+      $page_p2=$page+2;
+      $page_p3=$page+3;
+      $page_p4=$page+4;
+                                            
+      $last = $total_pages-4;
+                                            
+      $pagination .='<nav class="pagination_1" aria-label="Page navigation example" style="">'.
+                     '<ul class="pagination justify-content-end">';
+      if($total_pages==1)
+        { 
+        $pagination .='<li class="page-item disabled"><a class="page-link"><<</a></li>'.
+                      '<li class="page-item active "><a class="page-link" onClick="search_vendor('.$page.')">'.$page.'</a></li>'.  
+                      '<li class="page-item disabled"><a class="page-link" >>></a></li>';
+       }
+                                            
+      else if($total_pages==2)
+      { 
+      $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>';
+      for($i=1; $i<=2; $i++){ 
+        if($i==$page)
+        {
+          $active ='active';
+        }
+        else{
+          $active = '';
+        }
+      $pagination .='<li class="page-item '.$active.'"><a class="page-link" onClick="search_vendor('.$i.')">'.$i.'</a></li>';
+      } 
+        $pagination .='<li class="page-item disabled"><a class="page-link" >>></a></li>';
+      }
+                                                                               
+      else if($total_pages==3)
+      { 
+        $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>';
+                                                  
+      for($i=1; $i<=3; $i++){ 
+          if($i==$page)
+          {
+           $active ='active';
+          }
+          else{
+           $active = '';
+          }
+                                                
+      $pagination .='<li class="page-item '.$active.'"><a class="page-link" onClick="search_vendor('.$i.')">'.$i.'</a></li>';
+        } 
+      $pagination .='<li class="page-item disabled"><a class="page-link" >>></a></li>';
+        }
+      else if($page==$total_pages){ 
+      $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor(1)">First</a></li>'.
+                    '<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_4.')"><<</a></li>'.
+                    '<li class="page-item "><a class="page-link" onClick="search_vendor('.$page_2.')">'.$page_2.'</a></li>'.
+                    '<li class="page-item  "><a class="page-link" onClick="search_vendor('.$page_1.')">'.$page_1.'</a></li>'. 
+                    '<li class="page-item active"><a class="page-link" onClick="search_vendor('.$page.')">'.$page.'</a></li>';
+                                }
+      else { 
+      if($page==1)
+      {     
+         $pagination .='<li class="page-item active "><a class="page-link" onClick="search_vendor('.$page.')">'.$page.'</a></li>'.
+                      '<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_p1.')">'.$page_p1.'</a></li>'.
+                      '<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_p2.')">'.$page_p2.'</a></li>';
+        } 
+        else 
+        {
+        $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor(1)">First</a></li>';
+        if($page>2){
+         $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_3.')"><<</a></li>';
+         }
+        else{
+           $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_1.')"><<</a></li>';
+        }
+         $pagination .='<li class="page-item "><a class="page-link" onClick="search_vendor('.$page_1.')">'.$page_1.'</a></li>'.
+                      '<li class="page-item active"><a class="page-link" onClick="search_vendor('.$page.')">'.$page.'</a></li>'.
+                      '<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_p1.')">'.$page_p1.'</a></li>';
+             } 
+          if($page==1) {
+          $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_p4.')">>></a></li>';
+         } 
+         else if($page>1 && $page<$last) {
+              $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_p3.')">>></a></li>';
+         }
+        else{
+          $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor('.$page_p1.')">>></a></li>';
+        }
+                                               
+            $pagination .='<li class="page-item"><a class="page-link" onClick="search_vendor('.$total_pages.')">Last</a></li>';
+      }
+   
+        $pagination .='</ul></nav>';
+    }
+    else{
+      $pagination="";
+      $show="";
+    }
+
+    }else{
+                      $data .='<tr>'.
+                              '<td colspan=12 style="width:10%;color:red;font-weight: bold">NO DATA FOUND</td>'. 
+                              '</tr>'; 
+                      $show ="";
+                      $pagination ="";          
+}
+$satas = array('data' => $data, 'show' => $show,'pagination'=>$pagination);
+echo json_encode($satas);
+                                        
+}
+
+
+
+
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='edit_employee_voucher'){
+    
+    $sql_kotlist  =  $database->mysqlQuery("SELECT * from tbl_employee_voucher where  ev_id='".$_REQUEST['edit_id']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+            echo $result_kotlist['ev_employee_id'].'*'.$result_kotlist['ev_department'].'*'.$result_kotlist['ev_pay_type'].'*'
+                    .$result_kotlist['ev_date'].'*'
+            .$result_kotlist['ev_amount'].'*'.$result_kotlist['ev_from'].'*'.$result_kotlist['ev_approved_by'].'*'
+                    .$result_kotlist['ev_trans'].'*'
+            .$result_kotlist['ev_remarks'].'*'.$result_kotlist['ev_month'].'*'.$result_kotlist['ev_year'];
+            
+            
+            
+            
+            
+            
+                                        }}
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='update_employee_voucher'){
+    
+    
+    if($_REQUEST['ev_date']!=''){
+    $dov='"'.$_REQUEST['ev_date'].'"';
+    }else{
+      $dov='NULL';  
+    }
+    
+    
+    
+     $query3=$database->mysqlQuery(" UPDATE `tbl_employee_voucher` SET `ev_employee_id`='".$_REQUEST['ev_emp_id']."',"
+             . "`ev_department`='".$_REQUEST['ev_dept']."',`ev_pay_type`='".$_REQUEST['ev_pay_type']."',`ev_date`=$dov,`ev_amount`='".$_REQUEST['ev_amount']."',"
+             . "`ev_from`='".$_REQUEST['ev_from']."',`ev_approved_by`='".$_REQUEST['ev_approved']."',`ev_trans`='".$_REQUEST['ev_tran']."',"
+             . "`ev_remarks`='".$_REQUEST['ev_remarks']."',ev_month='".$_REQUEST['ev_month']."',ev_year='".$_REQUEST['ev_year']."' WHERE ev_id='".$_REQUEST['update_id']."' ");
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='search_asset_category'){
+    
+    $string='';
+    
+    if($_REQUEST['c_name']!=''){
+    $string.=" and tsc_name like '%".$_REQUEST['c_name']."%'   ";
+    }
+    
+     $sql_kotlist  =  $database->mysqlQuery("SELECT tsc_id,tsc_name,tsc_order,tsc_status from tbl_asset_category  where tsc_id!='' $string order by  tsc_order asc"); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){$i=0;
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  { $i++;   
+?>
+                
+                                 <tr>
+                                                 <td style="width:5%"><?=$i?></td>
+                                                 <td style="width:10%"><a href="#" onclick="edit_asset_cat('<?=$result_kotlist['tsc_id']?>');"   ><div class="action_button"><i class="glyphicon glyphicon-pencil"></i></div></a></td>
+                                                 <td style="width:30%"><?=$result_kotlist['tsc_name']?></td>
+                                                  <td style="width:5%"><?=$result_kotlist['tsc_order']?></td>
+                                                <td style="width:15%"><?=$result_kotlist['tsc_status']?></td>
+                                            </tr>       
+                                        
+                                        
+    <?php
+                                        }}else{
+                                            ?>
+                                             <tr>
+                                                 <td style="width:5%"></td>
+                                                 <td style="width:10%"></td>
+                                                 <td style="width:30%;color: darkred;font-weight: bold">NO DATA</td>
+                                                  <td style="width:5%"></td>
+                                                <td style="width:15%"></td>
+                                            </tr>
+                                            <?php
+                                        }
+                                        
+                                        
+                                        
+                                        
+}
+
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='add_asset_category'){
+    
+    
+      
+    
+        $insertion['tsc_status'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['c_status']);
+        	    
+        $insertion['tsc_name'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['c_name']);
+         $insertion['tsc_order'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['c_order']);
+       
+        $sql=$database->check_duplicate_entry('tbl_asset_category',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_asset_category',$insertion);
+         } 
+    
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='edit_asset_cat'){
+    $sql_kotlist  =  $database->mysqlQuery("SELECT tsc_name,tsc_order,tsc_status from tbl_asset_category where  tsc_id='".$_REQUEST['edit_id']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+            echo $result_kotlist['tsc_name'].'*'.$result_kotlist['tsc_order'].'*'.$result_kotlist['tsc_status'];
+                                        }}
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='update_asset_category'){
+    
+  
+     $query3=$database->mysqlQuery(" UPDATE `tbl_asset_category` SET `tsc_name`='".$_REQUEST['c_name']."',"
+             . "`tsc_order`='".$_REQUEST['c_order']."',`tsc_status`='".$_REQUEST['c_status']."' WHERE tsc_id='".$_REQUEST['update_id']."' ");
+}
+
+
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='search_asset_master'){
+    
+    $string='';
+    
+    if($_REQUEST['cm_name']!=''){
+    $string.=" and tm.tam_name like '%".$_REQUEST['cm_name']."%'   ";
+    }
+    
+     $sql_kotlist  =  $database->mysqlQuery("SELECT tam_id,tam_name,tsc_name,tam_depriciation,tam_status from tbl_asset_master tm left join  tbl_asset_category tc on tc.tsc_id=tm.tam_asset_category where tm.tam_id!='' $string "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){$i=0;
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  { $i++;   
+?>
+                                           
+                                        
+                                        
+                                 <tr>
+                                                 <td style="width:5%"><?=$i?></td>
+                                                 <td style="width:10%"><a href="#" onclick="edit_asset_master('<?=$result_kotlist['tam_id']?>');"   >
+                                                 <div class="action_button"><i class="glyphicon glyphicon-pencil"></i></div></a></td>
+                                                 <td style="width:30%"><?=$result_kotlist['tam_name']?></td>
+                                                  <td style="width:5%"><?=$result_kotlist['tsc_name']?></td>
+                                                  <td style="width:15%"><?=$result_kotlist['tam_depriciation']?></td>
+                                                <td style="width:15%"><?=$result_kotlist['tam_status']?></td>
+                                                 
+                                                
+                                            </tr>       
+                                        
+                                        
+    <?php
+                                        }}else{
+                                            ?>
+                                            <tr>
+                                            
+                                                <td style="width:5%"></td>
+                                                <td style="width:10%"></td>
+                                                <td style="width:30%;color: darkred;font-weight: bold">NO DATA</td>
+                                                <td style="width:5%"></td>
+                                                <td style="width:15%"></td>
+                                                <td style="width:15%"></td>
+                                            </tr>
+                                            <?php
+                                        }
+                                        
+                                        
+                                        
+                                        
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='add_asset_master'){
+    
+    
+      
+    
+        $insertion['tam_name'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cm_name']);
+        	    
+        $insertion['tam_asset_category'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cm_cat']);
+         $insertion['tam_status'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cm_status']);
+         $insertion['tam_depriciation'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cm_dep']);
+       
+        $sql=$database->check_duplicate_entry('tbl_asset_master',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_asset_master',$insertion);
+         } 
+    
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='edit_asset_master'){
+    $sql_kotlist  =  $database->mysqlQuery("SELECT tam_name,tam_asset_category,tam_status,tam_depriciation from tbl_asset_master where  tam_id='".$_REQUEST['edit_id']."' "); 
+	$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+	if($num_kotlist){
+	while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+	{
+      echo $result_kotlist['tam_name'].'*'.$result_kotlist['tam_asset_category'].'*'.$result_kotlist['tam_status'].'*'.$result_kotlist['tam_depriciation'];
+       }}
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='update_asset_master'){
+    
+  
+     $query3=$database->mysqlQuery(" UPDATE `tbl_asset_master` SET `tam_name`='".$_REQUEST['c_name']."',"
+             . "`tam_asset_category`='".$_REQUEST['c_cat']."',`tam_status`='".$_REQUEST['c_status']."',tam_depriciation='".$_REQUEST['c_dep']."' WHERE tam_id='".$_REQUEST['update_id']."' ");
+     
+   
+}
+else if(isset($_REQUEST['asset_name']) && $_REQUEST['asset_name']!=''){
+   
+        $insertion['tap_vendor_id']=  mysqli_real_escape_string($database->DatabaseLink,trim($_REQUEST['vendor_no']));
+        
+         $insertion['tap_date']=  mysqli_real_escape_string($database->DatabaseLink,trim($_REQUEST['date_no']));
+         
+         $insertion['tap_invoice_no']=  mysqli_real_escape_string($database->DatabaseLink,trim($_REQUEST['inv_no']));
+       
+        $insertion['tap_asset_name']= mysqli_real_escape_string($database->DatabaseLink,trim($_REQUEST['asset_name']));
+        
+        $insertion['tap_qty']= mysqli_real_escape_string($database->DatabaseLink,trim($_REQUEST['asset_qty']));
+        
+        $insertion['tap_unit_rate']= mysqli_real_escape_string($database->DatabaseLink,trim($_REQUEST['asset_unit_rate']));
+        
+        $insertion['tap_total']= mysqli_real_escape_string($database->DatabaseLink,trim($_REQUEST['asset_total']));
+        
+        $sts='N';
+        $insertion['tap_status']= mysqli_real_escape_string($database->DatabaseLink,trim($sts));
+        
+	
+        $sql=$database->check_duplicate_entry('tbl_asset_purchase',$insertion);
+        if($sql!=1)
+	{
+	$insertid         =  $database->insert('tbl_asset_purchase',$insertion);   
+         
+$fnct_menu = $database->mysqlQuery("select * from tbl_asset_purchase tp left join tbl_asset_master tm on tp.tap_asset_name=tm.tam_id where tp.tap_vendor_id='".$_REQUEST['vendor_no']."' and tp.tap_invoice_no='".$_REQUEST['inv_no']."' and tp.tap_date='".$_REQUEST['date_no']."' ");
+         $num_fdtl = $database->mysqlNumRows($fnct_menu);
+        if ($num_fdtl > 0) {
+              while ($result_fnctvenue = $database->mysqlFetchArray($fnct_menu))
+              {
+                      $row2[]=$result_fnctvenue;
+                  }
+        }
+        
+               
+          echo json_encode($row2);
+        
+        
+        
+         }
+
+
+}
+else if(isset($_REQUEST['value']) && $_REQUEST['value']=='delcar'){
+    
+     $fnct_menu = $database->mysqlQuery("Delete from tbl_asset_purchase where tap_id='".$_REQUEST['id']."'");
+    
+}
+else if(isset($_REQUEST['value']) && $_REQUEST['value']=='delete_all_asset_purchase'){
+    
+     $fnct_menu = $database->mysqlQuery("Delete from tbl_asset_purchase where tap_status='N'");
+    
+}
+else if(isset($_REQUEST['value']) && $_REQUEST['value']=='check_total_amount'){
+    
+    
+    $tot=0;
+
+    $fnct_menu = $database->mysqlQuery("select sum(tap_total) as total_asset from tbl_asset_purchase where tap_vendor_id='".$_REQUEST['asset_vendor']."' and tap_invoice_no='".$_REQUEST['asset_inv']."' and tap_date='".$_REQUEST['asset_date']."' ");
+         $num_fdtl = $database->mysqlNumRows($fnct_menu);
+      
+        if ($num_fdtl > 0) {
+              while ($result_fnctvenue = $database->mysqlFetchArray($fnct_menu))
+              {
+                  $tot=$result_fnctvenue['total_asset'];
+              } 
+                  
+                  if($tot)
+                  {
+                    echo $tot;
+                  }  
+                  else {
+                    echo '0';
+                  }
+        }
+        
+        if($tot==''){
+            $tot=0;
+        }
+    
+        if($_REQUEST['type_submit']=='edit_invoice'){
+            
+             $fnct_menu = $database->mysqlQuery(" update tbl_asset_purchase_invoice_detail set"
+                     . " tpd_subtotal='".$tot."',tpd_netamount=(tpd_tax_total+'$tot') where tpd_vendor='".$_REQUEST['asset_vendor']."' "
+                     . "and tpd_invoice='".$_REQUEST['asset_inv']."' and tpd_date='".$_REQUEST['asset_date']."'  ");
+              
+        }
+        
+      
+}
+
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='add_asset_tax'){
+    
+    
+     
+     $tx_data=json_decode($_REQUEST['taxdata']);
+   
+      for($c=0;$c<count($tx_data);$c++){
+          
+        $tx_id=$tx_data[$c]->taxid;
+        $tx_value=$tx_data[$c]->taxamt;
+          
+        if($tx_value>0){
+        $insertion['txd_tax_name'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$tx_id);
+        $insertion['txd_value'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$tx_value);
+      
+           
+
+        $sts='N';
+        $insertion['txd_inclusive'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['tax_inclusive']);
+        $insertion['txd_status'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$sts);
+        $insertion['txd_invoice'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['invoice']);
+        $insertion['txd_vendor'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['vendor']);
+        $insertion['txd_date'] 		                =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['date']);
+        
+      
+        
+        $sql=$database->check_duplicate_entry('tbl_asset_invoice_tax_details',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_asset_invoice_tax_details',$insertion);
+         } 
+        }
+         
+      }
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='add_invoice_main'){
+    
+    
+     if($_REQUEST['type_submit']=='edit_invoice'){
+         
+       $query3=$database->mysqlQuery(" UPDATE tbl_asset_purchase_invoice_detail SET tpd_subtotal='".$_REQUEST['subtotal']."',"
+               . " tpd_tax_total= '".$_REQUEST['tax_calc_asset']."',  tpd_netamount= '".$_REQUEST['netamount']."' , tpd_from_acc= '".$_REQUEST['fromacc']."', tpd_to_acc= '".$_REQUEST['toacc']."'  ,"
+               . "  tpd_paid_amount = '".$_REQUEST['paid_amount']."' ,tpd_trn_detail ='".$_REQUEST['tran']."' , tpd_remarks= '".$_REQUEST['remarks']."' ,tpd_credit_amount='".$_REQUEST['credit_asset']."'   "
+               . "WHERE tpd_invoice='".$_REQUEST['invoice']."' and tpd_vendor='".$_REQUEST['vendor']."' and tpd_date='".$_REQUEST['date']."' ");   
+        
+    }else{
+    
+        $date=date('Y-m-d');
+        $insertion['tpd_invoice'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['invoice']);
+        $insertion['tpd_vendor'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['vendor']);
+        $insertion['tpd_date'] 		                =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['date']);
+        $insertion['tpd_subtotal'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['subtotal']);
+        $insertion['tpd_tax_total'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['tax_calc_asset']);
+        $insertion['tpd_netamount'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['netamount']);
+        $insertion['tpd_from_acc'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['fromacc']);
+        $insertion['tpd_to_acc'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['toacc']);
+        $insertion['tpd_paid_amount'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['paid_amount']);
+        $insertion['tpd_trn_detail'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['tran']);
+        $insertion['tpd_remarks'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['remarks']);
+        $insertion['tpd_credit_amount'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['credit_asset']);
+        $insertion['tpd_entry_date'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$date);
+         
+         if($_REQUEST['dis']!=''){
+          $insertion['tpd_discount'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['dis']);
+         }
+      
+         $insertion['tpd_type_pay'] 		        =  mysqli_real_escape_string($database->DatabaseLink,'First');
+         
+        $sql=$database->check_duplicate_entry('tbl_asset_purchase_invoice_detail',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_asset_purchase_invoice_detail',$insertion);
+         } 
+         
+    } 
+        $query3=$database->mysqlQuery(" UPDATE `tbl_asset_invoice_tax_details` SET `txd_status`='Y' WHERE txd_invoice='".$_REQUEST['invoice']."' and txd_vendor='".$_REQUEST['vendor']."' and txd_date='".$_REQUEST['date']."' "); 
+        
+        $query3=$database->mysqlQuery(" UPDATE `tbl_asset_purchase` SET `tap_status`='Y' WHERE tap_invoice_no='".$_REQUEST['invoice']."' and tap_vendor_id='".$_REQUEST['vendor']."' and tap_date='".$_REQUEST['date']."' ");  
+         
+      
+}
+else if(isset($_REQUEST['value']) && $_REQUEST['value']=='delete_all_asset_purchase_tax'){
+    
+     $fnct_menu = $database->mysqlQuery("Delete from tbl_asset_invoice_tax_details where txd_status='N'");
+    
+}
+
+//------------------------------- Asset invoice list--------------------------------------------
+
+else if(isset($_REQUEST['set']) && $_REQUEST['set']=='search_asset_invoice')
+{
+    $string='';
+    if($_REQUEST['invoice']!='')
+    {   
+        $string.= " and ti.tpd_invoice like '%".$_REQUEST['invoice']."%'  "; 
+    }
+    if($_REQUEST['vendor']!='')
+    {
+        $string.= " and tv.v_name like '%".$_REQUEST['vendor']."%'  ";
+    }
+     
+    if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{
+			$string.= " and  ti.tpd_date between '".$_REQUEST['fromdt']."' and '".$_REQUEST['todt']."' ";                 
+		}
+
+    
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{
+			$to=date("Y-m-d");
+			$string.= " and  ti.tpd_date between '".$_REQUEST['fromdt']."' and '".$to."' ";               
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");
+			$string.= " and ti.tpd_date between '".$from."' and '".$_REQUEST['todt']."' ";                
+		}
+    else{
+      $from=date("Y-m-d");
+      $to=date("Y-m-d");
+      $string.= " and ti.tpd_date between '".$from."' and '".$_REQUEST['todt']."' ";  
+    }
+    
+    $tot_paid_asset=0;
+    $i=0;
+
+
+    $fnct_menu  =  $database->mysqlQuery("select tpd_credit_amount,tpd_discount,tpd_invoice,tpd_vendor,v_id,tpd_date,v_name,tpd_subtotal,tpd_tax_total,
+    tpd_netamount,tpd_paid_amount,tpd_remarks,tpd_entry_date,tpd_to_acc  from tbl_asset_purchase_invoice_detail ti left join tbl_vendor_master tv on tv.v_id=ti.tpd_vendor where ti.tpd_id!='' $string  ");
+  $num_fdtl = $database->mysqlNumRows($fnct_menu);
+    if($num_fdtl > 0) 
+    {
+      while ($result_fnctvenue = $database->mysqlFetchArray($fnct_menu))
+      { $i++; ?>
+              
+         <tr>
+            <td style="min-width:50px"><?=$i?></td>
+            <td style="min-width:80px;cursor: pointer">
+                                                    
+          <?php if($result_fnctvenue['tpd_credit_amount'] > 0){ 
+            error_reporting(0);
+            if($aa!=$result_fnctvenue['tpd_invoice'] || $bb!=$result_fnctvenue['tpd_vendor'])
+            {  
+                $aa=$result_fnctvenue['tpd_invoice'];
+                $bb= $result_fnctvenue['tpd_vendor'];
+            ?>
+
+            <a onclick="return edit_asset_purchase('<?=$result_fnctvenue['tpd_invoice']?>','<?=$result_fnctvenue['v_id']?>','<?=$result_fnctvenue['tpd_date']?>','<?=$result_fnctvenue['tpd_to_acc']?>');"><div class="action_button"><i class="glyphicon glyphicon-pencil"></i></div>
+            </a>
+                                                     
+            <a onclick="return add_pay('<?=$result_fnctvenue['tpd_invoice']?>','<?=$result_fnctvenue['v_id']?>','<?=$result_fnctvenue['tpd_date']?>');"><div class="action_button"><i class="glyphicon glyphicon-plus"></i></div>
+            </a>
+            <?php }
+            else{ ?>
+            
+            <a>
+            <div class="action_button">[X]</div>
+            </a>
+            
+            <?php } 
+          }else{ ?>
+              <a >
+                  <div class="action_button">    [X] </div>
+              </a>
+         <?php }?>   
+              </td>
+              <td style="min-width:100px"><?=$result_fnctvenue['tpd_date']?></td>                                             
+              <td style="min-width:150px"><?=$result_fnctvenue['v_name']?></td>
+              <td style="min-width:80px"><?=$result_fnctvenue['tpd_invoice']?></td>                                             
+              <td style="min-width:100px"><?=$result_fnctvenue['tpd_subtotal']?></td>  
+              <td style="min-width:80px"><?=$result_fnctvenue['tpd_tax_total']?></td>  
+              <td style="min-width:80px"><?=$result_fnctvenue['tpd_discount']?></td>  
+              <td style="min-width:100px"><?=$result_fnctvenue['tpd_netamount']?></td> 
+              <td style="min-width:100px"><?=$result_fnctvenue['tpd_paid_amount']?></td> 
+              <td style="min-width:100px"><?=$result_fnctvenue['tpd_credit_amount']?></td> 
+              <td style="min-width:150px"><?=$result_fnctvenue['tpd_remarks']?></td> 
+              <td style="min-width:100px"><?=$result_fnctvenue['tpd_entry_date']?></td> 
+          </tr>
+        <?php 
+     $tot_paid_asset=$tot_paid_asset+$result_fnctvenue['tpd_paid_amount'];
+    }
+    ?>
+                                            <tr>
+                                          <td style="width:10%;font-weight: bold">Paid</td>
+                                              
+                                            <td style="width:13%"></td>
+                                                <td style="width:10%"></td>
+                                              
+                                                <td style="width:8%"></td>  
+                                                <td style="width:8%"></td>   
+                                                 
+                                                <td style="width:8%"></td> 
+                                                 
+                                                 <td style="width:8%"></td> 
+                                               
+                                                 <td style="width:12%"></td> 
+                                                   <td style="width:8%;font-weight: bold"><?=$tot_paid_asset?></td>
+                                                 <td style="width:12%"></td> 
+                                                 <td style="width:12%"></td> 
+                                                 <td style="width:12%"></td> 
+                                                 <td style="width:12%"></td> 
+                                            </tr>                                  
+    
+    <?php
+      }
+      else { ?>
+        <tr><td colspan=12 style="width:10%;color: red;font-weight:bold ">No Records to Display</td></tr>
+    <?php  } 
+    
+}
+else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='search_asset_stock'){
+    
+    $string='';
+    
+    if($_REQUEST['cm_name']!=''){
+    $string.=" and tm.tam_name like '%".$_REQUEST['cm_name']."%'   ";
+    }
+    
+    if($_REQUEST['cm_cat']!=''){
+    $string.=" and tc.tsc_id='".$_REQUEST['cm_cat']."'   ";
+    }
+    
+    
+     $sql_kotlist  =  $database->mysqlQuery("SELECT distinct(tm.tam_name),tc.tsc_name, sum(tp.tap_qty) as qty  from tbl_asset_purchase tp left join tbl_asset_master tm on tm.tam_id=tp.tap_asset_name  left join  tbl_asset_category tc on tc.tsc_id=tm.tam_asset_category where tp.tap_id!='' $string group by tp.tap_asset_name "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){$i=0;
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  { $i++;   
+?>
+                                           
+                                     <tr>
+                                                <td style="width:5%"><?=$i?></td>
+                                                
+                                                <td style="width:20%"><?=$result_kotlist['tam_name']?></td>
+                                                 <td style="width:10%"><?=$result_kotlist['tsc_name']?></td>
+                                                <td style="width:20%;font-weight: bold"><?=$result_kotlist['qty']?></td>
+                                               
+                                            </tr>   
+                                        
+                                 
+                                        
+    <?php
+                                        }}else{
+                                            ?>
+                                             <tr>
+                                                <td style="width:5%"></td>
+                                                
+                                                <td style="width:20%"></td>
+                                                 <td style="width:10%;color:darkred">NO DATA</td>
+                                                <td style="width:20%"></td>
+                                               
+                                            </tr>   
+                                            <?php
+                                        }
+                                        
+                                        
+                                        
+                                        
+}
+else if(isset($_REQUEST['set']) && $_REQUEST['set']=='load_plus_data_invoice'){
+$fnct_menu = $database->mysqlQuery("select * from tbl_asset_purchase tp left join tbl_asset_master tm on tp.tap_asset_name=tm.tam_id where tp.tap_vendor_id='".$_REQUEST['vendor_no']."' and tp.tap_invoice_no='".$_REQUEST['inv_no']."' and tp.tap_date='".$_REQUEST['date_no']."' ");
+         $num_fdtl = $database->mysqlNumRows($fnct_menu);
+        if ($num_fdtl > 0) {
+              while ($result_fnctvenue = $database->mysqlFetchArray($fnct_menu))
+              {
+                      $row2[]=$result_fnctvenue;
+                  }
+        }
+        
+               
+          echo json_encode($row2);
+
+}
+else if(isset($_REQUEST['value']) && $_REQUEST['value']=='check_invoice_edit_load'){
+    
+    
+    
+    $fnct_menu = $database->mysqlQuery("select * from tbl_asset_purchase_invoice_detail where tpd_vendor='".$_REQUEST['asset_vendor']."' and tpd_invoice='".$_REQUEST['asset_inv']."' and tpd_date='".$_REQUEST['asset_date']."' ");
+         $num_fdtl = $database->mysqlNumRows($fnct_menu);
+        if ($num_fdtl > 0){
+              while ($result_fnctvenue = $database->mysqlFetchArray($fnct_menu))
+               {
+                          echo '*'.$result_fnctvenue['tpd_subtotal'].'*'.$result_fnctvenue['tpd_tax_total'].'*'.$result_fnctvenue['tpd_netamount'].
+                          '*'.$result_fnctvenue['tpd_from_acc'].'*'.$result_fnctvenue['tpd_paid_amount'].'*'.$result_fnctvenue['tpd_trn_detail'].
+                          '*'.$result_fnctvenue['tpd_remarks'].'*'.$result_fnctvenue['tpd_credit_amount'].'*'.$result_fnctvenue['tpd_discount'];   
+               }
+        }
+    
+    
+}
+
+else if(isset($_REQUEST['set']) && $_REQUEST['set']=='load_plus_data_invoice_tax'){
+$fnct_menu = $database->mysqlQuery("select * from tbl_asset_invoice_tax_details where txd_vendor='".$_REQUEST['asset_vendor']."' and txd_invoice='".$_REQUEST['asset_inv']."' and txd_date='".$_REQUEST['asset_date']."' ");
+         $num_fdtl = $database->mysqlNumRows($fnct_menu);
+        if ($num_fdtl > 0) {
+              while ($result_fnctvenue = $database->mysqlFetchArray($fnct_menu))
+              {
+                      $row2[]=$result_fnctvenue;
+                  }
+        }
+        
+               
+          echo json_encode($row2);
+
+}
+else if(isset($_REQUEST['set']) && $_REQUEST['set']=='load_edit_tax'){
+    ?>
+     
+                    <?php
+                    $fnct_menu = $database->mysqlQuery("select * from tbl_extra_tax_master te left"
+                  . " join tbl_asset_invoice_tax_details tx on te.amc_id=tx.txd_tax_name where tx.txd_invoice='".$_REQUEST['invoice']."' "
+                  . " and tx.txd_date= '".$_REQUEST['date']."'  and tx.txd_vendor='".$_REQUEST['vendor']."' limit 1 ");
+         $num_fdtl = $database->mysqlNumRows($fnct_menu);
+        if ($num_fdtl > 0) {
+              while ($result_fnctvenue = $database->mysqlFetchArray($fnct_menu))
+              { 
+           ?>
+              <input type="checkbox" id="etax_type" <?php if($result_fnctvenue['txd_inclusive']=='Y'){ ?> checked <?php } ?>      name="etax_type"  ><span style="color:black;"> Inclusive</span> 
+                   <?php } } ?> 
+                    
+                    <div class="col-lg-12 col-md-12 no-padding printer_add_text_boxes_cc add_supplier_cnt" style="margin-bottom:5px;">
+
+                    
+                      <?php $taxcount=0;
+                       $fnct_menu = $database->mysqlQuery("select count(txd_tax_name) as tax_count from tbl_asset_invoice_tax_details where  txd_invoice='".$_REQUEST['invoice']."' "
+                  . " and txd_date= '".$_REQUEST['date']."'  and txd_vendor='".$_REQUEST['vendor']."' ");
+         $num_fdtl = $database->mysqlNumRows($fnct_menu);
+        if ($num_fdtl > 0) {
+              while ($result_fnctvenue = $database->mysqlFetchArray($fnct_menu))
+              { 
+                $taxcount= $result_fnctvenue['tax_count']; 
+                  
+              }
+              }
+                  
+              ?>
+                         <input type="hidden" value="<?=$taxcount?>" id="etax_count" > 
+                        <?php
+              
+              
+              
+                      
+          $ct=0;     
+          $fnct_menu = $database->mysqlQuery("select amc_name,amc_value,amc_id,txd_value from tbl_extra_tax_master te left"
+                  . " join tbl_asset_invoice_tax_details tx on te.amc_id=tx.txd_tax_name where tx.txd_invoice='".$_REQUEST['invoice']."' "
+                  . " and tx.txd_date= '".$_REQUEST['date']."'  and tx.txd_vendor='".$_REQUEST['vendor']."' ");
+         $num_fdtl = $database->mysqlNumRows($fnct_menu);
+        if ($num_fdtl > 0) {
+              while ($result_fnctvenue = $database->mysqlFetchArray($fnct_menu))
+              { $ct++;
+                  ?>
+                       
+                        
+                        
+                     <div class="col-md-6">
+                     <div class="group" id="prn_div">   
+                         <input readonly value="<?=$result_fnctvenue['amc_name'].' ('.$result_fnctvenue['amc_value'].'%)' ?> "  etax_id="<?=$result_fnctvenue['amc_id']?>" type="text" id="etax_name<?=$ct?>" >   
+                          <span class="highlight"></span>
+                          <span class="bar"></span>
+                          <label id="lab_grp"></label>
+                        </div>
+                    </div>
+
+                        
+                        
+                     <div class="col-md-6">
+                     <div class="group" id="prn_div">   
+                         
+                         <input type="text" value="<?=$result_fnctvenue['txd_value']?>" id="etax_amt<?=$ct?>" onkeypress="return numdot_dot(this,event);" >   
+                        
+                         
+                          <span class="highlight"></span>
+                          <span class="bar"></span>
+                          <label id="lab_grp"></label>
+                        </div>
+                    </div>
+                    
+                     <?php } } ?>         
+                   
+                    
+                  
+                    </div>
+                      
+                    <a onclick="tax_update_all();" href="#"><button style="position:relative;top:2px;float:right;right:5px;height: 42px;" class="md-save">UPDATE</button></a>
+                    
+ <?php
+}else if(isset($_REQUEST['set']) && $_REQUEST['set']=='update_asset_tax'){
+    
+$tx_data=json_decode($_REQUEST['taxdata']);
+ echo count($tx_data);
+      for($c=0;$c<count($tx_data);$c++){
+          
+        $tx_id=$tx_data[$c]->taxid;
+        $tx_value=$tx_data[$c]->taxamt;
+          
+        if($tx_value>0){
+        
+         $fnct_menu = $database->mysqlQuery(" update tbl_asset_invoice_tax_details set txd_value='".$tx_value."',txd_inclusive='".$_REQUEST['tax_inclusive']."' where  txd_tax_name='".$tx_id."' and txd_invoice='".$_REQUEST['invoice']."' and  txd_vendor='".$_REQUEST['vendor']."' and  txd_date='".$_REQUEST['date']."' ");
+        //echo " update tbl_asset_invoice_tax_details set txd_value='".$tx_value."',  txd_inclusive='".$_REQUEST['tax_inclusive']."' where  txd_tax_name='".$tx_id."' and txd_invoice='".$_REQUEST['invoice']."' and  txd_vendor='".$_REQUEST['vendor']."' and  txd_date='".$_REQUEST['date']."' ";
+        }   
+      }
+      }  
+ else if(isset($_REQUEST['set']) && $_REQUEST['set']=='list_journal'){
+          
+          
+           $string='';
+    
+    if($_REQUEST['acc']!=''){
+    $string.=" and tm.tlm_ledger_name like '%".$_REQUEST['acc']."%'   ";
+    }
+    
+    if($_REQUEST['grp']!=''){
+    $string.=" and tg.tlg_name like '%".$_REQUEST['grp']."%'   ";
+    }
+          
+     if($_REQUEST['typ']!=''){
+    $string.=" and tm.tlm_type= '".$_REQUEST['typ']."'   ";
+    }
+           
+ 
+          $i=0;
+          $sql_login  =  $database->mysqlQuery("select tlm_id,tlm_ledger_name,tlg_name,tlm_group,tlm_vendor_id,tlm_staff_id,tlm_type from tbl_ledger_master tm left join tbl_ledger_group tg on tg.tlg_id=tm.tlm_group where tm.tlm_id!='' $string order by tm.tlm_ledger_name asc  "); 
+					$num_login   = $database->mysqlNumRows($sql_login);
+					if($num_login){
+					while($result_login  = $database->mysqlFetchArray($sql_login)) 
+					{ $i++;?>   
+                                        <tr  >
+                                          <td style="width:10%;text-transform: uppercase"><?=$i?></td>
+                                            <td style="width:30%;text-transform: uppercase"><?=$result_login['tlm_ledger_name']?></td>
+                                            <td style="width:18%;text-transform: uppercase"><?=$result_login['tlg_name']?></td>
+                                            <td style="width:18%;text-transform: uppercase;cursor: pointer"><a style="width:auto;padding:5px; background-color: #a91400; color: #ffffff;" 
+                                            onclick="return goto_detail('<?=$result_login['tlm_ledger_name']?>','<?=$result_login['tlm_id']?>',
+                                            '<?=$result_login['tlm_group']?>','<?=$result_login['tlm_vendor_id']?>','<?=$result_login['tlm_staff_id']?>',
+                                            '<?=$result_login['tlm_type']?>');">LEDGERS</a></td>
+                                            
+                                        </tr>
+                                        
+                                        
+                                        <?php
+                                        } } 
+ }
+ else if(isset($_REQUEST['set']) && $_REQUEST['set']=='list_journal_detail')
+ {
+  
+        $string='';
+        $string1='';
+        $string2='';
+        $string3='';       
+        $stringta='';
+        $stringdi='';
+        $string_as='';	
+        $string_con5='';
+        $string_rec='';
+        $string_loan_adv='';
+        $string_crd_new1=" "; 
+        $stringr='';
+        $openclose=''; 
+        $debt=0;
+        $crdt=0;
+         
+    if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{               
+      $openclose.=" and tps_dayclosedate  between '".$_REQUEST['fromdt']."' and '".$_REQUEST['todt']."' ";
+		}
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{
+			$to=date("Y-m-d");            
+      $openclose.=" and tps_dayclosedate  between '".$_REQUEST['fromdt']."' and '".$to."' ";
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");      
+      $openclose.=" and tps_dayclosedate  between '".$from."' and '".$_REQUEST['todt']."' ";
+		}
+    else
+	  {
+		  $from=date("Y-m-d");
+			$to=date("Y-m-d");              
+      $openclose.=" and tps_dayclosedate  between '".$from."' and '".$to."' ";
+	  }
+      
+  
+    $sql_logincashdi  =  $database->mysqlQuery("select tps_dayclosedate,tps_ledger_open_bal,tps_closing_balance 
+                                                from tbl_ledger_setting
+                                                where tps_dayclosedate!='' $openclose and tps_ledger_id='".$_REQUEST['acc']."' ");  
+	  $num_logincashdi   = $database->mysqlNumRows($sql_logincashdi);
+
+    
+	  if($num_logincashdi){
+      
+    foreach ($sql_logincashdi as $result_login_openclose)
+		 // while($result_login_openclose  = $database->mysqlFetchArray($sql_logincashdi)) 
+			{                      
+          $date_acc[]=$result_login_openclose['tps_dayclosedate'];
+
+          $string= " and  ts.sv_date = '".$result_login_openclose['tps_dayclosedate']."' ";
+          $string1= " and  ts.ev_date = '".$result_login_openclose['tps_dayclosedate']."' ";
+          $string2= " and  date(tes.tes_entrydate) = '".$result_login_openclose['tps_dayclosedate']."' ";
+          $string3= " and tes.ev_date  ='".$result_login_openclose['tps_dayclosedate']."' ";                        
+          $stringdi= " bm_dayclosedate = '".$result_login_openclose['tps_dayclosedate']."' ";
+			    $stringta= " tab_dayclosedate  ='".$result_login_openclose['tps_dayclosedate']."' ";                       
+          $string_as= "  tpd_date  = '".$result_login_openclose['tps_dayclosedate']."' ";                        
+          $string_con5= " and cv_date   ='".$result_login_openclose['tps_dayclosedate']."' ";  
+          $string_crd_new1=" cdp_dayclosedate = '".$result_login_openclose['tps_dayclosedate']."' ";                           
+          $string_rec= " and tr_date =  '".$result_login_openclose['tps_dayclosedate']."' ";
+          $string_loan_adv=" and tla_date =  '".$result_login_openclose['tps_dayclosedate']."' ";
+          $stringr=" and date(tr_date)  = '".$result_login_openclose['tps_dayclosedate']."' ";                                            
+        ?>
+            
+    <tr>
+      <td style="font-weight: bold ">Opening Balance </br>
+        <?=$result_login_openclose['tps_dayclosedate'] ?></br>
+        <span style="color:darkred"><?=number_format($result_login_openclose['tps_ledger_open_bal'],$_SESSION['be_decimal']) ?> <span>
+      </td>
+      <td></td><td></td><td></td><td></td></tr>                
+                  
+      <?php                              
+                                                        
+    $consolidated_final=0;
+  ///-----------------------------------acc_type = complimentary-----------------------------------------------------------------------////         
+    if($_REQUEST['acc_type'] =='Complimentary')
+    {
+        $payment_consolidated=array();
+        $consolidated_final=0;           
+        $each_module_sum=array();
+        $sql_summary  =  $database->mysqlQuery("select x.mode,sum(x.Total) as Total, x.dayclosedate from ( 
+                                                    select 'DI' AS mode,bm.bm_finaltotal as Total, bm.bm_dayclosedate as dayclosedate  FROM tbl_tablebillmaster bm  where bm.bm_status='Closed' and bm.bm_complimentary='Y' and $stringdi  union all
+                                                    select bm.tab_mode as mode, bm.tab_netamt as Total,bm.tab_dayclosedate as dayclosedate FROM tbl_takeaway_billmaster bm where bm.tab_status='Closed' and bm.tab_complimentary='Y' and $stringta
+                                                    )x group by x.mode, x.dayclosedate order by x.dayclosedate asc "); 
+                      
+        $num_summary  = $database->mysqlNumRows($sql_summary);
+        
+        if($num_summary)
+          {
+            while($result_summary  = $database->mysqlFetchArray($sql_summary))
+            {
+              $payment_consolidated[$result_summary['dayclosedate']][$result_summary['mode']]=$result_summary['Total'];
+            }
+            foreach($payment_consolidated as $key=>$val){
+              $each_day_final=0;                   
+                  if(array_key_exists("DI",$val)){ $each_day_final=$each_day_final+$val['DI']; $each_module_sum['DI'][]=$val['DI']; }else{ $each_module_sum['DI'][]=0; }
+                  if(array_key_exists("TA",$val)){ $each_day_final=$each_day_final+$val['TA']; $each_module_sum['TA'][]=$val['TA']; }else{ $each_module_sum['TA'][]=0; } 
+                  if(array_key_exists("CS",$val)){ $each_day_final=$each_day_final+$val['CS']; $each_module_sum['CS'][]=$val['CS'];  }else{ $each_module_sum['CS'][]=0;  }
+                  if(array_key_exists("HD",$val)){ $each_day_final=$each_day_final+$val['HD']; $each_module_sum['HD'][]=$val['HD']; }else{ $each_module_sum['HD'][]=0; }     
+            ?>
+   
+                <tr>
+                    <td ><?=$key?></td>
+                    <td >Sales</td>
+                    <td >Complimentary Sales</td>
+                    <td ><?php $consolidated_final=$consolidated_final+$each_day_final; echo number_format($each_day_final,$_SESSION['be_decimal']);?></td>
+                    <td >0.000</td>
+                </tr>                                       
+                <tr>
+                    <td ></td>
+                    <td ><?php if(array_key_exists("DI",$val)){ echo 'DI - ' .number_format($val['DI'],$_SESSION['be_decimal']);}else{ $each_module_sum['DI'][]=0; echo number_format(0,$_SESSION['be_decimal']) ;} ?></td>
+                    <td ><?php if(array_key_exists("TA",$val)){ echo 'TA - ' . number_format($val['TA'],$_SESSION['be_decimal']);}else{ $each_module_sum['TA'][]=0; echo number_format(0,$_SESSION['be_decimal']) ;} ?></td>
+                    <td ><?php if(array_key_exists("CS",$val)){ echo 'CS - ' . number_format($val['CS'],$_SESSION['be_decimal']);}else{$each_module_sum['CS'][]=0;  echo number_format(0,$_SESSION['be_decimal']) ;} ?></td>
+                    <td ><?php if(array_key_exists("HD",$val)){  echo 'HD - ' . number_format($val['HD'],$_SESSION['be_decimal']);}else{ $each_module_sum['HD'][]=0; echo number_format(0,$_SESSION['be_decimal']) ;} ?></td>                   
+                </tr>    
+                <tr>
+                    <td ><strong></strong></td>
+                    <td ><strong></strong></td>
+                    <td ><strong></strong></td>
+                    <td ><strong></strong></td>                
+                    <td ></td>
+                </tr>                         
+                    
+            <?php
+                }
+            ?>    
+                
+                </tr >
+                    <td ><strong></strong></td>
+                    <td ><strong></strong></td>
+                    <td ><strong></strong></td>
+                    <td ><strong></strong></td>                 
+                    <td ></td>
+                </tr>    
+                    
+                    
+                <tr style="font-weight: bold;" >
+                    <td ><strong>Total</strong></td>
+                    <td ><strong></strong></td>
+                    <td ><strong></strong></td>                                  
+                    <td ><strong><?=number_format($consolidated_final,$_SESSION['be_decimal'])?></strong></td>
+                     <td ><strong></strong></td>
+                </tr>
+            <?php
+          } 
+    }  
+    
+   
+ ///-----------------------------------acc_type = complimentary end-----------------------------------------------------------------------////                                    
+                                                                          
+///----------------------------------------acc_type = Sales------------------------------------------------------------------------------////      
+      $consolidated_final_sale=0;
+    if($_REQUEST['acc_type'] =='Sales')
+    {
+        $string1_str=" (sum(bm_amountpaid) - (sum(bm_amountbalace) + sum(bm_roundoff_value))) ";
+        $string1_strtacshd=" (sum(tab_amountpaid) - (sum(tab_amountbalace) + sum(tab_roundoff_value))) ";
+        
+        $payment_consolidated=array();
+        $consolidated_final_sale=0;
+            
+        $each_module_sum=array();
+        $sql_summary  =  $database->mysqlQuery("select x.mode,sum(x.Total) as Total, x.dayclosedate from ( 
+                                                    select 'DI' AS mode,bm.bm_finaltotal as Total, bm.bm_dayclosedate as dayclosedate  FROM tbl_tablebillmaster bm  where bm.bm_status='Closed' and bm.bm_complimentary!='Y' and $stringdi  union all
+                                                    select bm.tab_mode as mode, bm.tab_netamt as Total,bm.tab_dayclosedate as dayclosedate FROM tbl_takeaway_billmaster bm where bm.tab_status='Closed' and bm.tab_complimentary!='Y' and $stringta
+                                                    )x group by x.mode, x.dayclosedate order by x.dayclosedate asc "); 
+            
+      $num_summary  = $database->mysqlNumRows($sql_summary);
+      if($num_summary)
+      {
+        while($result_summary  = $database->mysqlFetchArray($sql_summary))
+        {
+        $totalcash=0;$subtotalcash=0;$subtotalcashta=0;$roundofdi=0;$roundofta=0;
+        $sql_logincashdi  =  $database->mysqlQuery("select sum(bm_roundoff_value) as roundofdi,$string1_str as tot from tbl_tablebillmaster left join tbl_paymentmode on tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id where bm_dayclosedate='".$result_summary['dayclosedate']."' and $stringdi group by bm_dayclosedate order by bm_dayclosedate ASC"); 
+	      $num_logincashdi   = $database->mysqlNumRows($sql_logincashdi);
+	      
+        if($num_logincashdi)
+        {
+		      while($result_logincashdi  = $database->mysqlFetchArray($sql_logincashdi)) 
+			    { 
+				    if($result_logincashdi['tot'] != "")	
+            {
+			        $subtotalcash =$subtotalcash + $result_logincashdi['tot'];
+              $roundofdi=$roundofdi+$result_logincashdi['roundofdi'];
+            }
+          }
+        } 
+     
+        $sql_logincashta  =  $database->mysqlQuery("select sum(tab_roundoff_value) as roundofta,$string1_strtacshd as tot from tbl_takeaway_billmaster left join tbl_paymentmode on tbl_takeaway_billmaster.tab_paymode=tbl_paymentmode.pym_id where tab_dayclosedate='".$result_summary['dayclosedate']."' and $stringta group by tab_dayclosedate order by tab_dayclosedate ASC"); 
+	      $num_logincashta   = $database->mysqlNumRows($sql_logincashta);
+
+	      if($num_logincashta)
+        {
+		      while($result_logincashta  = $database->mysqlFetchArray($sql_logincashta)) 
+			    { 
+				    if($result_logincashta['tot'] != "")	
+            {
+			        $subtotalcashta =$subtotalcashta + $result_logincashta['tot'];
+              $roundofta=$roundofta+$result_logincashta['roundofta'];
+            }
+          }
+        } 
+          $totalcash=$subtotalcash+$subtotalcashta+$roundofdi+$roundofta;
+                    
+        $payment_consolidated[$result_summary['dayclosedate']][$result_summary['mode']]=$result_summary['Total'];
+        }
+                
+        foreach($payment_consolidated as $key=>$val)
+        {
+            $each_day_final=0;
+                    
+            if(array_key_exists("DI",$val)){ $each_day_final=$each_day_final+$val['DI']; $each_module_sum['DI'][]=$val['DI']; }else{ $each_module_sum['DI'][]=0; }
+            if(array_key_exists("TA",$val)){ $each_day_final=$each_day_final+$val['TA']; $each_module_sum['TA'][]=$val['TA']; }else{ $each_module_sum['TA'][]=0; } 
+            if(array_key_exists("CS",$val)){ $each_day_final=$each_day_final+$val['CS']; $each_module_sum['CS'][]=$val['CS'];  }else{ $each_module_sum['CS'][]=0;  }
+            if(array_key_exists("HD",$val)){ $each_day_final=$each_day_final+$val['HD']; $each_module_sum['HD'][]=$val['HD']; }else{ $each_module_sum['HD'][]=0; } 
+            ?>
+     
+            <tr>
+              <td ><?=$key?></td>                 
+              <td >Sales</td>
+              <td >Software Sales</td>
+              <td ></td>
+              <td ><?php $consolidated_final_sale=$consolidated_final_sale+$each_day_final; echo number_format($each_day_final,$_SESSION['be_decimal']);?></td>
+            </tr>
+                    
+            <tr style="display:none">
+              <td ></td>
+              <td ><?php if(array_key_exists("DI",$val)){ echo 'DI - ' .number_format($val['DI'],$_SESSION['be_decimal']);}else{ $each_module_sum['DI'][]=0; echo number_format(0,$_SESSION['be_decimal']) ;} ?></td>
+              <td ><?php if(array_key_exists("TA",$val)){ echo 'TA - ' . number_format($val['TA'],$_SESSION['be_decimal']);}else{ $each_module_sum['TA'][]=0; echo number_format(0,$_SESSION['be_decimal']) ;} ?></td>
+              <td ><?php if(array_key_exists("CS",$val)){ echo 'CS - ' . number_format($val['CS'],$_SESSION['be_decimal']);}else{$each_module_sum['CS'][]=0;  echo number_format(0,$_SESSION['be_decimal']) ;} ?></td>
+              <td ><?php if(array_key_exists("HD",$val)){  echo 'HD - ' . number_format($val['HD'],$_SESSION['be_decimal']);}else{ $each_module_sum['HD'][]=0; echo number_format(0,$_SESSION['be_decimal']) ;} ?></td>
+            </tr>    
+                
+                
+            <tr style="display:none" >
+              <td ><strong></strong></td>
+              <td >Cash - <?=number_format($totalcash,$_SESSION['be_decimal'])?></td>
+              <td >Bank - <?=number_format($totalcash,$_SESSION['be_decimal'])?></td>
+              <td >Credit - <?=number_format($totalcash,$_SESSION['be_decimal'])?></td>
+              <td ></td>
+            </tr>      
+                
+            <tr>
+              <td ><strong></strong></td>
+              <td ><strong></strong></td>
+              <td ><strong></strong></td>
+              <td ><strong></strong></td>
+              <td ></td>
+            </tr>      
+            <?php
+        }
+            ?>                   
+            <tr >
+              <td ><strong></strong></td>
+              <td ><strong></strong></td>
+              <td ><strong></strong></td>
+              <td ><strong></strong></td>
+              <td ></td>
+            </tr>    
+                    
+            <tr style="font-weight: bold;" >
+              <td ><strong>Total</strong></td>
+              <td ><strong></strong></td>
+              <td ><strong></strong></td>
+              <td ><strong></strong></td>
+              <td ><strong><?=number_format($consolidated_final_sale,$_SESSION['be_decimal'])?></strong></td>
+            </tr>
+            <?php
+      } 
+    }                                
+         
+
+//----------------------/////////////---- sale calculation  cash and card //////////---------------------------------------->                     
+  
+      $string1_str=" (sum(bm_amountpaid) - (sum(bm_amountbalace) + sum(bm_roundoff_value))) ";
+      $string1_strtacshd=" (sum(tab_amountpaid) - (sum(tab_amountbalace) + sum(tab_roundoff_value))) ";
+
+      $tot_cash=0; $tot_card=0;
+      $payment_consolidated=array();
+            
+      $each_module_sum=array();
+                     
+      $sql_summary  =  $database->mysqlQuery("select sum(x.Total) as Total,x.pay1, x.dayclosedate from ( 
+                                              select bm.bm_paymode as pay1,bm.bm_finaltotal as Total, bm.bm_dayclosedate as dayclosedate  FROM tbl_tablebillmaster bm  where bm.bm_status='Closed' and bm.bm_complimentary!='Y' and $stringdi  union all
+                                              select bm.tab_paymode as pay1, bm.tab_netamt as Total,bm.tab_dayclosedate as dayclosedate FROM tbl_takeaway_billmaster bm where bm.tab_status='Closed' and bm.tab_complimentary!='Y' and $stringta
+                                              )x group by x.dayclosedate order by x.dayclosedate desc"); 
+                 
+      $num_summary  = $database->mysqlNumRows($sql_summary);
+   
+      if($num_summary>0)
+      {
+        while($result_summary  = $database->mysqlFetchArray($sql_summary))
+        {
+          //dine in sale calculation -cash
+          $totalcash=0;$subtotalcash=0;$subtotalcashta=0;$roundofdi=0;$roundofta=0;
+          $sql_logincashdi  =  $database->mysqlQuery("select sum(bm_roundoff_value) as roundofdi,$string1_str as tot from tbl_tablebillmaster  where  bm_status='Closed'  and bm_dayclosedate='".$result_summary['dayclosedate']."'   group by bm_dayclosedate order by bm_dayclosedate ASC"); 
+          $num_logincashdi   = $database->mysqlNumRows($sql_logincashdi);
+	        if($num_logincashdi)
+          {
+		        while($result_logincashdi  = $database->mysqlFetchArray($sql_logincashdi)) 
+			      { 
+				      if($result_logincashdi['tot'] != "")	
+              {
+			          $subtotalcash =$subtotalcash + $result_logincashdi['tot'];
+                $roundofdi=$roundofdi+$result_logincashdi['roundofdi'];
+              }
+            }
+          } 
+
+          //Take away  sale calculation -cash
+          $sql_logincashta  =  $database->mysqlQuery("select sum(tab_roundoff_value) as roundofta,$string1_strtacshd as tot from tbl_takeaway_billmaster  where  tab_status='Closed'  and tab_dayclosedate='".$result_summary['dayclosedate']."' group by tab_dayclosedate order by tab_dayclosedate ASC"); 
+          $num_logincashta   = $database->mysqlNumRows($sql_logincashta);
+	        if($num_logincashta)
+          {
+		        while($result_logincashta  = $database->mysqlFetchArray($sql_logincashta)) 
+			      { 
+				      if($result_logincashta['tot'] != "")	
+              {
+			          $subtotalcashta =$subtotalcashta + $result_logincashta['tot'];
+                $roundofta=$roundofta+$result_logincashta['roundofta'];
+              }
+            }
+          } 
+          
+          $totalcash=$subtotalcash+$subtotalcashta+$roundofdi+$roundofta; //dine in + takeaway -> cash Total inclucing round of
+        
+           //dine in sale calculation -card
+          $dine_sale_card=0;                 
+          $sql_login  =  $database->mysqlQuery("select sum(bm_transactionamount) as tot FROM tbl_tablebillmaster left join tbl_bankmaster on bm_id=bm_transcbank left join tbl_ledger_master  on tlm_id=bm_account  where bm_paymode='2' and tlm_id='".$_REQUEST['acc']."' and bm_status='Closed' and bm_dayclosedate='".$result_summary['dayclosedate']."' group by bm_dayclosedate order by bm_dayclosedate ASC ");  
+	        $num_login   = $database->mysqlNumRows($sql_login);
+	        if($num_login)
+          {
+		        while($result_login  = $database->mysqlFetchArray($sql_login)) 
+			      {   
+			        $dine_sale_card =$dine_sale_card + $result_login['tot'];                       
+            } 
+          } 
+
+          //take away sale calculation - card
+          $ta_sc_hd_sale_card=0;
+          $sql_loginta  =  $database->mysqlQuery("select sum(tab_transactionamount) as tot from tbl_takeaway_billmaster left join tbl_bankmaster on bm_id=tab_transcbank left join tbl_ledger_master  on tlm_id=bm_account where tab_paymode='2' and tlm_id='".$_REQUEST['acc']."' and tab_status='Closed' and tab_dayclosedate='".$result_summary['dayclosedate']."' group by tab_dayclosedate order by tab_dayclosedate ASC "); 
+	        $num_loginta   = $database->mysqlNumRows($sql_loginta);
+	        if($num_loginta)
+          {
+		        while($result_loginta  = $database->mysqlFetchArray($sql_loginta)) 
+			      { 
+			        $ta_sc_hd_sale_card =$ta_sc_hd_sale_card + $result_loginta['tot'];                     
+            } 
+          }
+
+          $total_module_sale_card=$dine_sale_card+$ta_sc_hd_sale_card; //dine in + takeaway -> card Total 
+
+          
+          // if($result_summary['pay1']=='1') // cash payment
+          // {
+              if($_REQUEST['acc_type'] =='Cash_account')
+              {
+                $tot_cash=  $tot_cash+$totalcash;            
+                if($totalcash > 0 )
+                { ?>
+                  <tr>
+                  <td style="font-weight: bold;color:darkred" >Sales</td>
+                  </tr>
+                <tr>
+                    <td style="width:10%;"><?=$result_summary['dayclosedate']?></td>
+                    <td style="width:18%;">Sales</td>
+                    <td style="width:18%;">Cash </td>                    
+                    <td style="width:30%;"><?=number_format($tot_cash,$_SESSION['be_decimal'])?></td>
+                    <td style="width:18%;"></td>                  
+                </tr>                     
+              <?php } 
+              } 
+          //}          
+          else
+          { 
+            if($_REQUEST['acc_type'] =='Bank_account') 
+            {              
+            $tot_card=  $tot_card+$total_module_sale_card;
+            if($tot_card > 0)
+            { ?>  
+                  <tr>
+                  <td style="font-weight: bold;color:darkred" >Sales</td>
+                  </tr>
+
+              <tr>
+                  <td style="width:10%;"><?=$result_summary['dayclosedate']?></td>                                    
+                  <td style="width:18%;">Sales</td>
+                  <td style="width:18%;">Card </td>
+                  <td style="width:30%;"><?=number_format($tot_card,$_SESSION['be_decimal'])?></td>
+                  <td style="width:18%;"></td>                
+              </tr>                        
+            <?php
+            } 
+            }
+          }  
+        }          
+      } 
+                
+         if($tot_card >0 || $tot_cash>0 )
+         { ?>
+          <tr><td ></td><td></td><td></td><td></td><td></td></tr>
+          
+            <tr style="font-weight: bold;">                                        
+              <td style="width:10%;">Total</td>
+              <td style="width:18%;"> </td>
+              <td style="width:18%;"></td>
+              <td style="width:30%;"><?=number_format($tot_card+$tot_cash,$_SESSION['be_decimal'])?></td>
+              <td style="width:18%;"></td>
+            </tr>     
+            
+          <?php } 
+     
+   ///------------------------------------------credit settle cash card---------------------------------------------------//
+    $tot_credit_card=0;   
+    $tot_credit_cash=0;
+         
+    $sql_logincpta1  =  $database->mysqlQuery("select cdp_dayclosedate,cdp_bank from tbl_credit_details_payment where $string_crd_new1 group by cdp_dayclosedate,cdp_bank"); 
+	  $num_logincpta1   = $database->mysqlNumRows($sql_logincpta1);
+	  if($num_logincpta1)
+    { 
+		  while($result_logincpta1  = $database->mysqlFetchArray($sql_logincpta1)) 
+			{  
+        //Credit  sale calculation - cash
+        $credit_cash=0;
+        $sql_logincpta  =  $database->mysqlQuery("select (sum(cdp_paid_cash) - (sum(cdp_balance)))  as tot from tbl_credit_details_payment where cdp_dayclosedate='".$result_logincpta1['cdp_dayclosedate']."' group by  cdp_dayclosedate"); 
+	      $num_logincpta   = $database->mysqlNumRows($sql_logincpta);
+	      if($num_logincpta)
+        {
+		      while($result_logincpta  = $database->mysqlFetchArray($sql_logincpta)) 
+			    { 
+			      $credit_cash =$credit_cash + $result_logincpta['tot'];
+          }
+        } 
+          
+        //Credit  sale calculation - card
+        $credit_card=0;
+        $sql_logincpta  =  $database->mysqlQuery("select sum(cdp_transaction_amount)  as tot from tbl_credit_details_payment left join tbl_bankmaster on bm_id=cdp_bank  left join tbl_ledger_master  on tlm_id=bm_account where tlm_id='".$_REQUEST['acc']."' and cdp_dayclosedate='".$result_logincpta1['cdp_dayclosedate']."' group by  cdp_dayclosedate "); 
+	      $num_logincpta   = $database->mysqlNumRows($sql_logincpta);
+	      if($num_logincpta)
+        {
+		      while($result_logincpta  = $database->mysqlFetchArray($sql_logincpta)) 
+			    { 		
+			      $credit_card =$credit_card + $result_logincpta['tot'];
+          }
+        } 
+
+        if($credit_cash>0 || $credit_card>0 )
+        { ?>
+
+       <?php }
+
+        if($result_logincpta1['cdp_bank']=='0' )
+        {
+          if($_REQUEST['acc_type'] =='Cash_account')
+          {
+            $tot_credit_cash=  $tot_credit_cash+$credit_cash; 
+            if($tot_credit_cash >0){   ?>
+            <tr>
+            <td style="font-weight: bold;color:darkred" >Credit Sales</td>
+          </tr>
+
+          <tr>
+             <td style="width:10%;"><?=$result_logincpta1['cdp_dayclosedate']?></td>
+             <td style="width:18%;">Sales</td>
+             <td style="width:18%;">Cash </td>
+             <td style="width:30%;"><?=number_format($tot_credit_cash,$_SESSION['be_decimal'])?></td>
+             <td style="width:18%;"></td>
+          </tr>          
+          <?php
+            }
+          }
+        }
+        else
+        { 
+          if($_REQUEST['acc_type'] =='Bank_account')
+          {
+            $tot_credit_card=  $tot_credit_card+$credit_card;
+            if($tot_credit_card>0){ ?>
+            <tr>
+            <td style="font-weight: bold;color:darkred" >Credit Sales</td>
+          </tr>
+
+          <tr>
+             <td style="width:10%;"><?=$result_logincpta1['cdp_dayclosedate']?></td>
+             <td style="width:18%;">Sales</td>
+             <td style="width:18%;">Card </td>
+             <td style="width:30%;"><?=number_format($tot_credit_card,$_SESSION['be_decimal'])?></td>
+             <td style="width:18%;"></td>
+          </tr>                       
+          <?php
+            }
+          }
+        }                      
+      }
+    } 
+                
+       if($tot_credit_card >0 || $tot_credit_cash>0 )
+       { ?> 
+       <tr><td ></td><td></td><td></td><td></td><td></td></tr>
+       
+          <tr style="font-weight: bold;">
+            <td style="width:10%;">Total</td>
+            <td style="width:18%;"> </td>
+            <td style="width:18%;"></td>
+            <td style="width:30%;"><?=number_format($tot_credit_card+$tot_credit_cash,$_SESSION['be_decimal'])?></td>
+            <td style="width:18%;"></td>
+          </tr>     
+                
+        <?php }      
+                
+  /////--------------------------------loan given----------------------------------------------------------------------//// 
+
+          $tot_debit_loan_adv=0; 
+          $tot_credit_loan_adv=0;  
+          if($_REQUEST['acc_type'] =='Bank_account' || $_REQUEST['acc_type'] =='Cash_account'){
+          $sql_login457  =  $database->mysqlQuery("select tla_amount,tla_date,tla_particulars,tla_to,tla_from,tla_paid,tla_type from tbl_loan_advance  where tla_from='".$_REQUEST['acc']."'  $string_loan_adv "); 
+          }
+          else{
+            $sql_login457  =  $database->mysqlQuery("select tla_amount,tla_date,tla_particulars,tla_to,tla_from from tbl_loan_advance  where tla_to='".$_REQUEST['acc']."'  $string_loan_adv ");
+          }
+
+          $num_login457   = $database->mysqlNumRows($sql_login457);
+					if($num_login457)
+          {?>
+            <tr>
+              <td style="font-weight: bold;color:darkred" >Loan-Advance Voucher</td>
+            </tr>
+         <?php
+					  while($result_login  = $database->mysqlFetchArray($sql_login457)) 
+					  { 
+              
+             // $tot_credit_loan_adv=$tot_credit_loan_adv+$result_login['tla_amount'];
+            //  $tot_debit_loan_adv=$tot_debit_loan_adv+$result_login['tla_amount'];?>
+                <tr>
+                    <td style="width:10%;"><?=$result_login['tla_date']?></td>
+                  <?php
+                  if($_REQUEST['acc_type'] =='Bank_account' || $_REQUEST['acc_type'] =='Cash_account')
+                    {
+                      $acc = $result_login['tla_to'];
+                    }
+                    else{
+                      $acc = $result_login['tla_from'];
+                    }
+                  $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$acc."'  "); 
+                  $num_login4   = $database->mysqlNumRows($sql_login2);
+					        
+                  if($num_login4)
+                  {                                          
+					          while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					            { ?>
+                        <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                      <?php 
+                      }
+                  }  ?>                                             
+                      <td style="width:30%;"><?=$result_login['tla_particulars']?></td>
+                      <?php   if($_REQUEST['acc_type'] =='Bank_account' || $_REQUEST['acc_type'] =='Cash_account'){ 
+                        $tot_credit_loan_adv=$tot_credit_loan_adv+$result_login['tla_amount'];?>
+                        <?php if($result_login['tla_type']=='Advance' && $result_login['tla_paid']!=""){ ?>
+                  <td style="width:18%;"><?= number_format($result_login['tla_paid'],$_SESSION['be_decimal'])?></td> 
+                       <?php }else { ?>
+                      <td style="width:18%;"></td> <?php } ?>
+                      <td style="width:18%;"><?= number_format($result_login['tla_amount'],$_SESSION['be_decimal'])?></td>  
+                      <?php } else { 
+                           $tot_debit_loan_adv=$tot_debit_loan_adv+$result_login['tla_amount']?>
+                        <td style="width:18%;"><?= number_format($result_login['tla_amount'],$_SESSION['be_decimal'])?></td>  
+                        <td style="width:18%;"></td>
+                     
+                   <?php   }  ?>
+                </tr>
+                <?php    
+            } ?>
+                  
+                  
+                  <tr style="font-weight: bold;">
+                    <td>Total</td>
+                    <td></td>
+                    <td></td>
+                    <?php if($tot_debit_loan_adv>0){ ?>
+                      <td><?=  number_format($tot_debit_loan_adv,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($tot_credit_loan_adv>0){ ?>
+                  <td><?= number_format($tot_credit_loan_adv,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+
+                  </tr>
+                  
+      <?php
+          }                               
+//--------------------------- /////////////loan adv to acc ////////// paid ----------------------------------------//
+                                  
+          $tot_debit_loan_adv1=0; 
+          $tot_credit_loan_adv1=0;  
+          
+          if($_REQUEST['acc_type'] =='Bank_account' || $_REQUEST['acc_type'] =='Cash_account'){
+          $sql_login457  =  $database->mysqlQuery("select tla_paid,tla_date,tla_particulars,tla_from,tla_to from tbl_loan_advance  where tla_to='".$_REQUEST['acc']."'  $string_loan_adv "); 
+          }
+          else {
+          $sql_login457  =  $database->mysqlQuery("select tla_paid,tla_date,tla_particulars,tla_from,tla_to from tbl_loan_advance  where tla_from='".$_REQUEST['acc']."'  $string_loan_adv "); 
+          }
+          $num_login457   = $database->mysqlNumRows($sql_login457);
+					if($num_login457)
+          {?>
+            <tr>
+                <td style="font-weight: bold;color:darkred" >Loan-Advance Voucher</td>
+            </tr>
+            <?php
+					  while($result_login  = $database->mysqlFetchArray($sql_login457)) 
+					  { 
+            ?>
+                <tr>
+                    <td style="width:10%;"><?=$result_login['tla_date']?></td>
+              <?php  
+                             if($_REQUEST['acc_type'] =='Bank_account' || $_REQUEST['acc_type'] =='Cash_account')
+                             {
+                               $acc = $result_login['tla_from'];
+                             }
+                             else{
+                               $acc = $result_login['tla_to'];
+                             }                                           
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$acc."'  "); 	
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                                  
+					      while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					      { ?>                                       
+                <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                <?php 
+                }
+              }  ?>  
+                <td style="width:30%;"><?=$result_login['tla_particulars']?></td>
+                <?php   if($_REQUEST['acc_type'] =='Bank_account' || $_REQUEST['acc_type'] =='Cash_account'){ 
+                   $tot_debit_loan_adv1=$tot_debit_loan_adv1+$result_login['tla_paid'];?>
+
+                <td style="width:18%;"><?= number_format($result_login['tla_paid'],$_SESSION['be_decimal'])?></td>  
+                <td style="width:18%;"></td> 
+                <?php } else {
+                   $tot_credit_loan_adv1=$tot_credit_loan_adv1+$result_login['tla_paid'];?>
+                  <td style="width:18%;"></td> 
+                  <td style="width:18%;"><?= number_format($result_login['tla_paid'],$_SESSION['be_decimal'])?></td>  
+            
+                  <?php } ?>
+              </tr>
+              <?php    
+            }    ?>
+                    
+          
+              <tr style="font-weight: bold;">
+                <td>Total</td>
+                <td></td>
+                <td></td>
+                <?php if($tot_debit_loan_adv1>0){ ?>
+                  <td><?=  number_format($tot_debit_loan_adv1,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($tot_credit_loan_adv1>0){ ?>
+                  <td><?= number_format($tot_credit_loan_adv1,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+
+              </tr>
+
+      <?php
+          }               
+                                        
+//-------------------------/////////////Receipt From acc ////////------------------------------------------//
+               
+          $tot_debit_rec=0; 
+          $tot_credit_rec=0;  
+          
+          $sql_login457  =  $database->mysqlQuery("select tr_amount,tr_date,tr_particulars,tr_to from tbl_receipts  where tr_from='".$_REQUEST['acc']."'  $string_rec "); 	
+          $num_login457   = $database->mysqlNumRows($sql_login457);
+					if($num_login457)
+          {?>
+              <tr>
+                <td style="font-weight: bold;color:darkred" >Receipt Voucher</td>
+              </tr>
+            <?php
+					  while($result_login  = $database->mysqlFetchArray($sql_login457)) 
+					  { 
+              $tot_credit_rec=$tot_credit_rec+$result_login['tr_amount'];?>
+              
+              <tr>
+                <td style="width:10%;"><?=$result_login['tr_date']?></td>
+              <?php                                             
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['tr_to']."'  "); 
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+
+					    if($num_login4)
+              {                          
+					      while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					      { ?>
+                  <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                <?php 
+                }
+              }  ?>  
+                                              
+              <td style="width:30%;"><?=$result_login['tr_particulars']?></td>
+              <td style="width:18%;"></td>
+              <td style="width:18%;"><?= number_format($result_login['tr_amount'],$_SESSION['be_decimal'])?></td>   
+              </tr>
+              <?php    
+            } ?>
+                    
+             
+
+              <tr style="font-weight: bold;">
+                  <td>Total</td>
+                  <td></td>
+                  <td></td>
+                  <?php if($tot_debit_rec>0){ ?>
+                    <td><?=  number_format($tot_debit_rec,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($tot_credit_rec>0){ ?>
+                 <td><?= number_format($tot_credit_rec,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+              </tr>
+                                        
+          <?php
+          }                 
+                    
+  /////////////---------------------------------Receipt to acc--------------------------------------------------------------- //////////                                     
+   
+          $tot_debit_rec1=0; 
+          $tot_credit_rec1=0;  
+
+          $sql_login457  =  $database->mysqlQuery("select tr_amount,tr_date,tr_particulars,tr_from from tbl_receipts  where tr_to='".$_REQUEST['acc']."'  $string_rec "); 
+          $num_login457   = $database->mysqlNumRows($sql_login457);
+					if($num_login457)
+          { ?>             
+              <tr>
+                <td style="font-weight: bold;color:darkred" >Receipt Voucher</td>
+              </tr>
+            <?php
+					  while($result_login  = $database->mysqlFetchArray($sql_login457)) 
+					  {                     
+              $tot_debit_rec1=$tot_debit_rec1+$result_login['tr_amount']; ?>
+                
+                <tr>
+                  <td style="width:10%;"><?=$result_login['tr_date']?></td>
+              <?php                                             
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['tr_from']."'  "); 
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                                          
+					      while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					        { ?>
+                  <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                  <?php 
+                  }
+              }  ?>  
+                                              
+                  <td style="width:30%;"><?=$result_login['tr_particulars']?></td>
+                  <td style="width:18%;"><?= number_format($result_login['tr_amount'],$_SESSION['be_decimal'])?></td>   
+                  <td style="width:18%;"></td> 
+                  </tr>
+                  <?php    
+            } ?>
+                    
+        
+
+                <tr style="font-weight: bold;">
+                  <td>Total</td>
+                  <td></td>
+                  <td></td>
+                  <?php if($tot_debit_rec1>0){ ?>
+                    <td><?=  number_format($tot_debit_rec1,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($tot_credit_rec1>0){ ?>
+                 <td><?= number_format($tot_credit_rec1,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                </tr>
+                                                                                      
+            <?php
+          }                  
+     
+ //------------------------- /////////////Contra From acc -------------------------------------------------//////////                             
+                                          
+          $tot_debit15=0; 
+          $tot_credit15=0;  
+
+          $sql_login457  =  $database->mysqlQuery("select cv_amount,cv_date,cv_remarks,cv_to_acc from tbl_contra_voucher  where cv_from_acc='".$_REQUEST['acc']."'  $string_con5 "); 
+          $num_login457   = $database->mysqlNumRows($sql_login457);
+					if($num_login457)
+          {?>
+            <tr>
+              <td style="font-weight: bold;color:darkred" >Contra Voucher</td>
+            </tr>
+            <?php
+					  while($result_login  = $database->mysqlFetchArray($sql_login457)) 
+					    { 
+                $tot_credit15=$tot_credit15+$result_login['cv_amount']; ?>
+                
+                  <tr>
+                    <td style="width:10%;"><?=$result_login['cv_date']?></td>
+                  <?php
+                                              
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['cv_to_acc']."'  "); 
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                                          
+					      while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+                { ?>
+                  <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                <?php }
+              }  ?>  
+                                              
+                  <td style="width:30%;"><?=$result_login['cv_remarks']?></td>
+                  <td style="width:18%;"></td>
+                  <td style="width:18%;"><?= number_format($result_login['cv_amount'],$_SESSION['be_decimal'])?></td>   
+                </tr>
+                <?php    
+              }  ?>
+                    
+
+              <tr style="font-weight: bold;">
+                <td>Total</td>
+                <td></td>
+                <td></td>
+                <?php if($tot_debit15>0){ ?>
+                    <td><?=  number_format($tot_debit15,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($tot_credit15>0){ ?>
+                 <td><?= number_format($tot_credit15,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+              </tr>
+                                        
+              <!-- <tr><td ></td><td></td><td></td><td></td><td></td></tr> -->
+             <?php
+          }          
+                    
+//-------------------------------------------Contra to acc ----------------------------------------------------------------//
+
+          $tot_debit16=0; 
+          $tot_credit16=0; 
+
+          $sql_login4575  =  $database->mysqlQuery("select cv_date,cv_amount,cv_from_acc,cv_remarks from tbl_contra_voucher  where cv_to_acc='".$_REQUEST['acc']."'  $string_con5 "); 
+          $num_login4575   = $database->mysqlNumRows($sql_login4575);
+					if($num_login4575)
+          { ?>
+            <tr>
+              <td style="font-weight: bold;color:darkred" >Contra Voucher</td>
+            </tr>
+            <?php
+					  while($result_login  = $database->mysqlFetchArray($sql_login4575)) 
+					  { 
+              $tot_debit16=$tot_debit16+$result_login['cv_amount']; ?>
+              
+              <tr>
+                <td style="width:10%;"><?=$result_login['cv_date']?></td>
+                <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['cv_from_acc']."'  "); 
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+
+					    if($num_login4)
+              {                                           
+					      while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					      { ?>
+                  <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                <?php 
+                }
+              }  ?>                                                
+                  <td style="width:30%;"><?=$result_login['cv_remarks']?></td>
+                  <td style="width:18%;"><?= number_format($result_login['cv_amount'],$_SESSION['be_decimal'])?></td>   
+                  <td style="width:18%;"></td>
+              </tr>
+              <?php    
+            } ?>
+                    
+
+              <tr style="font-weight: bold;">
+                <td>Total</td>
+                <td></td>
+                <td></td>
+                <?php if($tot_debit16>0){ ?>
+                    <td><?=  number_format($tot_debit16,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($tot_credit16>0){ ?>
+                 <td><?= number_format($tot_credit16,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+              </tr>
+                                        
+              <?php
+          }                   
+                    
+/////////////-----------------------------------supplier asset---------------------------------------------//////////                               
+
+          $tot_debit11=0; 
+          $tot_credit11=0;
+          
+          $sql_login45  =  $database->mysqlQuery("select tpd_paid_amount,tpd_date,tpd_from_acc,tpd_remarks,tpd_netamount,tpd_type_pay from tbl_asset_purchase_invoice_detail  where tpd_from_acc='".$_REQUEST['acc']."'and $string_as order by tpd_id asc"); 
+         $num_login45   = $database->mysqlNumRows($sql_login45);
+					if($num_login45)
+          { ?>
+            <tr>
+              <td style="font-weight: bold;color:darkred" >SUPPLIER ASSET PURCHASE</td>
+            </tr>
+            <?php
+					  while($result_login  = $database->mysqlFetchArray($sql_login45)) 
+					  { 
+              $tot_debit11=$tot_debit11+$result_login['tpd_paid_amount']; ?>
+
+              <tr>
+                <td style="width:10%;"><?=$result_login['tpd_date']?></td>
+              <?php
+                $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['tpd_from_acc']."'  "); 
+                $num_login4   = $database->mysqlNumRows($sql_login2);
+
+					    if($num_login4)
+              {                                        
+					      while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					        { ?>
+                  <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                  <?php 
+                  }
+              }  ?>  
+                                              
+                <td style="width:30%;"><?=$result_login['tpd_remarks']?></td>
+                <td style="width:18%;"></td>
+                <td style="width:18%;"><?= number_format($result_login['tpd_paid_amount'],$_SESSION['be_decimal'])?></td>        
+              
+                <?php $tot_credit11=$tot_credit11+$result_login['tpd_paid_amount']; 
+                //$tot_debit11=$tot_credit11-$tot_debit11;
+              /*  if($result_login['tpd_type_pay']=='First')
+                { 
+                  $tot_credit11=$tot_credit11+$result_login['tpd_netamount']; ?>
+
+                  <td style="width:18%;"><?= number_format($result_login['tpd_netamount'],$_SESSION['be_decimal'])?></td>
+                  <?php 
+                }
+                else
+                { ?>
+                  <td style="width:18%;"><?= number_format(0,$_SESSION['be_decimal'])?></td>
+                  <?php 
+                }*/ ?>
+                  </tr>
+                  <?php    
+            }   ?>
+                                        
+            <!-- <tr><td></td><td></td><td></td><td>Balance : <?=$tot_credit11-$tot_debit11?></td><td></td></tr> -->
+
+
+            <tr style="font-weight: bold;">
+              <td>Total</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <?php if($tot_credit11>0){ ?>
+                <td><?= number_format($tot_credit11,$_SESSION['be_decimal'])?></td>
+                 <?php } ?>
+           
+            </tr>
+               
+            <?php
+          }  
+
+
+          // --------------------Asset purchase details in vendor's ledger---------------------------//
+          $vendor_debit=0; 
+          $vendor_credit=0;
+       
+          if($_REQUEST['ven']!=""){
+        
+         
+          $sql_login45  =  $database->mysqlQuery("select tpd_paid_amount,tpd_date,tpd_from_acc,tpd_remarks,tpd_netamount,tpd_type_pay from tbl_asset_purchase_invoice_detail  where tpd_vendor='".$_REQUEST['ven']."'and $string_as order by tpd_id asc"); 
+         $num_login45   = $database->mysqlNumRows($sql_login45);
+					if($num_login45)
+          {   ?>
+            <tr>
+              <td style="font-weight: bold;color:darkred" >SUPPLIER ASSET PURCHASE</td>
+            </tr>
+            <?php
+					  while($result_login  = $database->mysqlFetchArray($sql_login45)) 
+					  { 
+              $vendor_debit=$vendor_debit+$result_login['tpd_paid_amount']; ?>
+
+              <tr>
+                <td style="width:10%;"><?=$result_login['tpd_date']?></td>
+              <?php
+                $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['tpd_from_acc']."'  "); 
+                $num_login4   = $database->mysqlNumRows($sql_login2);
+
+					    if($num_login4)
+              {                                        
+					      while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					        { ?>
+                  <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                  <?php 
+                  }
+              }  ?>  
+                                              
+                <td style="width:30%;"><?=$result_login['tpd_remarks']?></td>
+                
+              
+                <?php 
+                //$tot_debit11=$tot_credit11-$tot_debit11;
+                if($result_login['tpd_type_pay']=='First')
+                { 
+                  $vendor_credit=$vendor_credit+$result_login['tpd_netamount']; ?>
+                  <td style="width:18%;"><?= number_format($result_login['tpd_paid_amount'],$_SESSION['be_decimal'])?></td>
+                  <td style="width:18%;"><?= number_format($result_login['tpd_netamount'],$_SESSION['be_decimal'])?></td>
+                  <?php 
+                }
+                else
+                { ?>
+                  <td style="width:18%;"><?= number_format($result_login['tpd_paid_amount'],$_SESSION['be_decimal'])?></td>
+                  <td style="width:18%;"></td>
+                  <?php 
+                } ?>
+                  </tr>
+                  <?php    
+            }   ?>
+
+
+            <tr style="font-weight: bold;">
+              <td>Total</td>
+              <td></td>
+              <td></td>
+              <?php if($vendor_debit>0){ ?>
+                    <td><?=  number_format($vendor_debit,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($vendor_credit>0){ ?>
+                 <td><?= number_format($vendor_credit,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+            </tr>
+                                                      
+            <?php
+          }  
+
+        }
+ //---------------------------------supplier from acc  asset (discount)------------------------------------------- //////////
+             
+          $tot_debit12=0;
+          $tot_credit12=0;    
+  /*
+          $sql_login454  =  $database->mysqlQuery("select * from tbl_asset_purchase_invoice_detail  where tpd_from_acc='".$_REQUEST['acc']."'  $string_as "); 
+          $num_login454   = $database->mysqlNumRows($sql_login454);
+
+					if($num_login454)
+          { ?>
+            <tr>
+              <td style="font-weight: bold;color:darkred" >SUPPLIER ASSET</td>
+            </tr>
+            <?php
+					  while($result_login  = $database->mysqlFetchArray($sql_login454)) 
+					  {           
+              $tot_credit12=$tot_credit12+$result_login['tpd_paid_amount'];
+              $tot_debit12=$tot_debit12+$result_login['tpd_discount']; ?>
+
+              <tr>
+                <td style="width:10%;"><?=$result_login['tpd_date']?></td>
+                <?php
+                $sql_login2  =  $database->mysqlQuery("select * from tbl_ledger_master  where tlm_vendor_id='".$result_login['tpd_vendor']."'  "); 
+                $num_login4   = $database->mysqlNumRows($sql_login2);
+					      if($num_login4)
+                {                                           
+					        while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					        { ?>
+                    <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                    <?php 
+                  }
+                }  ?>  
+                                              
+                    <td style="width:30%;"><?=$result_login['tpd_remarks']?></td>
+                    <td style="width:18%;"><?= number_format($result_login['tpd_discount'],$_SESSION['be_decimal'])?></td>
+                    <td style="width:18%;"><?= number_format($result_login['tpd_paid_amount'],$_SESSION['be_decimal'])?></td>                                          
+                </tr>
+                <?php    
+            }    ?>
+                    
+              <tr><td></td><td></td><td></td><td></td><td></td></tr>  
+
+              <tr style="font-weight: bold;">
+                  <td>Total</td>
+                  <td></td>
+                  <td></td>
+                  <td><?=  number_format($tot_debit12,$_SESSION['be_decimal'])?></td>
+                  <td><?= number_format($tot_credit12,$_SESSION['be_decimal'])?></td>
+              </tr>
+                                        
+              <!-- <tr><td></td><td></td><td></td><td></td><td></td></tr>                                      -->
+              <?php
+          }           
+         */
+       /////////////-----------------------------------supplier from acc----------------------------------------------------//////////   
+
+        $tot_debit=0;
+          $tot_credit=0;
+        /*
+          $sql_login  =  $database->mysqlQuery("select * from tbl_supplier_voucher ts  where ts.sv_from='".$_REQUEST['acc']."'  $string "); 
+          $num_login   = $database->mysqlNumRows($sql_login);
+					if($num_login)
+          { ?>
+            <tr>
+              <td style="font-weight: bold;color:darkred" >Supplier</td>
+            </tr>
+            <?php
+					  while($result_login  = $database->mysqlFetchArray($sql_login)) 
+					  { 
+              $tot_debit=$tot_debit+$result_login['sv_discount'];          
+              $tot_credit=$tot_credit+$result_login['sv_paid_amount'];
+              ?>
+              
+              <tr>
+                <td style="width:10%;"><?=$result_login['sv_date']?></td>
+                <?php
+                $sql_login2  =  $database->mysqlQuery("select * from tbl_ledger_master  where tlm_vendor_id='".$result_login['sv_vendor_id']."'  "); 
+                $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                                          
+					      while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					      { ?>
+                  <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                  <?php 
+                }
+              }  ?>  
+                                              
+                  <td style="width:30%;"><?=$result_login['sv_remarks']?></td>
+                  <td style="width:18%;"><?= number_format($result_login['sv_discount'],$_SESSION['be_decimal'])?></td>
+                  <td style="width:18%;"><?=$result_login['sv_paid_amount']?></td>
+              </tr>              
+                <?php    
+            } ?>
+                    
+              <tr><td></td><td></td><td></td><td></td><td></td></tr>   
+
+              <tr style="font-weight: bold;">
+                <td>Total</td>
+                <td></td>
+                <td></td>
+                <td><?=  number_format($tot_debit,$_SESSION['be_decimal'])?></td>
+                <td><?= number_format($tot_credit,$_SESSION['be_decimal'])?></td>
+              </tr>
+                                        
+              <tr><td></td><td></td><td></td><td></td><td></td></tr>                                                                                                         
+            <?php
+         }*/
+/////////////--------------------------supplier vendor side------------------------------//////////                               
+                                                                  
+          $tot_debit6=0;
+          $tot_credit6=0; $rt=0;
+
+          $sql_login66  =  $database->mysqlQuery("select sv_paid_amount,sv_date,sv_from,sv_remarks,sv_paid_amount,sv_type_pay,sv_invoice_amount,sv_vendor_id from tbl_supplier_voucher ts  where ts.sv_from='".$_REQUEST['acc']."'  $string order by ts.sv_id asc "); 
+          $num_login66   = $database->mysqlNumRows($sql_login66);
+					if($num_login66)
+          { ?>
+            <tr>
+              <td style="font-weight: bold;color:darkred" >Supplier </td>
+            </tr>
+            <?php
+					  while($result_login66  = $database->mysqlFetchArray($sql_login66)) 
+					  { 
+              $tot_debit6=$tot_debit6+$result_login66['sv_paid_amount']; 
+              $sql_login5212  =  $database->mysqlQuery("select sum(tr_return_amount) as tot  from tbl_return_payment where tr_to_acc='".$_REQUEST['acc']."'   "); 
+              $num_login45   = $database->mysqlNumRows($sql_login5212);
+					    if($num_login45)
+              {                                 
+					      while($result_login452  = $database->mysqlFetchArray($sql_login5212)) 
+					      { 
+                  $rt=$result_login452['tot'];  
+                }
+              }  
+              if($result_login66['sv_paid_amount']>0){?>
+              
+              <tr>
+                <td style="width:10%;"><?=$result_login66['sv_date']?>  </td>
+                <?php
+                if($result_login66['sv_vendor_id']!='')
+                {
+                  $sql_login52  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_vendor_id='".$result_login66['sv_vendor_id']."'  "); 
+                  $num_login45   = $database->mysqlNumRows($sql_login52);
+					        if($num_login45)
+                  {                                         
+					          while($result_login45  = $database->mysqlFetchArray($sql_login52)) 
+					          { ?>
+                    <td style="width:18%;"><?=$result_login45['tlm_ledger_name']?></td>
+                    <?php 
+                    }
+                  } 
+                }
+                else
+                { ?>
+                  <td style="width:18%;"></td>
+                  <?php
+                } 
+                
+              
+                ?>  
+                                              
+                  <td style="width:30%;"><?=$result_login66['sv_remarks']?></td>
+                  <?php  if($_REQUEST['acc_type'] =='Cash_account' || $_REQUEST['acc_type'] =='Bank_account'){ ?>               
+                  <td style="width:18%;"></td>
+                  <td style="width:18%;"><?=$result_login66['sv_paid_amount']?></td>
+                    <?php } 
+                    else{ ?>              
+                  <td style="width:18%;"><?=$result_login66['sv_paid_amount']?></td>
+                  <td style="width:18%;"></td>                 
+                    <?php } ?>                          
+                 <?php 
+                 /*  if($result_login66['sv_type_pay']=='First')
+                  { 
+                    $tot_credit6=$tot_credit6+$result_login66['sv_invoice_amount']; ?>
+                    <td style="width:18%;"><?= number_format($result_login66['sv_invoice_amount'],$_SESSION['be_decimal'])?></td>
+                    <?php 
+                  }
+                  else
+                  { ?>
+                    <td style="width:18%;"><?= number_format(0,$_SESSION['be_decimal'])?></td>
+                    <?php 
+                  } */
+               ?>
+                                              
+                </tr>
+                <?php  }  
+              }  ?>
+                    
+
+                <tr style="font-weight: bold;">
+                  <td>Total</td>
+                  <td></td>
+                  <td></td>
+                  <td style="width:18%;"></td> 
+                  <?php if($tot_debit6>0){ ?>
+                    <td><?=  number_format($tot_debit6,$_SESSION['be_decimal'])?></td>
+                 <?php } ?>
+                
+                </tr>
+                                        
+                <!-- <tr>
+                  <td></td>
+                  <td></td>
+                  <td><?php echo $rt ; ?></td>
+                  <td>Balance: <?=($tot_credit6-$tot_debit6)-$rt?> </td>
+                  <td></td>
+                </tr>                               -->
+            <?php
+          }   
+          
+        
+
+          /////////////--------------------------supplier vendor - supplier ledger------------------------------//////////                               
+                                                                  
+          $supl_debit=0;
+          $supl_credit=0; $rt=0;
+
+          $sql_login66  =  $database->mysqlQuery("select sv_paid_amount,sv_date,sv_from,sv_remarks,sv_paid_amount,sv_type_pay,sv_invoice_amount,sv_credit_amount from tbl_supplier_voucher ts  where ts.sv_vendor_id='".$_REQUEST['ven']."'  $string order by ts.sv_id asc "); 
+          $num_login66   = $database->mysqlNumRows($sql_login66);
+					if($num_login66)
+          { ?>
+            <tr>
+              <td style="font-weight: bold;color:darkred" >Supplier </td>
+            </tr>
+            <?php
+					  while($result_login66  = $database->mysqlFetchArray($sql_login66)) 
+					  { 
+              $supl_debit=$supl_debit+$result_login66['sv_paid_amount']; 
+              $sql_login5212  =  $database->mysqlQuery("select sum(tr_return_amount) as tot  from tbl_return_payment where tr_to_acc='".$_REQUEST['acc']."'   "); 
+              $num_login45   = $database->mysqlNumRows($sql_login5212);
+					    if($num_login45)
+              {                                 
+					      while($result_login452  = $database->mysqlFetchArray($sql_login5212)) 
+					      { 
+                  $rt=$result_login452['tot'];  
+                }
+              }  
+              if($result_login66['sv_paid_amount']>0){?>
+              
+              <tr>
+                <td style="width:10%;"><?=$result_login66['sv_date']?>  </td>
+                <?php
+                if($result_login66['sv_from']!='')
+                {
+                  $sql_login52  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login66['sv_from']."'  "); 
+                  $num_login45   = $database->mysqlNumRows($sql_login52);
+					        if($num_login45)
+                  {                                         
+					          while($result_login45  = $database->mysqlFetchArray($sql_login52)) 
+					          { ?>
+                    <td style="width:18%;"><?=$result_login45['tlm_ledger_name']?></td>
+                    <?php 
+                    }
+                  } 
+                }
+                else
+                { ?>
+                  <td style="width:18%;"></td>
+                  <?php
+                } 
+                
+              
+                ?>  
+                                              
+                  <td style="width:30%;"><?=$result_login66['sv_remarks']?></td>
+                           
+                  <!-- <td style="width:18%;"><?=$result_login66['sv_paid_amount']?></td>
+                  <td style="width:18%;"><?= number_format(0,$_SESSION['be_decimal'])?></td>                  -->
+                                         
+                 <?php 
+                   if($result_login66['sv_type_pay']=='First')
+                  { 
+                    $supl_credit=$supl_credit+$result_login66['sv_invoice_amount']; ?>
+                    <td style="width:18%;"><?=$result_login66['sv_paid_amount']?></td>
+                    <td style="width:18%;"><?= number_format($result_login66['sv_invoice_amount'],$_SESSION['be_decimal'])?></td>
+                    <?php 
+                  }
+                  else
+                  { ?>
+                  <td style="width:18%;"><?=$result_login66['sv_paid_amount']?></td>
+                    <td style="width:18%;"></td>
+                    <?php 
+                  } 
+                  if($result_login66['sv_credit_amount']>0){
+               ?>
+                <tr><td></td><td></td><td></td><td>Balance - <?=$result_login66['sv_credit_amount']?> </td><td></td></tr>                               
+                <?php } ?>
+              </tr>
+
+                <?php  }  
+              }  ?>
+                    
+                
+
+                <tr style="font-weight: bold;">
+                  <td>Total</td>
+                  <td></td>
+                  <td></td>
+
+                  <?php if($supl_debit>0){ ?>
+                    <td><?=  number_format($supl_debit,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($supl_credit>0){ ?>
+                 <td><?= number_format($supl_credit,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                  
+                </tr>
+                                        
+                <!-- <tr>
+                  <td></td>
+                  <td></td>
+                  <td><?php echo $rt ; ?></td>
+                  <td>Balance: <?=($tot_credit6-$supl_debit)-$rt?> </td>
+                  <td></td>
+                </tr>                               -->
+            <?php
+          }  
+
+
+
+
+
+      /////////////----------------return payment vendor---------------------------------------------------//////////                                
+          $tot_debitr1=0;
+          $tot_creditr1=0;
+
+          $sql_login  =  $database->mysqlQuery("select tr_return_amount,tr_date,tr_vendor,tr_particulars,tr_return_amount from tbl_return_payment  where tr_vendor='".$_REQUEST['ven']."'  $stringr "); 
+          $num_login   = $database->mysqlNumRows($sql_login);
+					if($num_login)
+          { ?>
+            <tr>
+              <td style="font-weight: bold;color:darkred" >Supplier Return</td>
+            </tr>
+            <?php
+					  while($result_login  = $database->mysqlFetchArray($sql_login)) 
+					  { 
+              $tot_creditr1=$tot_creditr1+$result_login['tr_return_amount']; ?>
+
+              <tr>
+                <td style="width:10%;"><?=$result_login['tr_date']?></td>
+                <?php
+                $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_vendor_id='".$result_login['tr_vendor']."'  "); 
+                $num_login4   = $database->mysqlNumRows($sql_login2);
+					      
+                if($num_login4)
+                {                                    
+					        while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					        { ?>
+                  <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                  <?php 
+                  }
+                }  ?>  
+                                              
+                  <td style="width:30%;"><?=$result_login['tr_particulars']?></td>
+                  <td style="width:18%;"></td>
+                  <td style="width:18%;"><?=$result_login['tr_return_amount']?></td>
+                  
+              </tr>
+              <?php    
+            } ?>
+
+
+                <tr style="font-weight: bold;">
+                  <td>Total</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+
+                 <?php if($tot_creditr1>0){ ?>
+                 <td><?= number_format($tot_creditr1,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+
+          
+                </tr>
+                                                                                                                                                
+              <?php
+          }                     
+
+/////////////-------------------------------------return payment end------------------------------------------------ //////////                                
+                   
+
+ /////////////--------------------------------purchase return    end  return payment---------------------------------------- //////////                                                       
+          $tot_return_dr=0;
+          $tot_creditr=0;  
+          $rt_type='No';
+          
+          $sql_login  =  $database->mysqlQuery("select date(tr_date) as tr_date ,tr_return_amount,tr_vendor,tr_particulars from tbl_return_payment  where tr_to_acc='".$_REQUEST['acc']."'  $stringr "); 
+          $num_login   = $database->mysqlNumRows($sql_login);
+
+					if($num_login)
+          { ?>
+            <tr>
+              <td style="font-weight: bold;color:darkred" >Supplier Return</td>
+            </tr>
+            <?php
+					  while($result_login  = $database->mysqlFetchArray($sql_login)) 
+					  {
+              $sql_login2  =  $database->mysqlQuery("select tlm_type from tbl_ledger_master  where tlm_id='".$_REQUEST['acc']."' and (tlm_type='Bank_account' or tlm_type='Cash_account') "); 
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {
+                $rt_type='Yes';
+              }
+              else
+              {
+                 $rt_type='No';
+              }
+
+              $tot_return_dr=$tot_return_dr+$result_login['tr_return_amount']; ?>
+                                        
+              <tr>
+                  <td style="width:10%;"><?=$result_login['tr_date']?></td>
+              <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_vendor_id='".$result_login['tr_vendor']."'  "); 
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    
+              if($num_login4)
+              {                                       
+					      while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					      { ?>
+                  <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                  <?php 
+                }
+              }  ?>  
+                  <td style="width:30%;"><?=$result_login['tr_particulars']?></td>
+                  <td style="width:18%;"><?=$result_login['tr_return_amount']?></td>
+                  <td style="width:18%;"></td>
+                </tr>
+                <?php    
+            } ?>
+                    
+              <tr style="font-weight: bold;">
+                <td>Total</td>
+                <td></td>
+                <td></td>
+                <?php if($tot_return_dr>0){ ?>
+                    <td><?=  number_format($tot_return_dr,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <td></td>
+
+              </tr>
+
+            <?php                                 
+///////////////---------------------supplier vendor side-----------------------------------------------//////////                                                                                                       
+         }                             
+                                                                    
+/////////////--------------------employeeeee voucher from acc-----------------------------------------/////////////////
+      
+       $tot_debit1=0; 
+       $tot_credit1=0;
+           
+       $sql_login5  =  $database->mysqlQuery("select ev_remarks,ev_amount,ev_date,ev_employee_id from tbl_employee_voucher ts  where ts.ev_from='".$_REQUEST['acc']."'  $string1 "); 	
+       $num_login5   = $database->mysqlNumRows($sql_login5);
+			 if($num_login5)
+       { ?>
+        <tr>
+          <td style="font-weight: bold;color:darkred" >Employee Voucher</td>
+        </tr> 
+        <?php
+					while($result_login5  = $database->mysqlFetchArray($sql_login5)) 
+					{ 
+            $tot_credit1=$tot_credit1+$result_login5['ev_amount']; ?>
+            
+            <tr>
+              <td style="width:10%;"><?=$result_login5['ev_date']?></td>
+              <?php
+              $sql_login6  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_staff_id='".$result_login5['ev_employee_id']."'  "); 
+              $num_login6   = $database->mysqlNumRows($sql_login6);
+
+					  if($num_login6)
+            {                               
+					    while($result_login6  = $database->mysqlFetchArray($sql_login6)) 
+					    { ?>
+                                        
+              <td style="width:18%;"><?=$result_login6['tlm_ledger_name']?></td>
+              <?php 
+              }
+            }  ?>  
+                                              
+              <td style="width:30%;"><?=$result_login5['ev_remarks']?></td>
+              <td style="width:18%;"></td>
+              <td style="width:18%;"><?=$result_login5['ev_amount']?></td>
+            </tr>
+            <?php    
+          }  ?>
+                    
+
+            <tr style="font-weight: bold;">
+              <td>Total</td>
+              <td></td>
+              <td></td>
+
+              <?php if($tot_debit1>0){ ?>
+                    <td><?=  number_format($tot_debit1,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($tot_credit1>0){ ?>
+                 <td><?= number_format($tot_credit1,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+            </tr>
+                                        
+      <?php
+      }                       
+//////////////----------------------------------employeeeee voucher to acc-------------------------///////////////////////////////
+      
+       $tot_debit7=0; 
+       $tot_credit7=0;
+          
+       $sql_login56  =  $database->mysqlQuery("select ev_amount,ev_date,ev_from,ev_remarks,ev_pay_type_acc,ev_net_salary_new from tbl_employee_voucher ts  where ts.ev_employee_id='".$_REQUEST['staff']."'  $string1 "); 
+	     $num_login56   = $database->mysqlNumRows($sql_login56);
+			 if($num_login56)
+       {?>
+          <tr>
+            <td style="font-weight: bold;color:darkred" >Employee Voucher</td>
+          </tr> 
+          <?php
+					while($result_login56  = $database->mysqlFetchArray($sql_login56)) 
+					{                                 
+            $tot_debit7=$tot_debit7+$result_login56['ev_amount']; ?>
+            
+            <tr>
+              <td style="width:10%;"><?=$result_login56['ev_date']?></td>
+              <?php
+                                              
+              $sql_login6  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login56['ev_from']."'  "); 
+              $num_login6   = $database->mysqlNumRows($sql_login6);
+					    if($num_login6)
+              {                                         
+					      while($result_login6  = $database->mysqlFetchArray($sql_login6)) 
+					      { ?>
+                  <td style="width:18%;"><?=$result_login6['tlm_ledger_name']?></td>
+                  <?php 
+                }
+              }  ?>                                               
+                  <td style="width:30%;"><?=$result_login56['ev_remarks']?></td>
+                  <td style="width:18%;"><?=$result_login56['ev_amount']?></td>
+
+              <?php 
+              if($result_login56['ev_pay_type_acc']=='First')
+              { 
+                $tot_credit7=$tot_credit7+$result_login56['ev_net_salary_new'];  ?>
+                
+                <td style="width:18%;"><?=  number_format($result_login56['ev_net_salary_new'],$_SESSION['be_decimal'])?></td>
+                <?php 
+              }
+              else
+              { ?>       
+                <td style="width:18%;"></td>  
+                <?php 
+              } ?>  
+            </tr>
+            <?php    
+          }  ?>
+                  
+
+          <tr style="font-weight: bold;">
+            <td>Total</td>
+            <td></td>
+            <td></td>
+            <?php if($tot_debit7>0){ ?>
+                    <td><?=  number_format($tot_debit7,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($tot_credit7>0){ ?>
+                 <td><?= number_format($tot_credit7,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+          </tr>
+                                        
+          <tr>
+            <td ></td>
+            <td></td>
+            <td></td>
+            <td>Balance : <?=$tot_credit7-$tot_debit7?> </td>
+            <td></td>
+          </tr>                                 
+       <?php
+      }                                                                                                 
+//////////////------------------------------direct expense to--------------------------------------------///////////////////////////////
+      
+      $tot_debit2=0; 
+      $tot_credit2=0;
+       
+      $sql_login78  =  $database->mysqlQuery("select ev_date,ev_amount,ev_from_acc,ev_remarks from tbl_expense_voucher tes  where tes.ev_acc_type='Direct Expense' and tes.ev_to_acc='".$_REQUEST['acc']."'  $string3 ");       
+      $num_login78   = $database->mysqlNumRows($sql_login78);
+
+			if($num_login78)
+      { ?>
+        <tr>
+          <td style="font-weight: bold;color:darkred" >Direct Expense</td>
+        </tr>  
+        <?php
+				while($result_login78  = $database->mysqlFetchArray($sql_login78)) 
+				{         
+          $tot_debit2=$tot_debit2+$result_login78['ev_amount']; ?>
+
+          <tr>
+            <td style="width:10%;"><?=$result_login78['ev_date']?></td>
+          <?php
+          $sql_login88  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login78['ev_from_acc']."'  "); 
+          $num_login88   = $database->mysqlNumRows($sql_login88);
+					if($num_login88)
+          {                                 
+					  while($result_login88  = $database->mysqlFetchArray($sql_login88)) 
+					  { ?>                                       
+            <td style="width:18%;"><?=$result_login88['tlm_ledger_name']?></td>
+            <?php 
+            }
+          }  ?>  
+                                              
+            <td style="width:30%;"><?=$result_login78['ev_remarks']?></td>
+            <td style="width:18%;"><?=  number_format($result_login78['ev_amount'],$_SESSION['be_decimal'])?></td>
+            <td style="width:18%;"></td>
+          </tr>
+          <?php    
+        }   ?>
+                    
+              <tr style="font-weight: bold;">
+                  <td>Total</td>
+                  <td></td>
+                  <td></td>
+
+                  <?php if($tot_debit2>0){ ?>
+                    <td><?=  number_format($tot_debit2,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($tot_credit2>0){ ?>
+                 <td><?= number_format($tot_credit2,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+
+              </tr>     
+                                        
+        <?php
+      }                                                                
+//////////////-------------------------------------direct expense from---------------------------///////////////////////////////
+       $tot_debit3=0; 
+       $tot_credit3=0; 
+
+      $sql_login781  =  $database->mysqlQuery("select ev_date,ev_amount,ev_to_acc,ev_remarks from tbl_expense_voucher tes  where tes.ev_acc_type='Direct Expense' and tes.ev_from_acc='".$_REQUEST['acc']."'  $string3 "); 
+      $num_login781   = $database->mysqlNumRows($sql_login781);
+			if($num_login781)
+      { ?>
+        <tr>
+          <td style="font-weight: bold;color:darkred" >Direct Expense</td>
+        </tr>  
+        <?php
+				while($result_login781  = $database->mysqlFetchArray($sql_login781)) 
+				{         
+            $tot_credit3=$tot_credit3+$result_login781['ev_amount'];?>
+            
+            <tr>
+              <td style="width:10%;"><?=$result_login781['ev_date']?></td>
+              <?php
+              $sql_login88  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login781['ev_to_acc']."'  "); 
+              $num_login88   = $database->mysqlNumRows($sql_login88);
+					    if($num_login88)
+              {                           
+					      while($result_login88  = $database->mysqlFetchArray($sql_login88)) 
+					      { ?>
+                  <td style="width:18%;"><?=$result_login88['tlm_ledger_name']?></td>
+                  <?php 
+                }
+              }  ?>                                               
+                  <td style="width:30%;"><?=$result_login781['ev_remarks']?></td>
+                  <td style="width:18%;"></td> 
+                  <td style="width:18%;"><?=  number_format($result_login781['ev_amount'],$_SESSION['be_decimal'])?></td>
+              </tr>                 
+              <?php    
+        }   ?>
+                       
+          <tr style="font-weight: bold;">
+              <td>Total</td>
+              <td></td>
+              <td></td>
+
+              <?php if($tot_debit3>0){ ?>
+                    <td><?=  number_format($tot_debit3,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($tot_credit3>0){ ?>
+                 <td><?= number_format($tot_credit3,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 
+          </tr>     
+                                                                               
+      <?php
+     }                                                                     
+//////////////--------------------------------INDIRECT EXPENSE FROM ------------------------///////////////////////////////
+    
+       $tot_debit4=0; 
+       $tot_credit4=0;
+       $sql_login79  =  $database->mysqlQuery("select ev_amount,ev_date,ev_to_acc,ev_remarks from tbl_expense_voucher tes   where tes.ev_acc_type='Indirect Expense' and tes.ev_from_acc='".$_REQUEST['acc']."'   $string3"); 
+       $num_login79   = $database->mysqlNumRows($sql_login79);
+			 if($num_login79)
+       { ?>
+          <tr>
+            <td style="font-weight: bold;color:darkred" >Indirect Expense</td>
+          </tr>       
+          <?php
+					while($result_login79  = $database->mysqlFetchArray($sql_login79)) 
+					{         
+            $tot_credit4=$tot_credit4+$result_login79['ev_amount']; ?>
+
+            <tr>
+            <td style="width:10%;"><?=$result_login79['ev_date']?></td>
+            <?php
+            $sql_login89  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login79['ev_to_acc']."'  "); 
+            $num_login89   = $database->mysqlNumRows($sql_login89);
+					  if($num_login89)
+            {                                           
+					    while($result_login89  = $database->mysqlFetchArray($sql_login89)) 
+					    { ?>
+              <td style="width:18%;"><?=$result_login89['tlm_ledger_name']?></td>
+              <?php 
+              }
+            }  ?>  
+                                              
+              <td style="width:30%;"><?=$result_login79['ev_remarks']?></td>
+              <td style="width:18%;"></td>
+              <td style="width:18%;"><?=  number_format($result_login79['ev_amount'],$_SESSION['be_decimal'])?></td>
+            </tr>
+            <?php    
+          }   ?>                                         
+
+            <tr style="font-weight: bold;">
+              <td>Total</td>
+              <td></td>
+              <td></td>
+
+              <?php if($tot_debit4>0){ ?>
+                    <td><?=  number_format($tot_debit4,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($tot_credit4>0){ ?>
+                 <td><?= number_format($tot_credit4,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+
+   
+            </tr>                                      
+ <?php } 
+
+ //////////////--------------------------------INDIRECECT EXPENSE TO----------------------------------- ///////////////////////////////
+    
+       $tot_credit5=0; 
+       $tot_debit5=0;
+       $sql_login79  =  $database->mysqlQuery("select ev_amount,ev_date,ev_from_acc,ev_remarks from tbl_expense_voucher tes   where tes.ev_acc_type='Indirect Expense' and tes.ev_to_acc='".$_REQUEST['acc']."'   $string3"); 
+       $num_login79   = $database->mysqlNumRows($sql_login79);
+			if($num_login79)
+      { ?>
+                                       
+        <tr>
+          <td style="font-weight: bold;color:darkred" >Indirect Expense</td>
+        </tr>       
+        <?php
+					while($result_login79  = $database->mysqlFetchArray($sql_login79)) 
+					{ 
+            $tot_debit5=$tot_debit5+$result_login79['ev_amount'];?>
+
+            <tr>
+              <td style="width:10%;"><?=$result_login79['ev_date']?></td>
+            <?php
+            $sql_login89  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login79['ev_from_acc']."'  "); 
+            $num_login89   = $database->mysqlNumRows($sql_login89);
+					  if($num_login89)
+            {                                          
+					    while($result_login89  = $database->mysqlFetchArray($sql_login89)) 
+					     { ?>
+               <td style="width:18%;"><?=$result_login89['tlm_ledger_name']?></td>
+               <?php 
+               }
+            }    ?>  
+                                              
+            <td style="width:30%;"><?=$result_login79['ev_remarks']?></td>
+            <td style="width:18%;"><?=  number_format($result_login79['ev_amount'],$_SESSION['be_decimal'])?></td>
+            <td style="width:18%;"></td>
+            </tr>
+            <?php   
+          }   ?>
+                     
+
+         <tr style="font-weight: bold;">
+            <td>Total</td>
+            <td></td>
+            <td></td>
+
+            <?php if($tot_debit5>0){ ?>
+                    <td><?=  number_format($tot_debit5,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($tot_credit5>0){ ?>
+                 <td><?= number_format($tot_credit5,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+
+          </tr>                                                                               
+ <?php } ?>  
+
+        <tr style="border-bottom: 10px solid darkgrey; ">
+        <td style="font-weight: bold " >Closing Balance</br>
+        <?=$result_login_openclose['tps_dayclosedate'] ?></br>
+        <span style="color:darkred">    <?=number_format($result_login_openclose['tps_closing_balance'],$_SESSION['be_decimal']) ?> <span>
+        </td>
+        <td ></td><td></td><td ></td><td ></td></tr>    
+       
+                <?php
+ 
+      $debt=$debt+ ($tot_debit7+$tot_debit16+$tot_return_dr+$tot_debitr1+$tot_debit1+$tot_debit2+$tot_debit3+$tot_debit4+$tot_debit5+$supl_debit+
+                    $tot_debit_rec1+$tot_debit_loan_adv+$tot_debit_loan_adv1+$tot_card+$tot_cash+$tot_credit_card+$tot_credit_cash+$vendor_debit)  ;
+       
+                  
+
+      if($rt_type=='No') 
+      {
+        $crdt=$crdt+($tot_debit6+$tot_creditr1+$tot_credit+$tot_credit1+$tot_credit2+$tot_credit3+$tot_credit4+$tot_credit5+$tot_credit6+$supl_credit+
+        $tot_credit7+$consolidated_final_sale+$tot_debit11+$tot_credit12+$tot_credit15+$tot_credit16+$tot_credit_rec+$tot_credit_rec1+
+        $tot_credit_loan_adv1+$tot_credit_loan_adv+$vendor_credit)-$tot_creditr ;
+      }else{ // acc_type = bank or cash
+        $crdt=$crdt+($tot_debit6+$tot_creditr1+$tot_credit+$tot_credit1+$tot_credit2+$tot_credit3+$tot_credit4+$tot_credit5+$tot_credit6+
+        $tot_credit7+$consolidated_final_sale+$tot_debit11+$tot_credit12+$tot_credit15+$tot_credit16+$tot_credit_rec+$tot_credit_rec1+
+        $tot_credit_loan_adv1+$tot_credit_loan_adv)+$tot_creditr ;    
+      }
+ 
+ }}
+ ?>
+        <tr>
+          <td style="color:darkslateblue;font-weight: bold;">FINAL Total</td>
+          <td></td>
+          <td></td>
+          <?php if($debt>0){ ?>
+            <td id="tot_debit"><?=number_format($debt,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+                 <?php if($crdt>0){ ?>
+                  <td id="tot_credit"><?=number_format($crdt,$_SESSION['be_decimal'])?></td>
+                 <?php } else { ?>
+                  <td></td>
+                 <?php } ?>
+       
+         
+        </tr>
+ <?php
+      
+  }
+
+ else if(isset($_REQUEST['set']) && $_REQUEST['set']=='add_employee_salary'){
+     
+     $sal_all=  json_decode($_REQUEST['all_staff_data']);
+     
+     
+       $month=$_REQUEST['month'];
+       $year=$_REQUEST['year'];
+
+  for($i=0;$i<count($sal_all);$i++){
+      
+      
+        
+                $sname=$sal_all[$i]->sname;
+                $salary=$sal_all[$i]->salary;
+                $workday=$sal_all[$i]->workday;
+                
+                $lop=$sal_all[$i]->lop;
+                $deduction=$sal_all[$i]->deduction;
+                $extraday=$sal_all[$i]->extraday;
+                $extrapay=$sal_all[$i]->extrapay;
+                $netsalary=$sal_all[$i]->netsalary;
+                
+                $advance=$sal_all[$i]->advance;
+                
+                $paid=$sal_all[$i]->paid;
+               
+             
+    $date=date('Y-m-d H:i:s');
+        
+         $insertion['tes_emp_id'] 		=  mysqli_real_escape_string($database->DatabaseLink,$sname);
+         $insertion['tes_month'] 		=  mysqli_real_escape_string($database->DatabaseLink,$month);
+         $insertion['tes_year'] 		=  mysqli_real_escape_string($database->DatabaseLink,$year);
+         
+         
+         if($advance!=''){
+         $insertion['tes_advance'] 		=  mysqli_real_escape_string($database->DatabaseLink,$advance);
+         }else{
+           $insertion['tes_advance'] 		=  mysqli_real_escape_string($database->DatabaseLink,0);   
+         }
+         
+         
+          if($paid!=''){
+         $insertion['tes_paid'] 		=  mysqli_real_escape_string($database->DatabaseLink,$paid);
+         }else{
+           $insertion['tes_paid'] 		=  mysqli_real_escape_string($database->DatabaseLink,0);   
+         }
+         
+         if($workday!=''){
+         $insertion['tes_workdays'] 		=  mysqli_real_escape_string($database->DatabaseLink,$workday);
+         }else{
+           $insertion['tes_workdays'] 		=  mysqli_real_escape_string($database->DatabaseLink,0);   
+         }
+         
+         if($lop!=''){
+         $insertion['tes_lopdays'] 		=  mysqli_real_escape_string($database->DatabaseLink,$lop);
+         }else{
+             $insertion['tes_lopdays'] 		=  mysqli_real_escape_string($database->DatabaseLink,0);
+         
+         }
+         
+         if($extraday!=''){
+         $insertion['tes_extradays'] 		=  mysqli_real_escape_string($database->DatabaseLink,$extraday);
+         }else{
+             $insertion['tes_extradays'] 		=  mysqli_real_escape_string($database->DatabaseLink,0);
+         
+         }
+         
+         if($deduction!=""){
+         $insertion['tes_deduction'] 		=  mysqli_real_escape_string($database->DatabaseLink,$deduction);
+         }else{
+              $insertion['tes_deduction'] 		=  mysqli_real_escape_string($database->DatabaseLink,0);
+         }
+         
+         if($extrapay!=''){
+         $insertion['tes_extrapay'] 		=  mysqli_real_escape_string($database->DatabaseLink,$extrapay);
+         }else{
+             $insertion['tes_extrapay'] 		=  mysqli_real_escape_string($database->DatabaseLink,0);
+         
+         }
+         
+         if($netsalary!=''){
+         $insertion['tes_netsalary'] 		=  mysqli_real_escape_string($database->DatabaseLink,$netsalary);
+         }else{
+              $insertion['tes_netsalary'] 		=  mysqli_real_escape_string($database->DatabaseLink,0);  
+         }
+         
+         $insertion['tes_entrydate'] 		=  mysqli_real_escape_string($database->DatabaseLink,$date);
+     
+    $sql=$database->check_duplicate_entry('tbl_employee_salary',$insertion);
+	 if($sql!=1)
+	{
+	$insertid              			=  $database->insert('tbl_employee_salary',$insertion);
+               
+        }
+            
+                                   
+                
+              
+  }      
+    
+    
+    
+ }
+  else if(isset($_REQUEST['set']) && $_REQUEST['set']=='edit_salary')
+  {            
+          $sql_kotlist  =  $database->mysqlQuery("SELECT emp_id,emp_first_name,emp_designation,emp_salary,tes_workdays,tes_lopdays,tes_extradays,tes_deduction,tes_extrapay,tes_netsalary 
+                                                  from tbl_employee_master em  
+                                                  left join tbl_employee_salary es on es.tes_emp_id=em.emp_id 
+                                                  where es.tes_month='".$_REQUEST['month']."' and tes_year='".$_REQUEST['year']."' order by emp_first_name asc"); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){$ic=0;  $tot_net =0;$tot_paid=0; $tot_adv=0;
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {$ic++;
+                  $tot_net = $tot_net+$result_kotlist['tes_netsalary'];
+                ?>   
+                <div class="details_row_split" >
+                <div class="acc_add_box" style="width:8%;cursor: pointer">
+                <input style="cursor: pointer;color:darkred;text-transform: uppercase;font-weight: bold" readonly type="text" emp_id='<?=$result_kotlist['emp_id']?>' value="<?=$result_kotlist['emp_first_name']?>" class="form-control filte_new_box sname" id="sname"  >
+                </div>
+                                
+                <div class="acc_add_box" style="width:10%;cursor: pointer">
+                <input style="cursor: pointer" readonly  type="text" value="<?=$result_kotlist['emp_designation']?>" class="form-control filte_new_box sdesg" id="sdesg"  >
+                </div>
+                                
+                <div class="acc_add_box" style="width:10%;">
+                <input  style="cursor: pointer; " readonly value="<?=$result_kotlist['emp_salary']?>"  type="text" class="form-control filte_new_box salary" id="salary"  >
+                </div>
+                               
+                <div class="acc_add_box" style="width:8%;">
+                <input  type="text" maxlength="2" value="<?=$result_kotlist['tes_workdays']?>" onkeypress="return numdot(event)"  class="form-control filte_new_box workday" id="workday" >
+                </div>
+                                
+                <div class="acc_add_box" style="width:7%;">
+                <input type="text" maxlength="2" value="<?=$result_kotlist['tes_lopdays']?>" onkeypress="return numdot(event)"  class="form-control filte_new_box lop" id="lop" >
+                </div>
+                                
+                <div class="acc_add_box" style="width:10%;">
+                <input  type="text" maxlength="2" value="<?=$result_kotlist['tes_extradays']?>" onkeypress="return numdot(event)"  class="form-control filte_new_box extraday" id="extraday"  >
+                </div>
+                                
+                <div class="acc_add_box" style="width:10%;">
+                <input type="text"  onkeypress="return numdot(this,event)" value="<?=$result_kotlist['tes_deduction']?>"  class="form-control filte_new_box deduction" id="deduction" >
+                </div>
+                                
+                                
+                <div class="acc_add_box" style="width:10%;">                
+                <input  type="text" onkeypress="return numdot(this,event)"  value="<?=$result_kotlist['tes_extrapay']?>" class="form-control filte_new_box extrapay" id="extrapay"  >
+                </div>                               
+                                
+                <div class="acc_add_box" style="width:10%;">                                 
+                <input  type="text" onkeypress="return numdot(this,event)" value="<?=$result_kotlist['tes_netsalary']?>" class="form-control filte_new_box netsalary"  id="netsalary"  >
+                </div>
+                                    
+                <div class="acc_add_box" style="width:8%;cursor:pointer">                                 
+                <?php                                    
+                $sql_kotlist5  =  $database->mysqlQuery("SELECT sum(ev_amount) as paid from tbl_employee_voucher where ev_pay_type='Advance' and  ev_month='".$_REQUEST['month']."' and ev_year='".$_REQUEST['year']."'  and ev_employee_id='".$result_kotlist['emp_id']."'  "); 
+					      $num_kotlist5  = $database->mysqlNumRows($sql_kotlist5);
+					      if($num_kotlist5)
+                { 
+						    while($result_kotlist5  = $database->mysqlFetchArray($sql_kotlist5)) 
+							    { $tot_adv= $tot_adv+$result_kotlist5['paid'];?>
+                  <input readonly type="text" onkeypress="return numdot(event)" value="<?=$result_kotlist5['paid']?>" class="form-control filte_new_box "  id="adv_new"  >
+                <?php } 
+                }
+                else
+                { ?>
+                <input readonly type="text" onkeypress="return numdot(event)" value="0" class="form-control filte_new_box "  id="adv_new"  >   
+                <?php } ?>
+                </div>
+                                    
+                <div class="acc_add_box" style="width:8%;cursor: pointer">
+                <?php
+                $sql_kotlist5  =  $database->mysqlQuery("SELECT sum(ev_amount) as paid from tbl_employee_voucher where ev_pay_type='Salary' and  ev_month='".$_REQUEST['month']."' and ev_year='".$_REQUEST['year']."'  and ev_employee_id='".$result_kotlist['emp_id']."'  "); 
+					      $num_kotlist5  = $database->mysqlNumRows($sql_kotlist5);
+					      if($num_kotlist5)
+                {
+						    while($result_kotlist5  = $database->mysqlFetchArray($sql_kotlist5)) 
+							    { $tot_paid= $tot_paid+$result_kotlist5['paid']; ?>
+                  <input readonly type="text" onkeypress="return numdot(event)" value="<?=$result_kotlist5['paid']?>" class="form-control filte_new_box "  id="paid_new"  >
+                <?php } 
+                }
+                else{ ?>
+                <input readonly type="text" onkeypress="return numdot(event)" value="0" class="form-control filte_new_box "  id="paid_new"  >   
+                <?php } ?>
+                </div>
+                                    
+                </div>
+                                    
+                 <br>
+                 </div>
+                 <?php
+                 } ?>
+
+                 <div style="    display: flex;width: 100%;justify-content: flex-end;">
+
+                 <div class="acc_add_box" style="width:10%;">
+                <input type="text"  disabled=disabled value="Total"  class="form-control filte_new_box deduction" id="deduction" >
+                </div>
+                <div class="acc_add_box" style="width:10%;">
+                <input type="text" disabled=disabled  value="<?php echo $tot_net; ?>"  class="form-control filte_new_box deduction" id="deduction" >
+                </div>
+                <div class="acc_add_box" style="width:8%;">
+                <input type="text" disabled=disabled value="<?php echo $tot_adv; ?>"  class="form-control filte_new_box deduction" id="deduction" >
+                </div>
+                <div class="acc_add_box" style="width:8%;">
+                <input type="text"  disabled=disabled value="<?php echo $tot_paid; ?>"  class="form-control filte_new_box deduction" id="deduction" >
+                </div>
+                 </div>
+               <?php }
+      
+  }
+  else if(isset($_REQUEST['set']) && $_REQUEST['set']=='update_employee_salary'){
+     
+     $sal_all=  json_decode($_REQUEST['all_staff_data']);
+     
+     
+       $month=$_REQUEST['month'];
+       $year=$_REQUEST['year'];
+
+  for($i=0;$i<count($sal_all);$i++){
+      
+      
+        
+                $sname=$sal_all[$i]->sname;
+                
+                
+                if($sal_all[$i]->workday !=''){
+                   $workday=$sal_all[$i]->workday;
+                }else{
+                   $workday=0; 
+                }
+                
+                if($sal_all[$i]->lop !=''){
+                  $lop=$sal_all[$i]->lop;  
+                }else{
+                   $lop=0; 
+                }
+                
+                if($sal_all[$i]->deduction !=''){
+                     $deduction=$sal_all[$i]->deduction;
+                }else{
+                     $deduction=0;
+                }
+                
+                if($sal_all[$i]->extraday!=''){
+                     $extraday=$sal_all[$i]->extraday;
+                } else{
+                    $extraday=0; 
+                }            
+               
+               if($sal_all[$i]->extrapay!=''){
+                   $extrapay=$sal_all[$i]->extrapay; 
+               }else{
+                   $extrapay=0; 
+               }
+                
+                if($sal_all[$i]->netsalary !=''){
+               
+                $netsalary=$sal_all[$i]->netsalary;
+                }else{
+                    $netsalary=0;
+                }
+                
+                
+                
+    $fnct_menu = $database->mysqlQuery(" update tbl_employee_salary set tes_workdays='".$workday."',"
+            . "tes_lopdays='".$lop."',tes_extradays='".$extraday."' ,"
+            . "tes_deduction='".$deduction."',tes_extrapay='".$extrapay."',tes_netsalary='".$netsalary."' "
+            . " where   tes_month='".$month."' and "
+            . " tes_year='".$year."' and  tes_emp_id='".$sname."' ");
+    
+              
+  }      
+    
+    
+ }
+   else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_credit_pay')
+   {        
+      $sql_kotlist  =  $database->mysqlQuery("SELECT sum(sv_paid_amount) as paid,sv_invoice_amount,sum(sv_return_amount) as rt from tbl_supplier_voucher where sv_invoice_no='".$_REQUEST['edit_inv']."' and sv_vendor_id='".$_REQUEST['vendor']."'  "); 
+			$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+			if($num_kotlist)
+      { $ic=0;
+					while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+					{
+ 
+           if(($result_kotlist['paid']+$result_kotlist['rt']) >= $result_kotlist['sv_invoice_amount']){
+               echo 'no';
+           }else{
+               echo 'yes';
+           }
+
+          }
+      }
+    }
+   else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_adv_paid'){
+       
+      
+                              
+      $sql_kotlist  =  $database->mysqlQuery("SELECT * from tbl_employee_master em left join tbl_employee_voucher ev on ev.ev_employee_id=em.emp_id where em.emp_status='Active' group by em.emp_id order by em.emp_first_name asc"); 
+					
+      $num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){$ic=0;
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {$ic++; ?>   
+              <div class="details_row_split" >
+
+                  <div class="acc_add_box" style="width:8%;cursor: pointer">
+                     <input style="cursor: pointer;color:darkred;text-transform: uppercase;font-weight: bold" readonly type="text" emp_id='<?=$result_kotlist['emp_id']?>' value="<?=$result_kotlist['emp_first_name']?>" class="form-control filte_new_box sname" id="sname"  >
+                  </div>
+                                
+                  <div class="acc_add_box" style="width:10%;cursor: pointer">                                 
+                      <input style="cursor: pointer" readonly  type="text" value="<?=$result_kotlist['emp_designation']?>" class="form-control filte_new_box sdesg" id="sdesg"  >
+                  </div>
+                                
+                  <div class="acc_add_box" style="width:10%;">
+                      <input  style="cursor: pointer; " readonly value="<?=$result_kotlist['emp_salary']?>"  type="text" class="form-control filte_new_box salary" id="salary"  >
+                  </div>
+                                
+                  <div class="acc_add_box" style="width:8%;">                                 
+                     <input  type="text" maxlength="2" onkeypress="return numdot(this,event)"  class="form-control filte_new_box workday" id="workday" >
+                  </div>
+                                
+                 <div class="acc_add_box" style="width:7%;">                                  
+                    <input type="text" maxlength="2" onkeypress="return numdot(this,event)"  class="form-control filte_new_box lop" id="lop" >
+                 </div>
+            
+                <div class="acc_add_box" style="width:10%;">                                 
+                    <input  type="text" maxlength="2" onkeypress="return numdot(this,event)"  class="form-control filte_new_box extraday" id="extraday"  >
+                </div>
+                                                               
+                <div class="acc_add_box" style="width:10%;">                              
+                     <input  type="text" onkeypress="return numdot(this,event)"  class="form-control filte_new_box extrapay" id="extrapay"  >
+                </div>
+                                           
+                <div class="acc_add_box" style="width:10%;">                                  
+                    <input type="text"  onkeypress="return numdot(this,event)"  class="form-control filte_new_box deduction" id="deduction" >
+                </div>
+         
+                 <div class="acc_add_box" style="width:10%;">                                 
+                     <input  type="text" onkeypress="return numdot(this,event)"  class="form-control filte_new_box netsalary"  id="netsalary"  >
+                </div>
+                                    
+                <?php
+          $sql_kotlist5  =  $database->mysqlQuery("SELECT sum(ev_amount) as paid from tbl_employee_voucher where ev_pay_type='Advance' and  ev_month='".$_REQUEST['smonth']."' and ev_year='".$_REQUEST['syear']."' and ev_employee_id='".$result_kotlist['emp_id']."' group by ev_employee_id limit 1 "); 
+					$num_kotlist5  = $database->mysqlNumRows($sql_kotlist5);
+					if($num_kotlist5){
+						  while($result_kotlist5  = $database->mysqlFetchArray($sql_kotlist5)) 
+							  { ?>   
+                                    
+                <div class="acc_add_box" style="width:8%;;cursor: pointer">
+                  <input readonly value="<?=$result_kotlist5['paid']?>" type="text" onkeypress="return numdot(this,event)"  class="form-control filte_new_box advance"  id="advance"  >
+                </div>
+                                    
+                <?php
+                }}else{ ?>
+                
+                <div class="acc_add_box" style="width:8%;;cursor: pointer">
+                  <input readonly value="0" type="text" onkeypress="return numdot(this,event)"  class="form-control filte_new_box advance"  id="advance"  >
+                </div>
+                <?php
+                }                                       
+          $sql_kotlist55  =  $database->mysqlQuery("SELECT sum(ev_amount) as adv from tbl_employee_voucher where ev_pay_type='Salary' and  ev_month='".$_REQUEST['smonth']."' and ev_year='".$_REQUEST['syear']."' and ev_employee_id='".$result_kotlist['emp_id']."' group by ev_employee_id limit 1 "); 
+					$num_kotlist55  = $database->mysqlNumRows($sql_kotlist55);
+					if($num_kotlist55){
+						  while($result_kotlist55  = $database->mysqlFetchArray($sql_kotlist55)) 
+							  {  ?>   
+                                  
+                <div class="acc_add_box" style="width:8%;;cursor: pointer">
+                  <input readonly  type="text" value="<?=$result_kotlist55['adv']?>"  onkeypress="return numdot(event)"  class="form-control filte_new_box paid"  id="paid"  >
+                </div>
+                 <?php } } else{ ?>
+                
+                  <div class="acc_add_box" style="width:8%;;cursor: pointer">
+                    <input readonly value="0" type="text" onkeypress="return numdot(event)"  class="form-control filte_new_box advance"  id="advance"  >
+                  </div>
+                  <?php
+                  } ?>
+                 <br>
+            </div>
+        <?php } } 
+  
+   }    
+   
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_invoice'){
+           $sql_kotlist55  =  $database->mysqlQuery("SELECT sv_invoice_no from tbl_supplier_voucher where   sv_vendor_id='".$_REQUEST['vendor']."' and sv_invoice_no='".$_REQUEST['invoice']."'  "); 
+					$num_kotlist55  = $database->mysqlNumRows($sql_kotlist55);
+					if($num_kotlist55){
+						 echo 'no';
+                                                  } else{
+                                                      echo 'yes';
+                                                  }
+      }
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='set_bal_emp_salary'){
+          
+          $bal=0; $paid=0;
+          if($_REQUEST['mode']=='Salary'){
+
+          $sql_kotlist55  =  $database->mysqlQuery("SELECT sum(ev_amount) as paid from tbl_employee_voucher where   ev_month='".$_REQUEST['month']."' and ev_year='".$_REQUEST['year']."' and ev_employee_id='".$_REQUEST['emp_id']."' group by ev_employee_id limit 1 "); 
+					$num_kotlist55  = $database->mysqlNumRows($sql_kotlist55);
+					if($num_kotlist55){
+						  while($result_kotlist55  = $database->mysqlFetchArray($sql_kotlist55)) 
+							  {
+                   $bal=($_REQUEST['net']-$result_kotlist55['paid']);
+                   echo '*'.$bal.'*'.$result_kotlist55['paid'] ;
+                }
+            }else{
+                 echo '*'.$_REQUEST['net'].'*0';
+            }
+          }else{
+              
+              
+              
+              $sql_kotlist55  =  $database->mysqlQuery("SELECT sum(ev_amount) as adv from tbl_employee_voucher where   ev_month='".$_REQUEST['month']."' and ev_year='".$_REQUEST['year']."' and ev_employee_id='".$_REQUEST['emp_id']."' group by ev_employee_id limit 1 "); 
+					$num_kotlist55  = $database->mysqlNumRows($sql_kotlist55);
+					if($num_kotlist55){
+						  while($result_kotlist55  = $database->mysqlFetchArray($sql_kotlist55)) 
+							  {
+                                                      
+                                                      
+                                                   $bal=($_REQUEST['net']-$result_kotlist55['adv']);
+                                                   
+                                                    echo '*'.$bal.'*'.$result_kotlist55['adv'] ;
+                                                      
+                                                  }
+                                                  }else{
+                                                       echo '*'.$_REQUEST['net'].'*0';
+                                                  }
+              
+              
+          }
+          
+      }
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='set_asset_cat_check'){
+          
+          $sql_kotlist55  =  $database->mysqlQuery("SELECT tsc_name from tbl_asset_category where  tsc_name='".$_REQUEST['c_name']."'  "); 
+					$num_kotlist55  = $database->mysqlNumRows($sql_kotlist55);
+					if($num_kotlist55){
+                                            echo 'no';
+                                        }else{
+                                            echo 'yes';
+                                        }
+						  
+      }
+       else if(isset($_REQUEST['set']) && $_REQUEST['set']=='set_asset_cat_check_update'){
+          
+          $sql_kotlist55  =  $database->mysqlQuery("SELECT tsc_name from tbl_asset_category where  tsc_name='".$_REQUEST['c_name']."' and tsc_id !='".$_REQUEST['update_id']."' "); 
+					$num_kotlist55  = $database->mysqlNumRows($sql_kotlist55);
+					if($num_kotlist55){
+                                            echo 'no';
+                                        }else{
+                                            echo 'yes';
+                                        }
+						  
+      }
+      
+      
+       else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_asset_invoice'){
+          
+           
+           if($_REQUEST['mode'] !='update'){
+               
+          $sql_kotlist55  =  $database->mysqlQuery("SELECT tpd_invoice from tbl_asset_purchase_invoice_detail where  tpd_invoice='".$_REQUEST['asset_inv']."' and tpd_vendor='".$_REQUEST['asset_vendor']."' "); 
+					$num_kotlist55  = $database->mysqlNumRows($sql_kotlist55);
+					if($num_kotlist55){
+                                            echo 'no';
+                                        }else{
+                                            echo 'yes';
+                                        }
+           }else{
+               echo 'yes';
+           }	  
+      }
+
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='load_to_contra'){
+          
+          ?>
+           <select class="add_printer_drop" id="cv_to" > 
+                             <option value="">Select</option>
+                             <?php 
+                                         $sql_kotlist  =  $database->mysqlQuery("SELECT * from tbl_ledger_master tl left join tbl_ledger_group tg on tl.tlm_group=tg.tlg_id where (tg.tlg_name='Cash in Hand' OR tg.tlg_name='Bank Accounts') and tlm_id !='".$_REQUEST['from']."'  "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                                                      ?>
+                                        
+                                        
+                                          <option value="<?=$result_kotlist['tlm_id'] ?> "><?=$result_kotlist['tlm_ledger_name'] ?> </option>
+                                        
+                                                      <?php 
+                                                  }
+                                                  }
+                                                ?>
+                          </select>
+                          <label style="top:-5px;color: #414141;font-size: 14px" id="lab_grp">To ACC</label>
+          <?php
+      }
+       else if(isset($_REQUEST['set']) && $_REQUEST['set']=='load_to_contra1'){
+          
+          ?>
+           <select class="add_printer_drop" id="cv_to" > 
+                             <option value="">TO ACC</option>
+                             <?php 
+                                         $sql_kotlist  =  $database->mysqlQuery("SELECT * from tbl_ledger_master tl left join tbl_ledger_group tg on tl.tlm_group=tg.tlg_id where (tg.tlg_name='Cash in Hand' OR tg.tlg_name='Bank Accounts') and tlm_id !='".$_REQUEST['from']."'  "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                                                      
+                                                      ?>
+                                        
+                                        
+                             <option <?php if($result_kotlist['tlm_id']==$_REQUEST['to']){ ?> selected <?php } ?> value="<?=$result_kotlist['tlm_id'] ?> "><?=$result_kotlist['tlm_ledger_name'] ?> </option>
+                                        
+                                                      <?php 
+                                                  }
+                                                  }
+                                                ?>
+                          </select>
+          <?php
+      }
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='salary_calculate'){
+          
+          $sql_kotlist  =  $database->mysqlQuery("SELECT tes_netsalary from tbl_employee_salary where tes_emp_id ='".$_REQUEST['staff']."' and tes_month ='".$_REQUEST['month']."' and tes_year ='".$_REQUEST['year']."'  "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                 echo $result_kotlist['tes_netsalary'];
+                  }
+                 }
+      }
+      
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='asset_check_pay'){
+          
+          $sql_kotlist  =  $database->mysqlQuery("SELECT * from tbl_asset_purchase_invoice_detail tad left join tbl_vendor_master tv on tv.v_id=tad.tpd_vendor  where tad.tpd_invoice ='".$_REQUEST['invoice']."' and tad.tpd_vendor ='".$_REQUEST['vendor']."'  "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                                                      
+      echo '*'.$result_kotlist['tpd_netamount'].'*'.$result_kotlist['tpd_paid_amount'].'*'.$result_kotlist['v_name']
+              .'*'.$result_kotlist['tpd_date'].'*'.$result_kotlist['tpd_credit_amount'].'*'.$result_kotlist['tpd_from_acc']
+              .'*'.$result_kotlist['tpd_invoice'].'*'.$result_kotlist['tpd_tax_total'].'*'.$result_kotlist['tpd_subtotal'].'*'.$result_kotlist['tpd_discount'];
+                                                  }
+                                                  }
+      }
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_vendor_invoice')
+      {
+          $sql_kotlist  =  $database->mysqlQuery("SELECT tpd_invoice from tbl_asset_purchase_invoice_detail  where tpd_invoice ='".$_REQUEST['invoice']."' and tpd_vendor ='".$_REQUEST['vendor']."'  "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  echo 'yes';
+             }else{
+             echo 'no';    
+            }
+      }
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_bal_asset'){
+          
+          $sql_kotlist  =  $database->mysqlQuery("SELECT sum(tpd_paid_amount) as paid ,tpd_netamount from tbl_asset_purchase_invoice_detail  where tpd_invoice ='".$_REQUEST['invoice']."' and tpd_vendor ='".$_REQUEST['vendor']."'  "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  
+                                                    while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                                                      
+                                                      
+                                                 echo ($result_kotlist['tpd_netamount']-$result_kotlist['paid']);
+                                                      
+                                        }}
+      }else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_credit_pay_asset'){
+      
+          
+                             
+    $sql_kotlist  =  $database->mysqlQuery("SELECT sum(tpd_paid_amount) as paid,tpd_netamount from tbl_asset_purchase_invoice_detail where tpd_invoice='".$_REQUEST['edit_inv']."' and tpd_vendor='".$_REQUEST['vendor']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                                                     // echo $result_kotlist['paid'].' - '.$result_kotlist['sv_invoice_amount']; 
+                                                      if($result_kotlist['paid']==$result_kotlist['tpd_netamount']){
+                                                          echo 'no';
+                                                      }else{
+                                                          echo 'yes';
+                                                      }
+                                                      
+                                                  }
+                                                  }
+                                                  
+                                                  
+                                                  
+     }
+                                                  
+     else if(isset($_REQUEST['set']) && $_REQUEST['set']=='add_balance_asset')
+     {                                                     
+        $date=date('Y-m-d');
+        $insertion['tpd_invoice'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['invoice']);
+        $insertion['tpd_vendor'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['vendor']);
+        $insertion['tpd_date'] 		                =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['date']);
+        $insertion['tpd_subtotal'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['subtotal']);
+        $insertion['tpd_tax_total'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['tax']);
+        $insertion['tpd_netamount'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['total']);
+        $insertion['tpd_from_acc'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['from']);
+        $insertion['tpd_paid_amount'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['paid']);
+        $insertion['tpd_trn_detail'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['trans']);
+        $insertion['tpd_remarks'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['particulars']);
+        $insertion['tpd_credit_amount'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['credit']);
+        $insertion['tpd_entry_date'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$date);
+        $insertion['tpd_type_pay'] 		        =  mysqli_real_escape_string($database->DatabaseLink,'Partial');
+
+  
+        $sql=$database->check_duplicate_entry('tbl_asset_purchase_invoice_detail',$insertion);
+
+	 if($sql!=1)
+	 {       
+	  $insertid =  $database->insert('tbl_asset_purchase_invoice_detail',$insertion);
+         } 
+         
+    }                                        
+                                                  
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='set_close_bal'){
+          
+          $sql_kotlist  =  $database->mysqlQuery("update tbl_ledger_master set  tlm_close_bal='".$_REQUEST['close_bal']."' where tlm_id='".$_REQUEST['acc']."' "); 
+          
+      }    
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='add_stock_acc'){
+          
+          
+        				
+
+        $insertion['tas_date'] 		=  mysqli_real_escape_string($database->DatabaseLink,$database->convert_date($_REQUEST['date']));
+        
+        if($_REQUEST['open']!=''){
+        $insertion['tas_open_stock_value'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['open']);
+        }
+        
+        $insertion['tas_close_stock_value'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['close']);
+        $insertion['tas_login'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['staff']);
+        
+        
+        $sql=$database->check_duplicate_entry('tbl_account_stock',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_account_stock',$insertion);
+         } 
+         
+      }
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='edit_stock_acc'){
+          
+          
+        	$sql_kotlist  =  $database->mysqlQuery("SELECT * from tbl_account_stock where tas_id='".$_REQUEST['edit_id']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                               echo '*'.$result_kotlist['tas_date'].'*'.$result_kotlist['tas_open_stock_value'].'*'.$result_kotlist['tas_close_stock_value'] .'*'.$result_kotlist['tas_login'] ;                        
+                                                      
+                                                  }
+                                                  }			
+
+         
+      }
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='update_stock_acc'){
+          
+          		$date=	date("Y-m-d", strtotime($_REQUEST['date']) );	
+ if($_REQUEST['open']!=''){
+   $sql_kotlist  =  $database->mysqlQuery("update tbl_account_stock set  tas_date='".$date."',"
+           . "tas_open_stock_value='".$_REQUEST['open']."',tas_close_stock_value='".$_REQUEST['close']."' ,tas_login='".$_REQUEST['staff']."'"
+                
+                . " where tas_id='".$_REQUEST['upd_id']."' "); 				
+ }else{
+     $sql_kotlist  =  $database->mysqlQuery("update tbl_account_stock set  tas_date='".$date."',"
+           . " tas_close_stock_value='".$_REQUEST['close']."' ,tas_login='".$_REQUEST['staff']."'"
+                
+                . " where tas_id='".$_REQUEST['upd_id']."' ");
+ }
+ 
+         
+      }
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_stock_date'){
+          
+          
+          $date=	date("Y-m-d", strtotime($_REQUEST['date']) );	
+          
+          $sql_kotlist  =  $database->mysqlQuery("SELECT * from tbl_account_stock where tas_date='".$date."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+                                            echo 'no';
+                                        }else{
+                                            echo 'yes';
+                                        }
+          
+          
+   }
+else if(isset($_REQUEST['set']) && $_REQUEST['set']=='list_day_book'){       
+       
+  if($_REQUEST['type']=='all'){
+    
+        $debt=0;
+        $crdt=0;       
+
+    if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{
+      $from = $_REQUEST['fromdt'];
+      $to = $_REQUEST['todt'];                   
+		}
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{	
+      $from = $_REQUEST['fromdt'];
+			$to=date("Y-m-d");
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");
+      $to = $_REQUEST['todt'];  
+		}
+    else
+	  {
+		  $from=date("Y-m-d");
+			$to=date("Y-m-d");
+    }                    
+
+
+$dates = array();                    
+$period = new DatePeriod(new DateTime($from), new DateInterval('P1D'), new DateTime($to.' +1 day'));
+
+foreach ($period as $date) 
+{
+$dates[] = $date->format("Y-m-d");
+}
+
+for($i=0;$i<count($dates);$i++){
+ 
+  //-------------------------- cash sale----------------------------------//
+$subtotalcashdi=0;  $roundofdi=0;   
+$string1_str=" (sum(bm_amountpaid) - (sum(bm_amountbalace) + sum(bm_roundoff_value))) ";
+$sql_logincashdi  =  $database->mysqlQuery("select sum(bm_roundoff_value) as roundofdi,$string1_str as tot 
+                                            from tbl_tablebillmaster 
+                                            left join tbl_paymentmode on tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id 
+                                            where bm_status='Closed' and bm_dayclosedate='$dates[$i]' 
+                                            order by bm_dayclosedate,bm_billtime ASC"); 
+$num_logincashdi   = $database->mysqlNumRows($sql_logincashdi);
+if($num_logincashdi){
+    while($result_logincashdi  = $database->mysqlFetchArray($sql_logincashdi)) 
+      { 
+          if($result_logincashdi['tot'] != "")	{
+              $subtotalcashdi =$subtotalcashdi + $result_logincashdi['tot'];
+              $roundofdi=$roundofdi+$result_logincashdi['roundofdi'];
+          }
+      }} 
+
+$subtotalcashta=0; $roundofta=0;   
+    $string1_strtacshd=" (sum(tab_amountpaid) - (sum(tab_amountbalace) + sum(tab_roundoff_value))) ";
+    $sql_logincashta  =  $database->mysqlQuery("select sum(tab_roundoff_value) as roundofta,$string1_strtacshd as tot 
+                                                from tbl_takeaway_billmaster 
+                                                left join tbl_paymentmode on tbl_takeaway_billmaster.tab_paymode=tbl_paymentmode.pym_id 
+                                                where tab_status='Closed' and tab_dayclosedate='$dates[$i]'  
+                                                order by tab_dayclosedate,tab_time ASC");   
+$num_logincashta   = $database->mysqlNumRows($sql_logincashta);
+if($num_logincashta){
+    while($result_logincashta  = $database->mysqlFetchArray($sql_logincashta)) 
+      { 
+          if($result_logincashta['tot'] != "")	{
+              $subtotalcashta =$subtotalcashta + $result_logincashta['tot'];
+              $roundofta=$roundofta+$result_logincashta['roundofta'];
+            }
+          }} 
+    $totalcash=$subtotalcashdi+$subtotalcashta+$roundofdi+$roundofta; 
+    if($totalcash)
+    {
+        ?>                                                              
+              <tr>
+                  <td><?php echo $dates[$i]; ?> </td>
+                  <td></td>
+                  <td>Sales</td>
+                  <td>Cash</td>
+                  <td></td>                 
+                  <td><?= number_format(($totalcash),$_SESSION['be_decimal'])?></td>
+                  <td></td>
+              </tr>                                
+            
+            <tr><td colspan=7></td></tr> 
+            <?php  }
+////--------------------------card sale------------------------------////   
+    $sql_logincredit  =  $database->mysqlQuery("select x.bnk,sum(x.tot) as total from ( 
+                                                select  distinct (b.bm_name) as bnk,sum(bm.bm_transactionamount) as tot  
+                                                FROM tbl_tablebillmaster bm left join tbl_paymentmode on bm.bm_paymode=tbl_paymentmode.pym_id  
+                                                left join tbl_bankmaster b on  b.bm_id = bm.bm_transcbank  
+                                                where  tbl_paymentmode.pym_code='credit' and  bm.bm_status='Closed' 
+                                                AND bm.bm_complimentary!='Y' AND bm_dayclosedate='$dates[$i]' group by bnk  union all
+                                                select distinct (b.bm_name) as bnk, sum(bm.tab_transactionamount) as tot  
+                                                FROM tbl_takeaway_billmaster bm 
+                                                left join tbl_paymentmode on bm.tab_paymode=tbl_paymentmode.pym_id  
+                                                left join tbl_bankmaster b  on  b.bm_id = bm.tab_transcbank 
+                                                where tbl_paymentmode.pym_code='credit' and bm.tab_status='Closed' 
+                                                AND bm.tab_complimentary!='Y' AND tab_dayclosedate='$dates[$i]' group by bnk
+                                                )x group by x.bnk "); 
+	  $num_logincredit   = $database->mysqlNumRows($sql_logincredit);
+
+
+	  if($num_logincredit){
+		  while($result_logincredit  = $database->mysqlFetchArray($sql_logincredit)) 
+			{ ?>
+            <tr>
+            <td><?php echo $dates[$i]; ?></td>
+            <td></td>
+            <td>Sales</td>
+            <td>Card</td>          
+            <td><?='* '.$result_logincredit['bnk']?></td>
+            <td><?=number_format($result_logincredit['total'],$_SESSION['be_decimal'])?></td>
+            <td></td>
+            </tr>
+                      <?php   
+            } ?>
+            <tr><td colspan=7></td></tr>  
+          <?php }
+     
+
+//--------------------------------credit sale-----------------------------------------//
+
+         $stringcrd= "(bm.bm_dayclosedate='$dates[$i]'  or  tbm.tab_dayclosedate='$dates[$i]' ) ";
+         $st="";   $final=0;  
+         $sql_login  =  $database->mysqlQuery("select sum(cd.cd_amount) as tot,s.ser_firstname,l.ly_firstname,
+                                             cm.ct_corporatename,c.crd_staffid,c.crd_corporateid,c.crd_guestid,cd.cd_settled 
+                                             from tbl_credit_master as c 
+                                             left join tbl_credit_details as cd on c.crd_id=cd.cd_masterid 
+                                             left join tbl_staffmaster as s on c.crd_staffid=s.ser_staffid                                              
+                                             left join tbl_corporatemaster as cm on c.crd_corporateid=cm.ct_corporatecode 
+                                             left join tbl_loyalty_reg  as l on c.crd_guestid=l.ly_id 
+                                             left join tbl_tablebillmaster bm on bm.bm_billno=cd.cd_billno  
+                                             left join tbl_takeaway_billmaster tbm on tbm.tab_billno=cd.cd_billno 
+                                             WHERE $stringcrd group by cd.cd_masterid   order by cd.cd_dateofentry ASC"); 	 
+        
+            $num_login   = $database->mysqlNumRows($sql_login);
+           if($num_login)
+            {        
+                  while($result_login  = $database->mysqlFetchArray($sql_login)) 
+                                      {
+                  if($result_login['crd_staffid']!="")				
+                  {
+                      $party=$result_login['ser_firstname'];					
+                      $cat='Staff';
+                  }             			
+                  else if($result_login['crd_corporateid']!="")
+                  {
+                      $party=$result_login['ct_corporatename'];
+                      $cat="Corporate";
+                  }
+                  else if($result_login['crd_guestid']!="")
+                  {
+                      $party=$result_login['ly_firstname'];
+                      $cat="Guest";
+                  } ?>
+               <tr >
+                <td><?php echo $dates[$i]; ?></td>
+                <td></td>
+                <td>Sales</td>
+                <td>Credit Sale</td>
+                <td><?='* '.$party?></td>
+                <?php if($result_login['cd_settled']=='Y'){ ?>
+                  <td><?=number_format($result_login['tot'],$_SESSION['be_decimal'])?></td> 
+                  <?php } else { ?>
+                         <td></td>     
+                  <?php }?>        
+                <td><?=number_format($result_login['tot'],$_SESSION['be_decimal'])?></td>   
+                   
+              </tr> 
+              <?php          	
+              } ?>
+               <tr><td colspan=7></td></tr>  
+             <?php  }  
+
+/////-----------------------------loan-------------------------------////    
+             
+          $tot_debit_loan_adv=0; $tot_credit_loan_adv=0;  
+          $sql_login457  =  $database->mysqlQuery("select tla_id,tla_date,tla_amount,tla_to,tla_particulars,tla_from 
+                                                   from tbl_loan_advance 
+                                                   where tla_amount!='' and tla_from!='' and tla_date ='$dates[$i]' order by tla_id asc"); 
+          $num_login457   = $database->mysqlNumRows($sql_login457);
+					if($num_login457)
+          { 
+					while($result_login  = $database->mysqlFetchArray($sql_login457)) 
+					{ 
+          $tot_credit_loan_adv=$tot_credit_loan_adv+$result_login['tla_amount']; 
+          $tot_debit_loan_adv=$tot_debit_loan_adv+$result_login['tla_amount']; ?>
+          
+          <tr>
+                <td style="width:10%;"><?=$result_login['tla_date']?></td>
+                <td style="width:10%;">L <?=$result_login['tla_id']?></td>
+                <td style="width:10%;">Loans</td>
+            <?php
+            $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['tla_from']."'"); 
+            $num_login4   = $database->mysqlNumRows($sql_login2);
+					if($num_login4)
+          {                                          
+					while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					{ ?>                                       
+              <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+         <?php }}  ?>  
+                                              
+              <td style="width:30%;"><?=$result_login['tla_particulars']?></td>
+              <td style="width:18%;"></td>
+              <td style="width:18%;"><?= number_format($result_login['tla_amount'],$_SESSION['be_decimal'])?></td>   
+            </tr>
+
+            <tr>
+                <td style="width:10%;"><?=$result_login['tla_date']?></td>
+                <td style="width:10%;">L <?=$result_login['tla_id']?></td>
+                <td style="width:10%;">Loans</td>
+            <?php
+            $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master where tlm_id='".$result_login['tla_to']."'"); 
+            $num_login4   = $database->mysqlNumRows($sql_login2);
+					if($num_login4)
+          {                                          
+					while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					{ ?>                                       
+              <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+         <?php }}  ?>  
+                                              
+              <td style="width:30%;"><?=$result_login['tla_particulars']?></td>             
+              <td style="width:18%;"><?= number_format($result_login['tla_amount'],$_SESSION['be_decimal'])?></td>
+              <td style="width:18%;"></td>   
+            </tr>
+           <?php   }  ?>
+           <tr><td colspan=7></td></tr>                                                                         
+      <?php
+            }                 
+       ?>
+ <!-----------------------------------------/////////////loan adv to acc //////////------------------------------------------------>
+        <?php                                
+          $tot_debit_loan_adv1=0; $tot_credit_loan_adv1=0;  
+          $sql_login457  =  $database->mysqlQuery("select tla_id,tla_date,tla_paid,tla_from,tla_particulars,tla_amount,tla_to 
+                                                   from tbl_loan_advance  
+                                                   where tla_paid!='' and tla_to !='' and tla_date='$dates[$i]' order by tla_id asc"); 
+	
+           $num_login457   = $database->mysqlNumRows($sql_login457);
+					if($num_login457)
+          { 
+					while($result_login  = $database->mysqlFetchArray($sql_login457)) 
+					{ 
+          $tot_debit_loan_adv1=$tot_debit_loan_adv1+$result_login['tla_paid'];
+          $tot_credit_loan_adv1=$tot_credit_loan_adv1+$result_login['tla_paid']
+          ?>
+              <tr>
+              <td style="width:10%;"><?=$result_login['tla_date']?></td>
+                <td style="width:10%;">L <?=$result_login['tla_id']?></td>
+                <td style="width:10%;">Loan-Return</td>
+              <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['tla_to']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					if($num_login4)
+          {                           
+					while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					{ ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>  
+                                              
+            <td style="width:30%;"><?=$result_login['tla_particulars']?></td>
+            <td style="width:18%;"><?= number_format($result_login['tla_paid'],$_SESSION['be_decimal'])?></td>  
+            <td style="width:18%;"></td> 
+          </tr>
+
+          <tr>
+          <td style="width:10%;"><?=$result_login['tla_date']?></td>
+                <td style="width:10%;">L <?=$result_login['tla_id']?></td>
+                <td style="width:10%;">Loan-Return</td>
+              <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['tla_from']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					if($num_login4)
+          {                           
+					while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					{ ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>                                            
+            <td style="width:30%;"><?=$result_login['tla_particulars']?></td>
+            <td style="width:18%;"></td> 
+            <td style="width:18%;"><?= number_format($result_login['tla_paid'],$_SESSION['be_decimal'])?></td>           
+          </tr>
+          <?php    }    ?>
+                                              
+            <tr><td colspan=7></td></tr>      
+                               
+      <?php
+        }  
+      ?>                
+                                        
+<!------ /////////////Receipt  //////////-------------- -->   
+        <?php                                
+        $tot_debit_rec=0; $tot_credit_rec=0;  
+        $sql_login457  =  $database->mysqlQuery("select tr_id,tr_amount,tr_date,tr_to,tr_particulars,tr_from
+                                                 from tbl_receipts tr
+                                                 where tr_from !='' and tr_to !='' and tr_date='$dates[$i]' order by tr_id asc"); 
+	
+        $num_login457   = $database->mysqlNumRows($sql_login457);
+					if($num_login457)
+          { 
+					while($result_login  = $database->mysqlFetchArray($sql_login457)) 
+					{ 
+            $tot_credit_rec=$tot_credit_rec+$result_login['tr_amount']; ?>
+        <tr>
+          <td style="width:10%;"><?=$result_login['tr_date']?></td>
+          <td style="width:10%;">R <?=$result_login['tr_id']?></td>
+          <td style="width:10%;">Receipt</td>
+          <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['tr_to']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>                                    
+          <td style="width:30%;"><?=$result_login['tr_particulars']?></td>
+          <td style="width:18%;"><?= number_format($result_login['tr_amount'],$_SESSION['be_decimal'])?></td>   
+          <td style="width:18%;"></td>
+        </tr>
+
+        <tr>
+          <td style="width:10%;"><?=$result_login['tr_date']?></td>
+          <td style="width:10%;">R <?=$result_login['tr_id']?></td>
+          <td style="width:10%;">Receipt</td>
+          <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['tr_from']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>                                    
+          <td style="width:30%;"><?=$result_login['tr_particulars']?></td>
+          <td style="width:18%;"></td>
+          <td style="width:18%;"><?= number_format($result_login['tr_amount'],$_SESSION['be_decimal'])?></td>            
+        </tr>
+          <?php    }    ?>
+          <tr><td colspan=7></td></tr>   
+     <?php }     
+ ?>                                               
+ <!------------------/////////////Contra //////////------------------------->
+        <?php                                
+          $tot_debit15=0; $tot_credit15=0;  
+          $sql_login457  =  $database->mysqlQuery("select cv_id,cv_amount,cv_date,cv_to_acc,cv_remarks,cv_from_acc 
+                                                    from tbl_contra_voucher tcv
+                                                    where cv_from_acc !='' and cv_to_acc !='' and cv_date='$dates[$i]' order by cv_id asc"); 
+	
+          $num_login457   = $database->mysqlNumRows($sql_login457);
+					if($num_login457){ 
+					while($result_login  = $database->mysqlFetchArray($sql_login457)) 
+					{ 
+          $tot_credit15=$tot_credit15+$result_login['cv_amount']; ?>
+          <tr>
+          <td style="width:10%;"><?=$result_login['cv_date']?></td>
+          <td style="width:10%;">C <?=$result_login['cv_id']?></td>
+          <td style="width:10%;">Contra</td>  
+          <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['cv_to_acc']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>                                    
+          <td style="width:30%;"><?=$result_login['cv_remarks']?></td>         
+          <td style="width:18%;"><?= number_format($result_login['cv_amount'],$_SESSION['be_decimal'])?></td>   
+          <td style="width:18%;"></td>
+          </tr>
+
+          <tr>
+            <td style="width:10%;"><?=$result_login['cv_date']?></td>
+            <td style="width:10%;">C <?=$result_login['cv_id']?></td>
+            <td style="width:10%;">Contra</td>
+            <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['cv_from_acc']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>      
+            <td style="width:30%;"><?=$result_login['cv_remarks']?></td>
+            <td style="width:18%;"></td>
+            <td style="width:18%;"><?= number_format($result_login['cv_amount'],$_SESSION['be_decimal'])?></td>   
+          </tr>
+
+          <?php    }    ?>
+         <tr><td colspan=7></td></tr>                                                   
+                                       
+      <?php  }  ?>
+                       
+<!-------------------------/////////////supplier asset ////////// ----------------------------->
+               
+        <?php                                
+   
+          $tot_debit11=0; $tot_credit11=0;
+           $sql_login45  =  $database->mysqlQuery("select tpd_id,tpd_date,tpd_paid_amount,tpd_from_acc,tpd_remarks,tpd_credit_amount,tpd_type_pay,tpd_netamount,tpd_vendor 
+                                                  from tbl_asset_purchase_invoice_detail tap  
+                                                  where tpd_vendor !='' and tpd_from_acc !='' and tpd_date='$dates[$i]' order by tpd_id asc"); 
+	
+           $num_login45   = $database->mysqlNumRows($sql_login45);
+					if($num_login45){ 
+					while($result_login  = $database->mysqlFetchArray($sql_login45)) 
+					{ 
+          $tot_debit11=$tot_debit11+$result_login['tpd_paid_amount'];
+          ?>
+          <tr>
+            <td style="width:10%;"><?=$result_login['tpd_date']?></td>
+            <td style="width:10%;">AS <?=$result_login['tpd_id']?></td>
+            <td style="width:10%;">Asset Supplier</td>
+            <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['tpd_from_acc']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>                                                  
+            <td style="width:30%;"><?=$result_login['tpd_remarks']?></td>  
+            <td style="width:30%;"></td>                                 
+            <td style="width:18%;"><?= number_format($result_login['tpd_paid_amount'],$_SESSION['be_decimal'])?></td>   
+          </tr> 
+          
+          <tr>
+             <td style="width:10%;"><?=$result_login['tpd_date']?></td>
+             <td style="width:10%;">AS <?=$result_login['tpd_id']?></td>
+             <td style="width:10%;">Asset Supplier</td>
+             <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_vendor_id='".$result_login['tpd_vendor']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>      
+            <td style="width:30%;"><?=$result_login['tpd_remarks']?></td>                             
+            <td style="width:18%;"><?= number_format($result_login['tpd_paid_amount'],$_SESSION['be_decimal'])?></td>
+            <?php if($result_login['tpd_type_pay']=='First'){  ?>
+            <td style="width:18%;"><?= number_format($result_login['tpd_netamount'],$_SESSION['be_decimal'])?></td>
+            <?php }else{ ?>
+            <td style="width:18%;"></td>
+            <?php } ?>                             
+           </tr>
+          <?php    }    ?>    
+             <tr><td colspan=7></td></tr>                
+      <?php }   
+        ?>
+                                   
+<!----------------------------------------/////////////supplier //////////------------------------------------------------------->                                                                                 
+      <?php
+                                                                    
+      $tot_debit6=0;$tot_credit6=0; $rt=0;
+      $sql_login66  =  $database->mysqlQuery("select sv_id,sv_paid_amount,sv_date,sv_from,sv_remarks,sv_type_pay,sv_invoice_amount,sv_discount,sv_vendor_id 
+                                              from tbl_supplier_voucher ts
+                                             where ts.sv_vendor_id !='' and ts.sv_from!='' and ts.sv_date='$dates[$i]' order by ts.sv_id asc "); 
+	
+      $num_login66   = $database->mysqlNumRows($sql_login66);
+			if($num_login66){ ?>                             
+      <?php
+					while($result_login66  = $database->mysqlFetchArray($sql_login66)) 
+					{ 
+          $tot_debit6=$tot_debit6+$result_login66['sv_paid_amount'];                    
+         ?>
+         <tr>
+          <td style="width:10%;"><?=$result_login66['sv_date']?></td>
+          <td style="width:10%;">S <?=$result_login66['sv_id']?></td>
+          <td style="width:10%;">Supplier</td>
+          <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login66['sv_from']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>                                  
+          <td style="width:30%;"><?=$result_login66['sv_remarks']?></td>
+          <td style="width:18%;"></td>
+          <td style="width:18%;"><?=$result_login66['sv_paid_amount']?></td>         
+          </tr>
+
+          <tr>
+        <td style="width:10%;"><?=$result_login66['sv_date']?></td>
+        <td style="width:10%;">S <?=$result_login66['sv_id']?></td>
+        <td style="width:10%;">Supplier</td>
+        <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_vendor_id='".$result_login66['sv_vendor_id']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>                                                  
+        <td style="width:30%;"><?=$result_login66['sv_remarks']?></td>
+        <td style="width:18%;"><?= number_format($result_login66['sv_paid_amount'],$_SESSION['be_decimal'])?></td>
+        <?php if($result_login66['sv_type_pay']=='First') {?>
+        <td style="width:18%;"><?= number_format($result_login66['sv_invoice_amount'],$_SESSION['be_decimal'])?></td>
+        <?php }
+         else { ?> 
+        <td style="width:18%;"></td>
+       <?php } ?>        
+        </tr>
+          <?php    }    ?>           
+          <tr><td colspan=7></td></tr>                                                                                              
+      <?php
+       }                          
+                                            
+ /////////////---------------return payment ----------------------//////////                                
+                   
+   
+          $tot_debitr1=0;$tot_creditr1=0;
+          $sql_login  =  $database->mysqlQuery("select tr_id,tr_date,tr_return_amount,tr_vendor,tr_particulars,tr_to_acc 
+                                                from tbl_return_payment tr
+                                                where tr_vendor !='' and tr_to_acc!='' and date(tr_date)='$dates[$i]' order by tr_id asc"); 	
+          $num_login   = $database->mysqlNumRows($sql_login);
+					if($num_login){ 
+					while($result_login  = $database->mysqlFetchArray($sql_login)) 
+					{                    
+          $tot_debitr1=$tot_debitr1+$result_login['tr_return_amount']; ?>
+              <tr>
+              <td style="width:10%;"><?=date("Y-m-d",strtotime($result_login['tr_date']))?></td>
+              <td style="width:10%;">SR <?=$result_login['tr_id']?></td>
+              <td style="width:18%;">Supplier Return</td> 
+              <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['tr_to_acc']."' ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>                                       
+              <td style="width:30%;"><?=$result_login['tr_particulars']?></td>                                                                                 
+              <td style="width:18%;"><?=$result_login['tr_return_amount']?></td>
+              <td style="width:18%;"></td>    
+             </tr>  
+          <tr>
+            <td style="width:10%;"><?=date("Y-m-d",strtotime($result_login['tr_date']))?></td>
+            <td style="width:18%;">SR <?=$result_login['tr_id']?></td> 
+            <td style="width:18%;">Supplier Return</td> 
+            <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_vendor_id='".$result_login['tr_vendor']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?> 
+            <td style="width:30%;"><?=$result_login['tr_particulars']?></td>
+            <td style="width:18%;"></td>
+            <td style="width:18%;"><?=$result_login['tr_return_amount']?></td>
+           
+           </tr>
+          <?php    }   ?>
+          <tr><td colspan=7></td></tr> 
+              <?php    }                        
+                                                    
+//////////////------------employeeeee------------///////////////////////////////
+
+      $tot_debit1=0; $tot_credit1=0;
+      $sql_login5  =  $database->mysqlQuery("select ev_id,ev_date,ev_amount,ev_employee_id,ev_remarks,ev_amount,ev_pay_type_acc,
+                                              ev_net_salary_new,ev_from
+                                             from tbl_employee_voucher ts
+                                             where ts.ev_from !='' and  ts.ev_employee_id !='' and ts.ev_date='$dates[$i]' order by ev_id asc "); 
+
+      $num_login5   = $database->mysqlNumRows($sql_login5);
+					if($num_login5){  
+					while($result_login5  = $database->mysqlFetchArray($sql_login5)) 
+					{ 
+          $tot_credit1=$tot_credit1+$result_login5['ev_amount'];        
+           ?>
+          <tr>
+          <td style="width:10%;"><?=$result_login5['ev_date']?></td>
+          <td style="width:10%;">E <?=$result_login5['ev_id']?></td>
+          <td style="width:10%;">Employee</td>
+          <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login5['ev_from']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>                                             
+          <td style="width:30%;"><?=$result_login5['ev_remarks']?></td>
+          <td style="width:18%;"></td>
+          <td style="width:18%;"><?=$result_login5['ev_amount']?></td>
+          </tr>
+
+        <tr>
+          <td style="width:10%;"><?=$result_login5['ev_date']?></td>
+          <td style="width:10%;">E <?=$result_login5['ev_id']?></td>
+          <td style="width:10%;">Employee</td>
+          <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_staff_id='".$result_login5['ev_employee_id']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>                                             
+          <td style="width:30%;"><?=$result_login5['ev_remarks']?></td>         
+          <td style="width:18%;"><?=number_format($result_login5['ev_amount'],$_SESSION['be_decimal'])?></td>
+          <?php if($result_login5['ev_pay_type_acc']=='First') {?>
+          <td style="width:18%;"><?=number_format($result_login5['ev_net_salary_new'],$_SESSION['be_decimal'])?></td>
+          <?php } else {?>
+            <td style="width:18%;"></td>
+          <?php } ?>
+        </tr>
+          <?php    }   ?> 
+          <tr><td colspan=7></td></tr> 
+             <?php  }   
+ 
+                               
+      //////////////direct expense to///////////////////////////////
+      
+       $tot_debit2=0; $tot_credit2=0;
+           $sql_login78  =  $database->mysqlQuery("select ev_id,ev_amount,ev_date,ev_from_acc,ev_remarks,ev_to_acc 
+                                                  from tbl_expense_voucher tes 
+                                                  left join tbl_ledger_master lm on tes.ev_from_acc=lm.tlm_id  
+                                                  where tes.ev_acc_type='Direct Expense' and tes.ev_to_acc !='' 
+                                                  and tes.ev_from_acc !='' and tes.ev_date='$dates[$i]' order by ev_id asc"); 	
+           $num_login78   = $database->mysqlNumRows($sql_login78);
+					if($num_login78){ 
+					while($result_login78  = $database->mysqlFetchArray($sql_login78)) 
+					{          
+          $tot_debit2=$tot_debit2+$result_login78['ev_amount']; ?>
+        <tr>
+          <td style="width:10%;"><?=$result_login78['ev_date']?></td>
+          <td style="width:10%;">EX <?=$result_login78['ev_id']?></td>
+          <td style="width:10%;">Direct Exp</td>
+          <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login78['ev_from_acc']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>                                                
+          <td style="width:30%;"><?=$result_login78['ev_remarks']?></td>
+          <td style="width:18%;"></td>
+          <td style="width:18%;"><?=  number_format($result_login78['ev_amount'],$_SESSION['be_decimal'])?></td>         
+          </tr> 
+          
+          <tr>
+          <td style="width:10%;"><?=$result_login78['ev_date']?></td>
+          <td style="width:10%;">EX <?=$result_login78['ev_id']?></td>
+          <td style="width:10%;">Direct Exp</td>
+          <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login78['ev_to_acc']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>                                  
+          <td style="width:30%;"><?=$result_login78['ev_remarks']?></td>         
+          <td style="width:18%;"><?=  number_format($result_login78['ev_amount'],$_SESSION['be_decimal'])?></td>
+          <td style="width:18%;"></td>
+          </tr>
+          <?php    }   ?>
+        <tr><td colspan=7></td></tr>                              
+        <?php   } 
+                                                                                                                                     
+//////////////-----------INDIRECT EXPENSE ------------- ///////////////////////////////
+    
+       $tot_debit4=0; $tot_credit4=0;
+           $sql_login79  =  $database->mysqlQuery("select ev_id,ev_date,ev_amount,ev_to_acc,ev_remarks,ev_from_acc
+                                                  from tbl_expense_voucher tes  
+                                                  left join tbl_ledger_master tlm on tes.ev_to_acc=tlm.tlm_id
+                                                  where tes.ev_acc_type='Indirect Expense' and tes.ev_from_acc !='' 
+                                                  and tes.ev_to_acc!='' and tes.ev_date='$dates[$i]' order by ev_id asc"); 
+	
+          $num_login79   = $database->mysqlNumRows($sql_login79);
+					if($num_login79){
+					while($result_login79  = $database->mysqlFetchArray($sql_login79)) 
+					{ 
+         $tot_credit4=$tot_credit4+$result_login79['ev_amount'];  ?>
+
+        <tr>
+            <td style="width:10%;"><?=$result_login79['ev_date']?></td>
+            <td style="width:10%;">IEX <?=$result_login79['ev_id']?></td>
+            <td style="width:10%;">Indirect Exp</td>
+            <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login79['ev_from_acc']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>
+            <td style="width:30%;"><?=$result_login79['ev_remarks']?></td>
+            <td style="width:18%;"></td>
+            <td style="width:18%;"><?=  number_format($result_login79['ev_amount'],$_SESSION['be_decimal'])?></td>           
+          </tr>
+
+          <tr>
+          <td style="width:10%;"><?=$result_login79['ev_date']?></td>
+          <td style="width:10%;">IEX <?=$result_login79['ev_id']?></td>
+          <td style="width:10%;">Indirect Exp</td>
+          <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login79['ev_to_acc']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+            <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+          <?php }}  ?>      
+          <td style="width:30%;"><?=$result_login79['ev_remarks']?></td>         
+          <td style="width:18%;"><?=  number_format($result_login79['ev_amount'],$_SESSION['be_decimal'])?></td>
+          <td style="width:18%;"></td>
+          </tr>                  
+         <?php    }   ?>
+         <tr><td colspan=7></td></tr>                                                                                             
+ <?php } 
+
+}  
+
+          
+  }
+  
+   /////////////Credit purchase-------- /////////---------------- -//
+  if($_REQUEST['type']=='credit_purchase'){ 
+ 
+    if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{
+      $from = $_REQUEST['fromdt'];
+      $to= $_REQUEST['todt'];                      
+		}
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{
+      $from = $_REQUEST['fromdt'];
+			$to=date("Y-m-d");                     
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");
+      $to= $_REQUEST['todt'];                       
+		}
+    else
+	  {
+		  $from=date("Y-m-d");
+			$to=date("Y-m-d");
+    }  
+     
+                             
+    $period = new DatePeriod(new DateTime($from), new DateInterval('P1D'), new DateTime($to.' +1 day'));
+
+    foreach ($period as $date) 
+    {
+        $dates[] = $date->format("Y-m-d");
+    } 
+          $sql_login  =  $database->mysqlQuery("select tlm_id,tlm_vendor_id from tbl_ledger_master where tlm_vendor_id!='' "); 
+					$num_login   = $database->mysqlNumRows($sql_login);
+					if($num_login)
+          {
+					while($result_login5  = $database->mysqlFetchArray($sql_login)) 
+					{   
+            $vendors[]=$result_login5['tlm_vendor_id'];
+          }
+          } 
+        
+          for($i=0;$i<count($dates);$i++){
+                   
+            for($ii=0;$ii<count($vendors);$ii++){
+    
+          ///////////////credit purchase  --- supplier from acc  asset ////////// -------------- -
+              $sql_login454  =  $database->mysqlQuery("select tpd_id,tpd_date,tpd_paid_amount,tpd_remarks,tpd_vendor,tpd_invoice,tpd_type_pay,
+                                                      tpd_netamount,tpd_from_acc
+                                                      from tbl_asset_purchase_invoice_detail tap                                          
+                                                      where tpd_paid_amount!=tpd_netamount 
+                                                      and tpd_vendor ='$vendors[$ii]' and tpd_date='$dates[$i]' order by tpd_id asc");     
+                                                                              
+              $num_login454   = $database->mysqlNumRows($sql_login454);
+              $tot_credit_pay1=0;
+                if($num_login454)
+                {                                          
+                while($result_login  = $database->mysqlFetchArray($sql_login454)) 
+                { 
+                $tot_credit_pay1=$tot_credit_pay1+$result_login['tpd_paid_amount'];
+                ?>
+                <tr>
+                <td style="width:10%;"><?=$result_login['tpd_date']?></td>
+                <td style="width:10%;">AS <?=$result_login['tpd_id']?></td>
+                <td style="width:10%;">Asset Supplier </td>
+                <?php
+                    $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_vendor_id='".$result_login['tpd_vendor']."'  ");
+                    $num_login4   = $database->mysqlNumRows($sql_login2);
+                if($num_login4)
+                {                           
+                while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+                { ?>                                       
+                  <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                <?php }}  ?>  
+                <td style="width:30%;"><?=$result_login['tpd_remarks']?></td>
+                <td style="width:18%;"><?= number_format($result_login['tpd_paid_amount'],$_SESSION['be_decimal'])?></td>
+                <?php 
+                if($result_login['tpd_type_pay']=='First')
+                { ?>
+                  <td style="width:18%;"><?= number_format($result_login['tpd_netamount'],$_SESSION['be_decimal'])?></td>
+                <?php }else{ ?>
+                  <td style="width:18%;"></td> 
+                <?php  } ?>  
+                </tr>
+      
+                <tr>
+                <td style="width:10%;"><?=$result_login['tpd_date']?></td>
+                <td style="width:10%;">AS <?=$result_login['tpd_id']?></td>
+                <td style="width:10%;">Asset Supplier</td>
+                <?php
+                    $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['tpd_from_acc']."'  ");
+                    $num_login4   = $database->mysqlNumRows($sql_login2);
+                if($num_login4)
+                {                           
+                while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+                { ?>                                       
+                  <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+                <?php }}  ?>  
+                <td style="width:30%;"><?=$result_login['tpd_remarks']?></td>
+                <td style="width:18%;"></td>
+                <td style="width:18%;"><?= number_format($result_login['tpd_paid_amount'],$_SESSION['be_decimal'])?></td>          
+                </tr>
+         
+                <?php    }    ?>  
+                <tr><td colspan="7" ></td></tr>                           
+                <?php
+                 } ?>
+                 
+                 <!----------/////////////Credit purchase - supplier from acc//////////-------------------------------->                                                              
+        <?php 
+        $tot_credit_pay=0;                               
+           $sql_login  =  $database->mysqlQuery("select sv_date,sv_id,sv_paid_amount,sv_remarks,sv_vendor_id,sv_invoice_no,sv_invoice_amount,
+                                                  sv_type_pay,sv_from
+                                                  from tbl_supplier_voucher ts                              
+                                                  where ts.sv_invoice_amount!=ts.sv_paid_amount and sv_remarks!=''
+                                                  and ts.sv_vendor_id ='$vendors[$ii]' and sv_date='$dates[$i]' order by sv_id asc"); 
+	         $num_login   = $database->mysqlNumRows($sql_login);
+					if($num_login){                                      
+					while($result_login  = $database->mysqlFetchArray($sql_login)) 
+					{ 
+          $tot_credit_pay=$tot_credit_pay+$result_login['sv_paid_amount'];
+          ?>
+              <tr>
+              <td style="width:10%;"><?=$result_login['sv_date']?></td>
+              <td style="width:10%;">S <?=$result_login['sv_id']?></td>
+              <td style="width:18%;">Supplier</td>
+              <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_vendor_id='".$result_login['sv_vendor_id']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+              <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+              <?php }}  ?> 
+              <td style="width:30%;"><?=$result_login['sv_remarks']?> </td>
+              <td style="width:18%;"><?=$result_login['sv_paid_amount']?></td>
+              <?php if($result_login['sv_type_pay']=='First'){?>
+              <td style="width:18%;"><?= number_format($result_login['sv_invoice_amount'],$_SESSION['be_decimal'])?></td>
+             <?php } else { ?>
+              <td style="width:18%;"></td>
+             <?php } ?>
+             </tr>
+
+             <tr>
+              <td style="width:10%;"><?=$result_login['sv_date']?></td>
+              <td style="width:10%;">S <?=$result_login['sv_id']?></td>
+              <td style="width:18%;">Supplier</td>
+              <?php
+              $sql_login2  =  $database->mysqlQuery("select tlm_ledger_name from tbl_ledger_master  where tlm_id='".$result_login['sv_from']."'  ");
+              $num_login4   = $database->mysqlNumRows($sql_login2);
+					    if($num_login4)
+              {                           
+					    while($result_login4  = $database->mysqlFetchArray($sql_login2)) 
+					    { ?>                                       
+              <td style="width:18%;"><?=$result_login4['tlm_ledger_name']?></td>
+              <?php }} else{ ?> 
+                <td style="width:18%;"></td>
+                <?php }?>
+              <td style="width:30%;"><?=$result_login['sv_remarks']?> </td>
+              <td style="width:18%;"></td>
+              <td style="width:18%;"><?=$result_login['sv_paid_amount']?></td>             
+             </tr>
+            <?php } ?>
+                <tr><td colspan="7" ></td></tr>              
+           <?php }
+
+            }
+          }            
+}    
+          
+//  $crdt= $tot_credit_sale+$tot_debit_pay1+$tot_credit_pay5;
+                     
+//  $debt=$tot_credit_pay+$tot_credit_pay1;
+ 
+    ?> 
+                                        
+                                        <!-- <tr>
+                                            <td style="color:black;font-weight: bold;">FINAL Total</td>
+                                             <td></td>
+                                             
+                                               <td style="width:18%;"></td>
+                                              <td id="tot_debit"><?=number_format($debt,$_SESSION['be_decimal'])?></td>
+                                               <td id="tot_credit"><?=number_format($crdt,$_SESSION['be_decimal'])?></td>
+                                        </tr> -->
+                                        
+                                        <?php
+                                          
+       
+       
+   } 
+  
+  //------------------------------- receipt listing ------------------------------- //
+  else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='search_receipt_voucher'){
+  $limit = 100;
+  if(isset($_REQUEST['page']))
+  {
+  $page = $_REQUEST['page'];
+  }
+  else
+  {
+  $page= 1;
+  }
+   
+  $start_from = ($page-1)*$limit;
+    $string='';
+    
+   if($_REQUEST['toacc']!="")
+		{
+			$string.= " and  tr_acc_type = '".$_REQUEST['toacc']."'  ";              
+		}
+    
+    if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{
+			$string.= " and  tr_date between '".$_REQUEST['fromdt']."' and '".$_REQUEST['todt']."' ";                     
+		}
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{
+			$to=date("Y-m-d");
+			$string.= " and  tr_date between '".$_REQUEST['fromdt']."' and '".$to."' ";                  
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");
+			$string.= " and tr_date between '".$from."' and '".$_REQUEST['todt']."' ";                 
+		}
+    else{
+      $from=date("Y-m-d");
+      $to=date("Y-m-d");
+			$string.= " and tr_date between '".$from."' and '".$_REQUEST['todt']."' ";
+      $string .="";
+    }
+     
+    $sql_kotlist  =  $database->mysqlQuery("SELECT tr_id,tr_date,tr_acc_type,tr_amount,tr_transaction,tr_received,tr_particulars,tr_from,tr_to from tbl_receipts  where tr_id!='' $string order by tr_date desc LIMIT $start_from,$limit"); 
+		$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+
+
+    $sql_receipt_total  =  $database->mysqlQuery("SELECT tr_id from tbl_receipts  where tr_id!='' $string order by tr_date desc"); 
+		$num_receipt_total  = $database->mysqlNumRows($sql_receipt_total);
+    $total_pages = ceil($num_receipt_total/$limit);
+    $show="";
+    $data="";	
+    $pagination ="";
+
+					if($num_kotlist){
+            $i=$start_from+1;
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {  
+                  $data .= '<tr>'.
+                           '<td style="width:5%">'.$i.'</td>'.
+                            '<td  style="width:10%"><a onclick="return edit_contra_voucher('.$result_kotlist['tr_id'].');" href="#"> <div class="action_button printer_delete"><i class="glyphicon glyphicon-pencil"></i></div></a></td>'.
+                            '<td style="width:10%">'.$result_kotlist['tr_date'].'</td>'.
+                            '<td style="width:10%">'.$result_kotlist['tr_acc_type'].'</td>';
+
+          $sql_kotlist1  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where tlm_id='".$result_kotlist['tr_from']."' "); 
+					$num_kotlist1  = $database->mysqlNumRows($sql_kotlist1);
+					if($num_kotlist1){
+						  while($result_kotlist1  = $database->mysqlFetchArray($sql_kotlist1)) 
+							  {
+                $data .='<td style="width:10%;">'.$result_kotlist1['tlm_ledger_name'].'</td>';
+                } } 
+                 
+          $sql_kotlist2  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where tlm_id='".$result_kotlist['tr_to']."' "); 
+					$num_kotlist2  = $database->mysqlNumRows($sql_kotlist2);
+					if($num_kotlist2){
+						  while($result_kotlist2 = $database->mysqlFetchArray($sql_kotlist2)) 
+							  {                     
+                  $data .='<td style="width:10%;">'.$result_kotlist2['tlm_ledger_name'].'</td>';
+                } } 
+                  $data .= '<td style="width:10%;">'.$result_kotlist['tr_amount'].'</td>'.
+                     '<td style="width:10%;">'.$result_kotlist['tr_transaction'].'</td>'.
+                     '<td style="width:10%;">'.$result_kotlist['tr_received'].'</td>'.
+                      '<td style="width:10%;">'.$result_kotlist['tr_particulars'].'</td>';
+                      '</tr>';
+                      $i++;
+              }
+               $start = $start_from+1;
+  $end = $i-1;
+  if($num_receipt_total>$limit)
+{  $show = '<div>'
+  .'<p style="width: auto;color: #333;font-size: 15px;font-weight:bold; position: absolute;bottom: 25px;left: 20px;" >Showing '.$start.' to '.$end.' of '.$num_receipt_total.'</p> </div>';
+
+  $page_1=$page-1;
+  $page_2=$page-2;
+  $page_4 = $page-4;
+  $page_3 = $page-3;
+  $page_p1=$page+1;
+  $page_p2=$page+2;
+  $page_p3=$page+3;
+  $page_p4=$page+4;
+
+  $last = $total_pages-4;
+
+ $pagination .='<nav class="pagination_1" aria-label="Page navigation example" style="">'.
+              '<ul class="pagination justify-content-end">';
+  if($total_pages==1)
+ { 
+  $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>'.
+                '<li class="page-item active "><a class="page-link" onClick="search_contra('.$page.')">'.$page.'</a></li>'.  
+                '<li class="page-item disabled"><a class="page-link" >>></a></li>';
+ }
+
+ else if($total_pages==2)
+ { 
+  $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>';
+  for($i=1; $i<=2; $i++){ 
+    if($i==$page)
+    {
+      $active ='active';
+    }
+    else{
+      $active = '';
+    }
+  $pagination .='<li class="page-item '.$active.'"><a class="page-link" onClick="search_contra('.$i.')">'.$i.'</a></li>';
+  } 
+    $pagination .='<li class="page-item disabled"><a class="page-link" >>></a></li>';
+  }
+
+
+  else if($total_pages==3)
+  { 
+     $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>';
+  
+    for($i=1; $i<=3; $i++){ 
+     if($i==$page)
+     {
+       $active ='active';
+     }
+     else{
+       $active = '';
+     }
+
+   $pagination .='<li class="page-item '.$active.'"><a class="page-link" onClick="search_contra('.$i.')">'.$i.'</a></li>';
+   } 
+     $pagination .='<li class="page-item disabled"><a class="page-link" >>></a></li>';
+   }
+ else if($page==$total_pages){ 
+    $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra(1)">First</a></li>'.
+                  '<li class="page-item"><a class="page-link" onClick="search_contra('.$page_4.')"><<</a></li>'.
+                  '<li class="page-item "><a class="page-link" onClick="search_contra('.$page_2.')">'.$page_2.'</a></li>'.
+                  '<li class="page-item  "><a class="page-link" onClick="search_contra('.$page_1.')">'.$page_1.'</a></li>'. 
+                   '<li class="page-item active"><a class="page-link" onClick="search_contra('.$page.')">'.$page.'</a></li>';
+}
+else { 
+if($page==1)
+{     
+  $pagination .='<li class="page-item active "><a class="page-link" onClick="search_contra('.$page.')">'.$page.'</a></li>'.
+                '<li class="page-item"><a class="page-link" onClick="search_contra('.$page_p1.')">'.$page_p1.'</a></li>'.
+                '<li class="page-item"><a class="page-link" onClick="search_contra('.$page_p2.')">'.$page_p2.'</a></li>';
+  } 
+  else 
+  {
+  $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra(1)">First</a></li>';
+  if($page>2){
+  $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra('.$page_3.')"><<</a></li>';
+  }
+  else{
+    $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra('.$page_1.')"><<</a></li>';
+  }
+  $pagination .='<li class="page-item "><a class="page-link" onClick="search_contra('.$page_1.')">'.$page_1.'</a></li>'.
+                '<li class="page-item active"><a class="page-link" onClick="search_contra('.$page.')">'.$page.'</a></li>'.
+                '<li class="page-item"><a class="page-link" onClick="search_contra('.$page_p1.')">'.$page_p1.'</a></li>';
+      } 
+   if($page==1) {
+    $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra('.$page_p4.')">>></a></li>';
+   } 
+  else if($page>1 && $page<$last) {
+        $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra('.$page_p3.')">>></a></li>';
+  }
+  else{
+    $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra('.$page_p1.')">>></a></li>';
+  }
+
+      $pagination .='<li class="page-item"><a class="page-link" onClick="search_contra('.$total_pages.')">Last</a></li>';
+}
+$pagination .='</ul></nav>';
+          }
+          else{
+            $show="";$pagination ="";
+          }
+}else{
+   
+                  $data.= '<tr>'.
+                   '<td colspan="10" style="width:10%;color: red;font-weight:bold ">NO DATA FOUND</td>'.
+                   '</tr>';
+                  $show="";
+                  $pagination ="";
+}
+$satas = array('data' => $data, 'show' => $show,'pagination'=>$pagination);
+echo json_encode($satas);
+
+                                        
+}
+  else if(isset($_REQUEST['set']) && $_REQUEST['set']=='add_receipt_voucher'){
+        
+      
+      $date=date('Y-m-d H:i:s');
+   								
+
+        
+        if($_REQUEST['cv_date']!=''){
+        $insertion['tr_date'] 		               =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_date']);
+        }
+        $insertion['tr_from'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_from']);
+        $insertion['tr_to'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_to']);
+        $insertion['tr_amount'] 	        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_amount']);
+        
+        $insertion['tr_transaction'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_trans']);
+        $insertion['tr_particulars'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_remarks']); 
+        
+         $insertion['tr_received'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_receive']); 
+          $insertion['tr_acc_type'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_type']); 
+       
+          $insertion['tr_entry_date'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$date); 
+        
+        $sql=$database->check_duplicate_entry('tbl_receipts',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_receipts',$insertion);
+          
+          if($_REQUEST['cv_type']=='Investment'){
+              
+          $sql_kotlist22  =  $database->mysqlQuery("SELECT max(tps_id) as mxid from tbl_ledger_setting where tps_ledger_id='".$_REQUEST['cv_to']."' limit 1 "); 
+					$num_kotlist22 = $database->mysqlNumRows($sql_kotlist22);
+					if($num_kotlist22){
+						  while($result_kotlist256  = $database->mysqlFetchArray($sql_kotlist22)) 
+							  { 
+                                                      
+             $sql_kotlist2  =  $database->mysqlQuery("update tbl_ledger_setting set tps_closing_balance=(tps_closing_balance+'".$_REQUEST['cv_amount']."')  where tps_id='".$result_kotlist256['mxid']."'  "); 
+					
+                                                  
+                                                   }
+                                                  }
+          
+          }
+          
+         } 
+        
+  }
+   else if(isset($_REQUEST['set']) && $_REQUEST['set']=='edit_receipt_voucher'){
+       
+       
+        $sql_kotlist  =  $database->mysqlQuery("SELECT tr_date,tr_from,tr_to,tr_amount,tr_transaction,tr_particulars,tr_received,tr_acc_type from tbl_receipts  where tr_id='".$_REQUEST['edit_id']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                                                
+                 echo $result_kotlist['tr_date'].'*'.$result_kotlist['tr_from'].'*'.$result_kotlist['tr_to'].'*'.$result_kotlist['tr_amount'].'*'
+                                         .$result_kotlist['tr_transaction'].'*'.$result_kotlist['tr_particulars'].'*'.$result_kotlist['tr_received'].'*'.$result_kotlist['tr_acc_type'];                                 
+                                                  }
+                                                  }
+        
+  } else if(isset($_REQUEST['set']) && $_REQUEST['set']=='update_receipt_voucher'){
+        
+         $query3=$database->mysqlQuery("UPDATE `tbl_receipts` SET tr_date='".$_REQUEST['cv_date']."',`tr_from`='".$_REQUEST['cv_from']."',"
+             . "`tr_to`='".$_REQUEST['cv_to']."',"
+             . "`tr_amount`='".$_REQUEST['cv_amount']."',`tr_transaction`='".$_REQUEST['cv_trans']."',"
+                 . "`tr_particulars`='".$_REQUEST['cv_remarks']."',`tr_acc_type`='".$_REQUEST['cv_type']."',`tr_received`='".$_REQUEST['cv_receive']."' "
+                 . "where tr_id='".$_REQUEST['update_id']."' ");
+         
+         
+         if($_REQUEST['cv_type']=='Investment'){
+              
+          $sql_kotlist22  =  $database->mysqlQuery("SELECT max(tps_id) as mxid from tbl_ledger_setting where tps_ledger_id='".$_REQUEST['cv_to']."' limit 1 "); 
+					$num_kotlist22 = $database->mysqlNumRows($sql_kotlist22);
+					if($num_kotlist22){
+						  while($result_kotlist256  = $database->mysqlFetchArray($sql_kotlist22)) 
+							  { 
+                                                      
+             $sql_kotlist2  =  $database->mysqlQuery("update tbl_ledger_setting set tps_closing_balance=(tps_closing_balance+'".$_REQUEST['cv_amount']."')  where tps_id='".$result_kotlist256['mxid']."'  "); 
+					
+                                                  
+                                                   }
+                                                  }
+          
+          }
+         
+         
+         
+         
+  }
+  else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_pay_month')
+  {
+      $sql_kotlist  =  $database->mysqlQuery("SELECT tes_month from tbl_employee_salary  where tes_month='".$_REQUEST['smonth']."' and  tes_year='".$_REQUEST['syear']."'"); 
+			$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+			if($num_kotlist){
+                     echo 'yes';
+                      }else{
+                     echo 'no';
+                      }
+  }
+
+  else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='search_loan_adv_voucher'){
+    
+    $string='';
+    
+   if($_REQUEST['voucher_type']!="")
+		{
+			$string.= " and  tla_type = '".$_REQUEST['voucher_type']."'  ";
+                        
+		}
+    
+    if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{
+			$string.= " and  tla_date between '".$_REQUEST['fromdt']."' and '".$_REQUEST['todt']."' ";
+                        
+		}
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{
+			
+			$to=date("Y-m-d");
+			$string.= " and  tla_date between '".$_REQUEST['fromdt']."' and '".$to."' ";
+                        
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");
+			
+			$string.= " and tla_date between '".$from."' and '".$_REQUEST['todt']."' ";
+                        
+		}
+                
+                
+     $j=0;
+    $sql_kotlist  =  $database->mysqlQuery("SELECT sum(tla_paid) as paid,`tla_id`, `tla_type`, `tla_acc_type`, `tla_date`, `tla_from`, `tla_to`, tla_amount, `tla_transaction`, `tla_particulars`, `tla_receive`, `tla_entry_date`, `tla_pay_entry`, `tla_voucher_no` from tbl_loan_advance  where tla_pay_entry='First' and   tla_id!='' $string group by tla_main_acc "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  { $j++;  
+                                                          
+                                 //$amt=  $amt+$result_kotlist['tla_amount'];  
+                                  //$paid=  $paid+$result_kotlist['paid'];  
+                                                          
+                                                          
+?>
+                   <tr>
+                   <td style="width:5%"><?=$j;?> </td>
+                   <td  style="width:8%"><a onclick="return edit_contra_voucher('<?=$result_kotlist['tla_id']?>','<?=$result_kotlist['tla_to']?>');" href="#"> <div class="action_button printer_delete"><i class="glyphicon glyphicon-pencil"></i></div></a>
+                   <a  href="loan_adv_pay.php?to_acc=<?=$result_kotlist['tla_to']?>&acc_type=<?=$result_kotlist['tla_type']?>&adv_type=<?=$result_kotlist['tla_acc_type']?>&acc_from=<?=$result_kotlist['tla_from']?>"> <div class="action_button printer_delete"><i class="glyphicon glyphicon-user"></i></div></a>
+                   </td>
+                   <td style="width:10%"><?=$result_kotlist['tla_date']?></td>
+                   <td style="width:10%;"><?=$result_kotlist['tla_voucher_no']?></td>
+                    <td style="width:10%"><?=$result_kotlist['tla_type']?></td>
+                    
+                 <?php 
+                 
+           $sql_kotlist1  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where tlm_id='".$result_kotlist['tla_from']."' "); 
+					$num_kotlist1  = $database->mysqlNumRows($sql_kotlist1);
+					if($num_kotlist1){
+						  while($result_kotlist1  = $database->mysqlFetchArray($sql_kotlist1)) 
+							  {
+                   ?>
+                   <td style="width:10%;"><?=$result_kotlist1['tlm_ledger_name']?></td>
+                                        <?php } } ?>
+                    <?php 
+                 
+         $sql_kotlist2  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where tlm_id='".$result_kotlist['tla_to']."' "); 
+					$num_kotlist2  = $database->mysqlNumRows($sql_kotlist2);
+					if($num_kotlist2){
+						  while($result_kotlist2 = $database->mysqlFetchArray($sql_kotlist2)) 
+							  { ?>                                                 
+                  <td style="width:10%;color:darkred;font-weight: bold"><?=$result_kotlist2['tlm_ledger_name']?></td>                 
+                   <?php } } 
+
+     
+                   $amt=0;
+                   $sql_kotlist2  =  $database->mysqlQuery("SELECT sum(tla_amount) as amt from tbl_loan_advance  where tla_pay_entry='First' and  tla_main_acc='".$result_kotlist['tla_to']."' group by tla_to"); 
+					$num_kotlist2 = $database->mysqlNumRows($sql_kotlist2);
+					if($num_kotlist2){$i=0;
+						  while($result_kotlist2  = $database->mysqlFetchArray($sql_kotlist2)) 
+							  { $amt=$amt+$result_kotlist2['amt'];
+                   
+                   ?>
+                   <td style="width:10%;"><?=number_format($result_kotlist2['amt'],$_SESSION['be_decimal'])?> </td>
+                     
+                                        <?php }} 
+                                        
+                                        
+                                    
+                                        
+                      $amtpd=0;          
+                   $sql_kotlist2  =  $database->mysqlQuery("SELECT sum(tla_paid) as pd from tbl_loan_advance  where tla_paid>0 and  tla_main_acc='".$result_kotlist['tla_to']."' group by tla_to"); 
+					$num_kotlist2 = $database->mysqlNumRows($sql_kotlist2);
+					if($num_kotlist2){$i=0;
+						  while($result_kotlist25  = $database->mysqlFetchArray($sql_kotlist2)) 
+							  { 
+                     $amtpd=$amtpd+$result_kotlist25['pd'];          
+                   ?>
+                   <td style="width:10%;"><?=number_format($result_kotlist25['pd'],$_SESSION['be_decimal'])?> </td>
+                     
+                                        <?php }}else{ ?>
+                                     <td style="width:10%;"> </td>       
+                                            
+                                            
+                                            <?php
+                                        } ?>
+                                        
+                       <td style="width:10%;"><?=number_format($amt-$amtpd,$_SESSION['be_decimal'])?></td>
+                   </tr>
+<?php
+}}else{
+    ?>
+                   <tr>
+                   
+                   <td colspan="10" style="width:10%;color: red;font-weight:bold ">No Records Found</td>
+                  
+                   </tr>
+                   
+                   
+                   <?php
+}
+                                        
+}
+else if(isset($_REQUEST['set']) && $_REQUEST['set']=='add_loan_adv_voucher'){
+        
+      
+      $date=date('Y-m-d H:i:s');
+   								
+
+        
+        if($_REQUEST['cv_date']!=''){
+        $insertion['tla_date'] 		               =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_date']);
+        }
+        $insertion['tla_from'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_from']);
+        $insertion['tla_to'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_to']);
+        $insertion['tla_amount'] 	        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_amount']);
+        
+        $insertion['tla_transaction'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_trans']);
+        $insertion['tla_particulars'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_remarks']); 
+        
+         $insertion['tla_receive'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_receive']); 
+          $insertion['tla_type'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_type']); 
+       
+          $insertion['tla_acc_type'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_tpe_l']); 
+          
+          
+          $insertion['tla_entry_date'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$date); 
+          $insertion['tla_pay_entry'] 		        =  mysqli_real_escape_string($database->DatabaseLink,"First"); 
+           $insertion['tla_voucher_no'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['vouch_no']); 
+           
+           
+            $insertion['tla_main_acc'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_to']); 
+            
+        
+        $sql=$database->check_duplicate_entry('tbl_loan_advance',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_loan_advance',$insertion);
+         } 
+       
+  }
+   else if(isset($_REQUEST['set']) && $_REQUEST['set']=='edit_loan_adv_voucher'){
+       
+       
+        $sql_kotlist  =  $database->mysqlQuery("SELECT tla_date,tla_from,tla_to,tla_amount,tla_transaction,tla_particulars,tla_receive,tla_type,tla_acc_type,tla_voucher_no from tbl_loan_advance  where tla_id='".$_REQUEST['edit_id']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                                                
+                                     echo $result_kotlist['tla_date'].'*'.$result_kotlist['tla_from'].'*'.$result_kotlist['tla_to'].'*'.$result_kotlist['tla_amount'].'*'
+                                         .$result_kotlist['tla_transaction'].'*'.$result_kotlist['tla_particulars'].'*'.$result_kotlist['tla_receive'].'*'.$result_kotlist['tla_type'].'*'.$result_kotlist['tla_acc_type'].'*'.$result_kotlist['tla_voucher_no'];                                 
+                                                  }
+                                                  }
+        
+  } else if(isset($_REQUEST['set']) && $_REQUEST['set']=='update_loan_adv_voucher'){
+        
+      
+         $query3=$database->mysqlQuery("UPDATE `tbl_loan_advance` SET tla_date='".$_REQUEST['cv_date']."',`tla_from`='".$_REQUEST['cv_from']."',"
+             . "`tla_to`='".$_REQUEST['cv_to']."',"
+             . "`tla_amount`='".$_REQUEST['cv_amount']."',`tla_transaction`='".$_REQUEST['cv_trans']."',"
+                 . "`tla_particulars`='".$_REQUEST['cv_remarks']."',`tla_type`='".$_REQUEST['cv_type']."',`tla_receive`='".$_REQUEST['cv_receive']."',`tla_acc_type`='".$_REQUEST['cv_type_l']."' "
+                 . "where tla_id='".$_REQUEST['update_id']."' ");
+  
+     
+         
+         
+  }
+  else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_loan_to_acc'){
+      
+      
+      
+      if($_REQUEST['type']=='Loan'){
+   ?>
+               
+                   <select class="add_printer_drop" id="to_acc">
+                                <option value="">TO ACC</option>
+                                
+                                <?php 
+           $sql_kotlist  =  $database->mysqlQuery("SELECT tlm_id,tlm_ledger_name from tbl_ledger_master tl left join tbl_ledger_group tg on tl.tlm_group=tg.tlg_id where tlm_staff_id!=''  "); 
+			$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {?>
+                <option value="<?=$result_kotlist['tlm_id']?>"><?=$result_kotlist['tlm_ledger_name'] ?> </option>
+                  <?php 
+                                                  }
+                                                  }
+                                                ?>
+                            </select>
+                   <?php
+              
+      }else{
+       
+          ?>
+          <select class="add_printer_drop" id="to_acc">
+                                <option value="">TO ACC</option>
+                                
+                                <?php 
+                                
+                                
+                               if($_REQUEST['adv_typ']!=''){
+                                   
+                                   
+                                   if($_REQUEST['adv_typ']=='Fixed_asset'){
+                                       
+                                       $type=" tl.tlm_vendor_id!='' ";
+                                       
+                                   }else if($_REQUEST['adv_typ']=='Direct_expense'){
+                                       
+                                        $type=" tg.tlg_name='Direct Expense' ";
+                                        
+                                   }else{
+                                       
+                                        $type=" tg.tlg_name='Indirect Expense' ";
+                                   }
+                                   
+                                   
+                                   
+                                   
+                                   
+                               }
+                                
+                                
+          $sql_kotlist  =  $database->mysqlQuery("SELECT tlm_id,tlm_ledger_name from tbl_ledger_master tl left join tbl_ledger_group tg on tl.tlm_group=tg.tlg_id where tg.tlg_id!='' and   $type  "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  { ?>
+                <option value="<?=$result_kotlist['tlm_id']?>"><?=$result_kotlist['tlm_ledger_name'] ?> </option>
+                <?php 
+                 }
+                  }
+                 ?>
+                  </select>
+          
+          
+          
+          <?php
+      }   
+                   
+  }
+  else if(isset($_REQUEST['set']) &&  $_REQUEST['set']=='list_loan_adv'){
+    
+    $string='';
+    
+   if($_REQUEST['to_acc']!="")
+		{
+			$string.= " and  tla_main_acc = '".$_REQUEST['to_acc']."'  ";
+                        
+		}
+    
+    if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{
+			$string.= " and  tla_date between '".$_REQUEST['fromdt']."' and '".$_REQUEST['todt']."' ";
+                        
+		}
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{
+			
+			$to=date("Y-m-d");
+			$string.= " and  tla_date between '".$_REQUEST['fromdt']."' and '".$to."' ";
+                        
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");
+			
+			$string.= " and tla_date between '".$from."' and '".$_REQUEST['todt']."' ";
+                        
+		}
+     $amt=0;$bal=0;$paid=0;
+    $sql_kotlist  =  $database->mysqlQuery("SELECT tla_particulars,tla_pay_entry,tla_date,tla_type,tla_voucher_no,tla_to,tla_acc_type,tla_from,tla_amount,tla_paid from tbl_loan_advance  where tla_id!='' $string order by tla_voucher_no,tla_entry_date asc"); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){$i=0;
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  { $i++;    ?>
+                <tr>
+                  <?php if($result_kotlist['tla_pay_entry']=='First'){?>
+                  <td style="width:10%;font-weight: bold;cursor: pointer;color:darkred" >
+                  <?php  if($result_kotlist['tla_type']=='Loan')
+                  { ?>
+                  <a style="width: auto;padding: 5px;background-color: #a91400;color: #ffffff; text-decoration: none;" onclick="pay_bal('<?=$result_kotlist['tla_voucher_no']?>','<?=$result_kotlist['tla_to']?>','<?=$result_kotlist['tla_from']?>')" >SETTLE </a>
+                           
+                          
+                           <?php }else { ?>
+                           
+                           <a style="padding-left:10px" onclick="transfer_amount('<?=$result_kotlist['tla_acc_type']?>','<?=$result_kotlist['tla_to']?>','<?=$result_kotlist['tla_voucher_no']?>','<?=$result_kotlist['tla_to']?>','<?=$result_kotlist['tla_amount']?>','<?=$result_kotlist['tla_paid']?>')" ><span  class="fa fa-mail-forward"></span> </a></td>
+                     
+                           <?php } ?> 
+
+                        <?php 
+                      
+                      
+                      } else{?>
+                          
+                       <td style="width:5%">.</td>  
+                          
+                          
+                     <?php      
+                      }
+?>
+                   <td style="width:8%;"><?=$result_kotlist['tla_date']?></td>
+                   <td style="width:7%;"><?=$result_kotlist['tla_voucher_no']?></td>
+                   <td style="width:5%;"><?=$result_kotlist['tla_type']?></td>
+                 <?php 
+                 
+                $sql_kotlist1  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where tlm_id='".$result_kotlist['tla_from']."' "); 
+					$num_kotlist1  = $database->mysqlNumRows($sql_kotlist1);
+					if($num_kotlist1){
+						  while($result_kotlist1  = $database->mysqlFetchArray($sql_kotlist1)) 
+							  {
+                   ?>
+                   <td style="width:10%;"><?=$result_kotlist1['tlm_ledger_name']?></td>
+                                        <?php } } ?>
+                    <?php 
+                 
+                                         $sql_kotlist2  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where tlm_id='".$result_kotlist['tla_to']."' "); 
+					$num_kotlist2  = $database->mysqlNumRows($sql_kotlist2);
+					if($num_kotlist2){
+						  while($result_kotlist2 = $database->mysqlFetchArray($sql_kotlist2)) 
+							  {
+                                                      ?>
+                                                  
+                  <td style="width:10%;"><?=$result_kotlist2['tlm_ledger_name']?></td>
+                  
+                   <?php } } ?>
+                  
+                  <td style="width:20%;"><?=$result_kotlist['tla_particulars']?></td>
+                  
+                  
+                  <?php if($result_kotlist['tla_pay_entry']=='First'){
+                      
+                      $amt=$result_kotlist['tla_amount'];
+                      
+                      ?>
+                  
+                   <td style="width:15%;"><?=number_format($result_kotlist['tla_amount'],$_SESSION['be_decimal'])?></td>
+                   
+                    <?php if($result_kotlist['tla_pay_entry']=='Loan'){
+                          
+                          ?>
+                    <td style="width:15%;"></td>
+                    
+                    <?php }else{ ?>
+                          <td style="width:15%;"><?=number_format($result_kotlist['tla_paid'],$_SESSION['be_decimal'])?></td>
+                          
+                     <?php }  ?>
+                    
+                    
+                    
+                    
+                     <td style="width:10%;display: none"><?=number_format($result_kotlist['tla_amount'],$_SESSION['be_decimal'])?></td>
+                 <?php }else{
+                     
+                     $sql_kotlist23  =  $database->mysqlQuery("SELECT sum(tla_paid) as paid from tbl_loan_advance where tla_voucher_no='".$result_kotlist['tla_voucher_no']."' and tla_pay_entry='Partial' "); 
+					$num_kotlist23  = $database->mysqlNumRows($sql_kotlist23);
+					if($num_kotlist23){
+						  while($result_kotlist23 = $database->mysqlFetchArray($sql_kotlist23)) 
+							  {
+                                                      
+                                                      $paid=$paid+$result_kotlist23['paid'];
+                                                  }
+                                                  }
+                     
+                     $bal=$amt-$paid;
+                     
+                     ?>  
+                   <td style="width:15%;"></td>
+                    <td style="width:15%;"><?=number_format($result_kotlist['tla_paid'],$_SESSION['be_decimal'])?></td>
+                   <td style="width:10%;display: none"><?=number_format($bal,$_SESSION['be_decimal'])?></td>
+                 <?php }?>  
+                     
+                     
+                       
+                   </tr>
+<?php
+}}
+    ?>
+                
+                   
+                   
+                   <tr style="display:none">
+                   <td style="width:5%;">Total</td>
+                   <td style="width:5%"></td>
+                   <td style="width:10%;color: red;font-weight:bold "></td>
+                    <td style="width:20%;"></td>
+                  <td style="width:10%;"></td>
+                   <td style="width:10%;"></td>
+                   <td style="width:10%;"><?=number_format($paid,$_SESSION['be_decimal'])?></td>
+                     <td style="width:10%;"><?=number_format($bal,$_SESSION['be_decimal'])?></td>
+                       
+                   </tr>
+                   
+                   
+                   <?php
+}
+    else if(isset($_REQUEST['set']) && $_REQUEST['set']=='pay_loan_adv_voucher'){
+        
+      
+      $date=date('Y-m-d H:i:s');
+
+        if($_REQUEST['cv_date']!=''){
+        $insertion['tla_date'] 	=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_date']);
+        }
+        $insertion['tla_from'] =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_from']);
+        $insertion['tla_to'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_to']);
+      
+         
+        $insertion['tla_transaction'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_trans']);
+        $insertion['tla_particulars'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_remarks']); 
+        
+         $insertion['tla_receive'] 		        =  mysqli_real_escape_string($database->DatabaseLink,''); 
+         
+          $insertion['tla_type'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_type']); 
+       
+          $insertion['tla_acc_type'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_tpe_l']); 
+          
+          
+          $insertion['tla_entry_date'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$date); 
+          
+          
+          if($_REQUEST['pay_type']!='Pay'){
+          $insertion['tla_pay_entry'] 		        =  mysqli_real_escape_string($database->DatabaseLink,"Partial"); 
+         
+          
+           $insertion['tla_paid'] 	        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_amount']);
+           
+           
+            $insertion['tla_main_acc'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_from']); 
+           
+          }else{
+               $insertion['tla_pay_entry'] 		        =  mysqli_real_escape_string($database->DatabaseLink,"First"); 
+               
+               $insertion['tla_amount'] 	        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_amount']);
+               
+                $insertion['tla_main_acc'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['cv_to']); 
+          }
+          
+         
+              $insertion['tla_voucher_no'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['new_vouch_no']); 
+              
+              
+              
+         
+        
+        $sql=$database->check_duplicate_entry('tbl_loan_advance',$insertion);
+        
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_loan_advance',$insertion);
+         } 
+       
+  }                                    
+else if(isset($_REQUEST['set']) && $_REQUEST['set']=='search_vouch_no'){
+      
+      
+     
+                                         $sql_kotlist  =  $database->mysqlQuery("SELECT tla_voucher_no from tbl_loan_advance where tla_voucher_no='".$_REQUEST['vouch_no']."'  "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						echo 'no';
+                                        }else{
+                                                              
+  
+                                            echo 'yes';
+                                            }
+                                            
+                                            
+                                            
+  }
+  else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_pay_full'){
+      
+      $paid=0; $amt=0;
+     
+   $sql_kotlist23  =  $database->mysqlQuery("SELECT distinct(tla_amount) from tbl_loan_advance where tla_voucher_no='".$_REQUEST['vouch']."'  "); 
+	$num_kotlist  = $database->mysqlNumRows($sql_kotlist23);
+	if($num_kotlist){
+	 while($result_kotlist23 = $database->mysqlFetchArray($sql_kotlist23)) 
+	{
+             
+             $amt=$amt+$result_kotlist23['tla_amount'];
+          }
+        }
+                                            
+           
+        $sql_kotlist  =  $database->mysqlQuery("SELECT sum(tla_paid) as paid from tbl_loan_advance where tla_voucher_no='".$_REQUEST['vouch']."'  "); 
+	$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+	if($num_kotlist){
+	 while($result_kotlist23 = $database->mysqlFetchArray($sql_kotlist)) 
+	{
+             
+             $paid=$paid+$result_kotlist23['paid'];
+          }
+        }
+        
+       
+        if($paid < $amt){
+            echo 'yes';
+        }else{
+            echo 'no';
+        }
+        
+        
+        
+                                            
+          }
+          
+          else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_bal_loan_adv'){
+              
+              $paid=0; $amt=0;$bal=0;
+     
+   $sql_kotlist23  =  $database->mysqlQuery("SELECT tla_amount from tbl_loan_advance where tla_voucher_no='".$_REQUEST['vouch']."' and tla_pay_entry='First'  "); 
+	$num_kotlist  = $database->mysqlNumRows($sql_kotlist23);
+	if($num_kotlist){
+	 while($result_kotlist23 = $database->mysqlFetchArray($sql_kotlist23)) 
+	{
+             
+             $amt=$amt+$result_kotlist23['tla_amount'];
+          }
+        }
+                                            
+           
+        $sql_kotlist  =  $database->mysqlQuery("SELECT sum(tla_paid) as paid from tbl_loan_advance where tla_voucher_no='".$_REQUEST['vouch']."'  "); 
+	$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+	if($num_kotlist){
+	 while($result_kotlist23 = $database->mysqlFetchArray($sql_kotlist)) 
+	{
+             
+             $paid=$paid+$result_kotlist23['paid'];
+          }
+        }
+        
+        $bal=$amt-$paid;
+        
+        echo $bal;
+        
+          }
+   else if(isset($_REQUEST['set']) && $_REQUEST['set']=='transfer_advance_pay'){
+       
+       $sql_kotlist23  =  $database->mysqlQuery("update tbl_ledger_master set tlm_open_bal=tlm_open_bal+'".$_REQUEST['amount']."' where tlm_id='".$_REQUEST['to_acc']."' ");
+       
+              $sql_kotlist23  =  $database->mysqlQuery("update tbl_loan_advance set tla_paid='".$_REQUEST['amount']."' where tla_voucher_no='".$_REQUEST['vouch']."' ");
+           
+              
+              
+              if($_REQUEST['type']=='Direct_expense'){
+                  $type='Direct Expense';
+              }else if($_REQUEST['type']=='Indirect_expense'){
+                  $type='Indirect Expense';
+              }else{
+                 $type=''; 
+              }
+              
+              if($_REQUEST['type']=='Direct_expense' || $_REQUEST['type']=='Indirect_expense'){
+              
+        $date=date('Y-m-d');
+        
+       
+        $insertion['ev_date'] 		               =  mysqli_real_escape_string($database->DatabaseLink,$date);
+        
+        $insertion['ev_from_acc'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['from']);
+        $insertion['ev_to_acc'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['to_acc']);
+        $insertion['ev_amount'] 	        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['amount']);
+        
+        $insertion['ev_transaction_data'] 		       =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['tr_remarks']);
+        $insertion['ev_remarks'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['tr_remarks']); 
+        $insertion['ev_acc_type'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$type); 
+        
+        $insertion['ev_entry_date'] 		        =  mysqli_real_escape_string($database->DatabaseLink,$date); 
+        
+       
+          
+        
+        $sql=$database->check_duplicate_entry('tbl_expense_voucher',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_expense_voucher',$insertion);
+         } 
+              
+              
+              }
+              
+              
+ }
+ else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_stock_concept'){
+     
+      $date=	date("Y-m-d", strtotime($_REQUEST['date']) );
+      
+     $tot=0;
+     $subtotal=0;
+     $sql_login  =  $database->mysqlQuery("select sum(bm_finaltotal) as tot  FROM tbl_tablebillmaster bm left join tbl_floormaster tf on tf.fr_floorid=bm.bm_floorid where bm.bm_dayclosedate='".$date."' and bm.bm_status='Closed' and bm.bm_complimentary!='Y' "); 
+ 
+	  $num_login   = $database->mysqlNumRows($sql_login);
+	  if($num_login){
+         
+		  while($result_login  = $database->mysqlFetchArray($sql_login)) 
+			{   
+				
+                        $subtotal = $subtotal+$result_login['tot'];
+                      
+          } } 
+          
+          
+          
+         $subtotalta=0; 
+          $sql_loginta  =  $database->mysqlQuery("select sum(tab_netamt) as tot FROM tbl_takeaway_billmaster where   tab_dayclosedate='".$date."' and tab_status='Closed' and tab_complimentary!='Y' "); 
+  
+	  $num_loginta   = $database->mysqlNumRows($sql_loginta);
+	  if($num_loginta){
+		  while($result_loginta  = $database->mysqlFetchArray($sql_loginta)) 
+			{ 
+				
+			$subtotalta =$subtotalta + $result_loginta['tot'];
+                        
+          } }  
+      
+     $tot= $subtotal+$subtotalta;
+     
+     
+     echo number_format($tot,$_SESSION['be_decimal']).'*';
+     
+     
+     
+     
+     $stock_purcahse=0;
+     $sql_login5  =  $database->mysqlQuery("select distinct(sv_invoice_amount)   FROM tbl_supplier_voucher  where sv_date='".$date."' group by sv_vendor_id,sv_invoice_no  "); 
+ 
+	  $num_login5   = $database->mysqlNumRows($sql_login5);
+	  if($num_login5){
+         
+		  while($result_login5  = $database->mysqlFetchArray($sql_login5)) 
+			{   
+				
+                        $stock_purcahse = $stock_purcahse+$result_login5['sv_invoice_amount'];
+                      
+          } } 
+     
+     
+     echo number_format($stock_purcahse,$_SESSION['be_decimal']);
+     
+     
+     
+     
+  }
+ else if(isset($_REQUEST['set']) && $_REQUEST['set']=='loan_balance_ledger'){ 
+     
+     $string='';
+     if($_REQUEST['fromdt']!="" && $_REQUEST['todt']!="")
+		{
+			$string.= " and  tla_date between '".$_REQUEST['fromdt']."' and '".$_REQUEST['todt']."' ";
+                        
+		}
+		else if($_REQUEST['fromdt']!="" && $_REQUEST['todt']=="")
+		{
+			
+			$to=date("Y-m-d");
+			$string.= " and  tla_date between '".$_REQUEST['fromdt']."' and '".$to."' ";
+                        
+		}
+		else if($_REQUEST['fromdt']=="" && $_REQUEST['todt']!="")
+		{
+			$from=date("Y-m-d");
+			
+			$string.= " and tla_date between '".$from."' and '".$_REQUEST['todt']."' ";
+                        
+		}else{
+      $from=date("Y-m-d");
+			$to=date("Y-m-d");
+			$string.= " and tla_date between '".$from."' and '".$to."' ";
+                }
+     
+     
+  
+                         $amt=0;
+                         
+                        // echo "SELECT sum(tla_amount) as amt from tbl_loan_advance  where tla_pay_entry='First' and  tla_main_acc='".$_REQUEST['acc']."' $string group by tla_main_acc";
+                   $sql_kotlist2  =  $database->mysqlQuery("SELECT sum(tla_amount) as amt from tbl_loan_advance  where tla_pay_entry='First' and  tla_main_acc='".$_REQUEST['acc']."' $string group by tla_main_acc"); 
+					$num_kotlist2 = $database->mysqlNumRows($sql_kotlist2);
+					if($num_kotlist2){$i=0;
+						  while($result_kotlist2  = $database->mysqlFetchArray($sql_kotlist2)) 
+							  { 
+                                                      
+                                                      $amt=$amt+$result_kotlist2['amt'];
+                   
+                     
+                                }} 
+                                        
+                                        
+                                    
+                                        
+                      $amtpd=0;    
+                      
+                     // echo "SELECT sum(tla_paid) as pd from tbl_loan_advance  where tla_paid>0 and  tla_main_acc='".$_REQUEST['acc']."' $string group by tla_main_acc";
+                   $sql_kotlist2  =  $database->mysqlQuery("SELECT sum(tla_paid) as pd from tbl_loan_advance  where tla_paid>0 and  tla_main_acc='".$_REQUEST['acc']."' group by tla_main_acc"); 
+					$num_kotlist2 = $database->mysqlNumRows($sql_kotlist2);
+					if($num_kotlist2){$i=0;
+						  while($result_kotlist25  = $database->mysqlFetchArray($sql_kotlist2)) 
+							  { 
+                    
+                                                      
+                                                      $amtpd=$amtpd+$result_kotlist25['pd'];          
+                   }}
+              $bal=number_format(($amt-$amtpd),$_SESSION['be_decimal']);                       
+            
+              echo $bal;
+}
+else if(isset($_REQUEST['set']) && $_REQUEST['set']=='add_openclose_acc'){
+          
+         
+
+        	$close=str_replace(',','',$_REQUEST['close']);
+                
+                $open=str_replace(',','',$_REQUEST['open']);
+
+        $insertion['tps_dayclosedate'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['date']);
+        
+        if($_REQUEST['open']!=''){
+        $insertion['tps_ledger_open_bal'] 		=  mysqli_real_escape_string($database->DatabaseLink,$open);
+        }
+        
+        $insertion['tps_closing_balance'] 		=  mysqli_real_escape_string($database->DatabaseLink,$close);
+        $insertion['tps_ledger_id'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['ledger']);
+        
+        
+        $sql=$database->check_duplicate_entry('tbl_ledger_setting',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_ledger_setting',$insertion);
+         } 
+          
+         
+  }
+  else if(isset($_REQUEST['set']) && $_REQUEST['set']=='edit_openclose_acc'){
+          
+          
+        	$sql_kotlist  =  $database->mysqlQuery("SELECT tps_dayclosedate,tps_ledger_open_bal,tps_closing_balance,tps_ledger_id from tbl_ledger_setting where tps_id='".$_REQUEST['edit_id']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {
+                echo '*'.$result_kotlist['tps_dayclosedate'].'*'.$result_kotlist['tps_ledger_open_bal'].'*'.$result_kotlist['tps_closing_balance'] .'*'.$result_kotlist['tps_ledger_id'] ;                        
+                                                      
+                                                  }
+                                                  }			
+         
+      }
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='update_openclose_acc'){
+          
+          			
+ 
+   $sql_kotlist  =  $database->mysqlQuery("update tbl_ledger_setting set  tps_dayclosedate='".$_REQUEST['date']."',"
+           . "tps_ledger_open_bal='".$_REQUEST['open']."',tps_closing_balance='".$_REQUEST['close']."' ,tps_ledger_id='".$_REQUEST['ledger']."'"
+                
+                . " where tps_id='".$_REQUEST['upd_id']."' "); 				
+    
+      }
+      
+  //------------ Day wise open-close Balance listing- start-----------//
+else if(isset($_REQUEST['set']) && $_REQUEST['set']=='list_open_close_bal')
+{ 
+
+    $limit = 100;
+  
+    if(isset($_REQUEST['page']))
+    {
+      $page = $_REQUEST['page'];
+    }
+    else{
+      $page= 1;
+    }
+  
+    $start_from = ($page-1)*$limit;
+
+    $string='';
+    
+    if($_REQUEST['date']!="" && $_REQUEST['e_date']!="")
+		{
+                         $string.= " and  tps_dayclosedate between '".$_REQUEST['date']."' and '".$_REQUEST['e_date']."' ";                   
+		}
+                else if($_REQUEST['date']!="" && $_REQUEST['e_date']=="")
+		{
+			$to=date("Y-m-d");
+			$string.= " and  tps_dayclosedate between '".$_REQUEST['date']."' and '".$to."' ";
+                        
+		}
+		else if($_REQUEST['date']=="" && $_REQUEST['e_date']!="")
+		{
+			$from=date("Y-m-d");
+			
+			$string.= " and tps_dayclosedate between '".$from."' and '".$_REQUEST['e_date']."' ";
+                        
+		}else{
+                        $from=date("Y-m-d");
+			$to=date("Y-m-d");
+			$string.= " and tps_dayclosedate between '".$from."' and '".$to."' ";
+     
+                }
+                  
+                if($_REQUEST['ledger']!="")
+		{
+			$string.= " and  tps_ledger_id = '".$_REQUEST['ledger']."'  ";                    
+		}
+
+          $i=$start_from+1;
+
+          $sql_login  =  $database->mysqlQuery("select tps_dayclosedate,tps_ledger_open_bal,tps_closing_balance,tlm_ledger_name,tps_id from "
+          . " tbl_ledger_setting left join tbl_ledger_master on tlm_id=tps_ledger_id where tps_dayclosedate!='' $string order by tps_dayclosedate, "
+          . " tlm_ledger_name asc LIMIT $start_from,$limit"); 
+	  $num_login   = $database->mysqlNumRows($sql_login);
+
+
+          $sql_login_total  =  $database->mysqlQuery("select tps_id from tbl_ledger_setting left join tbl_ledger_master on tlm_id=tps_ledger_id where "
+          . " tps_dayclosedate!='' $string order by tps_dayclosedate,tlm_ledger_name asc "); 
+          $num_login_total   = $database->mysqlNumRows($sql_login_total);
+          $total_pages = ceil($num_login_total/$limit);
+ 
+          $show="";
+          $data="";	
+          $pagination ="";				
+          if($num_login){
+
+	   while($result_login  = $database->mysqlFetchArray($sql_login)) 
+	   { 
+           
+             $data .='<tr>'.
+             '<td style="width:5%;">'.$i.'</td>'.
+             '<td style="width:30%;text-transform: uppercase;font-weight:bold">'.$result_login["tlm_ledger_name"].'</td>'.        
+             '<td style="width:30%;text-transform: uppercase">'.$result_login["tps_dayclosedate"].'</td>'.
+             '<td style="width:20%;text-transform: uppercase">'.$result_login["tps_ledger_open_bal"].'</td>'.
+             '<td style="width:20%;text-transform: uppercase">'.$result_login["tps_closing_balance"].'</td>'.
+                                                    
+            // '<td  onclick="edit_ledger('.$result_login["tps_id"].');" style="min-width: 80px; width: 25%;"><a href="#" > <div class="action_button printer_delete"><i class="glyphicon glyphicon-pencil"></i></div></a></td>'.
+            '</tr>';
+            $i++;                             
+        }
+        
+        $start = $start_from+1;
+        $end = $i-1;
+
+if($num_login_total>$limit){
+    
+    
+  $show = '<div>'
+  .'<p "width: auto;color: #333;font-size: 15px;font-weight:bold">Showing '.$start.' to '.$end.' of '.$num_login_total.'</p> </div>';
+
+  $page_1=$page-1;
+  $page_2=$page-2;
+  $page_4 = $page-4;
+  $page_3 = $page-3;
+  $page_p1=$page+1;
+  $page_p2=$page+2;
+  $page_p3=$page+3;
+  $page_p4=$page+4;
+
+  $last = $total_pages-4;
+
+    $pagination .='<nav class="pagination_1" aria-label="Page navigation example" style="">'.
+                 '<ul class="pagination justify-content-end">';
+     if($total_pages==1)
+    { 
+     $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>'.
+                   '<li class="page-item active "><a class="page-link" onClick="search_data('.$page.')">'.$page.'</a></li>'.  
+                   '<li class="page-item disabled"><a class="page-link" >>></a></li>';
+    }
+
+    else if($total_pages==2)
+    { 
+        
+     $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>';
+     
+    for($i=1; $i<=2; $i++){ 
+    if($i==$page)
+    {
+      $active ='active';
+    }
+    else{
+      $active = '';
+    }
+          $pagination .='<li class="page-item '.$active.'"><a class="page-link" onClick="search_data('.$i.')">'.$i.'</a></li>';
+  } 
+          $pagination .='<li class="page-item disabled"><a class="page-link" >>></a></li>';
+  }
+
+
+  else if($total_pages==3)
+  { 
+     $pagination .='<li class="page-item disabled"><a class="page-link" ><<</a></li>';
+  
+    for($i=1; $i<=3; $i++){ 
+     if($i==$page)
+     {
+        $active ='active';
+     }
+     else{
+        $active = '';
+     }
+
+      $pagination .='<li class="page-item '.$active.'"><a class="page-link" onClick="search_data('.$i.')">'.$i.'</a></li>';
+   } 
+      $pagination .='<li class="page-item disabled"><a class="page-link" >>></a></li>';
+   }
+   
+ else if($page==$total_pages){ 
+     
+                  $pagination .='<li class="page-item"><a class="page-link" onClick="search_data(1)">First</a></li>'.
+                  '<li class="page-item"><a class="page-link" onClick="search_data('.$page_4.')"><<</a></li>'.
+                  '<li class="page-item "><a class="page-link" onClick="search_data('.$page_2.')">'.$page_2.'</a></li>'.
+                  '<li class="page-item  "><a class="page-link" onClick="search_data('.$page_1.')">'.$page_1.'</a></li>'. 
+                  '<li class="page-item active"><a class="page-link" onClick="search_data('.$page.')">'.$page.'</a></li>';
+}
+else { 
+    
+    if($page==1)
+    {     
+                $pagination .='<li class="page-item active "><a class="page-link" onClick="search_data('.$page.')">'.$page.'</a></li>'.
+                '<li class="page-item"><a class="page-link" onClick="search_data('.$page_p1.')">'.$page_p1.'</a></li>'.
+                '<li class="page-item"><a class="page-link" onClick="search_data('.$page_p2.')">'.$page_p2.'</a></li>';
+  } 
+  else 
+  {
+          $pagination .='<li class="page-item"><a class="page-link" onClick="search_data(1)">First</a></li>';
+  if($page>2){
+      
+          $pagination .='<li class="page-item"><a class="page-link" onClick="search_data('.$page_3.')"><<</a></li>';
+  }
+  else{
+          $pagination .='<li class="page-item"><a class="page-link" onClick="search_data('.$page_1.')"><<</a></li>';
+  }
+                $pagination .='<li class="page-item "><a class="page-link" onClick="search_data('.$page_1.')">'.$page_1.'</a></li>'.
+                '<li class="page-item active"><a class="page-link" onClick="search_data('.$page.')">'.$page.'</a></li>'.
+                '<li class="page-item"><a class="page-link" onClick="search_data('.$page_p1.')">'.$page_p1.'</a></li>';
+      } 
+   if($page==1) {
+          $pagination .='<li class="page-item"><a class="page-link" onClick="search_data('.$page_p4.')">>></a></li>';
+   } 
+  else if($page>1 && $page<$last) {
+         $pagination .='<li class="page-item"><a class="page-link" onClick="search_data('.$page_p3.')">>></a></li>';
+  }
+  else{
+         $pagination .='<li class="page-item"><a class="page-link" onClick="search_data('.$page_p1.')">>></a></li>';
+  }
+
+         $pagination .='<li class="page-item"><a class="page-link" onClick="search_data('.$total_pages.')">Last</a></li>';
+}
+         $pagination .='</ul></nav>';
+  
+}
+else{ 
+    
+  $show="";
+  $pagination="";
+  
+}
+      }else{ 
+          
+          $data .='<tr><td colspan=6 style="color:red">No Results Found</td></tr>';
+          $show ="";
+          $pagination="";
+     }
+
+$satas = array('data' => $data, 'show' => $show,'pagination'=>$pagination);
+echo json_encode($satas);
+      
+
+       
+   }
+       
+  //------------ Day wise open-close Balance listing- end----------// 
+
+ else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_open_close_entry'){
+          
+          
+       $string='';
+     if($_REQUEST['date']!="")
+		{
+			$string.= " and  tps_dayclosedate = '".$_REQUEST['date']."' ";
+                        
+		}
+                            
+     if($_REQUEST['ledger']!="")
+		{
+			$string.= " and  tps_ledger_id = '".$_REQUEST['ledger']."'  ";
+                        
+		}
+                
+        	$sql_kotlist  =  $database->mysqlQuery("SELECT tps_dayclosedate from tbl_ledger_setting where tps_dayclosedate !='' $string  "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+                            echo 'notok';
+                          }else{
+                            echo 'ok'; 
+                                                  }
+                                                  
+   }
+   //checking account name exist or not
+   else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_account_name')
+   {              
+    $sql_kotlist55  =  $database->mysqlQuery("SELECT tlm_ledger_name from tbl_ledger_master where  tlm_ledger_name='".$_REQUEST['name']."'  "); 
+    $num_kotlist55  = $database->mysqlNumRows($sql_kotlist55);
+    if($num_kotlist55){
+      echo 'yes'; // data exist
+    }else{
+      echo 'no'; //data not exist
+    }  
+    }
+
+     //checking account type exist or not
+   else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_account_name_cash')
+   {
+        	$sql_kotlist  =  $database->mysqlQuery("SELECT tlm_type from tbl_ledger_master where tlm_type='".$_REQUEST['type']."' "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  echo 'yes'; //type exist
+           }else{
+              echo 'no'; //type not exist
+          }			        
+      }
+
+      //checking group exist or not
+    else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_account_name_purchase')
+    {  
+        $sql_kotlist  =  $database->mysqlQuery("SELECT tlm_type from tbl_ledger_master where tlm_group='".$_REQUEST['group']."' "); 
+				$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+				if($num_kotlist){
+						echo 'yes';
+        }else{
+             echo 'no';
+        }			 
+      }
+      
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='return_pay'){
+         
+        $date=date('Y-m-d H:i:s');
+         
+        $insertion['tr_date'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['date']);
+        
+        $insertion['tr_vendor'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['vendor']);
+        
+        $insertion['tr_to_acc'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['to_acc']);
+        $insertion['tr_return_amount'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['amt']);
+        $insertion['tr_particulars'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['part']);
+        $insertion['tr_invoice'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['inv']);
+        $insertion['tr_sv_id'] 		=  mysqli_real_escape_string($database->DatabaseLink,$_REQUEST['sv_id']);
+        
+      
+        $sql=$database->check_duplicate_entry('tbl_return_payment',$insertion);
+	 if($sql!=1)
+	 {
+             
+	  $insertid =  $database->insert('tbl_return_payment',$insertion);
+         } 
+          
+         
+  }else if(isset($_REQUEST['set']) && $_REQUEST['set']=='return_pay_check'){
+          
+          
+        	$sql_kotlist  =  $database->mysqlQuery("SELECT tr_return_amount from tbl_return_payment where tr_vendor='".$_REQUEST['vendor']."' and tr_invoice='".$_REQUEST['inv']."' and tr_sv_id='".$_REQUEST['sv_id']."'  "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  echo 'no';
+                                                  }else{
+                                                      echo 'Yes';
+                                                  }			
+
+         
+      }
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_return_pay_vendor'){
+      
+      $amt1=0; $amt=0;
+      
+       $sql_kotlist2  =  $database->mysqlQuery("SELECT   sum(sv_return_amount) as tot from tbl_supplier_voucher  where sv_vendor_id='".$_REQUEST['vendor']."' and sv_invoice_no='".$_REQUEST['edit_inv']."' "); 
+					$num_kotlist2 = $database->mysqlNumRows($sql_kotlist2);
+					if($num_kotlist2){$i=0;
+						  while($result_kotlist25  = $database->mysqlFetchArray($sql_kotlist2)) 
+							  { 
+                                                      
+                                                      $amt=$amt+$result_kotlist25['tot'];
+                                                      
+                                                  }
+                                                  }
+                                                  
+                  echo $amt;                            
+  }
+  else if(isset($_REQUEST['set']) && $_REQUEST['set']=='check_ledger_balance'){
+         
+         $amt=0;
+         $sql_kotlist22  =  $database->mysqlQuery("SELECT max(tps_id) as mxid from tbl_ledger_setting where tps_ledger_id='".$_REQUEST['ledger']."' limit 1 "); 
+					$num_kotlist22 = $database->mysqlNumRows($sql_kotlist22);
+					if($num_kotlist22){
+						  while($result_kotlist256  = $database->mysqlFetchArray($sql_kotlist22)) 
+							  { 
+                                                      
+                $sql_kotlist2  =  $database->mysqlQuery("SELECT  tps_closing_balance from tbl_ledger_setting where tps_id='".$result_kotlist256['mxid']."' limit 1 "); 
+					$num_kotlist2 = $database->mysqlNumRows($sql_kotlist2);
+					if($num_kotlist2){
+						  while($result_kotlist25  = $database->mysqlFetchArray($sql_kotlist2)) 
+							  { 
+                                                      $amt=$result_kotlist25['tps_closing_balance'];
+                                                      
+                                                  }
+                                                  }
+                                                  
+                                                   }
+                                                  }
+                                        
+                     if($amt>0){
+                         echo 'ok';
+                     }else{
+                         echo 'notok';
+                     }                             
+           
+     }
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='delete_expense_voucher'){
+          
+           $data=''; $date=date('Y-m-d H:i:s');
+          $sql_kotlist225  =  $database->mysqlQuery("SELECT ev_from_acc,ev_to_acc,ev_amount,ev_date,ev_remarks from tbl_expense_voucher where ev_id='".$_REQUEST['vid']."' "); 
+					$num_kotlist22 = $database->mysqlNumRows($sql_kotlist225);
+					if($num_kotlist22){
+						  while($result_kotlist256  = $database->mysqlFetchArray($sql_kotlist225)) 
+							  { 
+           $data='From:'.$result_kotlist256['ev_from_acc'].' To:'.$result_kotlist256['ev_to_acc'].' Amount:'.$result_kotlist256['ev_amount'].' Date:'.$result_kotlist256['ev_date'].' Remarks:'.$result_kotlist256['ev_remarks'];        
+                                                    
+                    $sql_kotlist2256  =  $database->mysqlQuery("INSERT INTO `tbl_voucher_delete_log`(`tvd_type`, `tvd_data`, `tvd_date`) "
+                            . "VALUES ('Expense','$data','$date')");   
+                    
+                    
+                    
+             $sql_kotlist22  =  $database->mysqlQuery("delete from tbl_expense_voucher where ev_id='".$_REQUEST['vid']."' "); 
+                  
+                                                  }
+                                                  }
+          
+
+             
+      }
+      
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='delete_employee_voucher'){
+          
+          
+          $data=''; $date=date('Y-m-d H:i:s');
+          $sql_kotlist225  =  $database->mysqlQuery("SELECT ev_from,ev_employee_id,ev_amount,ev_date,ev_remarks from tbl_employee_voucher where ev_id='".$_REQUEST['vid']."' "); 
+					$num_kotlist22 = $database->mysqlNumRows($sql_kotlist225);
+					if($num_kotlist22){
+						  while($result_kotlist256  = $database->mysqlFetchArray($sql_kotlist225)) 
+							  { 
+           $data='From:'.$result_kotlist256['ev_from'].' To:'.$result_kotlist256['ev_employee_id'].' Amount:'.$result_kotlist256['ev_amount'].' Date:'.$result_kotlist256['ev_date'].' Remarks:'.$result_kotlist256['ev_remarks'];        
+                                                    
+                    $sql_kotlist2256  =  $database->mysqlQuery("INSERT INTO `tbl_voucher_delete_log`(`tvd_type`, `tvd_data`, `tvd_date`) "
+                            . "VALUES ('Employee','$data','$date')");   
+                    
+          
+          
+           $sql_kotlist22  =  $database->mysqlQuery("delete from tbl_employee_voucher where ev_id='".$_REQUEST['vid']."' "); 
+           
+                                        }}
+           
+           
+      }
+      
+      else if(isset($_REQUEST['set']) && $_REQUEST['set']=='delete_supplier_voucher'){
+          
+           $data=''; $date=date('Y-m-d H:i:s');
+          $sql_kotlist225  =  $database->mysqlQuery("SELECT sv_from,sv_vendor_id,sv_paid_amount,sv_date,sv_remarks from tbl_supplier_voucher where sv_id='".$_REQUEST['vid']."' "); 
+					$num_kotlist22 = $database->mysqlNumRows($sql_kotlist225);
+					if($num_kotlist22){
+						  while($result_kotlist256  = $database->mysqlFetchArray($sql_kotlist225)) 
+							  { 
+                                                      
+              $data='From:'.$result_kotlist256['sv_from'].' To:'.$result_kotlist256['sv_vendor_id'].' Amount:'.$result_kotlist256['sv_paid_amount'].' Date:'.$result_kotlist256['sv_date'].' Remarks:'.$result_kotlist256['sv_remarks'];        
+                                                    
+                    $sql_kotlist2256  =  $database->mysqlQuery("INSERT INTO `tbl_voucher_delete_log`(`tvd_type`, `tvd_data`, `tvd_date`) "
+                            . "VALUES ('Supplier','$data','$date')");   
+                    
+                    $sql_kotlist22  =  $database->mysqlQuery("delete from tbl_supplier_voucher where sv_id='".$_REQUEST['vid']."' ");  
+                                                  }
+                                                  }
+          
+           
+      }
+?>
+                    
+        

@@ -1,0 +1,115 @@
+@charset "utf-8";
+/* CSS Document */
+
+.bill_history_right_detail{width:37%;}
+.left_bill_history_contain {width: 25%;}
+.bill_history_center_bill{width: 37%;}
+.new_fnt td{font-size:14px;    word-wrap: break-word;line-height: 17px;/*max-height: 40px;height: 40px;*/}
+.new_fnt{table-layout: fixed;}
+.take_away_search_box{
+	width:90%;
+	height:25px;
+	display:inline-block;
+	border-radius:3px;
+	font-size:12px;
+	border:0;
+	margin-top:5px;
+	margin-bottom:5px;
+	color:#000;
+	line-height:25px;
+	padding-left:5px;
+	}
+.left_detail_scroll{
+	float:left;
+	    width: 100%;
+    height:74vh;
+    overflow: auto;
+    min-height: 350px;
+	}
+.new_fnt tr:hover{background-color:rgba(245, 53, 27, 0.27);cursor:pointer;}
+
+.bill_history_right_detail .bill_history_details_table {
+    min-height: 480px;
+    height: 69vh;
+	overflow-y: scroll;
+
+}
+.bill_user_detail_cc{
+	width:100%;
+	height:auto;
+	float:left;
+	}
+.bill_user_detail_cc table{width:100%;height:auto;float:left;}	
+.bill_user_detail_cc td{
+	font-size: 14px;
+    word-wrap: break-word;
+    min-height: 30px;
+	padding: 1.5% 0;
+	vertical-align:middle;
+	color:#000;
+	text-align:left;
+	padding-left:10px;
+	}	
+.settle_ment_change_history {min-height: 210px;height:30vh;}	
+.bill_detail_table_data{
+	width:100%;
+	min-height:190px;
+	height:32vh;
+	float:left;
+	overflow-y:scroll;
+	border-bottom:1px #ccc solid;
+	}
+.table_detail_new_table{
+	width:100%;height:auto;float:left;
+	}
+.table_detail_new_table td{
+	font-size: 14px;
+    word-wrap: break-word;
+	padding: 0.8% 0;
+	vertical-align:middle;
+	color:#000;
+	text-align:left;
+	padding-left:10px;
+	border:solid 1px #ccc;
+	text-align:center;
+	}
+.table_detail_new_total{
+	width:50%;
+	height:40px;
+	float:right;
+	}	
+.table_detail_new_total_txt{
+	width:95%;
+	height:40px;
+	float:left;
+	text-align:right;
+	font-family: 'CALIBRI_0';
+	font-size:16px;
+	font-weight:bold;
+	color:#000;
+	line-height:40px;
+	}	
+/*.bill_history_active {
+    background-color: rgba(245, 178, 27, 0.27);
+}	*/
+
+.bill_history_right_detail .bill_history_details_table {
+    min-height: 445px;
+    height:68vh;
+	border-bottom:1px #ccc solid;
+}	
+.bill_his_order_detail_head{background-color: #333;}
+.bill_detail_head{background-color: rgba(245, 178, 27, 0.27);text-align:left;padding-left:10px;font-weight:bold;}	
+
+.ta_cumstomer_pagination_cc{
+	width:100%;
+	height:auto;
+	float:left;
+	border-top:1px #ccc solid;
+	/*background-color: antiquewhite;
+    padding-bottom: 3px;
+    border-bottom: 1px #ccc solid;*/
+	    border-bottom: 1px #ccc solid;
+    padding-bottom: 3px;
+	}
+.ta_cumstomer_pagination_cc .pagination {margin:0;margin-top:3px;float:right;margin-right:1%;}	

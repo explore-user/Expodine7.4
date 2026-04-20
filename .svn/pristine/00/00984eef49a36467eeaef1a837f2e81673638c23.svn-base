@@ -1,0 +1,102 @@
+<style>
+html{height:100vh !important}
+body{overflow:hidden !important;height:100vh !important}
+</style>
+<link href="css/mange_pop_stl.css" rel="stylesheet" />
+
+<div class="md-content" style="position:fixed;width:40%;left:25%;top:3%;z-index:99999;"><!--1sttab-->
+<div class="container-fluid" style="margin-top: 20px;">
+	<div style="background-color:#fff;" class="row">
+		
+        	<div class="mang_pop_head">Head 1</div>
+				<div class="mange_filter_cc">
+                 	<div class="popup_filter_cc">
+                    	<div class="filte_new_text">Menu Name</div>
+                       <select class="popop_txt_bx">
+                                   <option value="">Menu Name</option>	
+                                    <option value="">Menu Name</option>
+                                    <option value="">Menu Name</option>
+                               
+                                </select>
+                    </div>
+                    <div class="popup_filter_cc">
+                    	<div class="filte_new_text">Select Active Status</div>
+                       			<select class="popop_txt_bx">
+                                   <option value="">All</option>	
+                                    <option value="">Yes</option>
+                                    <option value="">No</option>
+                               
+                                </select>
+                    </div>
+                    <div class="popup_filter_cc">
+                    	<div class="filte_new_text"></div>
+                        <a href="#" class="pop_filter_btn">Search</a>
+                    </div>
+                </div><!--mange_filter_cc-->
+                
+                <div class="filter_cont_list_cc">
+                		<table width="100%" border="0" class="filter_cont_tbl" cellspacing="0">
+                          <thead>
+                            <tr>
+                              <td width="70%">Mneu Name</td>
+                              <td>Status</td>
+                            </tr>
+                        
+                           </thead> 
+                           <tbody>
+                           <tr>
+                              <td width="70%">Text 1</td>
+                              <td><div class="popup_status_cc"><a href="#"><img src="img/black_tick.png" /></a></div>
+                                <div class="popup_status_cc"><a href="#"><img src="img/black_cross.png" /></a></div></td>
+                            </tr>
+                            <tr>
+                              <td width="70%">Text 2</td>
+                               <td><div class="popup_status_cc"><a href="#"><img src="img/green_tick.png" /></a></div>
+                                <div class="popup_status_cc"><a href="#"><img src="img/red_cross.png" /></a></div></td>
+                            </tr>
+                            </tr>
+                            <tr>
+                              <td width="70%">&nbsp;</td>
+                              <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td width="70%">&nbsp;</td>
+                              <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td width="70%">&nbsp;</td>
+                              <td>&nbsp;</td>
+                            </tr>
+                             <tr>
+                              <td width="70%">&nbsp;</td>
+                              <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td width="70%">&nbsp;</td>
+                              <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td width="70%">&nbsp;</td>
+                              <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td width="70%">&nbsp;</td>
+                              <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                              <td width="70%">&nbsp;</td>
+                              <td>&nbsp;</td>
+                            </tr>
+                           
+                           </tbody>
+                          </table>
+
+                </div><!--filter_cont_list_cc-->
+              
+				<div style="width: 100%;text-align:center;  text-align: center;background-color: #ccc;display: inline-block;" class="form-group">
+					<a style="display:inline-block; width:20%;padding: 6px;margin-bottom: 2%;margin-top: 2%;" class="btn btn-primary btn-block md-close_pop">Close</a>
+				</div>
+		
+	</div>
+</div>
+</div>

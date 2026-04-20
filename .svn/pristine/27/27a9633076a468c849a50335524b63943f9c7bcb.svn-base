@@ -1,0 +1,92 @@
+@charset "utf-8";
+/* CSS Document */
+.mrg_center{margin-left: 0.5%;margin-right: 0.5%;}
+.bill_history_right_detail{width:27%;}
+.left_bill_history_contain {width: 33%;}
+.bill_history_center_bill{width: 37%;}
+.new_fnt td{font-size:14px;    word-wrap: break-word;line-height: 17px;height:25px;padding:0.5% 0;}
+.new_fnt{table-layout: fixed;}
+.take_away_search_box{
+	width:90%;
+	height:25px;
+	display:inline-block;
+	font-size:12px;
+	border:0;
+	margin-top:5px;
+	margin-bottom:5px;
+	color:#000;
+	line-height:25px;
+	padding-left:5px;
+	}
+.left_detail_scroll{
+	float:left;
+	    width: 100%;
+    height: 69.5vh;
+    overflow: auto;
+    min-height: 320px;
+	}
+
+.total_count_ta_cc{
+	width:100%;
+	height:35px;
+	float:left;
+	 /*   background-color: bisque;*/
+	     background-color: #D2D2D2;
+	}
+.total_count_contain{
+     width: 32.2%;
+    height: 30px;
+    float: left;
+    /* border: solid 1px #ccc; */
+    margin-left: 0.8%;
+    margin-top: 3px;
+    background-color: #fff;
+    /* box-shadow: 0px 0px 5px #A2A2A2; */
+    /* border-radius: 3px; */
+	}
+.total_count_contain_head{
+       width: 100%;
+    height: 30px;
+    float: left;
+    text-align: center;
+    line-height: 25px;
+    font-family: 'CALIBRI_0';
+    font-size: 11px;
+    color: #000;
+    border-bottom: 1px #F1F1F1 solid;
+    font-weight: bold;
+}
+.total_count_contain_count {
+    width: 40%;
+    height: 25px;
+    float: left;
+    text-align: center;
+    line-height: 25px;
+    font-family: 'CALIBRI_0';
+    font-size: 15px;
+	font-weight:bold;
+    color: #000;
+}
+	
+.bill_history_details_table {
+    min-height: 410px !important;
+    height: 71vh !important;
+}
+.left_detail_scroll{
+	 min-height:380px !important;
+	 height: 62vh !important;
+	 border-bottom:1px #ccc solid;
+	 background-color: #F5F5EA;
+	}	
+.bill_history_details_table td {
+    color: #2B2B2B;
+   font-size:13px;
+}	
+.take_away_search_box{
+	    color: #FFF;
+    line-height: 25px;
+    padding-left: 5px;
+    background-color:#fff;
+    border: solid 1px #ccc;
+	}	
+	

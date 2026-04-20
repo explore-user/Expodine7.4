@@ -1,0 +1,26249 @@
+-- phpMyAdmin SQL Dump
+-- version 4.7.9
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost
+-- Generation Time: Apr 17, 2026 at 06:15 AM
+-- Server version: 5.7.31-log
+-- PHP Version: 7.2.4
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `expodine`
+--
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_app_machine_details` ()  NO SQL
+BEGIN
+
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_floormaster = 'Y') THEN 
+	BEGIN
+    UPDATE tbl_floormaster set fr_android_sync='N' where fr_android_sync = 'Y' ;
+  END;
+END IF;
+
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_kotcounter='Y') THEN 
+	BEGIN
+    UPDATE tbl_kotcountermaster set kr_android_sync='N' where kr_android_sync = 'Y' ;
+    END;
+END IF;
+
+
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_prefemaster='Y') THEN 
+	BEGIN
+    UPDATE tbl_preferencemaster set pmr_android_sync='N' where pmr_android_sync = 'Y' ;
+    END;
+END IF;
+
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_menumaincat='Y') THEN 
+	BEGIN
+    UPDATE tbl_menumaincategory set mmy_android_sync='N' where mmy_android_sync = 'Y' ;
+    END;
+END IF;
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_menusubcat='Y') THEN 
+	BEGIN
+    UPDATE tbl_menusubcategory set msy_android_sync='N' where msy_android_sync = 'Y' ;
+    END;
+END IF;
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_portionmas='Y') THEN 
+	BEGIN
+    UPDATE tbl_portionmaster set pm_android_sync='N' where pm_android_sync = 'Y' ;
+    END;
+END IF;
+
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_menumaster='Y') THEN 
+	BEGIN
+    UPDATE tbl_menumaster set mr_android_sync='N' where mr_android_sync = 'Y' ;
+    END;
+END IF;
+
+
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_menuprefemaster='Y') THEN 
+	BEGIN
+    UPDATE tbl_menuprefmaster set mpr_android_sync='N' where mpr_android_sync = 'Y' ;
+    END;
+END IF;
+
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_menuratemaster='Y') THEN 
+	BEGIN
+    UPDATE tbl_menuratemaster set mmr_android_sync='N' where mmr_android_sync = 'Y' ;
+    END;
+END IF;
+
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_counterrate='Y') THEN 
+	BEGIN
+    UPDATE tbl_menurate_counter set mrc_android_sync='N' where mrc_android_sync = 'Y' ;
+    END;
+END IF;
+
+
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_menustock='Y') THEN 
+	BEGIN
+    UPDATE tbl_menustock set mk_android_sync='N' where mk_android_sync = 'Y' ;
+    END;
+END IF;
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_menuimage='Y') THEN 
+	BEGIN
+    UPDATE tbl_menuimages set mes_android_sync='N' where mes_android_sync = 'Y' ;
+    END;
+END IF;
+
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_menucombination='Y') THEN 
+	BEGIN
+    UPDATE tbl_menucombination set mn_android_sync='N' where mn_android_sync = 'Y' ;
+    END;
+END IF;
+
+
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_nutrition='Y') THEN 
+	BEGIN
+    UPDATE tbl_menunutitionfacts set mnf_android_sync='N' where mnf_android_sync = 'Y' ;
+    END;
+END IF;
+
+
+
+IF NOT EXISTS(SELECT * from tbl_appmachinedetails WHERE as_sync_ingredient='Y') THEN 
+	BEGIN
+    UPDATE tbl_menuingredients set ms_android_sync='N' where ms_android_sync = 'Y' ;
+    END;
+END IF;
+
+
+
+
+
+
+
+
+
+
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_app_orderentry` (IN `temporderno_in` VARCHAR(15), OUT `message` VARCHAR(100))  NO SQL
+BEGIN
+DECLARE branchid_l BIGINT; 
+DECLARE menuid_l VARCHAR(30); 
+DECLARE portion_l INT; 
+DECLARE  qty_l INT; 
+DECLARE  status_l VARCHAR(50);
+DECLARE orderfrom_l VARCHAR(30);
+DECLARE entryuser_l VARCHAR(15); 
+DECLARE est_time_l VARCHAR(10);
+DECLARE staff_l VARCHAR(50); 
+DECLARE  type_l VARCHAR(50);
+DECLARE  floorid_l VARCHAR(10); 
+DECLARE  manual_rate_l FLOAT; 
+DECLARE  preferenceid_l INT; 
+DECLARE  preferencetext_l VARCHAR(200);
+
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE cur1 CURSOR FOR SELECT `branchid`, `menuid`, `portion`, `qty`, `status`, `orderfrom`, `entryuser`, `est_time`, `staff`, `type`, `floorid`, `manual_rate`, `preferenceid`, `preferencetext` FROM `temp_app_orderentry` WHERE temporderno = temporderno_in;
+          
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+  OPEN cur1;
+
+    read_loop: LOOP
+  
+  
+  FETCH cur1 INTO branchid_l,menuid_l,portion_l,qty_l,status_l,orderfrom_l,entryuser_l,est_time_l,staff_l,type_l,floorid_l,manual_rate_l,preferenceid_l,preferencetext_l;
+  
+  IF done THEN
+    
+      LEAVE read_loop;
+    END IF;
+  
+  CALL proc_tableordernentry(temporderno_in, branchid_l,menuid_l,portion_l,qty_l, status_l, orderfrom_l,entryuser_l,est_time_l, staff_l,type_l,floorid_l,manual_rate_l,preferenceid_l,preferencetext_l,@message);
+
+
+
+ END LOOP;
+ 
+  CLOSE cur1;
+  
+ delete from temp_app_orderentry where temporderno = temporderno_in; 
+
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_app_ta_orderentry` (IN `temporderno_in` VARCHAR(15), OUT `message` VARCHAR(100))  NO SQL
+BEGIN
+  DECLARE branchid_l BIGINT;
+  DECLARE menuid_l VARCHAR(30);
+  DECLARE portion_l INT;
+  DECLARE  qty_l INT;
+  DECLARE  manual_rate_l FLOAT;
+  DECLARE  preferencetext_l VARCHAR(200);
+  DECLARE mode_in_ta_l VARCHAR(10);
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE cur1 CURSOR FOR SELECT `branchid`, `menuid`, `portion`, `qty`, `manual_rate`, `preferencetext`,mode_in_ta FROM `temp_app_orderentry` WHERE temporderno = temporderno_in;
+
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  
+  set message = 'Error...Please check proc_app_ta_orderentry';
+  OPEN cur1;
+
+    read_loop: LOOP
+
+
+  FETCH cur1 INTO branchid_l,menuid_l,portion_l,qty_l,manual_rate_l,preferencetext_l,mode_in_ta_l;
+
+  IF done THEN
+
+      LEAVE read_loop;
+    END IF;
+
+  CALL proc_temptakeaway(temporderno_in,menuid_l,portion_l,qty_l,preferencetext_l,manual_rate_l,branchid_l,mode_in_ta_l); 
+  
+
+ END LOOP;
+
+  CLOSE cur1;
+
+ 
+ 
+  set message = 'Order Successfully Added'; 
+ END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_billclose` (IN `billno` VARCHAR(15), OUT `message` VARCHAR(250), IN `mode` CHAR(2))  MODIFIES SQL DATA
+BEGIN
+    DECLARE total decimal(15,0);
+    DECLARE branchid bigint(20);
+
+    IF(mode = 'BC')THEN
+    BEGIN
+     SELECT bm_finaltotal,bm_branchid INTO total,branchid FROM tbl_tablebillmaster WHERE bm_billno = trim(billno);
+
+        CALL  proc_billpayment(trim(billno),branchid,1,total,0.00,'','','','',0.00,'','',0.00,'N','',0.00,@message1);
+  SELECT @message1 INTO message;
+
+        IF(billno IS NULL) THEN
+    SET  message = 'Bill Number is Null';
+     END IF;
+
+    END;
+
+    ELSEIF(mode = 'WP')THEN
+    BEGIN
+        IF(billno IS NULL) THEN
+         SET  message = 'Bill Number is Null';
+        ELSE
+         BEGIN
+          SET  message = 'Bill Closed without Payment';
+            UPDATE `tbl_tablebillmaster` SET bm_status = 'WO_Payment', bm_billprinted = 'N' WHERE bm_billno = billno;
+         END;
+
+     END IF;
+    END;
+ END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_billdetailentry` (IN `ordernumber` VARCHAR(15), IN `billnumber` VARCHAR(16))  MODIFIES SQL DATA
+BEGIN
+  DECLARE portion,addon_portion,quantity,unit_id,base_unit_id,orderslno,disc_slno INT;
+  DECLARE menuid,rate_type,addon_menuid varchar(30);
+  DECLARE unit_weight decimal(15,5);
+  DECLARE rate,addon_rate,rate_new,item_base_rate,org_rate,TOTAL_RATE, E_AMOUNT,sum_of_discount,final_amount decimal(15,3);
+  DECLARE unit_type,type,addon_type varchar(50);
+  DECLARE todo varchar(50);
+  DECLARE EBILLSLNO,EQTY,final_qty,addon_order_slno,addon_bill_slno,addon_main_slno INT;
+  DECLARE discmenu char(1); 
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE cur1 CURSOR FOR SELECT ter_slno,ter_menuid,ter_rate_type,ter_unit_type, ter_portion,ter_qty,ter_unit_weight,ter_unit_id, ter_base_unit_id,ter_org_rate,ter_base_rate,ter_rate,ter_type,ter_total_rate,ter_addon_slno FROM tbl_tableorder WHERE ter_orderno= trim(ordernumber) AND ter_cancel = 'N'  AND ter_count_combo_ordering IS NULL;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+
+  OPEN cur1;
+
+    read_loop: LOOP
+
+    FETCH cur1 INTO orderslno,menuid,rate_type,unit_type, portion, quantity,unit_weight,unit_id,base_unit_id,org_rate,item_base_rate, rate, type ,TOTAL_RATE,addon_order_slno;
+
+    IF done THEN
+
+      LEAVE read_loop;
+    END IF;
+
+    SET EBILLSLNO = 0;
+    SET EQTY = 0;
+    SET sum_of_discount =0;
+    
+    
+    
+    
+
+    IF(quantity>0) THEN
+    BEGIN
+      IF(rate_type = 'Portion')THEN
+      BEGIN
+
+
+
+          IF((addon_order_slno IS NOT NULL)) THEN
+          BEGIN
+              SELECT ter_menuid,ter_portion,ter_type,ter_rate  INTO addon_menuid,addon_portion,addon_type,addon_rate FROM tbl_tableorder WHERE ter_orderno=trim(ordernumber) AND ter_slno=addon_order_slno;
+              IF EXISTS(SELECT * FROM tbl_tablebilldetails WHERE bd_billno= billnumber AND bd_menuid= addon_menuid AND  bd_portion = addon_portion AND bd_type = addon_type AND bd_rate = addon_rate AND bd_bill_addon_slno IS NULL  LIMIT 1) THEN
+              BEGIN
+                SELECT bd_billslno INTO addon_main_slno FROM tbl_tablebilldetails WHERE bd_billno= billnumber AND bd_menuid= addon_menuid AND  bd_portion = addon_portion AND bd_type = addon_type AND bd_rate = addon_rate AND bd_bill_addon_slno IS NULL  LIMIT 1;
+              END;
+              END IF;
+              IF EXISTS(SELECT * FROM tbl_tablebilldetails WHERE bd_billno= billnumber AND bd_menuid= menuid AND  bd_portion = portion AND bd_type = type AND bd_rate = rate AND bd_bill_addon_slno=addon_main_slno LIMIT 1) THEN
+              BEGIN
+                SELECT bd_billslno,bd_qty,bd_amount,bd_bill_addon_slno INTO EBILLSLNO,EQTY,E_AMOUNT,addon_bill_slno
+                FROM tbl_tablebilldetails
+                WHERE bd_billno= billnumber AND bd_menuid= menuid AND  bd_portion = portion AND bd_type = type AND bd_rate = rate AND bd_bill_addon_slno=addon_main_slno LIMIT 0,1;
+                SET todo = 'UPDATE';
+              END;
+              ELSE
+              BEGIN
+                SET todo = 'ADD';
+                SET unit_weight = 0.00;
+                SET unit_id = NULL;
+                SET base_unit_id = NULL;
+                SET unit_type = NULL;
+                SET item_base_rate = NULL;
+              END;
+              END IF;
+            END;
+
+          ELSE
+          BEGIN
+            IF EXISTS(SELECT * FROM tbl_tablebilldetails WHERE bd_billno= billnumber AND bd_menuid= menuid AND  bd_portion = portion AND bd_type = type AND bd_rate = rate AND bd_bill_addon_slno IS NULL  LIMIT 0, 1) THEN
+            BEGIN
+
+              SELECT bd_billslno,bd_qty,bd_amount,bd_bill_addon_slno INTO EBILLSLNO,EQTY,E_AMOUNT,addon_bill_slno
+              FROM tbl_tablebilldetails
+              WHERE bd_billno= billnumber AND bd_menuid= menuid AND  bd_portion = portion AND bd_type = type AND bd_rate = rate AND bd_bill_addon_slno IS NULL  LIMIT 0, 1;
+              SET todo = 'UPDATE';
+
+            END;
+            ELSE
+            BEGIN
+              SET todo = 'ADD';
+              SET unit_weight = 0.00;
+              SET unit_id = NULL;
+              SET base_unit_id = NULL;
+              SET unit_type = NULL;
+              SET item_base_rate = NULL;
+            END;
+            END IF;
+          END;
+
+          END IF;
+      END;
+      ELSEIF(rate_type= 'Unit') THEN
+      BEGIN
+        IF(unit_type = 'Packet')THEN
+        BEGIN
+          IF EXISTS(SELECT * FROM tbl_tablebilldetails WHERE bd_billno= billnumber AND bd_menuid= menuid AND  bd_unit_weight =unit_weight  AND bd_unit_id =  unit_id AND bd_type = type AND bd_unit_type =unit_type  AND bd_rate = rate  LIMIT 0, 1) THEN
+          BEGIN
+            SELECT bd_billslno,bd_qty,bd_amount INTO EBILLSLNO,EQTY,E_AMOUNT
+            FROM tbl_tablebilldetails
+            WHERE bd_billno= billnumber AND bd_menuid= menuid AND  bd_unit_weight =unit_weight  AND bd_unit_id =  unit_id AND bd_type = type AND bd_unit_type =unit_type AND bd_rate = rate  LIMIT 0, 1;
+            SET todo = 'UPDATE';
+          END;
+          ELSE
+          BEGIN
+            SET todo = 'ADD';
+            SET base_unit_id = NULL;
+            SET item_base_rate = NULL;
+            SET portion = NULL;
+          END;
+          END IF;
+        END;
+        ELSEIF(unit_type = 'Loose')THEN
+        BEGIN
+          IF EXISTS(SELECT * FROM tbl_tablebilldetails WHERE bd_billslno=orderslno and bd_billno= billnumber AND bd_unit_weight= unit_weight AND  bd_base_unit_id = base_unit_id AND bd_type = type AND bd_unit_type =unit_type AND bd_rate = rate  LIMIT 0, 1) THEN
+          BEGIN
+            SELECT bd_billslno,bd_qty,bd_amount INTO EBILLSLNO,EQTY,E_AMOUNT
+            FROM tbl_tablebilldetails
+            WHERE bd_billno= billnumber AND bd_menuid= menuid AND  bd_portion = portion AND bd_type = type AND bd_rate = rate  LIMIT 0, 1;
+            SET todo = 'UPDATE';
+          END;
+          ELSE
+          BEGIN
+            SET todo = 'ADD';
+            SET unit_id = NULL;
+            SET portion = NULL;
+
+          END;
+          END IF;
+        END;
+        END IF;
+      END;
+      END IF;
+
+
+     SELECT mr_excempt_disc INTO discmenu
+    FROM tbl_menumaster WHERE mr_menuid = trim(menuid); 
+    
+
+
+      IF (todo = 'ADD')THEN
+      BEGIN
+
+
+        IF((addon_order_slno='') OR (addon_order_slno IS NULL)) THEN
+        BEGIN
+          SET addon_bill_slno = NULL;
+
+        END;
+        ELSE
+        SELECT MAX(bd_billslno) INTO addon_bill_slno FROM tbl_tablebilldetails WHERE bd_billno = billnumber;
+        END IF;
+
+        INSERT INTO tbl_tablebilldetails(bd_billno,bd_billslno,bd_bill_addon_slno,bd_menuid,bd_rate_type,bd_unit_type,bd_portion,bd_unit_weight,bd_unit_id,bd_base_unit_id,bd_base_rate,bd_org_rate,bd_rate,bd_qty,bd_amount,bd_type,bd_exempt_disc)
+        VALUES(billnumber,0,addon_bill_slno,menuid,rate_type,unit_type,portion,unit_weight,unit_id,base_unit_id,item_base_rate,org_rate,rate,quantity,TOTAL_RATE,type,discmenu);
+
+
+         SELECT MAX(bd_billslno),bd_rate INTO disc_slno,rate_new  FROM tbl_tablebilldetails WHERE bd_billno = billnumber;
+         INSERT INTO `tbl_tablebill_item_discount`(`bd_billno`, `bd_billslno`,bd_menuid, `bd_discount_id`, `bd_discount_of`, `bd_mode`, `bd_discount_remarks`, `bd_discount`)
+         SELECT billnumber,disc_slno,menuid,d_discount_id,d_discount_of,d_mode,d_discount_remarks,d_discount FROM tbl_tableorder_discount WHERE d_orderno = trim(ordernumber) AND d_slno=orderslno;
+
+
+
+
+      END;
+      ELSEIF(todo = 'UPDATE') THEN
+      BEGIN
+        SET final_qty = EQTY + quantity;
+        SET final_amount = E_AMOUNT + TOTAL_RATE;
+
+        UPDATE  tbl_tablebilldetails SET bd_qty = final_qty,bd_amount = final_amount WHERE bd_billno = billnumber AND  bd_billslno = EBILLSLNO;
+      END;
+      END IF;
+
+    END;
+
+    SELECT sum(bd_discount) INTO sum_of_discount  FROM tbl_tablebill_item_discount WHERE bd_billno = billnumber AND bd_billslno = disc_slno;
+    IF(sum_of_discount>0) THEN
+    BEGIN
+      UPDATE  tbl_tablebilldetails  SET bd_discount = sum_of_discount,bd_rate= bd_org_rate - sum_of_discount ,bd_amount= (bd_qty *  (bd_org_rate - sum_of_discount))
+      WHERE bd_billno = billnumber AND bd_billslno = disc_slno;
+    END;
+    END IF;
+
+
+  END IF;
+  END LOOP;
+
+
+
+  CLOSE cur1;
+
+
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_billgenerate` (IN `orderno` VARCHAR(250), IN `branchid` INT, IN `discount_of` FLOAT, IN `discount_unit` CHAR(1), IN `discount` CHAR(1), IN `discountid` VARCHAR(20), IN `tableno` VARCHAR(100), IN `redeem` DECIMAL(15,3), OUT `billnumber` VARCHAR(16), OUT `Message` VARCHAR(250))  MODIFIES SQL DATA
+proc_billgenerate:BEGIN
+  DECLARE commacount,bill_ref_count,table_pax,total_pax,commacount_s,combo_count INT;
+  DECLARE discount_mode,FLAG_SUCCESS,ENABLE_EXTRA_TAX,EXTRA_PREFIX char(1);
+  DECLARE i,portion,sum_qty_bill,SERIES_SLNO,check2, check1 INT;
+  DECLARE bdate,bILLdate varchar(6);
+  DECLARE prefx varchar(3);
+  DECLARE floorid,discount_label varchar(10);
+  DECLARE ordernumber,ordernumber_s,servicetaxunit,servicechargeunit,vatunit varchar(15);
+  DECLARE del_tax,subtotal_exempt_disc,subtotal,finaltotal,discountvalue,sum_extra_tax,tax_exempt_total,taxable_amount,discount_tax_exempt,tax_total decimal(15,3);
+  DECLARE after_roundoff,second_digit,roundoff_value,discountvalue_P,rate_combo decimal(15,3);
+  DECLARE TEMP_billnumber,billno_missed varchar(15);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE discountof float;
+  DECLARE REGENERATE_BILLNO varchar(15);
+  DECLARE order_status varchar(20);
+  DECLARE bill_ref varchar(30);
+  DECLARE nearest_roundoff decimal(5,4);
+  DECLARE check_billno varchar(15);
+  DECLARE bill_custom_message varchar(250);
+  DECLARE bill_steward varchar(50);
+  DECLARE decimal1 int;
+  DECLARE uaetax char(1);
+  DECLARE uaeval decimal(15,3);
+  DECLARE decimal_part,dd decimal(15,3);
+    
+   DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
+  BEGIN
+    ROLLBACK;
+  END;
+  SELECT GET_LOCK('billgenerate', 5) INTO check1;
+  START TRANSACTION;
+  /* Exception handler is used to roll back if any error is faced*/
+  SET FLAG_SUCCESS = 'N';
+  SET Message = 'Error..In Bill Generatation';
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+ /* DELETE FROM tbl_tableorder WHERE ter_portion = 0 OR ter_rate = 0 AND ter_count_combo_ordering IS NULL;*/
+  DELETE FROM tbl_tablebillmaster WHERE  bm_billno LIKE 'TEMP*%';
+  DELETE FROM tbl_tablebill_item_discount WHERE  bd_billno LIKE 'TEMP*%';
+  SET discountvalue = 0.00;
+  SELECT be_branchprefix,be_nearest_roundoff_value,be_decimal INTO prefx,nearest_roundoff,decimal1 FROM
+  tbl_branchmaster WHERE be_branchid = branchid;
+  SELECT DATE_FORMAT(DAYCLOSEDATE,'%d%m%y') INTO bdate;
+  SET TEMP_billnumber = CONCAT('TEMP*',FLOOR(100000 + (RAND( )*8999)));
+  SET total_pax = 0;
+   INSERT INTO tbl_tablebillmaster(bm_billno,bm_branchid, bm_tableno,bm_orderno) VALUES(TEMP_billnumber,branchid,tableno,orderno);
+  SELECT LENGTH(TRIM(orderno)) - LENGTH(REPLACE(TRIM(orderno), ',', ''))   INTO commacount;
+  SET check_billno = NULL;
+  SET i=1;
+   /*Loop is used to get details of multiple order number combined into one bill */
+  ORDER_LOOP: WHILE (i <= commacount+1) DO
+    SELECT split_str(orderno,',',i) INTO ordernumber;
+    IF(i = 1) THEN
+    BEGIN
+      SELECT DISTINCT  f.fr_floorid,f.fr_enable_extra_tax,f.fr_extra_prefix,f.fr_bill_series,td.ts_status,td.ts_orderstaff
+      INTO floorid,ENABLE_EXTRA_TAX,EXTRA_PREFIX,SERIES_SLNO,order_status,bill_steward
+      FROM tbl_tabledetails td
+      LEFT JOIN tbl_floormaster f ON f.fr_floorid = td.ts_floorid WHERE td.ts_orderno =ordernumber;
+    END;
+    END IF;
+    IF(check_billno is NULL)then
+    BEGIN
+      IF EXISTS(SELECT * FROM tbl_temp_regenerate WHERE order_no = TRIM(ordernumber))THEN
+        SELECT bill_no INTO check_billno FROM tbl_temp_regenerate WHERE order_no = TRIM(ordernumber);
+      END IF;  
+      IF(check_billno IS NOT NULL)then
+        UPDATE tbl_temp_regenerate SET order_no = NULL WHERE bill_no = check_billno;
+      END IF;
+    END;
+    END IF;
+    IF EXISTS(SELECT * FROM tbl_tableorder WHERE ((ter_status = 'Added') OR (ter_status = 'Ready') OR (ter_status = 'Opened'))AND ter_orderno = ordernumber) THEN
+    BEGIN
+      SET Message = 'Orders pending to be served';
+      LEAVE proc_billgenerate;
+    END;
+    END IF;
+    IF EXISTS(SELECT * FROM tbl_tabledetails td WHERE td.ts_status = 'Billed' AND td.ts_orderno =ordernumber) THEN
+    BEGIN
+       SET i= i+1;
+       LEAVE ORDER_LOOP;
+    END;
+    END IF;
+    SELECT SUM(td.ts_paxcount) INTO table_pax FROM tbl_tabledetails td WHERE td.ts_orderno =ordernumber;
+    SET total_pax = total_pax+table_pax;
+    CALL proc_billdetailentry(ordernumber,TEMP_billnumber);
+    UPDATE tbl_tableorder SET ter_billnumber = TEMP_billnumber WHERE ter_orderno = ordernumber;
+    UPDATE tbl_tabledetails SET ts_billnumber = TEMP_billnumber  WHERE ts_orderno = ordernumber;
+    CALL proc_combo_bill_details_entry(ordernumber,TEMP_billnumber); 
+    SET i= i+1;
+  END WHILE;
+  
+
+  
+   SELECT SUM(RATE) into rate_combo FROM(SELECT DISTINCT cbd_count_combo_ordering, cbd_combo_total_rate AS RATE  FROM tbl_combo_bill_details  WHERE `cbd_billno` = TEMP_billnumber)Z;
+   
+   
+  if(rate_combo is NULL)THEN
+  SET rate_combo = 0;
+  END IF;
+  
+  SELECT  SUM(bd_amount) INTO  subtotal FROM tbl_tablebilldetails WHERE bd_billno = TEMP_billnumber;
+  
+  if(subtotal is NULL)THEN
+  SET subtotal = 0;
+  END IF;
+  
+  set subtotal = rate_combo + subtotal;
+  
+   
+  SELECT be_uae_tax_concept,be_uae_tax_value INTO uaetax,uaeval FROM  tbl_branchmaster;
+  
+   UPDATE tbl_tablebillmaster SET bm_subtotal = subtotal  WHERE  bm_billno = TEMP_billnumber;
+  
+  SET subtotal_exempt_disc = 0;
+  
+  SELECT  SUM(bd_amount) INTO  subtotal_exempt_disc FROM tbl_tablebilldetails WHERE bd_billno = TEMP_billnumber and bd_exempt_disc='N';
+  
+  if(subtotal_exempt_disc is NULL)THEN
+  SET subtotal_exempt_disc = 0;
+  END IF;
+  
+set subtotal_exempt_disc=subtotal_exempt_disc+rate_combo;
+  
+  
+  SET finaltotal = 0;
+  SET taxable_amount = 0;
+  SET tax_exempt_total = 0;
+  SET bill_custom_message = NULL;
+ /*Discount calculated for the bill*/
+  IF(Discount ='Y')THEN
+  BEGIN
+    IF(discountid = '0') THEN
+    BEGIN
+      SET discountof = discount_of;
+      SET discount_mode = discount_unit;
+      SET discountid = NULL;
+    END;
+    ELSE
+    BEGIN
+      SELECT ds_discountof,ds_mode INTO discountof,discount_mode FROM  tbl_discountmaster WHERE ds_discountid = discountid;
+    END;
+    END IF;
+    SET discount_label = NULL;
+    IF(discount_mode = 'P')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(((discountof * subtotal_exempt_disc)/100),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+      SET discount_label = CONCAT('(',discountof,'%)');
+    END;
+    ELSEIF(discount_mode = 'V')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(discountof,3);
+      SET discountvalue_P = TRUNCATE(((discountof * 100)/subtotal_exempt_disc),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+    END;
+    END IF;
+  END;
+  ELSE
+  BEGIN
+    SET discountvalue = 0.00;
+    SET discount_label = NULL;
+    SET discountid = NULL; 
+  END;
+  END IF;
+  /* subtotal less than 0 is checked, sub total less than 0 will be avoided for bill generation and table will be cleared to take another order */
+  /* loyality reddem starts here*/
+  if(redeem>0) then
+  Begin
+    UPDATE tbl_tablebillmaster SET bm_redeem_amount=redeem WHERE bm_billno = TEMP_billnumber;
+    Set subtotal=subtotal-redeem;
+  End;
+  End if;
+  
+  
+  
+    if(uaetax =  'Y') then
+    Begin
+  
+    set del_tax=TRUNCATE(subtotal/(1+(uaeval/100)),3);
+  
+    set subtotal=TRUNCATE(del_tax,3); 
+  
+  End;
+  
+  End if; 
+  
+  
+  
+  /* loyality ends*/
+  IF(subtotal<0)THEN
+  BEGIN
+      SET Message = 'DISCOUNT GIVEN MORE THAN BILL AMOUNT';
+      LEAVE proc_billgenerate;
+  END;
+  ELSEIF(subtotal>0)THEN
+  BEGIN
+    UPDATE tbl_tablebillmaster SET  bm_subtotal_final = subtotal,bm_discountvalue = discountvalue,bm_discountlabel = discount_label,bm_discountid = discountid
+    WHERE bm_billno = TEMP_billnumber;
+  END;
+  END IF;
+  /* tax exempt concept - start*/
+  IF EXISTS(SELECT * FROM tbl_tablebilldetails WHERE bd_billno = TEMP_billnumber AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster
+  WHERE mr_excempt_tax  ='Y'))THEN
+  BEGIN
+    SELECT sum(bd_amount) INTO tax_exempt_total FROM tbl_tablebilldetails
+    WHERE bd_billno = TEMP_billnumber AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+    IF(Discount ='Y')THEN
+    BEGIN
+      IF(discount_mode = 'P')THEN
+      BEGIN
+          SET discount_tax_exempt = REPLACE(FORMAT(((discountof * tax_exempt_total)/100),decimal1), ',', ''); 
+          SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      ELSEIF(discount_mode = 'V')THEN
+      BEGIN                        
+        SET discount_tax_exempt = REPLACE(FORMAT(((discountvalue_P * tax_exempt_total)/100),decimal1), ',', '');
+        SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      END IF;
+    END;
+    END IF;
+    SET taxable_amount = subtotal - tax_exempt_total;
+    SET subtotal = taxable_amount;
+    UPDATE tbl_tablebilldetails SET bd_symbol_for_tax = '*' WHERE bd_billno = TEMP_billnumber AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+     SET bill_custom_message = concat('* TAX EXEMPTED AMOUNT - ',FORMAT(tax_exempt_total,decimal1),'/b TAXABLE AMOUNT - ',FORMAT(taxable_amount,decimal1));
+  END;
+   ELSE
+  BEGIN
+   SET taxable_amount = subtotal;
+   SET tax_exempt_total = 0;
+  END;
+  END IF;
+  /* tax exempt concept - end*/
+  UPDATE tbl_tablebillmaster SET  bm_tax_exempt = tax_exempt_total,bm_taxable_amount = taxable_amount WHERE bm_billno = TEMP_billnumber;
+  IF(taxable_amount > 0 ) THEN
+  BEGIN
+    DELETE FROM `tbl_tablebill_extra_tax_master` WHERE `bem_billno` = TEMP_billnumber;
+    CALL proc_tax(TEMP_billnumber,'DI',floorid);
+  END;
+  END IF;
+  if exists( select *FROM tbl_tablebill_extra_tax_master WHERE bem_billno = TEMP_billnumber)then
+  begin
+   SELECT REPLACE(FORMAT(SUM(bem_total_value),decimal1), ',', '')  INTO tax_total FROM tbl_tablebill_extra_tax_master WHERE bem_billno = TEMP_billnumber;
+  END;
+  ELSE 
+    SET tax_total = 0;
+  END IF;
+  
+  
+  
+  
+  SET finaltotal = taxable_amount  +  tax_exempt_total + tax_total;
+  
+    
+   
+   IF((finaltotal != 0)OR (finaltotal > 0))THEN
+   BEGIN
+    IF(nearest_roundoff =0) THEN
+    BEGIN
+    
+    if(uaetax =  'Y')
+
+             THEN
+              BEGIN
+
+               SET second_digit = FLOOR(finaltotal * 100) MOD 10;
+               
+                IF second_digit >= 5 THEN
+            SET finaltotal = ROUND(finaltotal, 1);  -- Round up
+                 ELSE
+         SET finaltotal = FLOOR(finaltotal * 10) / 10; -- Round dw
+               END IF;
+               
+               SET after_roundoff = ROUND(finaltotal,3);
+               
+               END;
+               ELSE
+               BEGIN
+               
+                SET after_roundoff =finaltotal;
+               
+                END;
+
+                END IF;
+    
+      SET roundoff_value = 0.00;
+      
+    END;
+    ELSE
+    BEGIN
+      SET after_roundoff = (nearest_roundoff *ROUND(finaltotal/ nearest_roundoff));
+      SET roundoff_value =  (after_roundoff - finaltotal);
+    END;
+    END IF;
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = TEMP_billnumber) THEN
+    BEGIN
+      SET Message = 'Bill not generated - N1';
+      LEAVE proc_billgenerate;
+    END;
+    END IF;
+    IF(check_billno IS NULL) THEN
+    BEGIN
+     IF EXISTS(SELECT * FROM tbl_temp_regenerate WHERE order_no IS NULL)then
+      BEGIN
+        SELECT bill_no INTO billno_missed FROM tbl_temp_regenerate WHERE order_no IS NULL LIMIT 1; 
+        DELETE FROM tbl_tablebillmaster WHERE bm_billno = TRIM(billno_missed);
+        DELETE FROM tbl_tablebill_item_discount WHERE  bd_billno = TRIM(billno_missed);
+        DELETE FROM tbl_temp_regenerate WHERE bill_no  = TRIM(billno_missed);
+        DELETE FROM tbl_tablebill_extra_tax_master WHERE bem_billno  = TRIM(billno_missed);
+        DELETE FROM tbl_tablebill_extra_tax_details WHERE bet_billno  = TRIM(billno_missed);
+        SET billnumber = TRIM(billno_missed);
+      END;
+      ELSE
+      BEGIN
+        CALL proc_bill_series_gen('D',EXTRA_PREFIX,SERIES_SLNO,billnumber);
+      END;
+      END IF;
+      SET bill_ref_count = NULL;
+      SELECT ds_bill_ref_dine_in INTO bill_ref_count FROM tbl_datesettings
+      WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+      IF(bill_ref_count = NULL) THEN
+      BEGIN
+        INSERT INTO tbl_datesettings(ds_branchid,ds_date) VALUES(branchid, DAYCLOSEDATE);
+        SELECT ds_bill_ref_dine_in INTO bill_ref_count FROM tbl_datesettings
+        WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+      END;
+      END IF;
+      SET bill_ref = CONCAT('D',bill_ref_count);
+      UPDATE tbl_datesettings SET ds_bill_ref_dine_in = ds_bill_ref_dine_in +1 WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+    END;
+    ELSE
+    BEGIN
+      SELECT bm_bill_ref INTO bill_ref FROM tbl_tablebillmaster WHERE bm_billno = TRIM(check_billno);
+      DELETE FROM tbl_tablebillmaster WHERE bm_billno = TRIM(check_billno);
+      DELETE FROM tbl_temp_regenerate WHERE bill_no  = TRIM(check_billno);
+      DELETE FROM tbl_tablebill_item_discount WHERE  bd_billno = TRIM(check_billno);
+      SET billnumber = TRIM(check_billno);
+    END;
+    END IF;
+    UPDATE tbl_tablebillmaster SET bm_billno = billnumber,bm_total= finaltotal, bm_finaltotal = after_roundoff , bm_floorid = floorid,bm_totalpax = total_pax,
+    bm_roundoff_value = roundoff_value,bm_bill_ref= bill_ref,bm_comments =  bill_custom_message, bm_steward = bill_steward
+    WHERE bm_billno = TEMP_billnumber;
+    UPDATE tbl_tablebill_item_discount SET bd_billno =billnumber  WHERE bd_billno  = TEMP_billnumber;
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = billnumber) THEN
+    BEGIN
+      SET Message = 'Bill not generated - N2';
+      LEAVE proc_billgenerate;
+    END;
+    END IF;
+    UPDATE tbl_tableorder SET ter_billnumber = billnumber,ter_status = 'Billed'  WHERE ter_billnumber = TEMP_billnumber;
+    UPDATE tbl_tabledetails SET ts_status = 'Billed', ts_billnumber = billnumber  WHERE ts_billnumber = TEMP_billnumber;
+    SET Message = 'Bill generated sucessfully';
+  END;
+  ELSEIF((ROUND(finaltotal,0) = 0)OR (finaltotal < 0)) THEN
+  BEGIN
+    SELECT sum(ter_qty) INTO sum_qty_bill FROM tbl_tableorder WHERE ter_billnumber = TEMP_billnumber;
+    IF(ROUND(sum_qty_bill,0) = 0)THEN
+    BEGIN
+      SET Message = 'Total Items is 0,Order will be automatically closed';
+      set commacount = 0;
+      SELECT LENGTH(TRIM(orderno)) - LENGTH(REPLACE(TRIM(orderno), ',', ''))   INTO commacount;
+      SET i=1;
+      ORDER_LOOP: WHILE (i <= commacount+1) DO
+        SELECT split_str(orderno,',',i) INTO ordernumber;
+        UPDATE  tbl_tableorder SET ter_status = 'Closed' WHERE ter_orderno = ordernumber;
+        DELETE FROM tbl_tabledetails WHERE ts_orderno = ordernumber;
+        SET i= i+1;
+      END WHILE;
+      DELETE FROM tbl_tablebillmaster WHERE  bm_billno = TEMP_billnumber;
+      DELETE FROM tbl_tablebill_item_discount WHERE  bd_billno = TEMP_billnumber;
+      COMMIT; 
+    END;
+    ELSE
+    BEGIN
+      SET Message = 'Bill Not Generated - Q1';
+    END;
+    END IF;
+    LEAVE proc_billgenerate;
+  END;
+  END IF;
+  /* to avoid table miss*/
+  UPDATE tbl_tabledetails SET ts_status ='Occupied',ts_completed_order = 'Y' WHERE ts_status = 'Billed' AND ((ts_billnumber IS NULL)OR(ts_billnumber = ''));
+   /* */
+  COMMIT;
+   SELECT RELEASE_LOCK('billgenerate') INTO check2;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_billgenerate_temp` (IN `orderno` VARCHAR(250), IN `branchid` INT, OUT `billnumber` VARCHAR(16), IN `cancelamt` DECIMAL(15,3), IN `discount_of` FLOAT, IN `discount_unit` CHAR(1), IN `discount` CHAR(1), IN `discountid` VARCHAR(20), IN `tableno` VARCHAR(100), IN `loyalty_id` INT, OUT `Message` VARCHAR(250))  MODIFIES SQL DATA
+proc_billgenerate:BEGIN
+
+
+  DECLARE commacount,bill_ref_count,table_pax,total_pax INT;
+  DECLARE billnoformat,discount_mode,FLAG_SUCCESS,ENABLE_EXTRA_TAX,EXTRA_PREFIX char(1);
+  DECLARE i,portion,sum_qty_bill,SERIES_SLNO INT;
+  DECLARE bdate,bILLdate varchar(6);
+  DECLARE prefx varchar(3);
+
+  DECLARE floorid,discount_label varchar(10);
+  DECLARE ordernumber,servicetaxunit,servicechargeunit,vatunit varchar(15);
+  DECLARE subtotal,finaltotal,discountvalue,sum_extra_tax,tax_exempt_total,taxable_amount,discount_tax_exempt decimal(15,3);
+  DECLARE after_roundoff,roundoff_value,discountvalue_P decimal(15,3);
+  DECLARE TEMP_billnumber varchar(15);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE discountof float;
+  DECLARE REGENERATE_BILLNO varchar(15);
+  DECLARE order_status varchar(20);
+  DECLARE bill_ref varchar(30);
+  DECLARE nearest_roundoff decimal(5,4);
+  DECLARE check_billno varchar(15);
+  DECLARE bill_custom_message varchar(250);
+  DECLARE bill_steward varchar(50);
+  DECLARE BILL_PREFIX CHAR(2);
+
+  SET FLAG_SUCCESS = 'N';
+  SET Message = 'Error..In Bill Generatation';
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+
+    DELETE FROM tbl_tableorder WHERE ter_portion = 0 OR ter_rate = 0;
+
+  DELETE FROM tbl_tablebillmaster WHERE  bm_billno LIKE 'TEMP*%';
+
+    SET discountvalue = 0.00;
+
+  SELECT be_branchprefix,be_billnoformat,be_nearest_roundoff_value INTO prefx,billnoformat,nearest_roundoff FROM
+  tbl_branchmaster WHERE be_branchid = branchid;
+
+  SELECT DATE_FORMAT(DAYCLOSEDATE,'%d%m%y') INTO bdate;
+
+  SET TEMP_billnumber = CONCAT('TEMP*',FLOOR(100000 + (RAND( )*8999)));
+
+  SET total_pax = 0;
+   INSERT INTO tbl_tablebillmaster(bm_billno,bm_branchid,bm_cancelamount,bm_tableno,bm_orderno) VALUES(TEMP_billnumber,branchid,cancelamt,tableno,orderno);
+  SELECT LENGTH(TRIM(orderno)) - LENGTH(REPLACE(TRIM(orderno), ',', ''))   INTO commacount;
+  SET REGENERATE_BILLNO = '';
+
+  SET i=1;
+    ORDER_LOOP: WHILE (i <= commacount+1) DO
+    SELECT split_str(orderno,',',i) INTO ordernumber;
+    SET check_billno = '';
+    IF(i = 1) THEN
+    BEGIN
+            SELECT DISTINCT  f.fr_floorid,f.fr_enable_extra_tax,f.fr_extra_prefix,f.fr_bill_series,td.ts_status,td.ts_orderstaff
+      INTO floorid,ENABLE_EXTRA_TAX,EXTRA_PREFIX,SERIES_SLNO,order_status,bill_steward
+      FROM tbl_tabledetails td
+      LEFT JOIN tbl_floormaster f ON f.fr_floorid = td.ts_floorid WHERE td.ts_orderno =ordernumber;
+    END;
+    END IF;
+
+        SELECT DISTINCT ter_billnumber INTO check_billno FROM tbl_tableorder WHERE ter_orderno = ordernumber AND ter_billnumber IS NOT NULL;
+    IF(TRIM(check_billno)!= '')THEN
+    BEGIN
+        IF(TRIM(REGENERATE_BILLNO) = '')THEN
+        BEGIN
+          SET REGENERATE_BILLNO = TRIM(check_billno);
+          UPDATE tbl_tableorder SET ter_billnumber = NULL WHERE ter_billnumber = REGENERATE_BILLNO;
+          UPDATE tbl_tabledetails SET ts_billnumber = NULL WHERE ts_billnumber = REGENERATE_BILLNO;
+        END;
+        ELSE
+        BEGIN
+           UPDATE tbl_tableorder SET ter_billnumber = NULL WHERE ter_billnumber = check_billno;
+           UPDATE tbl_tabledetails SET ts_billnumber = NULL WHERE ts_billnumber = check_billno;
+           UPDATE tbl_tablebillmaster SET bm_can_regenerate = 'N',bm_status = 'Cancelled',
+           ter_cancelledreason = concat('Internal Cancellation,Regenerated With Bill - ',REGENERATE_BILLNO)
+           WHERE bm_billno = check_billno;
+        END;
+        END IF;
+    END;
+    END IF;
+
+    IF EXISTS(SELECT * FROM tbl_tableorder WHERE ((ter_status = 'Added') OR (ter_status = 'Ready') OR (ter_status = 'Opened'))AND ter_orderno = ordernumber) THEN
+    BEGIN
+      SET Message = 'Orders pending to be served';
+      LEAVE proc_billgenerate;
+    END;
+    END IF;
+
+        IF EXISTS(SELECT * FROM tbl_tabledetails td WHERE td.ts_status = 'Billed' AND td.ts_orderno =ordernumber) THEN
+    BEGIN
+       SET i= i+1;
+       LEAVE ORDER_LOOP;
+    END;
+    END IF;
+
+      SELECT SUM(td.ts_paxcount) INTO table_pax FROM tbl_tabledetails td WHERE td.ts_orderno =ordernumber;
+      SET total_pax = total_pax+table_pax;
+       CALL proc_billdetailentry(ordernumber,TEMP_billnumber);
+
+      UPDATE tbl_tableorder SET ter_billnumber = TEMP_billnumber WHERE ter_orderno = ordernumber;
+      UPDATE tbl_tabledetails SET ts_billnumber = TEMP_billnumber  WHERE ts_orderno = ordernumber;
+
+    SET i= i+1;
+  END WHILE;
+
+  SELECT bm_subtotal INTO subtotal FROM tbl_tablebillmaster WHERE bm_billno = TEMP_billnumber;
+
+ 
+  SET finaltotal = 0;
+  SET taxable_amount = 0;
+  SET tax_exempt_total = 0;
+  SET bill_custom_message = NULL;
+
+
+  IF(Discount ='Y')THEN
+  BEGIN
+      IF(discountid = '0') THEN
+     BEGIN
+        SET discountof = discount_of;
+        SET discount_mode = discount_unit;
+         
+     END;
+     ELSE
+     BEGIN
+      SELECT ds_discountof,ds_mode INTO discountof,discount_mode FROM  tbl_discountmaster WHERE ds_discountid = discountid;
+         
+     END;
+     END IF;
+
+
+      SET discount_label = NULL;
+      IF(discount_mode = 'P')THEN
+      BEGIN
+          SET discountvalue = ((discountof * subtotal)/100);
+       SET subtotal = (subtotal - discountvalue);
+       SET discount_label = CONCAT('(',discountof,'%)');
+      END;
+      ELSEIF(discount_mode = 'V')THEN
+      BEGIN
+        SET discountvalue = discountof;
+        SET discountvalue_P = ((discountof * 100)/subtotal);
+        SET subtotal = (subtotal - discountvalue);
+
+      END;
+      END IF;
+  END;
+  END IF;
+
+  IF(subtotal<0)then
+   BEGIN
+      SET Message = 'DISCOUNT GIVEN MORE THAN BILL AMOUNT';
+      LEAVE proc_billgenerate;
+    END;
+    END IF;
+
+  
+  IF EXISTS(SELECT * FROM tbl_tablebilldetails WHERE bd_billno = TEMP_billnumber AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster
+  WHERE mr_excempt_tax  ='Y'))THEN
+  BEGIN
+
+    SELECT sum(bd_amount) INTO tax_exempt_total FROM tbl_tablebilldetails
+    WHERE bd_billno = TEMP_billnumber AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+
+    IF(Discount ='Y')THEN
+    BEGIN
+      IF(discount_mode = 'P')THEN
+      BEGIN
+          SET discount_tax_exempt = ((discountof * tax_exempt_total)/100);
+          SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      ELSEIF(discount_mode = 'V')THEN
+      BEGIN
+
+        SET discount_tax_exempt = ((discountvalue_P * tax_exempt_total)/100);
+        SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+
+      END;
+      END IF;
+    END;
+    END IF;
+
+
+
+
+    SET taxable_amount = subtotal - tax_exempt_total;
+    SET subtotal = taxable_amount;
+
+    UPDATE tbl_tablebilldetails SET bd_symbol_for_tax = '*' WHERE bd_billno = TEMP_billnumber AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+
+    SET bill_custom_message = concat('* TAX EXEMPTED AMOUNT - ',tax_exempt_total,'/b TAXABLE AMOUNT - ',taxable_amount);
+
+  END;
+   ELSE
+  BEGIN
+   SET taxable_amount = subtotal;
+  END;
+  END IF;
+    
+
+
+
+
+    IF(taxable_amount > 0 ) THEN
+    BEGIN
+      
+    END;
+    END IF;
+  
+  CALL proc_tax(TEMP_billnumber,'DI',floorid);
+  
+  SET finaltotal = (taxable_amount -cancelamt) + afterservicecharge + afterservicetax + aftervat + tax_exempt_total;
+
+  IF((finaltotal != 0)OR (finaltotal > 0))THEN
+  BEGIN
+
+
+
+
+    IF((discountid != '0')) THEN
+    BEGIN
+      UPDATE tbl_tablebillmaster SET bm_discountid = discountid WHERE bm_billno = TEMP_billnumber;
+      END;
+    END IF;
+
+    
+
+        IF(nearest_roundoff =0) THEN
+    BEGIN
+      SET after_roundoff = finaltotal;
+      SET roundoff_value = 0.00;
+    END;
+    ELSE
+    BEGIN
+
+      SET after_roundoff = (nearest_roundoff *ROUND(finaltotal/ nearest_roundoff));
+      SET roundoff_value =  (after_roundoff - finaltotal);
+    END;
+    END IF;
+
+
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = TEMP_billnumber) THEN
+    BEGIN
+      SET Message = 'Bill not generated - N1';
+      LEAVE proc_billgenerate;
+    END;
+    END IF;
+
+
+    IF((REGENERATE_BILLNO IS NULL) OR (REGENERATE_BILLNO LIKE 'TEMP%')OR (TRIM(REGENERATE_BILLNO) = ''))   THEN
+    BEGIN
+
+      CALL proc_bill_series_gen('D',EXTRA_PREFIX,SERIES_SLNO,billnumber);
+
+      SET bill_ref_count = NULL;
+      SELECT ds_bill_ref_dine_in INTO bill_ref_count FROM tbl_datesettings
+      WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+
+      IF(bill_ref_count = NULL) THEN
+      BEGIN
+        INSERT INTO tbl_datesettings(ds_branchid,ds_date) VALUES(branchid, DAYCLOSEDATE);
+        SELECT ds_bill_ref_dine_in INTO bill_ref_count FROM tbl_datesettings
+        WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+
+      END;
+      END IF;
+      SET bill_ref = CONCAT('D',bill_ref_count);
+      UPDATE tbl_datesettings SET ds_bill_ref_dine_in = ds_bill_ref_dine_in +1 WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+
+    END;
+    ELSE
+    BEGIN
+      SELECT bm_bill_ref INTO bill_ref FROM tbl_tablebillmaster WHERE bm_billno = TRIM(REGENERATE_BILLNO);
+      DELETE FROM tbl_tablebillmaster WHERE bm_billno = TRIM(REGENERATE_BILLNO);
+      SET billnumber = TRIM(REGENERATE_BILLNO);
+
+    END;
+    END IF;
+
+
+
+
+        UPDATE tbl_tablebillmaster SET bm_billno = billnumber,bm_total= finaltotal, bm_finaltotal = after_roundoff , bm_floorid = floorid,
+    bm_discountvalue = discountvalue,bm_discountlabel = discount_label,bm_totalpax = total_pax,
+    bm_roundoff_value = roundoff_value,bm_bill_ref= bill_ref,bm_comments =  bill_custom_message, bm_tax_exempt = tax_exempt_total,bm_taxable_amount = taxable_amount,bm_steward = bill_steward
+    WHERE bm_billno = TEMP_billnumber;
+       UPDATE tbl_tablebill_item_discount SET bd_billno =billnumber  WHERE bd_billno  = TEMP_billnumber;
+
+
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = billnumber) THEN
+    BEGIN
+      SET Message = 'Bill not generated - N2';
+      LEAVE proc_billgenerate;
+    END;
+    END IF;
+
+
+        UPDATE tbl_tableorder SET ter_billnumber = billnumber,ter_status = 'Billed'  WHERE ter_billnumber = TEMP_billnumber;
+    UPDATE tbl_tabledetails SET ts_status = 'Billed', ts_billnumber = billnumber  WHERE ts_billnumber = TEMP_billnumber;
+    IF(loyalty_id!= 0) THEN
+    BEGIN
+      UPDATE `tbl_loyalty_reg` SET `ly_totalvisit`= ly_totalvisit + 1  WHERE  `ly_id` =  loyalty_id;
+    END;
+    END IF;
+    SET Message = 'Bill generated sucessfully';
+
+  END;
+  ELSEIF((finaltotal = 0)OR (finaltotal < 0)) THEN
+  BEGIN
+       SELECT sum(ter_qty)INTO sum_qty_bill FROM tbl_tableorder WHERE ter_billnumber = TEMP_billnumber;
+    IF(sum_qty_bill = 0)THEN
+    BEGIN
+      SET Message = 'Quantity is 0, Order will be automatically closed';
+      UPDATE  tbl_tableorder SET ter_status = 'Closed' WHERE ter_billnumber = TEMP_billnumber;
+      DELETE FROM tbl_tabledetails WHERE ts_billnumber = TEMP_billnumber;
+      DELETE FROM tbl_tablebillmaster WHERE  bm_billno = TEMP_billnumber;
+    END;
+    ELSE
+    BEGIN
+      SET Message = 'Bill Not Generated - Q1';
+    END;
+    END IF;
+    LEAVE proc_billgenerate;
+  END;
+  END IF;
+
+  
+  UPDATE tbl_tabledetails SET ts_status ='Occupied',ts_completed_order = 'Y' WHERE ts_status = 'Billed' AND ((ts_billnumber IS NULL)OR(ts_billnumber = ''));
+   
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_billpayment` (IN `billno` VARCHAR(15), IN `branchid` BIGINT, IN `paymodeid` INT, IN `amountpaid` DECIMAL(15,3), IN `upiamount` DECIMAL(15,3), IN `upitxnid` VARCHAR(100), IN `transactionamount` DECIMAL(15,2), IN `card_bank` INT, IN `complementary` CHAR(1), IN `remark` VARCHAR(200), IN `voucherid` VARCHAR(20), IN `couponcompany` VARCHAR(100), IN `couponamt` DECIMAL(15,3), IN `chequeno` VARCHAR(150), IN `chequebankname` VARCHAR(150), IN `chequeamount` DECIMAL(15,3), IN `credit` CHAR(1), IN `creditmasterid` VARCHAR(15), IN `creditamount` DECIMAL(15,3), IN `balanceamt` DECIMAL(15,3), IN `complementary_staff` VARCHAR(50), IN `auth_secretkey` VARCHAR(200), IN `auth_staffid` VARCHAR(50), IN `auth_loginid` VARCHAR(15), IN `payment_login` VARCHAR(15), IN `credit_remark` VARCHAR(250), OUT `message` VARCHAR(250))  NO SQL
+proc_billpayment:BEGIN
+   DECLARE commacount, i   INT;
+   DECLARE orderno         VARCHAR(250);
+   DECLARE ordernumber     VARCHAR(15);
+   DECLARE staff_id VARCHAR(50);
+   DECLARE payment_mode     VARCHAR(15);
+   DECLARE BillSplit,shift_permission       char(1);
+   DECLARE MAIN_ORDERNO    VARCHAR(250);
+   DECLARE DAYCLOSE        DATE;
+   DECLARE balance,bill_final decimal(15,3);
+
+  SELECT pym_code INTO payment_mode FROM  tbl_paymentmode WHERE pym_id = paymodeid;
+  SELECT dc_day  INTO DAYCLOSE FROM tbl_dayclose  WHERE dc_dateclose IS NULL;
+
+  SELECT bm_finaltotal INTO bill_final FROM tbl_tablebillmaster WHERE bm_billno =billno;
+
+  
+  SELECT ser_staffid,ser_shift_permission INTO staff_id,shift_permission
+  FROM tbl_staffmaster s
+  LEFT JOIN tbl_logindetails l ON l.ls_staffid =s.ser_staffid WHERE l.ls_username = payment_login;
+
+  IF(shift_permission = 'Y')THEN
+  BEGIN
+     IF NOT EXISTS(SELECT * FROM `tbl_shift_details` WHERE `sd_open_staff` = staff_id AND `sd_day` =DAYCLOSE AND  `sd_close` IS NULL) THEN
+     BEGIN
+
+      SET MESSAGE = Concat('Please open the shift for the current login');
+      LEAVE proc_billpayment;
+
+     END;
+     END IF;
+
+
+  END;
+  END IF;
+  
+
+  IF(payment_mode = 'cash')THEN
+  BEGIN
+    SET balance = (amountpaid-bill_final);
+  END;
+  ELSEIF(payment_mode = 'credit')THEN
+  BEGIN
+    IF ((amountpaid = '') OR (amountpaid = 'NULL')OR (amountpaid IS NULL))THEN
+      SET amountpaid =0;
+    END IF;
+
+    SET balance = ((amountpaid+transactionamount)- bill_final);
+  END;
+  ELSEIF(payment_mode = 'coupon')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  ELSEIF(payment_mode = 'voucher')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  ELSEIF(payment_mode = 'cheque')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  ELSEIF(payment_mode = 'credit_person')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  ELSEIF(payment_mode = 'complimentary')THEN
+  BEGIN
+    SET balance = balanceamt;
+    DELETE FROM `tbl_tablebill_extra_tax_master` WHERE `bem_billno` = billno;
+    UPDATE `tbl_tablebillmaster` SET bm_taxable_amount = 0, bm_total = bm_subtotal_final,bm_finaltotal=bm_subtotal_final,bm_taxable_amount = bm_subtotal_final,bm_roundoff_value= 0
+    WHERE `bm_billno`  = billno;
+  END;
+  ELSEIF(payment_mode = 'upi')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  END IF;
+
+
+
+
+
+   
+   IF ((voucherid = '') OR (voucherid = 'NULL'))
+   THEN
+      SET voucherid = NULL;
+   END IF;
+
+   IF (card_bank = 0)
+   THEN
+      SET card_bank = NULL;
+   END IF;
+
+
+
+   IF ((couponcompany = '') OR (couponcompany = 'NULL'))
+   THEN
+      SET couponcompany = NULL;
+   END IF;
+
+   IF ((chequeno = '') OR (chequeno = 'NULL'))
+   THEN
+      SET chequeno = NULL;
+   END IF;
+
+   IF ((chequebankname = '') OR (chequebankname = 'NULL'))
+   THEN
+      SET chequebankname = NULL;
+   END IF;
+
+   IF ((creditmasterid = '') OR (creditmasterid = 'NULL'))
+   THEN
+      SET creditmasterid = NULL;
+   END IF;
+
+   IF ((complementary_staff = '') OR (complementary_staff = 'NULL'))
+   THEN
+      SET complementary_staff = NULL;
+   END IF;
+
+   IF ((upitxnid = '') OR (upitxnid = 'NULL'))
+   THEN
+      SET upitxnid = NULL;
+   END IF;
+
+   SET MESSAGE = '';
+
+
+
+   IF EXISTS
+         (SELECT *
+          FROM tbl_tablebillmaster
+          WHERE     bm_billno = billno
+                AND bm_branchid = branchid
+                AND bm_paymode IS NOT NULL)
+   THEN
+      BEGIN
+         SET MESSAGE = 'Payment already processed';
+         LEAVE proc_billpayment;
+      END;
+   END IF;
+
+   SELECT bm_bill_is_split
+   INTO BillSplit
+   FROM tbl_tablebillmaster
+   WHERE bm_billno = billno;
+
+   UPDATE tbl_tablebillmaster
+   SET bm_paymode = paymodeid,
+       bm_amountpaid = amountpaid,
+       bm_upi_amount = upiamount,
+       bm_upi_txn_id = upitxnid,
+       bm_transactionamount = transactionamount,
+       bm_amountbalace = balance,
+       bm_transcbank = card_bank,
+       bm_complimentary = complementary,
+       bm_complimentaryremark = remark,
+       bm_voucherid = voucherid,
+       bm_couponcompany = couponcompany,
+       bm_couponamt = couponamt,
+       bm_chequeno = chequeno,
+       bm_chequebankname = chequebankname,
+       bm_chequebankamount = chequeamount,
+       bm_credit = credit,
+       bm_creditmasterid = creditmasterid,
+       bm_status = 'Closed',
+       bm_compl_mgmt_staff = complementary_staff,
+       bm_settlement_login = payment_login,
+       bm_creditremark = credit_remark,
+       bm_settlement_time = now()
+   WHERE bm_billno = billno AND bm_branchid = branchid;
+
+   IF (credit = 'Y')
+   THEN
+      BEGIN
+         INSERT INTO `tbl_credit_details`(`cd_billno`,
+                                          cd_modeofentry,
+                                          `cd_masterid`,
+                                          `cd_amount`,
+                                          cd_dayclosedate)
+         VALUES (billno,
+                 'DI',
+                 creditmasterid,
+                 creditamount,
+                 DAYCLOSE);
+      END;
+   END IF;
+
+   SELECT bm_orderno
+   INTO orderno
+   FROM tbl_tablebillmaster
+   WHERE bm_billno = TRIM(billno);
+
+   SELECT LENGTH(TRIM(orderno)) - LENGTH(REPLACE(TRIM(orderno), ',', ''))
+   INTO commacount;
+
+   SET i = 1;
+
+  ORDER_LOOP:
+   WHILE (i <= commacount + 1)
+   DO
+      SELECT split_str(orderno, ',', i)
+      INTO ordernumber;
+
+      UPDATE tbl_tableorder
+      SET ter_status = 'Closed', ter_orderno_temp = TRIM(ordernumber)
+      WHERE ter_orderno = TRIM(ordernumber);
+
+      IF (BillSplit = 'N')
+      THEN
+         BEGIN
+            DELETE FROM tbl_tabledetails
+            WHERE ts_orderno = TRIM(ordernumber);
+         END;
+      ELSEIF (BillSplit = 'Y')
+      THEN
+         BEGIN
+            SELECT TRIM(tbs_orderno)
+            INTO MAIN_ORDERNO
+            FROM tbl_tablebill_split
+            WHERE tbs_newbillno = billno;
+
+            UPDATE tbl_tablebill_split
+            SET tbs_billstatus = 'Closed'
+            WHERE tbs_newbillno = billno;
+
+            IF NOT EXISTS
+                  (SELECT *
+                   FROM tbl_tablebill_split
+                   WHERE     tbs_orderno = TRIM(MAIN_ORDERNO)
+                         AND tbs_billstatus != 'Closed')
+            THEN
+               BEGIN
+                  DELETE FROM tbl_tabledetails
+                  WHERE ts_orderno = TRIM(ordernumber);
+               END;
+            END IF;
+         END;
+      END IF;
+
+      SET i = i + 1;
+   END WHILE;
+
+   UPDATE tbl_notifications
+   SET tbl_read = 'Y',
+       tbl_readdate = CURRENT_DATE(),
+       tbl_readtime = CURRENT_TIME()
+   WHERE tbl_billno = billno;
+
+   SET MESSAGE = 'Payment succesfully processed';
+
+   UPDATE tbl_tabledetails
+   SET ts_status = 'Occupied', ts_completed_order = 'Y'
+   WHERE     ts_status = 'Billed'
+         AND ((ts_billnumber IS NULL) OR (ts_billnumber = ''));
+
+   IF (paymodeid = 2)
+   THEN
+      BEGIN
+         UPDATE tbl_bill_card_payments
+         SET mc_billno = billno
+         WHERE mc_billno = concat('temp_', billno);
+      END;
+   ELSE
+      BEGIN
+         DELETE FROM tbl_bill_card_payments
+         WHERE mc_billno = concat('temp_', billno);
+      END;
+   END IF;
+
+   DELETE FROM tbl_tableorder WHERE (ter_orderno IS NULL);
+   DELETE FROM `tbl_bill_card_payments` WHERE ((`mc_billno` = '') OR (`mc_billno` IS NULL));
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_billpayment_change` (IN `billno` VARCHAR(15), IN `branchid` BIGINT, IN `paymodeid` INT, IN `amountpaid` DECIMAL(15,2), IN `transactionamount` DECIMAL(15,2), IN `card_bank` INT, IN `complementary` CHAR(1), IN `remark` VARCHAR(200), IN `voucherid` VARCHAR(20), IN `couponcompany` VARCHAR(100), IN `couponamt` DECIMAL(15,2), IN `chequeno` VARCHAR(150), IN `chequebankname` VARCHAR(150), IN `chequeamount` DECIMAL(15,2), IN `credit` CHAR(1), IN `creditmasterid` VARCHAR(15), IN `creditamount` DECIMAL(15,2), IN `balanceamt` DECIMAL(15,2), IN `complementary_staff` VARCHAR(50), IN `auth_secretkey` VARCHAR(200), IN `auth_staffid` VARCHAR(50), IN `auth_loginid` VARCHAR(15), IN `changereason` VARCHAR(200), OUT `message` VARCHAR(250))  NO SQL
+BEGIN
+    DECLARE commacount,i INT;
+    DECLARE orderno VARCHAR(250);
+    DECLARE ordernumber VARCHAR(15);
+    DECLARE mnakingcost decimal(15,2);
+    
+    
+        IF((auth_secretkey = '') OR (auth_secretkey = 'NULL'))THEN
+    SET auth_secretkey = NULL;
+    END IF;    
+     IF((auth_staffid = '') OR (auth_staffid = 'NULL'))THEN
+    SET auth_staffid = NULL;
+    END IF;
+     IF((changereason = '') OR (changereason = 'NULL'))THEN
+    SET changereason = NULL;
+    END IF;
+     IF((auth_loginid = '') OR (auth_loginid = 'NULL'))THEN
+    SET auth_loginid = NULL;
+    END IF;
+    
+        INSERT INTO `tbl_tablebill_paymentchange`(`bcp_old_billno`, `bcp_old_branchid`, `bcp_old_billno_slno`, `bcp_old_paymode`, `bcp_old_credit`, `bcp_old_creditmasterid`, `bcp_old_complimentary`, `bcp_old_complimentaryremark`, `bcp_old_amountbalace`, `bcp_old_transactionamount`, `bcp_old_amountpaid`, `bcp_old_transcbank`, `bcp_old_voucherid`, `bcp_old_couponcompany`, `bcp_old_couponamt`, `bcp_old_chequeno`, `bcp_old_chequebankname`, `bcp_old_chequebankamount`,bcp_cancelledby_careof,bcp_cancelledreason, bcp_cancelledsecret,bcp_cancelledlogin)
+    SELECT `bm_billno`, `bm_branchid`,0,`bm_paymode`, `bm_credit`, `bm_creditmasterid`, `bm_complimentary`, `bm_complimentaryremark`, `bm_amountbalace`, `bm_transactionamount`, `bm_amountpaid`, `bm_transcbank`, `bm_voucherid`, `bm_couponcompany`, `bm_couponamt`, `bm_chequeno`, `bm_chequebankname`, `bm_chequebankamount`,auth_staffid,changereason,auth_secretkey,auth_loginid FROM `tbl_tablebillmaster` WHERE bm_billno = billno AND bm_branchid = branchid;
+
+    UPDATE tbl_tablebillmaster SET bm_amountpaid =0.00,bm_transactionamount = 0.00,bm_amountbalace = 0.00,bm_transcbank = NULL,bm_complimentary = 'N', bm_complimentaryremark = NULL,bm_voucherid = NULL,bm_couponcompany = NULL,
+bm_couponamt = 0.00,bm_chequeno= NULL, bm_chequebankname = NULL, bm_chequebankamount = 0.00, bm_credit = 'N', bm_creditmasterid = NULL,bm_compl_mgmt_staff = NULL WHERE bm_billno = billno AND bm_branchid = branchid;
+
+
+    IF((voucherid = '') OR (voucherid = 'NULL'))THEN
+    SET voucherid = NULL;
+    END IF;
+
+    IF((couponcompany = '') OR (couponcompany = 'NULL'))THEN
+    SET couponcompany = NULL;
+    END IF;
+
+     IF((chequeno = '') OR (chequeno = 'NULL'))THEN
+    SET chequeno = NULL;
+    END IF;
+
+
+    IF((chequebankname = '') OR (chequebankname = 'NULL'))THEN
+    SET chequebankname = NULL;
+    END IF;
+
+    IF((creditmasterid = '') OR (creditmasterid = 'NULL'))THEN
+    SET creditmasterid = NULL;
+    END IF;
+    
+    
+   
+
+    IF((complementary_staff = '') OR (complementary_staff = 'NULL'))THEN
+    SET complementary_staff = NULL;
+    END IF;
+
+      SET MESSAGE = '';
+
+      IF(paymodeid = 8) THEN
+      BEGIN
+
+         CALL proc_billsumofmakingcost(billno);
+
+
+      END;
+      END IF;
+      
+      UPDATE tbl_tablebillmaster SET bm_paymode = paymodeid,bm_amountpaid =amountpaid,bm_transactionamount = transactionamount,bm_amountbalace = balanceamt,bm_transcbank = card_bank,bm_complimentary = complementary, bm_complimentaryremark = remark,bm_voucherid = voucherid,bm_couponcompany = couponcompany,
+bm_couponamt = couponamt,bm_chequeno= chequeno, bm_chequebankname = chequebankname, bm_chequebankamount = chequeamount, bm_credit = credit, bm_creditmasterid = creditmasterid,bm_status = 'Closed',bm_compl_mgmt_staff = complementary_staff WHERE bm_billno = billno AND bm_branchid = branchid;
+
+     IF(credit = 'Y') THEN
+    BEGIN
+
+      INSERT INTO `tbl_credit_details`(`cd_billno`, `cd_masterid`, `cd_amount`)VALUES(billno,creditmasterid,creditamount);
+
+    END;
+    END IF;
+    
+    
+    IF(paymodeid = 2) THEN
+      BEGIN
+   
+   UPDATE tbl_bill_card_payments SET mc_billno=billno where mc_billno=concat('temp_',billno);
+END;
+ELSE
+BEGIN
+DELETE from tbl_bill_card_payments  where mc_billno=concat('temp_',billno);
+END;
+END IF;
+ 
+   set message = 'Payment successfully changed';
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_billpayment_ta_change` (IN `billno` VARCHAR(15), IN `branchid` BIGINT, IN `paymodeid` INT, IN `amountpaid` DECIMAL(15,2), IN `transactionamount` DECIMAL(15,2), IN `card_bank` INT, IN `complementary` CHAR(1), IN `remark` VARCHAR(200), IN `voucherid` VARCHAR(20), IN `couponcompany` VARCHAR(100), IN `couponamt` DECIMAL(15,2), IN `chequeno` VARCHAR(150), IN `chequebankname` VARCHAR(150), IN `chequeamount` DECIMAL(15,2), IN `credit` CHAR(1), IN `creditmasterid` VARCHAR(15), IN `creditamount` DECIMAL(15,2), IN `balanceamt` DECIMAL(15,2), IN `complementary_staff` VARCHAR(50), IN `auth_secretkey` VARCHAR(200), IN `auth_staffid` VARCHAR(50), IN `auth_loginid` VARCHAR(15), IN `changereason` VARCHAR(200), OUT `message` VARCHAR(250))  NO SQL
+BEGIN
+    DECLARE commacount,i INT;
+    DECLARE orderno VARCHAR(250);
+    DECLARE ordernumber VARCHAR(15);
+    DECLARE mnakingcost decimal(15,2);
+    
+    
+        IF((auth_secretkey = '') OR (auth_secretkey = 'NULL'))THEN
+    SET auth_secretkey = NULL;
+    END IF;    
+     IF((auth_staffid = '') OR (auth_staffid = 'NULL'))THEN
+    SET auth_staffid = NULL;
+    END IF;
+     IF((changereason = '') OR (changereason = 'NULL'))THEN
+    SET changereason = NULL;
+    END IF;
+     IF((auth_loginid = '') OR (auth_loginid = 'NULL'))THEN
+    SET auth_loginid = NULL;
+    END IF;
+    
+        INSERT INTO `tbl_tablebill_paymentchange`(`bcp_old_billno`, `bcp_old_branchid`, `bcp_old_billno_slno`, `bcp_old_paymode`, `bcp_old_credit`, `bcp_old_creditmasterid`, `bcp_old_complimentary`, `bcp_old_complimentaryremark`, `bcp_old_amountbalace`, `bcp_old_transactionamount`, `bcp_old_amountpaid`, `bcp_old_transcbank`, `bcp_old_voucherid`, `bcp_old_couponcompany`, `bcp_old_couponamt`, `bcp_old_chequeno`, `bcp_old_chequebankname`, `bcp_old_chequebankamount`,bcp_cancelledby_careof,bcp_cancelledreason, bcp_cancelledsecret,bcp_cancelledlogin)
+    SELECT `bm_billno`, `bm_branchid`,0,`bm_paymode`, `bm_credit`, `bm_creditmasterid`, `bm_complimentary`, `bm_complimentaryremark`, `bm_amountbalace`, `bm_transactionamount`, `bm_amountpaid`, `bm_transcbank`, `bm_voucherid`, `bm_couponcompany`, `bm_couponamt`, `bm_chequeno`, `bm_chequebankname`, `bm_chequebankamount`,auth_staffid,changereason,auth_secretkey,auth_loginid FROM `tbl_tablebillmaster` WHERE bm_billno = billno AND bm_branchid = branchid;
+
+    UPDATE tbl_takeaway_billmaster SET tab_amountpaid =0.00,tab_transactionamount = 0.00,tab_amountbalace = 0.00,tab_transcbank = NULL,tab_complimentary = 'N', tab_complimentaryremark = NULL,tab_voucherid = NULL,tab_couponcompany = NULL,
+tab_couponamt = 0.00,tab_chequeno= NULL, tab_chequebankname = NULL, tab_chequebankamount = 0.00, tab_credit = 'N', tab_creditmasterid = NULL WHERE tab_billno = billno AND tab_branchid = branchid;
+
+
+    IF((voucherid = '') OR (voucherid = 'NULL'))THEN
+    SET voucherid = NULL;
+    END IF;
+
+    IF((couponcompany = '') OR (couponcompany = 'NULL'))THEN
+    SET couponcompany = NULL;
+    END IF;
+
+     IF((chequeno = '') OR (chequeno = 'NULL'))THEN
+    SET chequeno = NULL;
+    END IF;
+
+
+    IF((chequebankname = '') OR (chequebankname = 'NULL'))THEN
+    SET chequebankname = NULL;
+    END IF;
+
+    IF((creditmasterid = '') OR (creditmasterid = 'NULL'))THEN
+    SET creditmasterid = NULL;
+    END IF;
+    
+    
+   
+
+    IF((complementary_staff = '') OR (complementary_staff = 'NULL'))THEN
+    SET complementary_staff = NULL;
+    END IF;
+
+      SET MESSAGE = '';
+
+    
+      
+      UPDATE tbl_takeaway_billmaster SET tab_paymode = paymodeid,tab_amountpaid =amountpaid,tab_transactionamount = transactionamount,tab_amountbalace = balanceamt,tab_transcbank = card_bank,tab_complimentary = complementary, tab_complimentaryremark = remark,tab_voucherid = voucherid,tab_couponcompany = couponcompany,
+tab_couponamt = couponamt,tab_chequeno= chequeno, tab_chequebankname = chequebankname, tab_chequebankamount = chequeamount, tab_credit = credit, tab_creditmasterid = creditmasterid,tab_status = 'Closed' WHERE tab_billno = billno AND tab_branchid = branchid;
+
+     IF(credit = 'Y') THEN
+    BEGIN
+
+      INSERT INTO `tbl_credit_details`(`cd_billno`, `cd_masterid`, `cd_amount`)VALUES(billno,creditmasterid,creditamount);
+
+    END;
+    END IF;
+ 
+ 
+ IF(paymodeid = 2) THEN
+  BEGIN
+   
+   UPDATE tbl_bill_card_payments SET mc_billno=billno where mc_billno IN(concat('temp_',billno),billno);
+END;
+ELSE
+BEGIN
+DELETE from tbl_bill_card_payments  where mc_billno IN(concat('temp_',billno),billno);
+END;
+END IF;
+ 
+ 
+   set message = 'Payment successfully changed';
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_billsumofmakingcost` (IN `billnumber` VARCHAR(16))  MODIFIES SQL DATA
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE meduid varchar(30);
+    DECLARE slno int;
+    DECLARE total_makingcost,billamount DECIMAL(15,2);
+      DECLARE cur1 CURSOR FOR SELECT bd_billslno,bd_menuid,bd_amount FROM tbl_tablebilldetails WHERE  bd_billno= trim(billnumber);
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    
+    SET total_makingcost = 0;
+    OPEN cur1;
+
+      read_loop: LOOP
+
+
+      FETCH cur1 INTO slno,meduid,billamount;
+
+      IF done THEN
+
+        LEAVE read_loop;
+      END IF;
+      SELECT fcm_total_finalcost INTO total_makingcost  FROM fc_recipe_master WHERE fcm_menuid = meduid;
+      IF((total_makingcost != 'NULL')OR(total_makingcost != '')) THEN
+         UPDATE tbl_tablebilldetails SET bd_rate = total_makingcost, bd_amount = (bd_qty *total_makingcost) WHERE  bd_billno= trim(billnumber) AND bd_billslno = slno;
+      END IF;
+    END LOOP;
+    CLOSE cur1;
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_bill_r` (IN `TEMP_billnumber` VARCHAR(16), OUT `Message` VARCHAR(250))  MODIFIES SQL DATA
+proc_billgenerate:BEGIN
+  DECLARE commacount,bill_ref_count,table_pax,total_pax,commacount_s,combo_count INT;
+  DECLARE discount_mode,FLAG_SUCCESS,ENABLE_EXTRA_TAX,EXTRA_PREFIX char(1);
+  DECLARE i,portion,sum_qty_bill,SERIES_SLNO,check2, check1 INT;
+  DECLARE bdate,bILLdate varchar(6);
+  DECLARE prefx varchar(3);
+  DECLARE floorid,discount_label varchar(10);
+  DECLARE ordernumber,ordernumber_s,servicetaxunit,servicechargeunit,vatunit varchar(15);
+  DECLARE subtotal,finaltotal,discountvalue,sum_extra_tax,tax_exempt_total,taxable_amount,discount_tax_exempt,tax_total decimal(15,3);
+  DECLARE after_roundoff,roundoff_value,discountvalue_P,rate_combo decimal(15,3);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE discountof float;
+  DECLARE REGENERATE_BILLNO varchar(15);
+  DECLARE order_status varchar(20);
+  DECLARE bill_ref varchar(30);
+  DECLARE nearest_roundoff decimal(5,4);
+  DECLARE check_billno varchar(15);
+  DECLARE bill_custom_message varchar(250);
+  DECLARE bill_steward varchar(50);
+  DECLARE decimal1 int;
+   DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
+  BEGIN
+    ROLLBACK;
+  END;
+  SELECT GET_LOCK('proc_bill_r', 5) INTO check1;
+  START TRANSACTION;
+  /* Exception handler is used to roll back if any error is faced*/
+  SET FLAG_SUCCESS = 'N';
+  SET Message = 'Error..In Bill Generatation';
+
+
+
+
+  SET discountvalue = 0.00;
+
+  SELECT be_branchprefix,be_nearest_roundoff_value,be_decimal INTO prefx,nearest_roundoff,decimal1 FROM
+  tbl_branchmaster;
+
+  SELECT DATE_FORMAT(DAYCLOSEDATE,'%d%m%y') INTO bdate;
+  SET total_pax = 0;
+
+  /*Loop is used to get details of multiple order number combined into one bill */
+
+  SELECT SUM(RATE) INTO rate_combo FROM(SELECT DISTINCT cbd_count_combo_ordering, cbd_combo_total_rate AS RATE  FROM tbl_combo_bill_details  WHERE `cbd_billno` = TEMP_billnumber)Z;
+  
+
+  IF(rate_combo IS NULL)THEN
+  SET rate_combo = 0;
+  END IF;
+  
+  SELECT  SUM(bd_amount) INTO  subtotal FROM tbl_tablebilldetails WHERE bd_billno = TEMP_billnumber;
+  SELECT bm_floorid INTO floorid FROM tbl_tablebillmaster WHERE bm_billno = TEMP_billnumber;
+  
+  IF(subtotal IS NULL)THEN
+  SET subtotal = 0;
+  END IF;
+
+  SET subtotal = rate_combo + subtotal;
+
+
+  UPDATE tbl_tablebillmaster SET bm_subtotal = subtotal,bm_subtotal_final = subtotal  WHERE  bm_billno = TEMP_billnumber;
+
+
+  SET finaltotal = 0;
+  SET taxable_amount = 0;
+  SET tax_exempt_total = 0;
+  SET bill_custom_message = NULL;
+ /*Discount calculated for the bill*/
+  SET discountvalue = 0.00;
+
+
+  /* subtotal less than 0 is checked, sub total less than 0 will be avoided for bill generation and table will be cleared to take another order */
+
+
+  /* tax exempt concept - start*/
+  IF EXISTS(SELECT * FROM tbl_tablebilldetails WHERE bd_billno = TEMP_billnumber AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster
+  WHERE mr_excempt_tax  ='Y'))THEN
+  BEGIN
+    SELECT sum(bd_amount) INTO tax_exempt_total FROM tbl_tablebilldetails
+    WHERE bd_billno = TEMP_billnumber AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+    SET taxable_amount = subtotal - tax_exempt_total;
+    SET subtotal = taxable_amount;
+    UPDATE tbl_tablebilldetails SET bd_symbol_for_tax = '*' WHERE bd_billno = TEMP_billnumber AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+     SET bill_custom_message = concat('* TAX EXEMPTED AMOUNT - ',FORMAT(tax_exempt_total,decimal1),'/b TAXABLE AMOUNT - ',FORMAT(taxable_amount,decimal1));
+  END;
+   ELSE
+  BEGIN
+   SET taxable_amount = subtotal;
+   SET tax_exempt_total = 0;
+  END;
+  END IF;
+  /* tax exempt concept - end*/
+  UPDATE tbl_tablebillmaster SET  bm_tax_exempt = tax_exempt_total,bm_taxable_amount = taxable_amount WHERE bm_billno = TEMP_billnumber;
+  IF(taxable_amount >= 0 ) THEN
+  BEGIN
+    DELETE FROM `tbl_tablebill_extra_tax_master` WHERE `bem_billno` = TEMP_billnumber;
+     DELETE FROM `tbl_tablebill_extra_tax_details` WHERE `bet_billno` = TEMP_billnumber;
+    CALL proc_tax(TEMP_billnumber,'DI',floorid);
+  END;
+  END IF;
+  IF EXISTS( SELECT *FROM tbl_tablebill_extra_tax_master WHERE bem_billno = TEMP_billnumber)THEN
+  BEGIN
+    SELECT FORMAT(SUM(bem_total_value),decimal1)INTO tax_total FROM tbl_tablebill_extra_tax_master WHERE bem_billno = TEMP_billnumber;
+  END;
+  ELSE
+    SET tax_total = 0;
+  END IF;
+  SET finaltotal = taxable_amount  +  tax_exempt_total + tax_total;
+  IF((finaltotal != 0)OR (finaltotal > 0))THEN
+  BEGIN
+    IF(nearest_roundoff =0) THEN
+    BEGIN
+      SET after_roundoff = finaltotal;
+      SET roundoff_value = 0.00;
+    END;
+    ELSE
+    BEGIN
+      SET after_roundoff = (nearest_roundoff *ROUND(finaltotal/ nearest_roundoff));
+      SET roundoff_value =  (after_roundoff - finaltotal);
+    END;
+    END IF;
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = TEMP_billnumber) THEN
+    BEGIN
+      SET Message = 'Bill not generated - N1';
+      LEAVE proc_billgenerate;
+    END;
+    END IF;
+       SET Message = roundoff_value;
+
+    UPDATE tbl_tablebillmaster SET bm_total= finaltotal, bm_finaltotal = after_roundoff ,
+    bm_roundoff_value = roundoff_value,bm_comments =  bill_custom_message,bm_amountbalace = ((bm_transactionamount+bm_amountpaid)-finaltotal)-roundoff_value, cloud_sync = 'Y'
+    WHERE bm_billno = TEMP_billnumber;
+
+           SET Message = '5';
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = TEMP_billnumber) THEN
+    BEGIN
+      SET Message = 'Bill not generated - N2';
+      LEAVE proc_billgenerate;
+    END;
+    END IF;
+    SET Message = 'Bill sucessfully Changed';
+  END;
+  END IF;
+  /* to avoid table miss*/
+  /* */
+  COMMIT;
+   SELECT RELEASE_LOCK('proc_bill_r') INTO check2;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_bill_regenerate` (IN `regen_billno` VARCHAR(15), IN `secretkey` VARCHAR(200), IN `staffid` VARCHAR(50), IN `reason` TEXT, IN `loginid` VARCHAR(15), OUT `message` VARCHAR(100))  NO SQL
+proc_bill_regenerate:BEGIN
+  DECLARE AMOUNT DECIMAL(15,3);
+  DECLARE orderno varchar(500);
+  DECLARE commacount,i INT;
+  DECLARE ordernumber varchar(15);
+    DECLARE Pointadd DECIMAL(15,2);
+    DECLARE Pointredeem DECIMAL(15,2);
+    Declare Pointcustomer,loy_id,flr_id,tbl_id INT;
+  
+   
+    if((staffid = '') or (staffid = 'NULL'))THEN
+  set staffid = NULL;
+  end if;
+  
+    if((reason = '') or (reason = 'NULL'))THEN
+  set reason = NULL;
+  end if;
+  
+    if((secretkey = '') or (secretkey = 'NULL'))THEN
+  set secretkey = NULL;
+  end if;
+  
+    if((loginid = '') or (loginid = 'NULL'))THEN
+  set loginid = NULL;
+  end if;
+
+
+  SELECT bm_finaltotal,bm_orderno,bm_loy_id,bm_floorid INTO AMOUNT,orderno,loy_id,flr_id FROM tbl_tablebillmaster where bm_billno = regen_billno;
+  
+  SELECT ts_tableid INTO tbl_id FROM tbl_tabledetails where ts_orderno = orderno limit 1;
+  
+  update  tbl_loyalty_reg set ly_default='Y',ly_module='DI',ly_customer_floor=flr_id,ly_customer_table=tbl_id where ly_id =loy_id;
+  
+  UPDATE tbl_tablebillmaster set bm_status = 'Regenerating' where bm_billno = regen_billno;
+  
+  INSERT INTO `tbl_regenrate_log`(`re_billno`, `re_staffid`, `re_reason`, `re_loginid`, `re_secretkey`,re_amount,re_order_no)
+  VALUES (regen_billno,staffid,reason,loginid,secretkey,AMOUNT,orderno);
+  
+  UPDATE tbl_tabledetails SET ts_billnumber = NULL WHERE ts_billnumber = regen_billno;
+
+  SELECT lob_point_add,lob_point_redeem,lob_loyalty_customer INTO Pointadd,Pointredeem,Pointcustomer FROM tbl_loyalty_pointadd_bill where lob_billno = regen_billno;
+  
+  IF (Pointadd='' or Pointadd IS NULL ) THEN
+  Set Pointadd=0;
+ END IF;
+  
+   IF (Pointredeem='' or Pointredeem IS NULL) THEN
+  Set Pointredeem=0;
+  END IF;
+  
+   
+  
+  UPDATE tbl_loyalty_reg SET ly_points=(ly_points+Pointredeem)-Pointadd , ly_totalvisit=ly_totalvisit-1 where ly_id=Pointcustomer;
+ 
+  Delete from tbl_loyalty_pointadd_bill where lob_billno = regen_billno;
+ 
+   
+  SELECT LENGTH(TRIM(orderno)) - LENGTH(REPLACE(TRIM(orderno), ',', ''))   INTO commacount;
+  SET i=1;
+  ORDER_LOOP: WHILE (i <= commacount+1) DO
+  
+    SELECT split_str(orderno,',',i) INTO ordernumber;
+    
+     UPDATE tbl_tableorder SET ter_status = 'Served'  WHERE ter_orderno = ordernumber and ter_status = 'Billed';
+     
+    IF NOT EXISTS(select * from tbl_temp_regenerate where bill_no = regen_billno)THEN
+    BEGIN
+    
+      INSERT INTO `tbl_temp_regenerate`(`bill_no`, `order_no`) VALUES(regen_billno,ordernumber);
+      
+    END;
+    END IF;
+    
+    SET i= i+1;
+    END WHILE;
+  
+ SET message = "Bill Regenerated Sucessfully";
+
+  
+  UPDATE tbl_tabledetails SET ts_status ='Served',ts_completed_order = 'Y' where ts_status = 'Billed' and ((ts_billnumber is NULL)OR(ts_billnumber = ''));
+   
+  
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_bill_series_gen` (IN `PREFIX` CHAR(1), IN `EXTRA_PREFIX` VARCHAR(1), IN `SERIES_SLNO` INT, OUT `BILL_SERIES` VARCHAR(15))  MODIFIES SQL DATA
+BEGIN
+  DECLARE billcount INT;
+  DECLARE alpahabet char(1);
+  DECLARE finyear char(4);
+   
+  SELECT ys_fin_year INTO finyear FROM tbl_yearsettings WHERE ys_fin_year_current = 'Y';
+  SELECT b_count,b_alpahabet INTO  billcount,alpahabet FROM tbl_year_bill_series WHERE b_series = SERIES_SLNO AND b_fin_year = TRIM(finyear);
+
+  IF((EXTRA_PREFIX IS NULL)AND(alpahabet IS NULL)) THEN
+  SET BILL_SERIES = CONCAT(PREFIX,finyear,'-',billcount);
+  ELSEIF((EXTRA_PREFIX IS NOT NULL)AND(alpahabet IS NOT NULL))THEN
+  SET BILL_SERIES = CONCAT(PREFIX,finyear,'-',EXTRA_PREFIX,alpahabet,billcount);
+  ELSEIF(EXTRA_PREFIX IS NOT NULL)THEN
+  SET BILL_SERIES = CONCAT(PREFIX,finyear,'-',EXTRA_PREFIX,billcount);
+  ELSEIF(alpahabet IS NOT NULL)THEN
+  SET BILL_SERIES = CONCAT(PREFIX,finyear,'-',alpahabet,billcount);
+  END IF;
+
+  UPDATE tbl_year_bill_series SET b_count = b_count +1 WHERE b_series = SERIES_SLNO AND b_fin_year = TRIM(finyear);
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_bill_split_generate` (IN `temp_billno` VARCHAR(250), IN `floorid` VARCHAR(10), IN `discount_of` FLOAT, IN `discount_unit` CHAR(1), IN `discount` CHAR(1), IN `discountid` VARCHAR(20), IN `tableno` VARCHAR(100), OUT `billnumber` VARCHAR(16), OUT `Message` VARCHAR(250))  MODIFIES SQL DATA
+proc_bill_split_generate:BEGIN
+  DECLARE commacount,bill_ref_count,table_pax,total_pax,commacount_s INT;
+  DECLARE discount_mode,FLAG_SUCCESS,ENABLE_EXTRA_TAX,EXTRA_PREFIX char(1);
+  DECLARE i,portion,sum_qty_bill,SERIES_SLNO INT;
+  DECLARE bdate,bILLdate varchar(6);
+  DECLARE prefx varchar(3);
+  DECLARE discount_label varchar(10);
+  DECLARE ordernumber,ordernumber_s,servicetaxunit,servicechargeunit,vatunit varchar(15);
+  DECLARE subtotal,finaltotal,discountvalue,sum_extra_tax,tax_exempt_total,taxable_amount,discount_tax_exempt,tax_total decimal(15,3);
+  DECLARE after_roundoff,roundoff_value,discountvalue_P,rate_combo decimal(15,3);
+  DECLARE billno_missed varchar(15);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE discountof float;
+  DECLARE REGENERATE_BILLNO varchar(15);
+  DECLARE order_status varchar(20);
+  DECLARE bill_ref varchar(30);
+  DECLARE nearest_roundoff decimal(5,4);
+  DECLARE check_billno varchar(15);
+  DECLARE bill_custom_message varchar(250);
+  DECLARE bill_steward varchar(50);
+  DECLARE decimal1,branchid int;
+   DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
+  BEGIN
+    ROLLBACK;
+  END;
+  START TRANSACTION;
+  SET FLAG_SUCCESS = 'N';
+  set branchid = 1;
+  SET Message = 'Error..In Bill Generatation';
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+  DELETE FROM tbl_tableorder WHERE ter_portion = 0 OR ter_rate = 0;
+  SET discountvalue = 0.00;
+  SELECT be_branchprefix,be_nearest_roundoff_value,be_decimal INTO prefx,nearest_roundoff,decimal1 FROM
+  tbl_branchmaster WHERE be_branchid = '1';
+  SELECT DISTINCT f.fr_enable_extra_tax,f.fr_extra_prefix,f.fr_bill_series
+      INTO ENABLE_EXTRA_TAX,EXTRA_PREFIX,SERIES_SLNO
+      FROM tbl_floormaster f WHERE f.fr_floorid = floorid ;
+  
+  
+   SELECT SUM(RATE) into rate_combo FROM(SELECT DISTINCT cbd_count_combo_ordering, cbd_combo_total_rate AS RATE  FROM tbl_combo_bill_details  WHERE `cbd_billno` = TEMP_billnumber)Z;
+  
+  
+  if(rate_combo is NULL)THEN
+  SET rate_combo = 0;
+  END IF;
+  
+  SELECT  SUM(bd_amount) INTO  subtotal FROM tbl_tablebilldetails WHERE bd_billno = TEMP_billnumber;
+  
+  if(subtotal is NULL)THEN
+  SET subtotal = 0;
+  END IF;
+  
+  set subtotal = rate_combo + subtotal;
+  
+  UPDATE tbl_tablebillmaster SET bm_subtotal = subtotal  WHERE  bm_billno = TEMP_billnumber;
+  
+  
+  
+  
+  
+  
+  SET finaltotal = 0;
+  SET taxable_amount = 0;
+  SET tax_exempt_total = 0;
+  SET bill_custom_message = NULL;
+  IF(Discount ='Y')THEN
+  BEGIN
+    IF(discountid = '0') THEN
+    BEGIN
+      SET discountof = discount_of;
+      SET discount_mode = discount_unit;
+      SET discountid = NULL;
+    END;
+    ELSE
+    BEGIN
+      SELECT ds_discountof,ds_mode INTO discountof,discount_mode FROM  tbl_discountmaster WHERE ds_discountid = discountid;
+    END;
+    END IF;
+    SET discount_label = NULL;
+    IF(discount_mode = 'P')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(((discountof * subtotal)/100),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+      SET discount_label = CONCAT('(',discountof,'%)');
+    END;
+    ELSEIF(discount_mode = 'V')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(discountof,3);
+      SET discountvalue_P = TRUNCATE(((discountof * 100)/subtotal),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+    END;
+    END IF;
+  END;
+  ELSE
+  BEGIN
+    SET discountvalue = 0.00;
+    SET discount_label = NULL;
+    SET discountid = NULL; 
+  END;
+  END IF;
+  IF(subtotal<0)THEN
+  BEGIN
+      SET Message = 'DISCOUNT GIVEN MORE THAN BILL AMOUNT';
+      LEAVE proc_bill_split_generate;
+  END;
+  ELSEIF(subtotal>0)THEN
+  BEGIN
+    UPDATE tbl_tablebillmaster SET  bm_subtotal_final = subtotal,bm_discountvalue = discountvalue,bm_discountlabel = discount_label,bm_discountid = discountid
+    WHERE bm_billno = temp_billno;
+  END;
+  END IF;
+  IF EXISTS(SELECT * FROM tbl_tablebilldetails WHERE bd_billno = temp_billno AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster
+  WHERE mr_excempt_tax  ='Y'))THEN
+  BEGIN
+    SELECT sum(bd_amount) INTO tax_exempt_total FROM tbl_tablebilldetails
+    WHERE bd_billno = temp_billno AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+    IF(Discount ='Y')THEN
+    BEGIN
+      IF(discount_mode = 'P')THEN
+      BEGIN
+           SET discount_tax_exempt = FORMAT(((discountof * tax_exempt_total)/100),decimal1);
+          SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      ELSEIF(discount_mode = 'V')THEN
+      BEGIN
+           SET discount_tax_exempt = FORMAT(((discountvalue_P * tax_exempt_total)/100),decimal1);
+        SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      END IF;
+    END;
+    END IF;
+    SET taxable_amount = subtotal - tax_exempt_total;
+    SET subtotal = taxable_amount;
+    UPDATE tbl_tablebilldetails SET bd_symbol_for_tax = '*' WHERE bd_billno = temp_billno AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+     SET bill_custom_message = concat('* TAX EXEMPTED AMOUNT - ',FORMAT(tax_exempt_total,decimal1),'/b TAXABLE AMOUNT - ',FORMAT(taxable_amount,decimal1));
+  END;
+   ELSE
+  BEGIN
+   SET taxable_amount = subtotal;
+   SET tax_exempt_total = 0;
+  END;
+  END IF;
+  UPDATE tbl_tablebillmaster SET  bm_tax_exempt = tax_exempt_total,bm_taxable_amount = taxable_amount WHERE bm_billno = temp_billno;
+  IF(taxable_amount > 0 ) THEN
+  BEGIN
+    DELETE FROM `tbl_tablebill_extra_tax_master` WHERE `bem_billno` = temp_billno;
+    CALL proc_tax(temp_billno,'DI',floorid);
+  END;
+  END IF;
+  if exists( select *FROM tbl_tablebill_extra_tax_master WHERE bem_billno = temp_billno)then
+  begin
+    SELECT SUM(bem_total_value)INTO tax_total FROM tbl_tablebill_extra_tax_master WHERE bem_billno = temp_billno;
+  END;
+  ELSE 
+    SET tax_total = 0;
+  END IF;
+  SET finaltotal = taxable_amount  +  tax_exempt_total + tax_total;
+  IF((finaltotal != 0)OR (finaltotal > 0))THEN
+  BEGIN
+    IF(nearest_roundoff =0) THEN
+    BEGIN
+      SET after_roundoff = finaltotal;
+      SET roundoff_value = 0.00;
+    END;
+    ELSE
+    BEGIN
+      SET after_roundoff = (nearest_roundoff *ROUND(finaltotal/ nearest_roundoff));
+      SET roundoff_value =  (after_roundoff - finaltotal);
+    END;
+    END IF;
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = temp_billno) THEN
+    BEGIN
+      SET Message = 'Bill not generated - N1';
+      LEAVE proc_bill_split_generate;
+    END;
+    END IF;
+    SET check_billno = NULL;
+    IF(check_billno IS NULL) THEN
+    BEGIN
+      IF EXISTS(SELECT * FROM tbl_temp_regenerate WHERE order_no IS NULL)then
+      BEGIN
+        SELECT bill_no INTO billno_missed FROM tbl_temp_regenerate WHERE order_no IS NULL LIMIT 1; 
+        DELETE FROM tbl_tablebillmaster WHERE bm_billno = TRIM(billno_missed);
+        DELETE FROM tbl_tablebill_item_discount WHERE  bd_billno = TRIM(billno_missed);
+        DELETE FROM tbl_temp_regenerate WHERE bill_no  = TRIM(billno_missed);
+        DELETE FROM tbl_tablebill_extra_tax_master WHERE bem_billno  = TRIM(billno_missed);
+        DELETE FROM tbl_tablebill_extra_tax_details WHERE bet_billno  = TRIM(billno_missed);
+        SET billnumber = TRIM(billno_missed);
+      END;
+      ELSE
+      BEGIN
+        CALL proc_bill_series_gen('D',EXTRA_PREFIX,SERIES_SLNO,billnumber);
+      END;
+      END IF;
+      SET bill_ref_count = NULL;
+      SELECT ds_bill_ref_dine_in INTO bill_ref_count FROM tbl_datesettings
+      WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+      IF(bill_ref_count = NULL) THEN
+      BEGIN
+        INSERT INTO tbl_datesettings(ds_branchid,ds_date) VALUES(branchid, DAYCLOSEDATE);
+        SELECT ds_bill_ref_dine_in INTO bill_ref_count FROM tbl_datesettings
+        WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+      END;
+      END IF;
+      SET bill_ref = CONCAT('D',bill_ref_count);
+      UPDATE tbl_datesettings SET ds_bill_ref_dine_in = ds_bill_ref_dine_in +1 WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+    END;
+    END IF;
+    UPDATE tbl_tablebillmaster SET bm_billno = billnumber,bm_total= finaltotal, bm_finaltotal = after_roundoff , bm_floorid = floorid,bm_totalpax = total_pax,
+    bm_roundoff_value = roundoff_value,bm_bill_ref= bill_ref,bm_comments =  bill_custom_message
+    WHERE bm_billno = temp_billno;
+    UPDATE tbl_tablebill_item_discount SET bd_billno =billnumber  WHERE bd_billno  = temp_billno;
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = billnumber) THEN
+    BEGIN
+      SET Message = 'Bill not generated - N2';
+      LEAVE proc_bill_split_generate;
+    END;
+    END IF;
+    SET Message = 'Bill generated sucessfully';
+  END;
+  END IF;
+  UPDATE tbl_tabledetails SET ts_status ='Occupied',ts_completed_order = 'Y' WHERE ts_status = 'Billed' AND ((ts_billnumber IS NULL)OR(ts_billnumber = ''));
+  COMMIT;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_comboentry` (IN `orderid` VARCHAR(200), IN `cod_id` VARCHAR(200), IN `combo_pack_id` VARCHAR(200), IN `combo_qty` VARCHAR(200), IN `combo_pack_rate` VARCHAR(200), IN `combo_total_rate` VARCHAR(200), IN `combo_menu_id` VARCHAR(200), IN `combo_menu_qty` VARCHAR(200), IN `slno` VARCHAR(200), IN `floor_id` VARCHAR(200), IN `steward` VARCHAR(200), IN `user_id` VARCHAR(200), IN `pref` VARCHAR(200), IN `dc_date` VARCHAR(200))  NO SQL
+proc_comboentry :BEGIN
+DECLARE orderno, check2, check1 int(11);
+DECLARE CHECK_COUNT int(11);
+DECLARE max_orddering_count,lastid,sp_id  int(11);
+SET max_orddering_count = 1;
+SET lastid=1;
+
+SELECT GET_LOCK('combo_lock', 4)
+  INTO check1;
+
+SELECT  COUNT(*) INTO CHECK_COUNT FROM tbl_combo_ordering_details WHERE cod_orderno = TRIM(orderid) and cod_combo_pack_id = TRIM(combo_pack_id);
+IF (CHECK_COUNT>0)THEN
+  BEGIN
+  SELECT max(cod_count_combo_ordering) INTO sp_id FROM tbl_combo_ordering_details where cod_orderno = TRIM(orderid) and cod_combo_pack_id=TRIM(combo_pack_id) and cod_combo_id=TRIM(cod_id);
+    IF (sp_id IS NOT NULL)THEN
+      BEGIN
+       SELECT COUNT(*) INTO CHECK_COUNT FROM tbl_combo_ordering_details WHERE cod_orderno = TRIM(orderid) and cod_combo_pack_id = TRIM(combo_pack_id) and cod_menu_id=TRIM(combo_menu_id) and cod_count_combo_ordering=TRIM(sp_id);
+          IF (CHECK_COUNT>0)THEN
+            BEGIN
+            SELECT max(cod_count_combo_ordering)  INTO max_orddering_count  FROM tbl_combo_ordering_details;
+            SET max_orddering_count = max_orddering_count+1;
+            END;
+            ELSE
+            BEGIN
+            SELECT max(cod_count_combo_ordering) INTO max_orddering_count FROM tbl_combo_ordering_details WHERE cod_orderno = TRIM(orderid) and cod_combo_pack_id = TRIM(combo_pack_id);
+            SET max_orddering_count = max_orddering_count;
+            END;
+          END IF;
+      END;
+      ELSE
+      BEGIN
+      
+      
+      
+      END;
+    END IF;
+ 
+  
+  END;
+  ELSE
+  BEGIN
+   SELECT max(cod_count_combo_ordering)  INTO max_orddering_count  FROM tbl_combo_ordering_details;
+  SET max_orddering_count = max_orddering_count+1;
+  END;
+  END IF;
+
+
+IF (max_orddering_count IS NULL)THEN
+BEGIN
+SET max_orddering_count=1;
+END;
+END IF;
+
+
+ INSERT INTO tbl_combo_ordering_details(cod_orderno,cod_combo_id,cod_combo_pack_id,cod_combo_qty,cod_combo_pack_rate,cod_combo_total_rate,cod_menu_id,cod_menu_qty,cod_order_status,cod_combo_preference,cod_count_combo_ordering,cod_entry_date,cod_dayclosedate)
+  values(orderid,cod_id,combo_pack_id,combo_qty,combo_pack_rate,combo_total_rate,combo_menu_id,combo_menu_qty,'Added',pref,max_orddering_count,NOW(),dc_date);
+  
+  SELECT max(c.cod_id) INTO lastid FROM tbl_combo_ordering_details c;
+  
+  
+  INSERT INTO tbl_tableorder (ter_orderno,ter_branchid,ter_menuid,ter_portion,ter_qty,ter_orderfrom,ter_entryuser,ter_staff,ter_type,ter_floorid,ter_status,ter_combo_entry_id,ter_preferencetext,ter_count_combo_ordering) 
+  values(orderid,'1',combo_menu_id,'1',combo_qty*combo_menu_qty,'Android_Interface',steward,user_id,'Dinein',floor_id,'Added',lastid,pref,max_orddering_count);
+  SELECT RELEASE_LOCK('combo_lock')
+  INTO check2;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_combo_amount_total` (IN `orderno` VARCHAR(15))  MODIFIES SQL DATA
+BEGIN
+  DECLARE single_total,combo_total,combo_single_total decimal(15,3);
+  DECLARE combo_count INT;
+  DECLARE combo_done INT DEFAULT FALSE;
+  DECLARE combocur1 CURSOR FOR SELECT DISTINCT(cod_count_combo_ordering),cod_combo_total_rate FROM tbl_combo_ordering_details where cod_orderno = TRIM(orderno);
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET combo_done = TRUE;
+  
+  SET combo_total = 0;
+  OPEN combocur1;
+  read_loop: LOOP
+
+  FETCH combocur1 INTO combo_count,combo_single_total;
+  
+  IF combo_done THEN
+    
+  LEAVE read_loop;
+  END IF;
+    
+      set combo_total = combo_total + combo_single_total;
+  END LOOP;
+  UPDATE  tbl_tabledetails SET ts_totalamount = ts_totalamount+combo_total WHERE ts_orderno = TRIM(orderno);
+  CLOSE combocur1;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_combo_bill_details_entry` (IN `ordernumber` VARCHAR(100), IN `billnumber` VARCHAR(16))  MODIFIES SQL DATA
+BEGIN
+  DECLARE  count_combo_ordering,combo_id,combopack_id,combo_qty,combo_menu_qty,combo_count INT;
+  DECLARE combo_total_rate,combo_pack_rate,rate_combo decimal(15,3);
+  DECLARE combo_menu_id VARCHAR(30);
+  DECLARE dayclosedate DATE;
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE cur1 CURSOR FOR SELECT  `cod_count_combo_ordering`,`cod_combo_id`,`cod_combo_pack_id`,`cod_combo_qty`,cod_combo_pack_rate,`cod_combo_total_rate`,`cod_menu_id`,`cod_menu_qty`,`cod_dayclosedate`  FROM tbl_combo_ordering_details  where  `cod_orderno` IN(ordernumber)  and cod_cancel='N';
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+ 
+  OPEN cur1;
+
+    read_loop: LOOP
+
+      FETCH cur1 INTO count_combo_ordering,combo_id,combopack_id,combo_qty,combo_pack_rate,combo_total_rate,combo_menu_id,combo_menu_qty,dayclosedate;
+      
+      IF done THEN
+
+        LEAVE read_loop;
+      END IF;
+     
+      IF NOT EXISTS(SELECT * FROM  tbl_combo_bill_details WHERE cbd_count_combo_ordering=count_combo_ordering AND cbd_menu_id=combo_menu_id and cbd_billno=billnumber) THEN
+        BEGIN
+          
+            INSERT INTO tbl_combo_bill_details(cbd_billno,cbd_count_combo_ordering,cbd_combo_id,cbd_combo_pack_id,cbd_combo_qty,cbd_combo_pack_rate,cbd_combo_total_rate,cbd_menu_id,cbd_menu_qty,cbd_entry_date,cbd_dayclosedate)
+            VALUES(billnumber,count_combo_ordering,combo_id,combopack_id,combo_qty,combo_pack_rate,combo_total_rate,combo_menu_id,combo_menu_qty,NOW(),dayclosedate);
+            
+            SELECT count(cbd_count_combo_ordering) INTO combo_count from tbl_combo_bill_details where `cbd_billno` = billnumber  and cbd_count_combo_ordering=count_combo_ordering;
+            IF(combo_count=1) THEN
+              SELECT cbd_combo_total_rate into rate_combo FROM tbl_combo_bill_details   WHERE cbd_count_combo_ordering=count_combo_ordering and `cbd_billno` = billnumber limit 1;
+              UPDATE tbl_tablebillmaster set bm_subtotal=bm_subtotal+rate_combo WHERE bm_billno=billnumber;
+              
+            END IF;
+             
+        END;
+      
+      END IF;
+    END LOOP;
+  
+  
+  CLOSE cur1;
+  
+            
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_combo_stock` ()  MODIFIES SQL DATA
+BEGIN
+  DECLARE combo_packid, comboid INT;
+  DECLARE dayclosedate DATE;
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE cur1 CURSOR FOR SELECT cp_id,cp_combo FROM tbl_combo_packs;
+ 
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  TRUNCATE `tbl_combo_stock`;
+  SELECT dc_day into dayclosedate FROM tbl_dayclose WHERE dc_dateclose is null and dc_timeclose is null;
+  OPEN cur1;
+
+    read_loop: LOOP
+
+    FETCH cur1 INTO combo_packid,comboid; 
+
+    IF done THEN
+
+      LEAVE read_loop;
+    END IF;
+      INSERT INTO `tbl_combo_stock`(`cs_pack_id`, `cs_combo_id`, `cs_stock_number`, `cs_stock_status`, `cs_stock_date`, `cs_last_updated`) VALUES (combo_packid,comboid,0,'N',dayclosedate,NOW());
+    END LOOP;
+  CLOSE cur1;
+
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_combo_ta_subtotal_calculation` (IN `billnumber` VARCHAR(16), IN `count_combo_ordering` INT)  MODIFIES SQL DATA
+BEGIN
+  DECLARE  combo_count INT;
+  DECLARE rate_combo decimal(15,3);
+  DECLARE combo_menu_id VARCHAR(30);
+  DECLARE dayclosedate DATE;
+         
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_copyfloorrate` (IN `new_floorid` VARCHAR(10), IN `floorid` VARCHAR(10), OUT `message` VARCHAR(250))  NO SQL
+begin
+  
+  
+
+
+   DELETE FROM  tbl_menuratemaster WHERE mmr_floorid = new_floorid;
+ 
+ 	INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`, `mmr_portion`, `mmr_rate`,mmr_default) SELECT `mmr_menuid`, new_floorid, `mmr_portion`, `mmr_rate`,mmr_default FROM tbl_menuratemaster WHERE mmr_floorid = floorid;
+
+	SET message = 'Rate Copied Successfully';
+
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_credittoroom` (IN `credit_id` VARCHAR(15), IN `cd_billno` VARCHAR(15), IN `roomid` INT, IN `totalamount` DECIMAL(15,2))  NO SQL
+BEGIN
+   DECLARE roomid INT;
+   DECLARE roomno,roomid_expolite,checkinid varchar(50);
+   DECLARE DAYCLOSEDATE DATE;
+
+
+
+
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_credit_entry` (IN `name` VARCHAR(200), IN `mobileno` VARCHAR(20), IN `branchid` BIGINT, IN `credit_type` INT, OUT `credit_id` VARCHAR(20))  NO SQL
+BEGIN
+  DECLARE crm_id int;
+  DECLARE type_name varchar(250);
+  DECLARE companycode varchar(30);
+  IF (mobileno = '') THEN
+  SET mobileno =NULL;
+  END IF;
+  IF (name = '') THEN
+  SET name =NULL;
+  END IF;
+  SELECT `ct_credit_type` INTO type_name FROM `tbl_credit_types` WHERE `ct_creditid` = credit_type;
+  IF(type_name = 'By Guest')THEN
+  BEGIN
+     IF EXISTS(SELECT * FROM `tbl_loyalty_reg` WHERE trim(ly_mobileno)=mobileno)THEN
+    BEGIN
+      SELECT l.ly_id INTO crm_id FROM  tbl_loyalty_reg l WHERE ly_mobileno=mobileno;
+      IF NOT EXISTS(SELECT * FROM tbl_credit_master WHERE crd_guestid = crm_id)THEN
+      BEGIN
+        INSERT INTO `tbl_credit_master`(`crd_id`, `crd_type`, `crd_branchid`, `crd_guestid`) VALUES(0,credit_type,branchid,crm_id);
+      END;
+      END IF;
+    END;
+    ELSE
+    BEGIN
+    UPDATE tbl_branchmaster
+   SET be_loyalityreg_count = be_loyalityreg_count + 1
+ WHERE be_branchid = 1 ;
+      INSERT INTO tbl_loyalty_reg(ly_id,ly_firstname,ly_mobileno)VALUES(0,trim(name),mobileno);
+      SELECT l.ly_id INTO crm_id FROM  tbl_loyalty_reg l WHERE l.ly_firstname = trim(name);
+      INSERT INTO `tbl_credit_master`(`crd_id`, `crd_type`, `crd_branchid`, `crd_guestid`) VALUES(0,credit_type,branchid,crm_id);
+       INSERT INTO tbl_ledger_master(tlm_guest_id,tlm_ledger_name,tlm_group) VALUES(crm_id,trim(name),71);
+    END;
+    END IF;
+    SELECT crd_id INTO credit_id FROM tbl_credit_master WHERE crd_guestid = crm_id;
+  END;
+  ELSEIF(type_name = 'By Company')THEN
+  BEGIN
+    IF EXISTS(SELECT * FROM `tbl_corporatemaster` WHERE `ct_corporatename` = trim(name))THEN
+    BEGIN
+     SELECT ct_corporatecode INTO companycode FROM `tbl_corporatemaster` WHERE `ct_corporatename` = trim(name);
+    END;
+    ELSE
+    BEGIN
+      INSERT INTO `tbl_corporatemaster`(`ct_corporatecode`, `ct_corporatename`) VALUES (0,trim(name));
+      SELECT ct_corporatecode INTO companycode FROM `tbl_corporatemaster` WHERE `ct_corporatename` = trim(name);
+      INSERT INTO `tbl_credit_master`(`crd_id`, `crd_type`, `crd_branchid`, `crd_corporateid`) VALUES(0,credit_type,branchid,companycode);
+    END;
+    END IF;
+    SELECT crd_id INTO credit_id FROM tbl_credit_master WHERE crd_corporateid = companycode;
+  END;
+  END IF;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_dailymenustock` ()  MODIFIES SQL DATA
+BEGIN
+
+ 
+
+TRUNCATE tbl_menustock ;
+CALL proc_stock_dinein();
+ 
+  CALL proc_stock_counter();
+
+ CALL proc_stock_ta();
+
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_dayend` (OUT `message` VARCHAR(100))  NO SQL
+proc_dayend:BEGIN
+    DECLARE maxid bigint;
+    DECLARE SUCCESS CHAR(1);
+    DECLARE DAYCLOSEDATE DATE;
+    DECLARE AREA,auto_close VARCHAR(20);
+    DECLARE loginid VARCHAR(15);
+   
+    SELECT auto_dayclose_time INTO auto_close FROM tbl_generalsettings;
+    
+    SELECT MAX(dc_id) INTO maxid FROM tbl_dayclose;
+
+    SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+    SET SUCCESS = 'Y';
+
+    DELETE FROM `tbl_tabledetails` WHERE ts_status = 'Billed' AND ((ts_billnumber IS NULL)OR(ts_billnumber = ''));
+    DELETE FROM `tbl_takeaway_billmaster` WHERE `tab_billno` LIKE 'TEMP%';
+    DELETE FROM `tbl_takeaway_billmaster` WHERE trim(`tab_billno`)= '';
+
+    IF EXISTS( SELECT * FROM  tbl_branchmaster WHERE be_single_shift = 'N' ) THEN
+    BEGIN
+
+    IF EXISTS( SELECT * FROM tbl_shift_details WHERE sd_close IS NULL) THEN
+    BEGIN
+       
+    
+       SELECT l.ls_username INTO loginid FROM tbl_shift_details d LEFT JOIN tbl_staffmaster s ON s.ser_staffid = d.sd_open_staff LEFT JOIN tbl_logindetails l ON l.ls_staffid = s.ser_staffid LIMIT 1;
+      SET message = concat('OOPS!! Please close the shift of ', loginid ,' for proceeding to dayclose');
+      LEAVE proc_dayend;
+    END;
+    END IF;
+
+    END;
+    END IF;
+    
+    IF EXISTS(SELECT * FROM `tbl_voucherpayment` WHERE `vp_dayclose_date` =  DAYCLOSEDATE   and (`vp_status` NOT IN ('Approved','Cancelled'))) THEN
+    BEGIN
+       SET message = concat('Expense Approval is Pending. Please Approve for proceeding to dayclose');
+      LEAVE proc_dayend;
+    END;
+    END IF;
+
+    IF EXISTS( SELECT * FROM tbl_tabledetails where date(ts_entrydate)  = DAYCLOSEDATE ) THEN
+    BEGIN
+      SET SUCCESS = 'N';
+      SET AREA = 'FINE DINE';
+    END;
+     ELSEIF EXISTS( SELECT * FROM tbl_takeaway_billmaster WHERE tab_paymode IS NULL AND tab_status NOT IN ('Cancelled') AND tab_dayclosedate  = DAYCLOSEDATE) THEN
+    BEGIN
+      SET SUCCESS = 'N';
+      SET AREA = 'TAKE AWAY/COUNTER';
+    END;
+     ELSEIF EXISTS( SELECT * FROM tbl_takeaway_billmaster WHERE tab_status NOT IN ('Cancelled','Closed') AND tab_dayclosedate  = DAYCLOSEDATE) THEN
+    BEGIN
+    
+      SET SUCCESS = 'N';
+      SET AREA = 'TAKE AWAY/COUNTER';
+    END;
+    END IF;
+    
+
+    IF(SUCCESS = 'Y') THEN
+    BEGIN
+      UPDATE `tbl_dayclose` SET `dc_dateclose`= CURRENT_DATE(),`dc_timeclose`= CURRENT_TIME() WHERE dc_id = maxid AND `dc_dateclose` IS NULL;
+     
+      
+      
+       IF(auto_close = 'N') THEN
+       BEGIN
+       DELETE FROM `tbl_temp_tablebillmaster`;
+       DELETE FROM tbl_temp_orderno_details;
+       UPDATE  tbl_tableorder SET ter_orderno_temp = ter_orderno WHERE ter_dayclosedate = DAYCLOSEDATE;
+      
+       DELETE FROM `tbl_tabledetails`;
+       DELETE FROM tbl_tableorder WHERE ((ter_orderno IS NULL) OR (ter_orderno LIKE 'TEMP%'));
+       
+       
+      END;
+      END IF;
+      
+      SET message = 'Day close successfull!';
+    END;
+    ELSE
+     SET message = CONCAT('OOPS! Please Close Pending/Hold Orders In ',AREA,' For Proceeding.');
+    END IF;
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_daystart` (OUT `message` VARCHAR(100))  NO SQL
+BEGIN
+  DECLARE DDMM_TODAY,NEW_FINYEAR,NEW_FINYEAR_CHECK,FINYEAR_START,FINYEAR_END CHAR(4);
+  DECLARE PRESENT_YEAR,PRESENT_YEAR_CHECK TINYINT;
+  DECLARE PRESENT_YEAR_START,PRESENT_YEAR_END,YEAR_END_DATE_NEW DATE;
+
+
+
+  IF NOT EXISTS(SELECT * FROM tbl_dayclose WHERE dc_day= current_date()) THEN
+  BEGIN
+    SELECT be_fin_year_start INTO FINYEAR_START  FROM tbl_branchmaster;
+    SELECT be_fin_year_end INTO FINYEAR_END  FROM tbl_branchmaster;
+    INSERT INTO `tbl_dayclose`(`dc_day`, `dc_id`, `dc_dateopen`, `dc_timeopen`) VALUES (current_date(),0,current_date(),current_time());
+    SET message = 'Day-In successfull!';
+
+    SELECT DATE_FORMAT(current_date(),'%d%m') INTO DDMM_TODAY;
+
+    SELECT `ys_fin_year_end` INTO YEAR_END_DATE_NEW FROM `tbl_yearsettings` WHERE `ys_fin_year_current` = 'Y';
+
+    IF(YEAR_END_DATE_NEW IS NULL)THEN
+    BEGIN
+        SELECT DATE_FORMAT(current_date(),'%y') INTO PRESENT_YEAR;
+        SET NEW_FINYEAR = CONCAT(PRESENT_YEAR,PRESENT_YEAR+1);
+        SELECT DATE_FORMAT(CURDATE(),'%Y-%m-%d') INTO PRESENT_YEAR_START;
+        SET PRESENT_YEAR_END =  DATE_FORMAT(CONCAT(PRESENT_YEAR+1,FINYEAR_END),'%Y-%m-%d');
+        UPDATE tbl_yearsettings SET ys_fin_year_current = 'N';
+        INSERT INTO `tbl_yearsettings`(`ys_fin_year`, `ys_fin_year_current`, `ys_fin_year_start`, `ys_fin_year_end`)
+        VALUES(NEW_FINYEAR,'Y',PRESENT_YEAR_START,PRESENT_YEAR_END);
+    END;
+    ELSE
+    BEGIN
+      IF(DATE_FORMAT(CURDATE(),'%Y-%m-%d')> DATE_FORMAT(YEAR_END_DATE_NEW,'%Y-%m-%d'))THEN
+      BEGIN
+        SELECT DATE_FORMAT(current_date(),'%y') INTO PRESENT_YEAR;
+        SET NEW_FINYEAR = CONCAT(PRESENT_YEAR,PRESENT_YEAR+1);
+        SELECT DATE_FORMAT(CURDATE(),'%Y-%m-%d') INTO PRESENT_YEAR_START;
+        UPDATE tbl_yearsettings SET ys_fin_year_current = 'N';
+        INSERT INTO `tbl_yearsettings`(`ys_fin_year`, `ys_fin_year_current`, `ys_fin_year_start`, `ys_fin_year_end`)
+        VALUES(NEW_FINYEAR,'Y',DATE_FORMAT(CURDATE(),'%Y-%m-%d'),DATE_SUB(DATE_FORMAT(DATE_ADD(CURDATE(), INTERVAL 1 YEAR),'%Y-%m-%d'), INTERVAL 1 DAY));
+      END;
+      END IF;
+    END;
+    END IF;
+
+  END;
+  ELSE
+  BEGIN
+    SET message = 'ERROR!! SALE IS ALREADY CLOSED FOR THE DAY..';
+  END;
+  END IF;
+
+  TRUNCATE tbl_notifications;
+
+  IF EXISTS(SELECT * FROM tbl_menumaster)THEN
+  BEGIN
+    CALL proc_dailymenustock();
+  END;
+  END IF;
+  IF EXISTS(SELECT * FROM tbl_combo_packs)THEN
+  BEGIN
+    CALL proc_combo_stock();
+  END;
+  END IF;
+
+  END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_day_close_revert` (OUT `message` VARCHAR(100))  MODIFIES SQL DATA
+proc_day_close_revert:BEGIN
+   DECLARE revert_date,dayopendate date;
+   DECLARE dayopentime time;
+   
+   
+   IF EXISTS(SELECT * FROM tbl_dayclose WHERE dc_dateclose IS NULL) then
+    begin
+      SET message = 'Day is Already Opened!!';
+
+      LEAVE proc_day_close_revert;
+    end;
+    end if;
+   
+   select max(dc_day) into revert_date from tbl_dayclose;
+   
+   select dc_dateopen,dc_timeopen into dayopendate, dayopentime from tbl_dayclose where dc_day = revert_date;
+   
+   DELETE FROM `tbl_dayclose` WHERE dc_day = revert_date;
+   
+   INSERT INTO `tbl_dayclose`(`dc_day`, `dc_id`, `dc_dateopen`, `dc_timeopen`) VALUES (revert_date,0,dayopendate,dayopentime);
+   
+   CALL proc_dailymenustock();
+   
+   set message = concat('Day close reverted for the day -',revert_date); 
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_discount_add` (IN `mode` CHAR(2), IN `category` VARCHAR(100), IN `dicsount_id` INT, IN `operation` CHAR(1), IN `di` CHAR(1), IN `ta` CHAR(1), IN `cs` CHAR(1), IN `date_limit` CHAR(1), IN `time_limit` CHAR(1), IN `day_limit` CHAR(1), IN `from_date` VARCHAR(50), IN `to_date` VARCHAR(50), IN `from_time` VARCHAR(50), IN `to_time` VARCHAR(50), IN `day_name` VARCHAR(50), OUT `message` VARCHAR(150))  BEGIN
+
+
+
+IF(from_date = '0')then
+ set from_date = NULL;
+END IF;
+
+if(to_date = '0')then
+  set to_date = NULL;
+END IF;
+
+if(day_name ='0')then
+  set day_name = NULL;
+END IF;
+
+IF(from_time= '0')then
+  set from_time = NULL;
+END IF;
+
+IF(to_time= '0')then
+  set to_time = NULL;
+END IF;
+
+
+IF(TRIM(mode) = 'MC')THEN
+BEGIN
+ DELETE FROM tbl_menu_discount WHERE md_menuid IN (SELECT mr_menuid from tbl_menumaster where mr_maincatid = trim(category) and md_discount = dicsount_id);
+  if(operation ='A') then
+  begin
+
+  INSERT INTO `tbl_menu_discount`(`md_menuid`, `md_slno`, `md_discount`, `md_date_limit`, `md_time_limit`, `md_day_limit`, `md_day`, `md_from_date`, `md_to_date`, `md_di_active`, `md_cs_active`, `md_ta_active`, `md_active`, `md_from_time`, `md_to_time`)
+  SELECT mr_menuid,0,dicsount_id,date_limit,time_limit,day_limit,day_name,from_date,to_date,di,cs,ta,'Y',from_time,to_time from tbl_menumaster where mr_maincatid =  trim(category);
+end ;
+end if;
+END;
+ELSEIF(trim(MODE) = 'SC')THEN
+
+BEGIN
+
+ DELETE FROM tbl_menu_discount WHERE md_menuid IN (SELECT mr_menuid from tbl_menumaster where  mr_subcatid= trim(category) and md_discount = dicsount_id);
+  if(operation ='A') then
+  begin
+
+  INSERT INTO `tbl_menu_discount`(`md_menuid`, `md_slno`, `md_discount`, `md_date_limit`, `md_time_limit`, `md_day_limit`, `md_day`, `md_from_date`, `md_to_date`, `md_di_active`, `md_cs_active`, `md_ta_active`, `md_active`, `md_from_time`, `md_to_time`)
+  SELECT mr_menuid,0,dicsount_id,date_limit,time_limit,day_limit,day_name,from_date,to_date,di,cs,ta,'Y',from_time,to_time from tbl_menumaster where mr_subcatid=  trim(category);
+end ;
+end if;
+
+END;
+end if;
+
+
+
+if(operation ='A')then
+SET message = 'Discount Added/changed sucessfully!!';
+else
+SET message = 'Discount Removed sucessfully!!';
+END IF;
+
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_discount_after_bill` (IN `TEMP_billnumber` VARCHAR(16), IN `discount_of` FLOAT, IN `discount_unit` CHAR(1), IN `discount` CHAR(1), IN `discountid` VARCHAR(20), IN `redeem` DECIMAL(15,3), OUT `Message` VARCHAR(250))  NO SQL
+proc_discount_after_bill:BEGIN
+  DECLARE commacount,bill_ref_count,table_pax,total_pax,commacount_s,combo_count INT;
+  DECLARE discount_mode,FLAG_SUCCESS,ENABLE_EXTRA_TAX,EXTRA_PREFIX char(1);
+  DECLARE i,portion,sum_qty_bill,SERIES_SLNO,check2, check1 INT;
+  DECLARE bdate,bILLdate varchar(6);
+  DECLARE prefx varchar(3);
+  DECLARE floorid,discount_label varchar(10);
+  DECLARE ordernumber,ordernumber_s,servicetaxunit,servicechargeunit,vatunit varchar(15);
+  DECLARE del_tax,subtotal,finaltotal,discountvalue,sum_extra_tax,tax_exempt_total,taxable_amount,discount_tax_exempt,tax_total decimal(15,3);
+  DECLARE after_roundoff,roundoff_value,discountvalue_P,rate_combo decimal(15,3);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE discountof float;
+  DECLARE REGENERATE_BILLNO varchar(15);
+  DECLARE order_status varchar(20);
+  DECLARE bill_ref varchar(30);
+  DECLARE uaetax char(1);
+   DECLARE uaeval decimal(15,3);
+  DECLARE nearest_roundoff decimal(5,4);
+  DECLARE check_billno varchar(15);
+  DECLARE bill_custom_message varchar(250);
+  DECLARE bill_steward varchar(50);
+  DECLARE decimal1 int;
+   DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
+  BEGIN
+    ROLLBACK;
+  END;
+  SELECT GET_LOCK('proc_discount_after_bill', 5) INTO check1;
+  START TRANSACTION;
+  /* Exception handler is used to roll back if any error is faced*/
+  SET FLAG_SUCCESS = 'N';
+  SET Message = 'Error..In Bill Generatation';
+
+
+
+
+  SET discountvalue = 0.00;
+
+  SELECT be_branchprefix,be_nearest_roundoff_value,be_decimal INTO prefx,nearest_roundoff,decimal1 FROM
+  tbl_branchmaster;
+
+  SELECT DATE_FORMAT(DAYCLOSEDATE,'%d%m%y') INTO bdate;
+  SET total_pax = 0;
+
+  /*Loop is used to get details of multiple order number combined into one bill */
+
+  SELECT SUM(RATE) INTO rate_combo FROM(SELECT DISTINCT cbd_count_combo_ordering, cbd_combo_total_rate AS RATE  FROM tbl_combo_bill_details  WHERE `cbd_billno` = TEMP_billnumber)Z;
+  
+
+  IF(rate_combo IS NULL)THEN
+  SET rate_combo = 0;
+  END IF;
+  
+  SELECT  SUM(bd_amount) INTO  subtotal FROM tbl_tablebilldetails WHERE bd_billno = TEMP_billnumber;
+  SELECT bm_floorid INTO floorid FROM tbl_tablebillmaster WHERE bm_billno = TEMP_billnumber;
+  
+  IF(subtotal IS NULL)THEN
+  SET subtotal = 0;
+  END IF;
+
+  SET subtotal = rate_combo + subtotal;
+  
+ SELECT be_uae_tax_concept,be_uae_tax_value INTO uaetax,uaeval FROM  tbl_branchmaster;
+
+  UPDATE tbl_tablebillmaster SET bm_subtotal = subtotal,bm_subtotal_final = subtotal  WHERE  bm_billno = TEMP_billnumber;
+
+
+
+  SET finaltotal = 0;
+  SET taxable_amount = 0;
+  SET tax_exempt_total = 0;
+  SET bill_custom_message = NULL;
+ /*Discount calculated for the bill*/
+  SET discountvalue = 0.00;
+  
+  
+  
+  
+/*Discount calculated for the bill*/
+  IF(Discount ='Y')THEN
+  BEGIN
+   
+    IF(discountid = '0') THEN
+    BEGIN
+      SET discountof = discount_of;
+      SET discount_mode = discount_unit;
+      SET discountid = NULL;
+    END;
+    ELSE
+    BEGIN
+      SELECT ds_discountof,ds_mode INTO discountof,discount_mode FROM  tbl_discountmaster WHERE ds_discountid = discountid;
+    END;
+    END IF;
+    SET discount_label = NULL;
+    IF(discount_mode = 'P')THEN
+    BEGIN
+     
+      SET discountvalue = TRUNCATE(((discountof * subtotal)/100),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+      SET discount_label = CONCAT('(',discountof,'%)');
+    END;
+    ELSEIF(discount_mode = 'V')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(discountof,3);
+      SET discountvalue_P = TRUNCATE(((discountof * 100)/subtotal),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+    END;
+    END IF;
+  END;
+  ELSE
+  BEGIN
+    SET discountvalue = 0.00;
+    SET discount_label = NULL;
+    SET discountid = NULL; 
+  END;
+  END IF;
+ 
+ 
+ 
+  /* loyality reddem starts here*/
+  if(redeem>0) then
+  Begin
+    UPDATE tbl_tablebillmaster SET bm_redeem_amount=redeem WHERE bm_billno = TEMP_billnumber;
+    Set subtotal=subtotal-redeem;
+  End;
+  End if;
+  /* loyality ends*/
+
+  /* subtotal less than 0 is checked, sub total less than 0 will be avoided for bill generation and table will be cleared to take another order */
+
+
+if(uaetax =  'Y') then
+  Begin
+  
+    set del_tax=TRUNCATE(subtotal/(1+(uaeval/100)),3);
+  
+    set subtotal=del_tax;
+  
+  End;
+  End if;
+
+IF(subtotal<0)THEN
+  BEGIN
+      SET Message = 'DISCOUNT GIVEN MORE THAN BILL AMOUNT';
+      LEAVE proc_discount_after_bill;
+  END;
+  ELSEIF(subtotal>0)THEN
+  BEGIN
+ 
+    UPDATE tbl_tablebillmaster SET  bm_subtotal_final = subtotal,bm_discountvalue = discountvalue,bm_discountlabel = discount_label,bm_discountid = discountid
+    WHERE bm_billno = TEMP_billnumber;
+  END;
+  END IF;
+
+  /* tax exempt concept - start*/
+  IF EXISTS(SELECT * FROM tbl_tablebilldetails WHERE bd_billno = TEMP_billnumber AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster
+  WHERE mr_excempt_tax  ='Y'))THEN
+  BEGIN
+    SELECT sum(bd_amount) INTO tax_exempt_total FROM tbl_tablebilldetails
+    WHERE bd_billno = TEMP_billnumber AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+   
+    IF(Discount ='Y')THEN
+    BEGIN
+      IF(discount_mode = 'P')THEN
+      BEGIN
+          SET discount_tax_exempt = REPLACE(FORMAT(((discountof * tax_exempt_total)/100),decimal1), ',', ''); 
+          SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      ELSEIF(discount_mode = 'V')THEN
+      BEGIN                        
+        SET discount_tax_exempt = REPLACE(FORMAT(((discountvalue_P * tax_exempt_total)/100),decimal1), ',', '');
+        SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      END IF;
+    END;
+    END IF;
+    
+    SET taxable_amount = subtotal - tax_exempt_total;
+    SET subtotal = taxable_amount;
+    UPDATE tbl_tablebilldetails SET bd_symbol_for_tax = '*' WHERE bd_billno = TEMP_billnumber AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+     SET bill_custom_message = concat('* TAX EXEMPTED AMOUNT - ',FORMAT(tax_exempt_total,decimal1),'/b TAXABLE AMOUNT - ',FORMAT(taxable_amount,decimal1));
+  END;
+   ELSE
+  BEGIN
+   SET taxable_amount = subtotal;
+   SET tax_exempt_total = 0;
+  END;
+  END IF;
+  /* tax exempt concept - end*/
+  
+   
+  UPDATE tbl_tablebillmaster SET  bm_tax_exempt = tax_exempt_total,bm_taxable_amount = taxable_amount WHERE bm_billno = TEMP_billnumber;
+  IF(taxable_amount > 0 ) THEN
+  BEGIN   
+    DELETE FROM `tbl_tablebill_extra_tax_master` WHERE `bem_billno` = TEMP_billnumber;
+      DELETE FROM `tbl_tablebill_extra_tax_details` WHERE `bet_billno` = TEMP_billnumber;
+      
+    CALL proc_tax(TEMP_billnumber,'DI',floorid);
+   
+  END;
+  END IF;
+  IF EXISTS( SELECT *FROM tbl_tablebill_extra_tax_master WHERE bem_billno = TEMP_billnumber)THEN
+  BEGIN
+    SELECT FORMAT(SUM(bem_total_value),decimal1)INTO tax_total FROM tbl_tablebill_extra_tax_master WHERE bem_billno = TEMP_billnumber;
+  END;
+  ELSE
+    SET tax_total = 0;
+  END IF;
+  
+ 
+  SET finaltotal = taxable_amount  +  tax_exempt_total + tax_total;
+  IF((finaltotal != 0)OR (finaltotal > 0))THEN
+  BEGIN
+    IF(nearest_roundoff =0) THEN
+    BEGIN
+      SET after_roundoff = finaltotal;
+      SET roundoff_value = 0.00;
+    END;
+    ELSE
+    BEGIN
+      SET after_roundoff = (nearest_roundoff *ROUND(finaltotal/ nearest_roundoff));
+      SET roundoff_value =  (after_roundoff - finaltotal);
+    END;
+    END IF;
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = TEMP_billnumber) THEN
+    BEGIN
+      SET Message = 'Bill not generated - N1';
+      LEAVE proc_discount_after_bill;
+    END;
+    END IF;
+       SET Message = roundoff_value;
+       
+
+    UPDATE tbl_tablebillmaster SET bm_total= finaltotal, bm_finaltotal = after_roundoff ,
+    bm_roundoff_value = roundoff_value,bm_comments =  bill_custom_message
+    WHERE bm_billno = TEMP_billnumber;
+
+
+           SET Message = '5';
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = TEMP_billnumber) THEN
+    BEGIN
+      SET Message = 'Bill not generated - N2';
+      LEAVE proc_discount_after_bill;
+    END;
+    END IF;
+    SET Message = 'Bill sucessfully Changed';
+  END;
+  END IF;
+  /* to avoid table miss*/
+  /* */
+  COMMIT;
+   SELECT RELEASE_LOCK('proc_discount_after_bill') INTO check2;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_extra_tax_change` (IN `mode` CHAR(2), IN `category` VARCHAR(100), IN `tax_id` INT, IN `operation` CHAR(1), OUT `message` VARCHAR(150))  BEGIN
+
+
+IF(TRIM(mode) = 'MC')THEN
+BEGIN
+ DELETE FROM `tbl_menu_tax_master` WHERE `mtm_menuid` IN (SELECT mr_menuid from tbl_menumaster where mr_maincatid = trim(category) and mtm_tax_id = tax_id  );
+if(operation ='A') then
+begin
+ INSERT INTO `tbl_menu_tax_master`(`mtm_menuid`, `mtm_tax_id`) SELECT mr_menuid,tax_id from tbl_menumaster where mr_maincatid =  trim(category);
+end ;
+end if;
+
+END;
+ELSEIF(trim(MODE) = 'SC')THEN
+BEGIN
+ DELETE FROM `tbl_menu_tax_master` WHERE `mtm_menuid` IN (SELECT mr_menuid from tbl_menumaster where mr_subcatid= trim(category) and mtm_tax_id = tax_id);
+if(operation ='A') then
+begin
+INSERT INTO `tbl_menu_tax_master`(`mtm_menuid`, `mtm_tax_id`) SELECT mr_menuid,tax_id from tbl_menumaster where mr_subcatid=  trim(category);
+end ;
+end if;
+
+END;
+ELSEIF(trim(MODE) = 'DT')THEN
+BEGIN
+ DELETE FROM `tbl_menu_tax_master` WHERE `mtm_menuid` IN (SELECT mr_menuid from tbl_menumaster where mr_diet = trim(category) and mtm_tax_id = tax_id);
+if(operation ='A') then
+begin
+INSERT INTO `tbl_menu_tax_master`(`mtm_menuid`, `mtm_tax_id`) SELECT mr_menuid,tax_id from tbl_menumaster where mr_diet = trim(category);
+end ;
+end if;
+
+
+END;
+END IF;
+
+if(operation ='A')then
+SET message = 'Extra Tax Added/changed sucessfully!!';
+else
+SET message = 'Extra Tax Removed sucessfully!!';
+END IF;
+
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_function_invoice` (IN `temp_invoice` VARCHAR(50), OUT `invoice_number` VARCHAR(50))  NO SQL
+begin
+ 
+ 
+  DECLARE INVOICE INT;
+  DECLARE finyear char(4);
+  
+  
+  SELECT ys_fin_year,ys_function_invoice
+  INTO finyear,INVOICE FROM tbl_yearsettings WHERE ys_fin_year_current = 'Y';
+  
+  SET invoice_number = CONCAT('I',finyear,INVOICE); 
+
+        
+  UPDATE tbl_yearsettings SET ys_function_invoice = ys_function_invoice +1 WHERE ys_fin_year_current = 'Y';
+  UPDATE `tbl_function_invoice` SET `fi_invoice_no`= invoice_number WHERE fi_invoice_no = temp_invoice;
+  
+  UPDATE  tbl_function_invoice_extras SET fi_invoice_no = invoice_number WHERE fi_invoice_no = temp_invoice;
+   
+
+
+
+
+end$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_function_register` (IN `Func_temp_id` VARCHAR(50), IN `Func_total_rate` FLOAT, OUT `function_id` VARCHAR(50))  NO SQL
+begin
+  
+  
+  DECLARE function_count INT;
+  DECLARE finyear char(4);
+  
+  SELECT ys_fin_year,ys_function_count
+  INTO finyear,function_count FROM tbl_yearsettings WHERE ys_fin_year_current = 'Y';
+  
+  SET function_id = CONCAT('F',finyear,function_count); 
+
+        
+  UPDATE tbl_yearsettings SET ys_function_count = ys_function_count +1 WHERE ys_fin_year_current = 'Y';
+  UPDATE `tbl_function_details` SET `fd_id`= function_id,fd_total_rate = Func_total_rate WHERE fd_id = Func_temp_id;
+  
+  UPDATE  tbl_function_details_menu SET fdm_function_id = function_id WHERE fdm_function_id = Func_temp_id;
+   
+  INSERT INTO `tbl_loyalty_reg`(`ly_id`, `ly_firstname`, `ly_mobileno`, `ly_emailid`, `ly_mailreceive`)
+  select 0,fd_customer,fd_mobile_1,fd_email,'Y' FROM tbl_function_details WHERE (fd_customer IS NOT NULL) AND `fd_id` = function_id;
+
+
+
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_gencounter` (IN `temp_billno` VARCHAR(15), IN `branchid` BIGINT, IN `discount` CHAR(1), IN `discount_of` FLOAT, IN `discount_unit` CHAR(1), IN `discountid` VARCHAR(20), IN `loginid` VARCHAR(15), OUT `new_billno` VARCHAR(15), OUT `new_kotno` VARCHAR(20), OUT `message` VARCHAR(250))  MODIFIES SQL DATA
+proc_gencounter:BEGIN
+  DECLARE prefix varchar(3);
+  DECLARE bdate varchar(6);
+  DECLARE finyear char(4);
+  DECLARE billno_daily,discount_mode,kotbypass,ENABLE_EXTRA_TAX char(1);
+  DECLARE billcount,custcount,bill_ref_count,SERIES_SLNO INT;
+  DECLARE nearest_round_off decimal(5,4);
+  DECLARE status_tobe varchar(100);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE discountof float;
+  DECLARE servicetaxunit,servicechargeunit,vatunit varchar(15);
+  DECLARE servicetax,vat,takeaway_servicecharge,servicecharge, subtotal,finaltotal,discountvalue,sum_extra_tax,tax_exempt_total,taxable_amount,discount_tax_exempt decimal(15,3);
+  DECLARE afterservicetax,aftervat,afterservicecharge,inservicecharge,after_roundoff,roundoff_value,discountvalue_P decimal(15,3);
+  DECLARE discount_label varchar(10);
+  DECLARE bill_ref varchar(30);
+  DECLARE bill_custom_message varchar(250);
+
+
+  SET Message = 'Error..In Bill Generatation';
+
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+
+  SELECT be_branchprefix
+  INTO prefix
+  FROM tbl_branchmaster
+  WHERE be_branchid = branchid;
+
+  SELECT bsc_nearest_roundoff,bsc_kotbypass,bsc_bill_series
+  INTO nearest_round_off,kotbypass,SERIES_SLNO
+  FROM tbl_branch_settings_counter
+  WHERE bsc_branchid = branchid;
+  
+  SET billcount = 0;
+  SELECT DATE_FORMAT(DAYCLOSEDATE,'%d%m%y') INTO bdate;
+
+
+
+  SELECT tab_subtotal INTO subtotal FROM tbl_takeaway_billmaster WHERE tab_dayclosedate=DAYCLOSEDATE and tab_billno = temp_billno ;
+  SET afterservicecharge = 0;
+  SET afterservicetax = 0;
+  SET aftervat =0;
+  SET finaltotal = 0;
+  SET taxable_amount = 0;
+  SET tax_exempt_total = 0;
+  SET bill_custom_message = NULL;
+  
+  SET discountvalue= 0;
+    IF(discount ='Y')THEN
+  BEGIN
+    IF(discountid != "") THEN
+     BEGIN
+      SELECT ds_discountof,ds_mode INTO discountof,discount_mode FROM  tbl_discountmaster WHERE ds_discountid = discountid;
+     END;
+     ELSEIF (discountid = "") THEN
+     BEGIN
+        SET discountof = discount_of;
+        SET discount_mode = discount_unit;
+     END;
+     END IF;
+
+
+      SET discount_label = NULL;
+      IF(discount_mode = 'P')THEN
+      BEGIN
+          SET discountvalue = ((discountof * subtotal)/100);
+       SET subtotal = (subtotal - discountvalue);
+       SET discount_label = CONCAT('(',discountof,'%)');
+      END;
+      ELSEIF(discount_mode = 'V')THEN
+      BEGIN
+        SET discountvalue = discountof;
+        SET discountvalue_P = ((discountof * 100)/subtotal);
+        SET subtotal = (subtotal - discountvalue);
+
+      END;
+      END IF;
+  END;
+  END IF;
+
+
+
+
+  /* tax exempt concept - start*/
+  
+  IF EXISTS(SELECT * FROM tbl_takeaway_billdetails WHERE tab_billno = temp_billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster 
+  WHERE mr_excempt_tax  ='Y'))then 
+  begin
+    
+    SELECT sum(tab_amount) into tax_exempt_total FROM tbl_takeaway_billdetails 
+    WHERE tab_billno = temp_billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');    
+    
+    IF(discount ='Y')THEN
+    BEGIN
+      IF(discount_mode = 'P')THEN
+      BEGIN
+          SET discount_tax_exempt = ((discountof * tax_exempt_total)/100);
+          SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      ELSEIF(discount_mode = 'V')THEN
+      BEGIN
+        SET discount_tax_exempt = ((discountvalue_P * tax_exempt_total)/100);
+        SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+
+      END;
+      END IF;
+    END;
+    END IF;
+  
+    SET taxable_amount = subtotal - tax_exempt_total;
+    SET subtotal = taxable_amount;
+    
+    UPDATE tbl_takeaway_billdetails SET tab_symbol_for_tax = '*' WHERE 	tab_billno = temp_billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');  
+    
+    SET bill_custom_message = concat('* TAX EXEMPTED AMOUNT - ',tax_exempt_total,'/b TAXABLE AMOUNT - ',taxable_amount);
+  
+  end;
+   ELSE 
+  BEGIN
+   SET taxable_amount = subtotal;
+  END; 
+  END IF;
+  
+  /* tax exempt concept - end*/
+
+
+  IF(taxable_amount > 0 ) THEN
+  BEGIN
+
+   CALL proc_tax(temp_billno,'CS','');
+  END;
+  END IF;  
+    
+  SET finaltotal = taxable_amount + tax_exempt_total;  
+    
+    
+    
+    
+    
+    
+  IF((kotbypass = 'Y')OR(kotbypass = NULL)OR(TRIM(kotbypass) = ''))THEN
+    SET status_tobe = 'Closed';
+  ELSEIF(kotbypass = 'N')THEN
+    SET status_tobe = 'Processing';
+  END IF;
+  
+  IF(finaltotal != 0)THEN
+  BEGIN
+    IF(billno_daily = 'N')THEN
+    BEGIN
+         
+    END;
+    ELSEIF(billno_daily = 'Y')THEN
+    BEGIN
+
+    END;
+    END IF;
+    
+    
+    SET bill_ref_count = 0; 
+    SELECT ds_bill_ref_counter INTO bill_ref_count FROM tbl_datesettings
+    WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+
+    IF(bill_ref_count = 'NULL') THEN
+      BEGIN
+        INSERT INTO tbl_datesettings(ds_branchid,ds_date) VALUES(branchid, DAYCLOSEDATE);
+        SELECT ds_bill_ref_counter INTO bill_ref_count FROM tbl_datesettings 
+        WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+        
+    END;
+    END IF;
+     CALL proc_bill_series_gen('C',NULL,SERIES_SLNO,new_billno);
+    SET bill_ref = CONCAT('C',bill_ref_count);
+    UPDATE tbl_datesettings SET ds_bill_ref_counter = ds_bill_ref_counter +1 WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+    
+    
+
+    IF(discountid != "") THEN
+    BEGIN
+      UPDATE tbl_takeaway_billmaster SET tab_discountid = discountid WHERE tab_billno = temp_billno;
+      END;
+    END IF;
+    UPDATE tbl_takeaway_billdetails SET tab_status = status_tobe WHERE tab_billno = temp_billno;
+    
+        IF(ENABLE_EXTRA_TAX='Y')then
+    begin
+      CALL proc_menu_extra_tax(temp_billno,'CS');
+      SELECT SUM(tbe_total_value) into sum_extra_tax from tbl_takeaway_bill_extra_tax_master where tbe_billno = temp_billno;
+      if(sum_extra_tax>0)then
+      set finaltotal = finaltotal + sum_extra_tax; 
+      end if;
+    end;
+    end if;
+    
+    if(nearest_round_off =0) THEN
+    BEGIN
+      set after_roundoff = finaltotal;
+      SET roundoff_value = 0.00;
+    END;
+    ELSE 
+    BEGIN
+      set after_roundoff = (nearest_round_off *ROUND(finaltotal/ nearest_round_off));
+       set roundoff_value =  (after_roundoff - finaltotal);
+    END;
+    END IF;
+    
+     
+    
+    CALL proc_genkotno(new_kotno,branchid,'COUNTER-SALE','1');
+    
+   
+    UPDATE tbl_takeaway_billmaster SET tab_billno = new_billno,tab_kotno=trim(new_kotno),
+    tab_total= finaltotal,
+    tab_netamt = after_roundoff,tab_status = status_tobe,
+    tab_hd = 'N',tab_discountvalue = discountvalue,tab_discount_label = discount_label,tab_mode = 'CS',
+    tab_payment_settled ='N',tab_mode_of_entry ='G',tab_roundoff_value = roundoff_value, tab_bill_ref = bill_ref,tab_loginid = trim(loginid),
+    tab_comments =  bill_custom_message, tab_tax_exempt = tax_exempt_total,tab_taxable_amount = taxable_amount
+    WHERE tab_billno = temp_billno;
+    SET Message = 'Bill and Kot generated sucessfully';
+    
+  END;
+  ELSEIF(finaltotal = 0) THEN
+  BEGIN
+    SET Message = 'Bill and Kot Not Generated';
+    LEAVE proc_gencounter;
+  END;
+  END IF;
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_gencounter_bill` (IN `temp_billno` VARCHAR(15), IN `branchid` BIGINT, IN `discount` CHAR(1), IN `discount_of` FLOAT, IN `discount_unit` CHAR(1), IN `discountid` VARCHAR(20), IN `loginid` VARCHAR(20), IN `table_name` VARCHAR(50), IN `pax` VARCHAR(50), IN `redeem` DECIMAL(15,3), OUT `new_billno` VARCHAR(15), OUT `message` VARCHAR(250))  MODIFIES SQL DATA
+proc_gencounter_bill:BEGIN
+  DECLARE prefix varchar(3);
+  DECLARE bdate varchar(6);
+  DECLARE new_kotno varchar(250); 
+  DECLARE finyear char(4);
+  DECLARE billno_daily,discount_mode char(1);
+  DECLARE billcount,custcount,bill_ref_count,SERIES_SLNO INT;
+  DECLARE nearest_round_off decimal(5,4);
+  DECLARE status_tobe varchar(100);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE discountof float;
+  DECLARE del_tax,subtotal_exempt_disc,subtotal,finaltotal,discountvalue,sum_extra_tax,tax_exempt_total,taxable_amount,discount_tax_exempt decimal(15,3);
+  DECLARE after_roundoff,second_digit,roundoff_value,discountvalue_P,tax_total,rate_combo decimal(15,3);
+  DECLARE discount_label varchar(10);
+  DECLARE bill_ref varchar(30);
+  DECLARE bill_custom_message varchar(250);
+  DECLARE decimal1 int;
+  DECLARE uaetax char(1);
+  DECLARE uaeval decimal(15,3);
+  DECLARE regen_status varchar(20);
+  DECLARE decimal_part,dd decimal(15,3);
+   
+  
+  SET Message = 'Error..In Bill Generatation';
+  
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+  IF((trim(discountid) = 'none')or(trim(discountid) = '')or(trim(discountid) = '0'))then
+    set  discountid = NULL;
+  END IF;
+  IF(trim(table_name) = '')then
+    set  table_name = NULL;
+  END IF;
+   IF(trim(pax) = '')then
+    set  pax = NULL;
+  END IF;
+  SELECT be_branchprefix,be_decimal INTO prefix,decimal1 FROM tbl_branchmaster WHERE be_branchid = branchid;
+  
+  SELECT bsc_nearest_roundoff,bsc_bill_series INTO nearest_round_off,SERIES_SLNO FROM tbl_branch_settings_counter WHERE bsc_branchid = branchid;
+  SET status_tobe = 'Bill_Generated';
+  SELECT DATE_FORMAT(DAYCLOSEDATE,'%d%m%y') INTO bdate;
+  
+  SELECT SUM(RATE) into rate_combo FROM(SELECT DISTINCT cbd_count_combo_ordering, cbd_combo_total_rate AS RATE  FROM tbl_combo_bill_details_ta WHERE `cbd_billno` = temp_billno)Z;
+   
+  if(rate_combo is NULL)THEN
+  SET rate_combo = 0;
+  END IF;
+  
+   
+ SELECT sum(`tab_amount`) INTO subtotal FROM `tbl_takeaway_billdetails` WHERE `tab_billno` = temp_billno and tab_count_combo_ordering IS NULL;
+  
+ 
+  
+  if(subtotal is NULL)THEN
+  SET subtotal = 0;
+  END IF;
+  
+  set subtotal = rate_combo + subtotal;
+
+SELECT be_uae_tax_concept,be_uae_tax_value INTO uaetax,uaeval FROM  tbl_branchmaster;
+  
+  
+   
+  UPDATE tbl_takeaway_billmaster SET tab_subtotal = subtotal  WHERE tab_billno = temp_billno;
+  
+SELECT tab_regen_status INTO regen_status FROM  tbl_takeaway_billmaster where  tab_billno = temp_billno;
+
+SET subtotal_exempt_disc = 0;
+SELECT sum(`tab_amount`) INTO subtotal_exempt_disc FROM `tbl_takeaway_billdetails` WHERE `tab_billno` = temp_billno and tab_count_combo_ordering IS NULL and tab_exempt_disc='N';
+ 
+  if(subtotal_exempt_disc is NULL)THEN
+  SET subtotal_exempt_disc = 0;
+  END IF;
+  
+set subtotal_exempt_disc=subtotal_exempt_disc+rate_combo;
+
+
+  SET finaltotal = 0;
+  SET taxable_amount = 0;
+  SET tax_exempt_total = 0;
+  SET bill_custom_message = NULL;
+  IF(discount = 'Y')THEN
+  BEGIN
+    IF(discountid IS NOT NULL) THEN
+     BEGIN
+      SELECT ds_discountof,ds_mode INTO discountof,discount_mode FROM  tbl_discountmaster WHERE ds_discountid = discountid;
+     END;
+     ELSEIF (discountid IS NULL) THEN
+     BEGIN
+        SET discountof = discount_of;
+        SET discount_mode = discount_unit;
+        SET discountid = NULL;
+     END;
+     END IF;
+    IF(discount_mode = 'P')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(((discountof * subtotal_exempt_disc)/100),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+      SET discount_label = CONCAT('(',discountof,'%)');
+    END;
+    ELSEIF(discount_mode = 'V')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(discountof,3);
+      SET discountvalue_P = TRUNCATE(((discountof * 100)/subtotal_exempt_disc),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+    END;
+    END IF;
+  END;
+  ELSE
+  BEGIN
+    SET discountvalue = 0.00;
+    SET discount_label = NULL;
+    SET discountid = NULL; 
+    set discountof = 0.00;
+   
+  END;
+  END IF;
+  
+ 
+ 
+  
+  if(redeem>0) then
+  Begin
+    UPDATE tbl_takeaway_billmaster SET tab_redeem_amount=redeem WHERE tab_billno = temp_billno;
+    Set subtotal=subtotal-redeem;
+  End;
+  End if;
+  
+   if(uaetax =  'Y') then
+  Begin
+  
+    set del_tax=subtotal/(1+(uaeval/100));
+  
+      set subtotal=TRUNCATE(del_tax,3); 
+       
+  End;
+  End if;
+  
+  
+   IF(subtotal<0)THEN
+  BEGIN
+      SET Message = 'DISCOUNT GIVEN MORE THAN BILL AMOUNT';
+      LEAVE proc_gencounter_bill;
+  END;
+  ELSEIF(subtotal>0)THEN
+  BEGIN
+    UPDATE tbl_takeaway_billmaster SET  tab_subtotal_final = subtotal,tab_discountvalue = discountvalue,tab_discount_label = discount_label,
+    tab_discountid = discountid,tab_discount_mode = discount_mode,tab_discount_of =discountof
+    WHERE tab_billno = temp_billno;
+  END;
+  END IF;
+  IF EXISTS(SELECT * FROM tbl_takeaway_billdetails WHERE tab_billno = temp_billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster 
+  WHERE mr_excempt_tax  ='Y'))then 
+  begin
+    SELECT sum(tab_amount) into tax_exempt_total FROM tbl_takeaway_billdetails 
+    WHERE tab_billno = temp_billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');    
+    IF(discount ='Y')THEN
+    BEGIN
+      IF(discount_mode = 'P')THEN
+      BEGIN
+          SET discount_tax_exempt = REPLACE(FORMAT(((discountof * tax_exempt_total)/100),decimal1), ',', ''); 
+          SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      ELSEIF(discount_mode = 'V')THEN
+      BEGIN
+        SET discount_tax_exempt = REPLACE(FORMAT(((discountvalue_P * tax_exempt_total)/100),decimal1), ',', '');
+        SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      END IF;
+    END;
+    END IF;
+    SET taxable_amount = subtotal - tax_exempt_total;
+    
+    
+    SET subtotal = taxable_amount;
+    UPDATE tbl_takeaway_billdetails SET tab_symbol_for_tax = '*' WHERE 	tab_billno = temp_billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');  
+    SET bill_custom_message = concat('* TAX EXEMPTED AMOUNT - ',FORMAT(tax_exempt_total,decimal1),'/b TAXABLE AMOUNT - ',FORMAT(taxable_amount,decimal1));
+  end;
+  ELSE 
+  BEGIN
+    SET taxable_amount = subtotal;
+    SET tax_exempt_total = 0;
+    
+    
+  END; 
+  END IF;
+  
+   
+  
+  UPDATE tbl_takeaway_billmaster SET  tab_tax_exempt = tax_exempt_total,tab_taxable_amount = taxable_amount WHERE tab_billno = temp_billno;
+  IF(taxable_amount > 0 ) THEN
+  BEGIN
+   DELETE FROM `tbl_takeaway_bill_extra_tax_master` WHERE `tbe_billno` = temp_billno;
+    CALL proc_tax(temp_billno,'CS','');
+  END;
+  END IF; 
+  if exists( select * FROM  tbl_takeaway_bill_extra_tax_master WHERE tbe_billno = temp_billno)then
+  begin
+        
+    SELECT REPLACE(FORMAT(SUM(tbe_total_value),decimal1), ',', '') INTO tax_total FROM tbl_takeaway_bill_extra_tax_master WHERE tbe_billno = temp_billno;
+  END;
+  ELSE 
+    SET tax_total = 0;
+  END IF;
+  SET finaltotal = taxable_amount+ tax_exempt_total + tax_total;
+  IF((finaltotal != 0)or (finaltotal < 0))THEN
+  BEGIN
+  
+   CALL proc_genkotno(new_kotno,branchid,'COUNTER-SALE',loginid);
+  
+   IF (regen_status !='Y')
+         THEN
+            BEGIN
+               CALL proc_bill_series_gen('C',NULL,SERIES_SLNO,new_billno);
+            END;
+         ELSEIF (regen_status ='Y')
+         THEN
+            BEGIN
+                SET new_billno = temp_billno;
+               
+               
+            END;
+         END IF;
+  
+    
+   
+    IF (regen_status !='Y')
+         THEN
+            BEGIN
+    
+    SET bill_ref_count = NULL;
+    SELECT ds_bill_ref_counter INTO bill_ref_count FROM tbl_datesettings
+    WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+    IF(bill_ref_count IS NULL) THEN
+      BEGIN
+        INSERT INTO tbl_datesettings(ds_branchid,ds_date) VALUES(branchid, DAYCLOSEDATE);
+        SELECT ds_bill_ref_counter INTO bill_ref_count FROM tbl_datesettings
+        WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+    END;
+    END IF;
+    SET bill_ref = CONCAT('C',bill_ref_count);
+    UPDATE tbl_datesettings SET ds_bill_ref_counter = ds_bill_ref_counter +1 WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+    
+    END;
+         ELSEIF (regen_status ='Y')
+         THEN
+            BEGIN
+            
+             SELECT tab_bill_ref
+               INTO bill_ref
+               FROM tbl_takeaway_billmaster
+               WHERE tab_bill_reorder = temp_billno;
+            
+        
+            END;
+         END IF;
+    
+    
+    
+    UPDATE tbl_takeaway_billdetails SET tab_status = status_tobe WHERE tab_billno = temp_billno;
+    UPDATE tbl_combo_bill_details_ta SET cbd_order_status = status_tobe WHERE cbd_billno = temp_billno;
+    if(nearest_round_off =0) THEN
+    BEGIN
+     
+     
+     if(uaetax =  'Y')
+
+             THEN
+              BEGIN
+
+               SET second_digit = FLOOR(finaltotal * 100) MOD 10;
+               
+                IF second_digit >= 5 THEN
+                 SET finaltotal = ROUND(finaltotal, 1);  -- Round up
+                ELSE
+        SET finaltotal = FLOOR(finaltotal * 10) / 10;  -- Round down 
+               END IF;
+               
+               SET after_roundoff = ROUND(finaltotal,3);
+               
+               END;
+               ELSE
+               BEGIN
+               
+                SET after_roundoff =finaltotal;
+               
+                END;
+
+                END IF;
+     
+     
+      SET roundoff_value = 0.00;
+      
+    END;
+    ELSE 
+    BEGIN
+      set after_roundoff = (nearest_round_off*ROUND(finaltotal/nearest_round_off));
+      set roundoff_value =  (after_roundoff - finaltotal);
+    END;
+    END IF;
+    
+   
+    
+    
+    
+    
+     
+     
+     UPDATE tbl_takeaway_billdetails
+         SET tab_kotno_new = new_kotno
+         WHERE tab_billno = temp_billno and tab_regen_status_menu='N' ;
+     
+      UPDATE tbl_takeaway_item_discount
+         SET tbd_billno = new_billno
+         WHERE tbd_billno = temp_billno;
+         
+         
+      
+     
+    UPDATE tbl_takeaway_billmaster SET tab_billno = new_billno,tab_total= finaltotal,tab_kotno=trim(new_kotno),
+    tab_netamt = after_roundoff,tab_status = status_tobe,tab_hd = 'N',tab_mode = 'CS',tab_payment_settled ='N',tab_mode_of_entry ='GS',
+    tab_roundoff_value = roundoff_value, tab_bill_ref = bill_ref,tab_loginid = loginid,tab_comments =  bill_custom_message, tab_table_no = table_name, tab_no_pax = pax
+    WHERE tab_billno = temp_billno;
+    SET Message = 'Bill generated sucessfully';
+  END;
+  ELSEIF(finaltotal = 0) THEN
+  BEGIN
+    SET Message = 'Bill Not Generated';
+    LEAVE proc_gencounter_bill;
+  END;
+  END IF;
+  
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_gencounter_billsettle_kot` (IN `billno` VARCHAR(15), IN `branchid` BIGINT, IN `paymodeid` INT, IN `amountpaid` DECIMAL(15,2), IN `upiamount` DECIMAL(15,3), IN `upitxnid` VARCHAR(100), IN `transactionamount` DECIMAL(15,2), IN `card_bank` INT, IN `complementary` CHAR(1), IN `remark` VARCHAR(200), IN `voucherid` VARCHAR(20), IN `couponcompany` VARCHAR(100), IN `couponamt` DECIMAL(15,2), IN `chequeno` VARCHAR(150), IN `chequebankname` VARCHAR(150), IN `chequeamount` DECIMAL(15,2), IN `credit` CHAR(1), IN `creditmasterid` VARCHAR(15), IN `creditamount` DECIMAL(15,2), IN `balanceamt` DECIMAL(15,2), IN `complementary_staff` VARCHAR(50), IN `mode` CHAR(2), IN `payment_login` CHAR(15), IN `credit_remark_cs` CHAR(250), OUT `kotno` VARCHAR(20), IN `order_confirming_staff` VARCHAR(50), OUT `message` VARCHAR(250))  MODIFIES SQL DATA
+proc_gencounter_billsettle_kot:BEGIN
+   DECLARE commacount,i INT;
+    DECLARE orderno VARCHAR(250);
+    DECLARE ordernumber VARCHAR(15);
+    DECLARE mnakingcost decimal(15,2);
+    DECLARE BillSplit,kotbypass char(1);
+    DECLARE MAIN_BILLNO VARCHAR(15);
+    DECLARE MODE_OF_ORDER VARCHAR(30);
+    DECLARE status varchar(100);
+    DECLARE mode_of_entry CHAR(3);
+    DECLARE kot_check VARCHAR(250);
+    DECLARE DAYCLOSE DATE;
+    DECLARE payment_mode     VARCHAR(15);
+    DECLARE balance,bill_final decimal(15,3);
+    DECLARE shift_permission       char(1);
+    DECLARE staff_id VARCHAR(50);
+    DECLARE kot_in VARCHAR(250);
+
+    
+
+    SELECT pym_code INTO payment_mode FROM  tbl_paymentmode WHERE pym_id = paymodeid;
+
+  SELECT dc_day INTO DAYCLOSE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+
+
+    
+  SELECT ser_staffid,ser_shift_permission INTO staff_id,shift_permission
+  FROM tbl_staffmaster s
+  LEFT JOIN tbl_logindetails l ON l.ls_staffid =s.ser_staffid WHERE l.ls_username = payment_login;
+
+  IF(shift_permission = 'Y')THEN
+  BEGIN
+     IF NOT EXISTS(SELECT * FROM `tbl_shift_details` WHERE `sd_open_staff` = staff_id AND `sd_day` =DAYCLOSE AND  `sd_close` IS NULL) THEN
+     BEGIN
+
+      SET MESSAGE = Concat('Please open the shift for the current login');
+      LEAVE proc_gencounter_billsettle_kot;
+
+     END;
+     END IF;
+
+
+  END;
+  END IF;
+  
+
+
+  SELECT tab_netamt INTO bill_final FROM tbl_takeaway_billmaster WHERE tab_billno = billno;
+
+  IF(payment_mode = 'cash')THEN
+  BEGIN
+    SET balance = (amountpaid-bill_final);
+  END;
+  ELSEIF(payment_mode = 'credit')THEN
+  BEGIN
+    IF ((amountpaid = '') OR (amountpaid = 'NULL')OR (amountpaid IS NULL))THEN
+      SET amountpaid =0;
+    END IF;
+
+    SET balance = ((amountpaid+transactionamount)- bill_final);
+  END;
+  ELSEIF(payment_mode = 'coupon')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  ELSEIF(payment_mode = 'voucher')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  ELSEIF(payment_mode = 'cheque')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  ELSEIF(payment_mode = 'credit_person')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  ELSEIF(payment_mode = 'complimentary')THEN
+  BEGIN
+    SET balance = balanceamt;
+    DELETE FROM `tbl_takeaway_bill_extra_tax_master` WHERE `tbe_billno` = billno;
+    UPDATE `tbl_takeaway_billmaster` SET `tab_taxable_amount` = 0, `tab_total` = `tab_subtotal_final`,`tab_taxable_amount` = `tab_subtotal_final`,tab_netamt = tab_subtotal_final,`tab_roundoff_value`= 0
+    WHERE tab_billno = billno;
+  END;
+  ELSEIF(payment_mode = 'upi')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  END IF;
+
+
+    IF((voucherid = '') OR (voucherid = 'NULL'))THEN
+    SET voucherid = NULL;
+    END IF;
+
+    IF((couponcompany = '') OR (couponcompany = 'NULL'))THEN
+    SET couponcompany = NULL;
+    END IF;
+
+     IF((chequeno = '') OR (chequeno = 'NULL'))THEN
+    SET chequeno = NULL;
+    END IF;
+
+    IF((chequebankname = '') OR (chequebankname = 'NULL'))THEN
+    SET chequebankname = NULL;
+    END IF;
+
+    IF((creditmasterid = '') OR (creditmasterid = 'NULL'))THEN
+    SET creditmasterid = NULL;
+    END IF;
+
+    IF((complementary_staff = '') OR (complementary_staff = 'NULL'))THEN
+    SET complementary_staff = NULL;
+    END IF;
+
+     IF((upitxnid = '') OR (upitxnid = 'NULL'))THEN
+    SET upitxnid = NULL;
+    END IF;
+
+      SET MESSAGE = '';
+
+
+    IF EXISTS(SELECT * FROM tbl_takeaway_billmaster WHERE tab_billno = billno AND tab_branchid = branchid AND  tab_paymode IS NOT NULL)THEN
+    BEGIN
+     SET MESSAGE = 'Payment already processed';
+    LEAVE proc_gencounter_billsettle_kot;
+    END;
+    END IF;
+
+
+    IF(credit = 'Y') THEN
+    BEGIN
+        INSERT INTO `tbl_credit_details`(`cd_billno`,cd_modeofentry, `cd_masterid`, `cd_amount`,cd_dayclosedate)VALUES(billno,'CS',creditmasterid,creditamount,DAYCLOSE);
+        
+    END;
+    END IF;
+
+    SELECT bsc_kotbypass INTO kotbypass
+    FROM tbl_branch_settings_counter WHERE bsc_branchid = branchid;
+
+    IF((kotbypass = 'N')OR(kotbypass = NULL)OR(TRIM(kotbypass) = ''))THEN
+      SET status = 'Closed';
+    ELSEIF(kotbypass = 'Y')THEN
+      SET status = 'Processing';
+    END IF;
+
+
+
+    IF(mode = 'TA')THEN
+      SET  MODE_OF_ORDER =  'COUNTER-SALE';
+    ELSEIF(mode = 'CS')THEN
+        SET  MODE_OF_ORDER =  'COUNTER-SALE';
+    END IF;
+
+
+    SELECT tab_mode_of_entry,tab_kotno INTO mode_of_entry,kot_check  FROM tbl_takeaway_billmaster WHERE tab_billno = billno AND tab_branchid = branchid;
+
+    
+    
+    
+    IF(TRIM(kot_check) != '' && TRIM(kot_check) !='NULL' )THEN
+    
+    SET kotno = TRIM(kot_check);
+    ELSE
+      CALL proc_genkotno(kot_in,branchid,'COUNTER-SALE',order_confirming_staff);
+      UPDATE tbl_takeaway_billmaster
+    SET tab_kotno=trim(kot_in) where  tab_billno = billno AND tab_branchid = branchid;
+      SET kotno = TRIM(kot_in);
+    END IF;
+    
+    UPDATE tbl_takeaway_billmaster
+    SET tab_paymode = paymodeid,tab_amountpaid =amountpaid,tab_upi_amount=upiamount,tab_upi_txn_id=upitxnid,tab_transactionamount = transactionamount,tab_amountbalace = balance,tab_transcbank = card_bank,tab_complimentary = complementary, tab_complimentaryremark = remark,tab_voucherid = voucherid,tab_couponcompany = couponcompany,tab_couponamt = couponamt,tab_chequeno= chequeno, tab_chequebankname = chequebankname,
+    tab_chequebankamount = chequeamount, tab_credit = credit, tab_creditmasterid = creditmasterid,tab_status = status,tab_mode = mode ,tab_payment_settled ='Y',tab_settlement_login = payment_login,tab_creditremark=credit_remark_cs,tab_settlement_time = now()
+    WHERE tab_billno = billno AND tab_branchid = branchid;
+    
+    UPDATE tbl_takeaway_billdetails SET tab_status =  status WHERE tab_billno = billno;
+    UPDATE tbl_takeaway_billdetails t, tbl_menumaster m SET t.tab_status = 'Packed' where t.tab_billno = billno and t.tab_menuid = m.mr_menuid and m.mr_show_in_kod = 'N';
+   
+    UPDATE tbl_combo_bill_details_ta SET cbd_order_status = status WHERE cbd_billno = billno;
+    
+
+IF(paymodeid = 2) THEN
+      BEGIN
+
+   UPDATE tbl_bill_card_payments SET mc_billno=billno WHERE mc_billno=concat('temp_',billno);
+END;
+ELSE
+BEGIN
+DELETE FROM tbl_bill_card_payments  WHERE mc_billno=concat('temp_',billno);
+END;
+END IF;
+
+
+  SET message = 'KOT GENERATED & PAYMENT SUCCESSFUL';
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_genkotno` (OUT `kotno` VARCHAR(20), IN `branchid` INT, IN `mode_of_order` VARCHAR(100), IN `order_confirming_staff` VARCHAR(50))  MODIFIES SQL DATA
+BEGIN
+   DECLARE kot int;
+   DECLARE DAYCLOSEDATE DATE;
+   
+   
+    SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+    SET kot = NULL;
+     
+    SELECT ds_kotno INTO kot FROM tbl_datesettings
+    WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+    
+    IF(kot  IS NULL) THEN
+    
+    INSERT INTO tbl_datesettings(ds_branchid,ds_date) VALUES(branchid, DAYCLOSEDATE);
+    
+    SELECT ds_kotno INTO kot FROM tbl_datesettings
+    WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+    
+    END IF;
+    
+    
+      SET kotno = CONCAT('KOT','-',kot);
+        
+      INSERT INTO `tbl_kotmaster`(`kr_date`, `kr_kotno`,kr_time,kr_mode_of_order,kr_order_confirming_staff) VALUES(DAYCLOSEDATE,kotno,CURTIME(),mode_of_order,order_confirming_staff);
+   
+    UPDATE tbl_datesettings SET ds_kotno = ds_kotno +1
+    WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+    
+  
+    
+    END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_gensecretkey` (IN `staffid` VARCHAR(50), OUT `secretkey` VARCHAR(250))  MODIFIES SQL DATA
+BEGIN
+  
+   declare cancelwithkey char(1);
+   declare pw varchar(250);
+   declare passwordstaff varchar(250);
+   
+      IF NOT EXISTS(SELECT * FROM tbl_secretkeymaster WHERE (sr_expiredtime IS  NULL) AND sr_staffid = TRIM(staffid)) THEN
+   BEGIN
+
+    SELECT ser_cancelwithkey INTO cancelwithkey FROM tbl_staffmaster  WHERE ser_staffid = trim(staffid);
+
+   SELECT ls_password INTO passwordstaff FROM tbl_logindetails WHERE ls_staffid = staffid;
+
+        SET secretkey = FLOOR( 1000 + ( RAND( ) *8999 ));
+
+      INSERT INTO `tbl_secretkeymaster`(`sr_staffid`,`sr_password`, `sr_key`, `sr_generatedtime`, `sr_defaultkey`) VALUES(staffid,passwordstaff,secretkey,now(),cancelwithkey);
+
+
+  END;
+  ELSE
+  begin
+      
+     SELECT s.sr_key into secretkey  FROM tbl_secretkeymaster s WHERE (s.sr_expiredtime IS  NULL) AND s.sr_staffid = TRIM(staffid);
+    
+  end;
+  END IF;
+  
+  
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_gentakeaway` (IN `temp_billno` VARCHAR(15), IN `branchid` BIGINT, IN `bmode` CHAR(2), IN `customer` VARCHAR(100), IN `contactno` VARCHAR(20), IN `permanent_address` VARCHAR(300), IN `order_address` VARCHAR(300), IN `landmark` VARCHAR(100), IN `area` VARCHAR(100), IN `remarks` VARCHAR(1000), IN `discount_of` FLOAT, IN `discount_unit` CHAR(1), IN `discount` CHAR(1), IN `discountid` VARCHAR(20), IN `loginid` VARCHAR(20), IN `eat_in` CHAR(1), IN `gst` VARCHAR(20), OUT `new_billno` VARCHAR(15), IN `order_confirming_staff` VARCHAR(50), IN `redeem` DECIMAL(15,3), OUT `kotno` VARCHAR(20))  MODIFIES SQL DATA
+proc_gentakeaway:BEGIN
+   /* Procedure to confirm the cart list of take away module and generate the kot process and bill number*/
+   DECLARE prefix                                                                                                      varchar(3);
+   DECLARE bdate                                                                                                       varchar(6);
+   DECLARE finyear                                                                                                     char(4);
+   DECLARE nearest_round_off                                                                                           decimal(5, 4);
+   DECLARE discount_mode, kotbypass                                                                                    char(1);
+   DECLARE billcount, custcount, bill_ref_count, SERIES_SLNO                                                           INT;
+   DECLARE customerid3, customerid, BILL_REORDER                                                                       varchar(15);
+   DECLARE kotstatus                                                                                                   char(1);
+   DECLARE status_tobe, Message                                                                                        varchar(100);
+   DECLARE DAYCLOSEDATE                                                                                                DATE;
+   DECLARE discountof                                                                                                  float;
+   DECLARE del_tax,subtotal_exempt_disc,subtotal, finaltotal, discountvalue, sum_extra_tax, tax_exempt_total, taxable_amount, discount_tax_exempt   decimal(15, 3);
+   DECLARE after_roundoff,second_digit, roundoff_value, discountvalue_P, tax_total,delivery_charge,rate_combo                                  decimal(15, 3);
+   DECLARE discount_label                                                                                              varchar(10);
+   DECLARE bill_ref                                                                                                    varchar(30);
+   DECLARE eat_in_                                                                                                     varchar(100);
+   DECLARE bill_custom_message                                                                                         varchar(250);
+   DECLARE reorder_kotno                                                                                               VARCHAR(20);
+   DECLARE decimal1,FLOOR_ID                                                                                                    int;
+   DECLARE uaetax char(1);
+  DECLARE uaeval decimal(15,3);
+    DECLARE decimal_part,dd decimal(15,3); 
+   
+  
+   
+   
+   SELECT dc_day
+   INTO DAYCLOSEDATE
+   FROM tbl_dayclose
+   WHERE dc_dateclose IS NULL;
+   IF ((customer = '') OR (customer = 'NULL'))
+   THEN
+      SET customer = NULL;
+   END IF;
+   IF ((contactno = '') OR (contactno = 'NULL'))
+   THEN
+      SET contactno = NULL;
+   END IF;
+   IF ((gst = '') OR (gst = 'NULL'))
+   THEN
+      SET gst = NULL;
+   END IF;
+   IF ((trim(discountid) = 'none')
+       OR (trim(discountid) = '')
+       OR (trim(discountid) = '0'))
+   THEN
+      SET discountid = NULL;
+   END IF;
+   SELECT  be_decimal
+   INTO  decimal1
+   FROM tbl_branchmaster
+   WHERE be_branchid = branchid;
+   SELECT bsth_nearest_roundoff, bsth_kotbypass, bsth_bill_series,bsth_delivery_charge
+   INTO nearest_round_off, kotbypass, SERIES_SLNO,delivery_charge
+   FROM tbl_branch_settings_ta_hd
+   WHERE bsth_branchid = branchid;
+   SET billcount = NULL;
+   SELECT DATE_FORMAT(DAYCLOSEDATE, '%d%m%y')
+   INTO bdate;
+   
+   
+   
+   
+   
+   SELECT SUM(RATE) into rate_combo FROM(SELECT DISTINCT cbd_count_combo_ordering, cbd_combo_total_rate AS RATE  FROM tbl_combo_bill_details_ta WHERE `cbd_billno` = temp_billno)Z;
+   
+  
+  if(rate_combo is NULL)THEN
+  SET rate_combo = 0;
+  END IF;
+  
+ SELECT sum(`tab_amount`) INTO subtotal FROM `tbl_takeaway_billdetails` WHERE `tab_billno` = temp_billno;
+  
+  if(subtotal is NULL)THEN
+  SET subtotal = 0;
+  END IF;
+  
+  set subtotal = rate_combo + subtotal;
+
+
+SELECT be_uae_tax_concept,be_uae_tax_value INTO uaetax,uaeval FROM  tbl_branchmaster;
+  
+   
+   UPDATE tbl_takeaway_billmaster SET tab_subtotal = subtotal  WHERE tab_billno = temp_billno;
+   
+   
+   SELECT  tab_bill_reorder, tab_kotno,tab_food_partner
+   INTO  BILL_REORDER, reorder_kotno,FLOOR_ID
+   FROM tbl_takeaway_billmaster
+   WHERE tab_billno = temp_billno;
+   
+   
+   SET subtotal_exempt_disc = 0;
+   SELECT sum(`tab_amount`) INTO subtotal_exempt_disc FROM `tbl_takeaway_billdetails` WHERE `tab_billno` = temp_billno and tab_count_combo_ordering IS NULL and tab_exempt_disc='N';
+  
+
+   if(subtotal_exempt_disc is NULL)THEN
+  SET subtotal_exempt_disc = 0;
+  END IF;
+  
+set subtotal_exempt_disc=subtotal_exempt_disc+rate_combo;
+   
+   SET finaltotal = 0;
+   SET taxable_amount = 0;
+   SET tax_exempt_total = 0;
+   SET bill_custom_message = NULL;
+   IF (discount = 'Y')
+   THEN
+      BEGIN
+         IF (discountid IS NOT NULL)
+         THEN
+            BEGIN
+               SELECT ds_discountof, ds_mode
+               INTO discountof, discount_mode
+               FROM tbl_discountmaster
+               WHERE ds_discountid = discountid;
+            END;
+         ELSEIF (discountid IS NULL)
+         THEN
+            BEGIN
+               SET discountof = discount_of;
+               SET discount_mode = discount_unit;
+               SET discountid = NULL;
+            END;
+         END IF;
+         IF (discount_mode = 'P')
+         THEN
+            BEGIN
+               SET discountvalue =
+                      TRUNCATE(((discountof * subtotal_exempt_disc) / 100), 3);
+               SET subtotal = TRUNCATE((subtotal - discountvalue), 3);
+               SET discount_label = CONCAT('(', discountof, '%)');
+            END;
+         ELSEIF (discount_mode = 'V')
+         THEN
+            BEGIN
+               SET discountvalue = TRUNCATE(discountof, 3);
+               SET discountvalue_P =
+                      TRUNCATE(((discountof * 100) / subtotal_exempt_disc), 3);
+               SET subtotal = TRUNCATE((subtotal - discountvalue), 3);
+            END;
+         END IF;
+      END;
+   ELSE
+      BEGIN
+         SET discountvalue = 0.00;
+         SET discount_label = NULL;
+         SET discountid = NULL;
+         SET discountof = 0.00;
+      END;
+   END IF;
+ /* loyality reddem starts here*/
+  if(redeem>0) then
+  Begin
+    UPDATE tbl_takeaway_billmaster SET tab_redeem_amount=redeem WHERE tab_billno = temp_billno;
+    Set subtotal=subtotal-redeem;
+  End;
+  End if;
+  
+    
+ if(uaetax =  'Y') then
+  Begin
+  
+    set del_tax=subtotal/(1+(uaeval/100));
+  
+    set subtotal=TRUNCATE(del_tax,3); 
+       
+  End;
+  
+  End if;
+  
+  
+  /* loyality ends*/
+   IF (subtotal < 0)
+   THEN
+      BEGIN
+         SET Message = 'DISCOUNT GIVEN MORE THAN BILL AMOUNT';
+         LEAVE proc_gentakeaway;
+      END;
+   ELSEIF (subtotal > 0)
+   THEN
+      BEGIN
+         UPDATE tbl_takeaway_billmaster
+         SET tab_subtotal_final = subtotal,
+             tab_discountvalue = discountvalue,
+             tab_discount_label = discount_label,
+             tab_discountid = discountid,
+             tab_discount_mode = discount_mode,
+             tab_discount_of = discountof
+         WHERE tab_billno = temp_billno;
+      END;
+   END IF;
+   /* tax exempt concept - start*/
+   IF EXISTS
+         (SELECT *
+          FROM tbl_takeaway_billdetails
+          WHERE     tab_billno = temp_billno
+                AND tab_menuid IN (SELECT mr_menuid
+                                   FROM tbl_menumaster
+                                   WHERE mr_excempt_tax = 'Y'))
+   THEN
+      BEGIN
+         SELECT sum(tab_amount)
+         INTO tax_exempt_total
+         FROM tbl_takeaway_billdetails
+         WHERE     tab_billno = temp_billno
+               AND tab_menuid IN (SELECT mr_menuid
+                                  FROM tbl_menumaster
+                                  WHERE mr_excempt_tax = 'Y');
+                                  
+         IF (discount = 'Y')
+         THEN
+            BEGIN
+               IF (discount_mode = 'P')
+               THEN
+                  BEGIN 
+                     SET discount_tax_exempt =
+                            REPLACE(FORMAT(((discountof * tax_exempt_total) / 100),decimal1), ',', '');
+                     SET tax_exempt_total =
+                            (tax_exempt_total - discount_tax_exempt);
+                  END;
+               ELSEIF (discount_mode = 'V')
+               THEN
+                  BEGIN
+                     SET discount_tax_exempt = 
+                            REPLACE(FORMAT(((discountvalue_P * tax_exempt_total) / 100),decimal1), ',', '');
+                     SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+                  END;
+               END IF;
+            END;
+         END IF;
+         SET taxable_amount = subtotal - tax_exempt_total;
+         SET subtotal = taxable_amount;
+         UPDATE tbl_takeaway_billdetails
+         SET tab_symbol_for_tax = '*'
+         WHERE     tab_billno = temp_billno
+               AND tab_menuid IN (SELECT mr_menuid
+                                  FROM tbl_menumaster
+                                  WHERE mr_excempt_tax = 'Y');
+         SET bill_custom_message =
+                concat('* TAX EXEMPTED AMOUNT - ',
+                       FORMAT(tax_exempt_total, decimal1),
+                       '/b TAXABLE AMOUNT - ',
+                       FORMAT(taxable_amount, decimal1));
+      END;
+   ELSE
+      BEGIN
+         SET taxable_amount = subtotal;
+         SET tax_exempt_total = 0;
+      END;
+   END IF;
+   /* tax exempt concept - end*/
+   UPDATE tbl_takeaway_billmaster
+   SET tab_tax_exempt = tax_exempt_total, tab_taxable_amount = taxable_amount
+   WHERE tab_billno = temp_billno;
+   IF (taxable_amount > 0)
+   THEN
+      BEGIN
+         DELETE FROM `tbl_takeaway_bill_extra_tax_master`
+         WHERE `tbe_billno` = temp_billno;
+         DELETE FROM tbl_takeaway_bill_extra_tax_details
+         WHERE `tbet_billno` = temp_billno;
+         CALL proc_tax(temp_billno, 'TA', FLOOR_ID);
+      END;
+   END IF;
+   IF EXISTS
+         (SELECT *
+          FROM tbl_takeaway_bill_extra_tax_master
+          WHERE tbe_billno = temp_billno)
+   THEN
+      BEGIN   
+         SELECT REPLACE(FORMAT(SUM(tbe_total_value),decimal1), ',', '')
+         INTO tax_total
+         FROM tbl_takeaway_bill_extra_tax_master
+         WHERE tbe_billno = temp_billno;
+      END;
+   ELSE
+      SET tax_total = 0;
+   END IF;
+   SET finaltotal = taxable_amount + tax_exempt_total + tax_total;
+   IF ((kotbypass = 'N') OR (kotbypass = NULL) OR (TRIM(kotbypass) = ''))
+   THEN
+      SET status_tobe = 'Closed';
+   ELSEIF (kotbypass = 'Y')
+   THEN
+      SET status_tobe = 'Processing';
+   END IF;
+   IF ((finaltotal != 0) OR (finaltotal > 0))
+   THEN
+      BEGIN
+         UPDATE tbl_takeaway_billdetails
+         SET tab_status = status_tobe
+         WHERE tab_billno = temp_billno;
+         UPDATE tbl_takeaway_billdetails t, tbl_menumaster m 
+         SET t.tab_status = 'Packed' where t.tab_billno = temp_billno and t.tab_menuid = m.mr_menuid and m.mr_show_in_kod = 'N';
+         UPDATE tbl_combo_bill_details_ta 
+         SET cbd_order_status= status_tobe
+         WHERE 	cbd_billno=temp_billno;
+         IF (nearest_round_off = 0)
+         THEN
+            BEGIN
+            
+            if(uaetax =  'Y')
+
+             THEN
+              BEGIN
+
+               SET second_digit = FLOOR(finaltotal * 100) MOD 10;
+               
+                IF second_digit >= 5 THEN
+                 SET finaltotal = ROUND(finaltotal, 1);  -- Round up
+                 ELSE
+       SET finaltotal = FLOOR(finaltotal * 10) / 10;  -- Round down
+               END IF;
+               
+               SET after_roundoff = ROUND(finaltotal,3);
+               
+               END;
+               ELSE
+               BEGIN
+               
+                SET after_roundoff =finaltotal;
+               
+                END;
+
+                END IF;
+            
+               
+               SET roundoff_value = 0.00;
+            END;
+         ELSE
+            BEGIN
+               SET after_roundoff =
+                      (  nearest_round_off
+                       * ROUND(finaltotal / nearest_round_off));
+               SET roundoff_value = (after_roundoff - finaltotal);
+            END;
+         END IF;
+         IF (TRIM(BILL_REORDER) IS NULL)
+         THEN
+            BEGIN
+               CALL proc_genkotno(kotno,
+                                  branchid,
+                                  'TA/HD',
+                                  order_confirming_staff);
+            END;
+         ELSEIF (TRIM(BILL_REORDER) IS NOT NULL)
+         THEN
+            BEGIN
+               /* SET kotno = reorder_kotno; */
+               
+                CALL proc_genkotno(kotno,
+                                  branchid,
+                                  'TA/HD',
+                                  order_confirming_staff);
+               
+               
+            END;
+         END IF;
+         IF (bmode = 'HD')
+         THEN
+            BEGIN
+               IF ((trim(contactno) != '') OR (!(trim(contactno IS NULL))))
+               THEN
+                  BEGIN
+                     SELECT t.tac_customerid
+                     INTO customerid3
+                     FROM tbl_takeaway_customer t
+                     WHERE t.tac_contactno = trim(contactno);
+                     SET customerid = customerid3;
+                     IF (customerid IS NULL)
+                     THEN
+                        BEGIN
+                           INSERT INTO `tbl_takeaway_customer`(
+                                          `tac_customerid`,
+                                          `tac_customername`,
+                                          `tac_contactno`,
+                                          `tac_address`,
+                                          `tac_landmark`,
+                                          `tac_area`,
+                                          `tac_remarks`,
+                                          `tac_branchid`,
+                                          tac_per_address,
+                                          tac_entrydate,
+                                          tac_gst)
+                           VALUES (0,
+                                   customer,
+                                   contactno,
+                                   order_address,
+                                   landmark,
+                                   area,
+                                   remarks,
+                                   branchid,
+                                   permanent_address,
+                                   now(),
+                                   gst);
+                           SELECT t.tac_customerid
+                     INTO customerid
+                     FROM tbl_takeaway_customer t
+                     WHERE t.tac_contactno = trim(contactno);
+                        END;
+                     ELSE
+                        BEGIN
+                           UPDATE `tbl_takeaway_customer`
+                           SET tac_customername = customer,
+                               tac_address = order_address,
+                               tac_landmark = landmark,
+                               tac_area = area,
+                               tac_remarks = remarks,
+                               tac_per_address = permanent_address,
+                               tac_homedelivery_count =
+                                  tac_homedelivery_count + 1,
+                               tac_gst = gst
+                           WHERE tac_customerid = trim(customerid);
+                        END;
+                        
+                     END IF;
+
+                  END;
+               END IF;
+            END;
+         ELSEIF ((bmode = 'TA') OR (bmode = 'CS'))
+         THEN
+            BEGIN
+               IF ((trim(contactno) != '') OR (!(trim(contactno IS NULL))))
+               THEN
+                  BEGIN
+                     SELECT t.tac_customerid
+                     INTO customerid3
+                     FROM tbl_takeaway_customer t
+                     WHERE t.tac_contactno = trim(contactno);
+                     SET customerid = customerid3;
+                     IF (customerid IS NULL)
+                     THEN
+                        BEGIN
+                           INSERT INTO `tbl_takeaway_customer`(
+                                          `tac_customerid`,
+                                          `tac_customername`,
+                                          `tac_contactno`,
+                                          `tac_address`,
+                                          `tac_landmark`,
+                                          `tac_area`,
+                                          `tac_remarks`,
+                                          `tac_branchid`,
+                                          tac_per_address,
+                                          tac_entrydate,
+                                          tac_gst)
+                           VALUES (0,
+                                   customer,
+                                   contactno,
+                                   order_address,
+                                   landmark,
+                                   area,
+                                   remarks,
+                                   branchid,
+                                   permanent_address,
+                                   now(),
+                                   gst);
+                          SELECT t.tac_customerid
+                     INTO customerid
+                     FROM tbl_takeaway_customer t
+                     WHERE t.tac_contactno = trim(contactno);
+      
+                        END;
+                     ELSE
+                        BEGIN
+                           UPDATE `tbl_takeaway_customer`
+                           SET tac_customername = customer,
+                               tac_address = order_address,
+                               tac_landmark = landmark,
+                               tac_area = area,
+                               tac_remarks = remarks,
+                               tac_per_address = permanent_address,
+                               tac_takeaway_count = tac_takeaway_count + 1,
+                               tac_gst = gst
+                           WHERE tac_customerid = trim(customerid);
+                        END;
+                         
+                     END IF;
+                  END;
+               END IF;
+            END;
+         END IF;
+         UPDATE tbl_takeaway_billdetails
+         SET tab_status = status_tobe
+         WHERE tab_billno = temp_billno;
+         IF (!(customerid IS NULL))
+         THEN
+            BEGIN
+               UPDATE tbl_takeaway_billmaster
+               SET tab_hdcustomerid = customerid
+               WHERE tab_billno = temp_billno;
+            END;
+         END IF;
+         IF (TRIM(BILL_REORDER) IS NULL)
+         THEN
+            BEGIN
+               IF (bmode = 'TA')
+               THEN
+                  BEGIN
+                     CALL proc_bill_series_gen('T',
+                                               NULL,
+                                               SERIES_SLNO,
+                                               new_billno);
+                  END;
+               ELSEIF (bmode = 'HD')
+               THEN
+                  BEGIN
+                     CALL proc_bill_series_gen('H',
+                                               NULL,
+                                               SERIES_SLNO,
+                                               new_billno);
+                  END;
+               END IF;
+            END;
+         ELSEIF (TRIM(BILL_REORDER) IS NOT NULL)
+         THEN
+            BEGIN
+               SET new_billno = BILL_REORDER;
+            END;
+         END IF;
+         IF (TRIM(BILL_REORDER) IS NULL)
+         THEN
+            BEGIN
+               SET bill_ref_count = NULL;
+               SELECT ds_bill_ref_ta
+               INTO bill_ref_count
+               FROM tbl_datesettings
+               WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+               IF (bill_ref_count IS NULL)
+               THEN
+                  BEGIN
+                     INSERT INTO tbl_datesettings(ds_branchid, ds_date)
+                     VALUES (branchid, DAYCLOSEDATE);
+                     SELECT ds_bill_ref_ta
+                     INTO bill_ref_count
+                     FROM tbl_datesettings
+                     WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+                  END;
+               END IF;
+               SET bill_ref = CONCAT('T', bill_ref_count);
+               UPDATE tbl_datesettings
+               SET ds_bill_ref_ta = ds_bill_ref_ta + 1
+               WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+            END;
+         ELSEIF (TRIM(BILL_REORDER) IS NOT NULL)
+         THEN
+            BEGIN
+               SELECT tab_bill_ref
+               INTO bill_ref
+               FROM tbl_takeaway_billmaster
+               WHERE tab_bill_reorder = BILL_REORDER;
+            END;
+         END IF;
+         IF (bmode = 'TA')
+         THEN
+            BEGIN
+               IF (eat_in = 'Y')
+               THEN
+                  SET eat_in_ = 'TAKE-AWAY --> EAT IN';
+               ELSE
+                  SET eat_in_ = 'TAKE-AWAY';
+               END IF;
+               
+                UPDATE tbl_takeaway_billdetails
+         SET tab_kotno_new = kotno
+         WHERE tab_billno = temp_billno and tab_regen_status_menu='N' ;
+               
+               UPDATE tbl_kotmaster
+               SET kr_mode_of_order = eat_in_
+               WHERE     tbl_kotmaster.kr_date = DAYCLOSEDATE
+                     AND tbl_kotmaster.kr_kotno = trim(kotno);
+               UPDATE tbl_takeaway_billmaster
+               SET tab_hd = 'N',
+                   tab_billno = new_billno,
+                   tab_total = finaltotal,
+                   tab_netamt = after_roundoff,
+                   tab_status = status_tobe,
+                   tab_kotno = kotno,
+                   tab_mode = bmode,
+                   tab_payment_settled = 'N',
+                   tab_roundoff_value = roundoff_value,
+                   tab_loginid = loginid,
+                   tab_bill_ref = bill_ref,
+                   tab_comments = bill_custom_message,
+                   tab_name = customer,
+                   tab_phone = contactno,
+                   tab_gst = gst
+               WHERE tab_billno = temp_billno;
+               
+               
+            END;
+         ELSEIF (bmode = 'CS')
+         THEN
+            BEGIN
+               UPDATE tbl_kotmaster
+               SET kr_mode_of_order = 'TAKE-AWAY'
+               WHERE     tbl_kotmaster.kr_date = DAYCLOSEDATE
+                     AND tbl_kotmaster.kr_kotno = trim(kotno);
+               UPDATE tbl_takeaway_billmaster
+               SET tab_hd = 'N',
+                   tab_billno = new_billno,
+                   tab_total = finaltotal,
+                   tab_netamt = after_roundoff,
+                   tab_status = status_tobe,
+                   tab_kotno = kotno,
+                   tab_mode = bmode,
+                   tab_payment_settled = 'N',
+                   tab_roundoff_value = roundoff_value,
+                   tab_loginid = loginid,
+                   tab_bill_ref = bill_ref,
+                   tab_comments = bill_custom_message,
+                   tab_name = customer,
+                   tab_phone = contactno,
+                   tab_gst = gst
+               WHERE tab_billno = temp_billno;
+            END;
+         ELSEIF (bmode = 'HD')
+         THEN
+            BEGIN
+            
+            UPDATE tbl_takeaway_billdetails
+         SET tab_kotno_new = kotno
+         WHERE tab_billno = temp_billno and tab_regen_status_menu='N' ;
+            
+            
+               UPDATE tbl_kotmaster
+               SET kr_mode_of_order = 'HOME-DELIVERY'
+               WHERE     tbl_kotmaster.kr_date = DAYCLOSEDATE
+                     AND tbl_kotmaster.kr_kotno = trim(kotno);
+                if(delivery_charge>0) then
+                begin
+                  set after_roundoff = after_roundoff + delivery_charge;
+                end;
+                end if;
+               UPDATE tbl_takeaway_billmaster
+               SET tab_hd = 'Y',
+                   tab_billno = new_billno,
+                   tab_total = finaltotal,
+                   tab_delivery_charge = delivery_charge,
+
+                   tab_netamt = after_roundoff,
+                   tab_status = status_tobe,
+                   tab_kotno = kotno,
+                   tab_mode = bmode,
+                   tab_payment_settled = 'N',
+                   tab_roundoff_value = roundoff_value,
+                   tab_loginid = loginid,
+                   tab_bill_ref = bill_ref,
+                   tab_comments = bill_custom_message,
+                   tab_name = customer,
+                   tab_phone = contactno,
+                   tab_gst = gst,
+                   tab_delivery_status = 'NA'
+               WHERE tab_billno = temp_billno;
+            END;
+          END IF;
+          UPDATE tbl_combo_bill_details_ta 
+          SET cbd_kot_no= kotno
+          WHERE 	cbd_billno=new_billno;
+         UPDATE tbl_takeaway_item_discount
+         SET tbd_billno = new_billno
+         WHERE tbd_billno = temp_billno;
+      END;
+   END IF;
+   
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_hold_order` (IN `billno` VARCHAR(15), IN `branchid` BIGINT, OUT `hold_billno` VARCHAR(15), OUT `hold_message` VARCHAR(100))  BEGIN
+
+	DECLARE DAYCLOSEDATE DATE;
+  DECLARE HOLDNO INT;
+  DECLARE billnumber VARCHAR(15);
+  
+  SET hold_message = 'Error..Generating Hold';
+  SET HOLDNO = 23;
+    
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+  SELECT ds_hold_no INTO HOLDNO FROM tbl_datesettings WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+    
+  IF(HOLDNO = NULL) THEN
+    INSERT INTO tbl_datesettings(ds_branchid,ds_date) VALUES(branchid, DAYCLOSEDATE);
+    SELECT ds_hold_no INTO HOLDNO FROM tbl_datesettings WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+  END IF;
+  
+    SET hold_billno = CONCAT('HOLD','-',HOLDNO);
+
+    UPDATE tbl_takeaway_billmaster SET tab_billno = hold_billno,tab_on_hold ='Y' where  tab_billno = billno and tab_branchid = branchid;
+  
+  UPDATE tbl_datesettings SET ds_hold_no = ds_hold_no +1 WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+ 
+  SET hold_message = CONCAT('Order is on Hold with HOLD NO','- ',HOLDNO);
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_hold_release` (IN `hold_no` VARCHAR(15), IN `branchid` BIGINT, IN `temp_billno` VARCHAR(15), OUT `new_temp_bill_no` VARCHAR(15), OUT `message` VARCHAR(100))  BEGIN
+ 
+ 
+ 
+  DECLARE NEW_HOLDNO VARCHAR(15);
+  DECLARE NEW_HOLD_MESSAGE VARCHAR(100);
+  declare FLAG int;
+  
+  SET message = 'Error..Releasing Hold';
+  
+  IF EXISTS(SELECT * FROM tbl_takeaway_billdetails WHERE tab_billno = temp_billno) THEN
+  BEGIN
+    CALL proc_hold_order(temp_billno,branchid,@newholdno,@message);
+    select @newholdno into NEW_HOLDNO;
+    select @message into NEW_HOLD_MESSAGE;
+  END;
+  end if;
+  
+    
+  REPEAT
+    SET new_temp_bill_no =  CONCAT('TEMP-',FLOOR(10000000 + ( RAND( )*8999 )));
+    IF EXISTS(SELECT * FROM tbl_takeaway_billmaster where tab_billno = new_temp_bill_no)THEN
+      SET FLAG = 1;
+    else set FLAG = 0;
+    END IF;
+    UNTIL(FLAG = 0)
+  END REPEAT;
+    
+    
+  
+  UPDATE tbl_takeaway_billmaster SET tab_billno = new_temp_bill_no,tab_on_hold ='N' 
+  where  tab_billno = hold_no and tab_branchid = branchid;
+
+  
+  SET message = 'Hold is released';
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_inital_setup` (IN `branchname` VARCHAR(200), IN `address` VARCHAR(250), IN `version_code` VARCHAR(20), IN `apk_version_name` VARCHAR(50), IN `apk_version_code` VARCHAR(50), OUT `Message` VARCHAR(250))  BEGIN
+  DECLARE COUNTRYID smallint(11);
+  DECLARE STATEID,CITYID,BRANCHID bigint(20);
+  DECLARE DESIGNATION,DEPARTMENT,DESIGNATION_cas,DESIGNATION_man,DESIGNATION_ste,DESIGNATION_str,DESIGNATION_del,DESIGNATION_acc VARCHAR(30);
+  DECLARE STAFFID,STAFFID_cas,STAFFID_man,STAFFID_ste,STAFFID_str,STAFFID_del,STAFFID_acc varchar(50);
+
+
+  SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE `tbl_accounthead`;
+TRUNCATE `tbl_advance_day_detail`;
+TRUNCATE `tbl_advance_payment`;
+TRUNCATE `tbl_advance_pay_menu_details`;
+TRUNCATE `tbl_appmachinedetails`;
+TRUNCATE `tbl_archive_settings`;
+TRUNCATE `tbl_archive_settings_log`;
+TRUNCATE `tbl_asset_category`;
+TRUNCATE `tbl_asset_invoice_tax_details`;
+TRUNCATE `tbl_asset_master`;
+TRUNCATE `tbl_asset_purchase`;
+TRUNCATE `tbl_asset_purchase_invoice_detail`;
+TRUNCATE `tbl_bankmaster`;
+TRUNCATE `tbl_base_unit_master`;
+TRUNCATE `tbl_billcancel_log`;
+TRUNCATE `tbl_bill_card_payments`;
+TRUNCATE `tbl_branchmaster`;
+TRUNCATE `tbl_branchsettings_android`;
+TRUNCATE `tbl_branch_settings_cloud`;
+TRUNCATE `tbl_branch_settings_counter`;
+TRUNCATE `tbl_branch_settings_loyality`;
+TRUNCATE `tbl_branch_settings_printer`;
+TRUNCATE `tbl_branch_settings_ta_hd`;
+TRUNCATE `tbl_cancellation_reasons`;
+TRUNCATE `tbl_cardmaster`;
+TRUNCATE `tbl_cash_drawer_log`;
+TRUNCATE `tbl_cloud_backup_history`;
+TRUNCATE `tbl_combo_bill_details`;
+TRUNCATE `tbl_combo_bill_details_ta`;
+TRUNCATE `tbl_combo_menu_labels`;
+TRUNCATE `tbl_combo_name`;
+TRUNCATE `tbl_combo_ordering_details`;
+TRUNCATE `tbl_combo_packs`;
+TRUNCATE `tbl_combo_pack_menus`;
+TRUNCATE `tbl_combo_pack_rates`;
+TRUNCATE `tbl_combo_stock`;
+TRUNCATE `tbl_combo_type`;
+TRUNCATE `tbl_complementory_reasons`;
+TRUNCATE `tbl_contra_voucher`;
+TRUNCATE `tbl_corporatemaster`;
+TRUNCATE `tbl_couponcompany`;
+TRUNCATE `tbl_credit_details`;
+TRUNCATE `tbl_credit_details_payment`;
+TRUNCATE `tbl_credit_master`;
+TRUNCATE `tbl_credit_types`;
+TRUNCATE `tbl_currency_conv_rate`;
+TRUNCATE `tbl_currency_master`;
+TRUNCATE `tbl_daily_stock_detail`;
+TRUNCATE `tbl_databank`;
+TRUNCATE `tbl_datesettings`;
+TRUNCATE `tbl_dayclose`;
+TRUNCATE `tbl_dayclose_revert_log`;
+TRUNCATE `tbl_dbsize_detail`;
+TRUNCATE `tbl_delivery_status`;
+TRUNCATE `tbl_denomination_master`;
+TRUNCATE `tbl_departmentmaster`;
+TRUNCATE `tbl_designationmaster`;
+TRUNCATE `tbl_discountmaster`;
+TRUNCATE `tbl_employee_master`;
+TRUNCATE `tbl_employee_voucher`;
+TRUNCATE `tbl_expense_voucher`;
+TRUNCATE `tbl_expodine_machines`;
+TRUNCATE `tbl_extra_tax_master`;
+TRUNCATE `tbl_feedbackmaster`;
+TRUNCATE `tbl_feedbackrating`;
+TRUNCATE `tbl_feedbackratingcount`;
+TRUNCATE `tbl_feedback_remark_entry`;
+TRUNCATE `tbl_floormaster`;
+TRUNCATE `tbl_floor_tax`;
+TRUNCATE `tbl_function_details`;
+TRUNCATE `tbl_function_details_menu`;
+TRUNCATE `tbl_function_extra_costs`;
+TRUNCATE `tbl_function_invoice`;
+TRUNCATE `tbl_function_invoice_extras`;
+TRUNCATE `tbl_function_type`;
+TRUNCATE `tbl_function_venue`;
+TRUNCATE `tbl_generalsettings`;
+TRUNCATE `tbl_general_settings_log`;
+TRUNCATE `tbl_ingredientmaster`;
+TRUNCATE `tbl_kotcountermaster`;
+TRUNCATE `tbl_kotmaster`;
+TRUNCATE `tbl_kot_cancellation`;
+TRUNCATE `tbl_languages`;
+TRUNCATE `tbl_language_feedback`;
+TRUNCATE `tbl_language_floor`;
+TRUNCATE `tbl_language_menu_main`;
+TRUNCATE `tbl_language_menu_master`;
+TRUNCATE `tbl_language_menu_sub`;
+TRUNCATE `tbl_language_portion`;
+TRUNCATE `tbl_language_preference`;
+TRUNCATE `tbl_language_staff`;
+TRUNCATE `tbl_language_table_master`;
+TRUNCATE `tbl_logindetails`;
+TRUNCATE `tbl_login_restrict_logs`;
+TRUNCATE `tbl_loyalty_campaign`;
+TRUNCATE `tbl_loyalty_campaign_group`;
+TRUNCATE `tbl_loyalty_discount`;
+TRUNCATE `tbl_loyalty_group_details`;
+TRUNCATE `tbl_loyalty_levels`;
+TRUNCATE `tbl_loyalty_pointadd_bill`;
+TRUNCATE `tbl_loyalty_pointrule`;
+TRUNCATE `tbl_loyalty_point_transfers`;
+TRUNCATE `tbl_loyalty_redeem_rule`;
+TRUNCATE `tbl_loyalty_reg`;
+TRUNCATE `tbl_loyalty_rules`;
+TRUNCATE `tbl_loyalty_rules_type`;
+TRUNCATE `tbl_loyalty_sendto`;
+TRUNCATE `tbl_loyalty_sms_source`;
+TRUNCATE `tbl_loyalty_voucher`;
+TRUNCATE `tbl_menucombination`;
+TRUNCATE `tbl_menuimages`;
+TRUNCATE `tbl_menuingredients`;
+TRUNCATE `tbl_menumaincategory`;
+TRUNCATE `tbl_menumaster`;
+TRUNCATE `tbl_menunutitionfacts`;
+TRUNCATE `tbl_menuprefmaster`;
+TRUNCATE `tbl_menuratemaster`;
+TRUNCATE `tbl_menuratetakeaway`;
+TRUNCATE `tbl_menurate_counter`;
+TRUNCATE `tbl_menurate_roomservice`;
+TRUNCATE `tbl_menusearchtype`;
+TRUNCATE `tbl_menustock`;
+TRUNCATE `tbl_menusubcategory`;
+TRUNCATE `tbl_menu_addons`;
+TRUNCATE `tbl_menu_discount`;
+TRUNCATE `tbl_menu_import`;
+TRUNCATE `tbl_menu_ingredient_detail`;
+TRUNCATE `tbl_menu_rate_cs_upload`;
+TRUNCATE `tbl_menu_rate_di_upload`;
+TRUNCATE `tbl_menu_rate_ta_upload`;
+TRUNCATE `tbl_menu_tax_master`;
+TRUNCATE `tbl_menu_upload`;
+TRUNCATE `tbl_modulemaster`;
+TRUNCATE `tbl_modulesubmaster`;
+TRUNCATE `tbl_notifications`;
+TRUNCATE `tbl_online_billdetails`;
+TRUNCATE `tbl_online_billmaster`;
+TRUNCATE `tbl_online_order`;
+TRUNCATE `tbl_order_addon`;
+TRUNCATE `tbl_order_addon_changes`;
+TRUNCATE `tbl_paymentmode`;
+TRUNCATE `tbl_portionmaster`;
+TRUNCATE `tbl_preferencemaster`;
+TRUNCATE `tbl_printersettings`;
+TRUNCATE `tbl_printersettings_ip`;
+TRUNCATE `tbl_printersettings_log`;
+TRUNCATE `tbl_printertype`;
+TRUNCATE `tbl_printer_styles`;
+TRUNCATE `tbl_profession_master`;
+TRUNCATE `tbl_regenerate_reasons`;
+TRUNCATE `tbl_regenrate_log`;
+TRUNCATE `tbl_reportmaster`;
+TRUNCATE `tbl_report_bydate`;
+TRUNCATE `tbl_reset_bill_log`;
+TRUNCATE `tbl_roommaster`;
+TRUNCATE `tbl_secretkeymaster`;
+TRUNCATE `tbl_shift_card_detail_close`;
+TRUNCATE `tbl_shift_card_detail_open`;
+TRUNCATE `tbl_shift_close_denomination`;
+TRUNCATE `tbl_shift_details`;
+TRUNCATE `tbl_shift_open_denomination`;
+TRUNCATE `tbl_sms_report_settings`;
+TRUNCATE `tbl_sms_report_slab`;
+TRUNCATE `tbl_sms_time_settings`;
+TRUNCATE `tbl_staffmaster`;
+TRUNCATE `tbl_staffmaster_logs`;
+TRUNCATE `tbl_staff_salary_detail`;
+TRUNCATE `tbl_state`;
+TRUNCATE `tbl_supplier_voucher`;
+TRUNCATE `tbl_tablebilldetails`;
+TRUNCATE `tbl_tablebillmaster`;
+TRUNCATE `tbl_tablebill_extra_tax_details`;
+TRUNCATE `tbl_tablebill_extra_tax_master`;
+TRUNCATE `tbl_tablebill_item_discount`;
+TRUNCATE `tbl_tablebill_paymentchange`;
+TRUNCATE `tbl_tablebill_split`;
+TRUNCATE `tbl_tabledetails`;
+TRUNCATE `tbl_tableinsertion`;
+TRUNCATE `tbl_tablemaster`;
+TRUNCATE `tbl_tableorder`;
+TRUNCATE `tbl_tableorder_changes`;
+TRUNCATE `tbl_tableorder_discount`;
+TRUNCATE `tbl_table_cloud`;
+TRUNCATE `tbl_takeaway_billdetails`;
+TRUNCATE `tbl_takeaway_billmaster`;
+TRUNCATE `tbl_takeaway_bill_extra_tax_details`;
+TRUNCATE `tbl_takeaway_bill_extra_tax_master`;
+TRUNCATE `tbl_takeaway_cancel_items`;
+TRUNCATE `tbl_takeaway_customer`;
+TRUNCATE `tbl_takeaway_item_discount`;
+TRUNCATE `tbl_temp_orderno_details`;
+TRUNCATE `tbl_temp_regenerate`;
+TRUNCATE `tbl_temp_tablebilldetails`;
+TRUNCATE `tbl_temp_tablebillmaster`;
+TRUNCATE `tbl_timely_sms_entry`;
+TRUNCATE `tbl_track_l`;
+TRUNCATE `tbl_track_l_details`;
+TRUNCATE `tbl_unit_master`;
+TRUNCATE `tbl_unit_master_combination`;
+TRUNCATE `tbl_usermodules`;
+TRUNCATE `tbl_vendor_master`;
+TRUNCATE `tbl_version`;
+TRUNCATE `tbl_version_log`;
+TRUNCATE `tbl_voucherhead`;
+TRUNCATE `tbl_voucherpayment`;
+TRUNCATE `tbl_yearsettings`;
+TRUNCATE `tbl_year_bill_series`;
+TRUNCATE `temp_loyalty_reg`;
+TRUNCATE  tbl_requisition;
+TRUNCATE  tbl_purchase_order;
+TRUNCATE  tbl_grn_order;
+TRUNCATE  tbl_store_stock;
+TRUNCATE  tbl_store_transfer;
+TRUNCATE  tbl_physical_stock;
+TRUNCATE  tbl_purchase_return;
+TRUNCATE  tbl_grn_summary;
+TRUNCATE  tbl_consumption;
+TRUNCATE  tbl_inv_settings;
+TRUNCATE  tbl_stock_details;
+TRUNCATE  tbl_wastage;
+TRUNCATE  tbl_production;
+TRUNCATE  tbl_menu_ingredient_detail;
+TRUNCATE  tbl_product_conversion;
+TRUNCATE  tbl_food_cost;
+TRUNCATE  tbl_central_kitchen_transfer;
+TRUNCATE  tbl_inv_kitchen;
+
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+INSERT INTO `tbl_cancellation_reasons` (`cr_id`, `cr_reason`, `cr_active`) VALUES
+(1, 'Wrong Entry', 'Y'),
+(2, 'Customer Returned', 'Y'),
+(3, 'Order Delayed', 'Y');
+
+INSERT INTO `tbl_regenerate_reasons` (`rr_id`, `rr_reason`, `rr_active`) VALUES
+(1, 'Quantity change', 'Y'),
+(2, 'Kot Cancellation', 'Y');
+
+
+
+INSERT INTO `tbl_branchmaster`(be_branchid,be_branchname,be_address,be_footer4,be_branchprefix,be_footer1,be_footer3)
+VALUES(1,trim(branchname),address,'POWERED BY - EXPODINE.COM','B','Thank You Visit Again','Parcel Food Should Be Consumed Within 2 HRS');
+SELECT be_branchid INTO BRANCHID FROM tbl_branchmaster WHERE trim(be_branchname) = branchname;
+UPDATE `tbl_branchmaster` SET `be_authorise_with_code` = 'Y',be_staff_selection ='Drop_Down',be_login_mode ='Card/Pin';
+
+
+INSERT INTO `tbl_departmentmaster` (`der_departmentid`, `der_departmentname`, `der_branch`) VALUES
+('0', 'Restaurant', 1);
+
+ SELECT der_departmentid INTO DEPARTMENT  FROM tbl_departmentmaster WHERE TRIM(der_departmentname) = 'Restaurant';
+
+
+INSERT INTO `tbl_designationmaster` (`dr_designationid`, `dr_designationname`, `dr_branch`, `dr_login`, `dr_takeorder`, `dr_authorisation_code`) VALUES
+('0', 'Manager', 1, 'Yes', 'N', 'Y'),
+('0', 'Others', 1, 'No', 'N', 'N'),
+('0', 'Super Admin', 1, 'Yes', 'N', 'Y'),
+('0', 'KOT Manager', 1, 'Yes', 'N', 'Y'),
+('0', 'Store Manager', 1, 'Yes', 'N', 'N'),
+('0', 'Delivery Boy', 1, 'No', 'N', 'N'),
+('0', 'Steward', 1, 'Yes', 'Y', 'Y'),
+('0', 'Cashier', 1, 'Yes', 'N', 'Y'),
+('0', 'Supervisor', 1, 'Yes', 'N', 'N'),
+('0', 'Waiter', 1, 'Yes', 'N', 'N'),
+('0', 'Captain', 1, 'Yes', 'N', 'Y'),
+('0', 'Accountant', 1, 'Yes', 'N', 'Y');
+
+SELECT dr_designationid INTO DESIGNATION FROM tbl_designationmaster WHERE TRIM(dr_designationname) = 'Super Admin';
+SELECT dr_designationid INTO DESIGNATION_cas FROM tbl_designationmaster WHERE TRIM(dr_designationname) = 'Cashier';
+SELECT dr_designationid INTO DESIGNATION_man FROM tbl_designationmaster WHERE TRIM(dr_designationname) = 'Manager';
+SELECT dr_designationid INTO DESIGNATION_ste FROM tbl_designationmaster WHERE TRIM(dr_designationname) = 'Steward';
+SELECT dr_designationid INTO DESIGNATION_str FROM tbl_designationmaster WHERE TRIM(dr_designationname) = 'Store Manager';
+SELECT dr_designationid INTO DESIGNATION_del FROM tbl_designationmaster WHERE TRIM(dr_designationname) = 'Delivery Boy';
+SELECT dr_designationid INTO DESIGNATION_acc FROM tbl_designationmaster WHERE TRIM(dr_designationname) = 'Accountant';
+
+
+INSERT INTO `tbl_delivery_status` (`ds_id`, `ds_name`, `ds_short_code`) VALUES
+(1, 'Delivered', 'D'),
+(2, 'Change Del. Boy', 'NA');
+
+
+INSERT INTO `tbl_staffmaster` (`ser_staffid`, `ser_firstname`, `ser_lastname`, `ser_gender`, `ser_designation`, `ser_department`, `ser_dob`, `ser_address1`, `ser_address2`, `ser_dateofjoin`, `ser_mobileno`, `ser_alternateno`, `ser_email`, `ser_employeestatus`, `ser_remarks`, `ser_idtype`, `ser_idno`, `ser_branchofficeid`, `ser_cancelpermission`, `ser_cancelwithkey`, `ser_defaultfloor`, `ser_mode`, `ser_discountpermission`, `ser_compl_mgmt`, `ser_stockchng_permission`, `ser_discount_manual`, `ser_counter_enable_generate`, `ser_counter_enable_hold`, `ser_permit_cash_drawer_open`, `ser_kot_cancel_permission`, `ser_confirm_code`, `ser_authorisation_code`, `ser_bill_cancel_permission`, `ser_rate_edit`, `ser_dayclose_permission`, `ser_shift_permission`, `ser_release_login`, `ser_bill_regen_per`, `ser_bill_reprint_per`, `ser_kot_reprint_per`, `ser_bill_settle_change_per`, `ser_order_split_permission`,`ser_tip_edit_permission`,`ser_credit_view`,`ser_comp_view`,`ser_credit_permission`,`ser_comp_permission`,`ser_dayclose_revert_permission`,`ser_bill_reset`,`ser_reset_accounts`,`ser_online_order`,`ser_inv_permission`) VALUES
+('0', 'Admin', NULL, 'Male',  DESIGNATION, DEPARTMENT, NULL, trim(branchname), NULL, NULL, '', NULL, NULL, 'Active', NULL, NULL, NULL, 1, 'Y', 'N', NULL, 'B', 'Y', 'N', 'N', 'Y', 'N', 'Y', 'Y', 'Y', NULL, '3681', 'Y', 'N', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'N',  'Y', 'Y', 'Y', 'Y', 'Y','Y', 'Y', 'Y','Y','Y'),
+('0', 'Manager', NULL, 'Male', DESIGNATION_man, DEPARTMENT, NULL, trim(branchname), '', NULL, '', '', '', 'Active', '', '', '', 1, 'Y', 'N', NULL, 'B', 'Y', 'N', 'N', 'Y', 'N', 'Y', 'N', 'Y', NULL, '4127', 'Y', 'N', 'Y', 'N', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N','N','Y'),
+('0', 'Cashier', NULL, 'Male', DESIGNATION_cas, DEPARTMENT,NULL, trim(branchname), '', NULL, '', '', '', 'Active',  NULL, NULL, NULL, 1, 'N', 'N', NULL, 'B', 'Y', 'N', 'N', 'Y', 'N', 'Y', 'N', 'Y', NULL, '4321', 'N', 'N', 'Y', 'N', 'N', 'Y', 'Y', 'N', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'N', 'N','N','N'),
+('0', 'steward1', '', 'Male', DESIGNATION_ste, DEPARTMENT, NULL, trim(branchname), '', NULL, '', '', '', 'Active', '', '', '', 1, 'Y', 'N', NULL, 'B', 'N', 'N', 'N', 'N', 'N', 'Y', 'N', 'Y', NULL, '1111', 'N', 'N', 'N', 'N', 'N', 'Y', 'N', 'Y', 'N', 'N',  'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N','N','N'),
+('0', 'Store Manager', '', 'Male', DESIGNATION_str, DEPARTMENT, NULL, trim(branchname), '', NULL, '', '', '', 'Active', '', '', '', 1, 'Y', 'N', NULL, 'B', 'N', 'N', 'N', 'N', 'N', 'Y', 'N', 'Y', NULL, '2222', 'N', 'N', 'N', 'N', 'N', 'Y', 'N', 'Y', 'N', 'N',  'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N','N','N'),
+('0', 'Delivery Boy', '', 'Male', DESIGNATION_del, DEPARTMENT, NULL, trim(branchname), '', NULL, '', '', '', 'Active', '', '', '', 1, 'Y', 'N', NULL, 'B', 'N', 'N', 'N', 'N', 'N', 'Y', 'N', 'Y', NULL, '3333', 'N', 'N', 'N', 'N', 'N', 'Y', 'N', 'Y', 'N', 'N',  'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N','N','N'),
+('0', 'Accountant', '', 'Male', DESIGNATION_acc, DEPARTMENT, NULL, trim(branchname), '', NULL, '', '', '', 'Active', '', '', '', 1, 'Y', 'N', NULL, 'B', 'N', 'N', 'N', 'N', 'N', 'Y', 'N', 'Y', NULL, '4444', 'N', 'N', 'N', 'N', 'N', 'Y', 'N', 'Y', 'N', 'N',  'N', 'N', 'N', 'N', 'N', 'N', 'N', 'N','N','N');
+
+
+
+SELECT ser_staffid INTO STAFFID FROM tbl_staffmaster WHERE Trim(ser_firstname) = 'Admin';
+SELECT ser_staffid INTO STAFFID_cas FROM tbl_staffmaster WHERE Trim(ser_firstname) = 'Cashier';
+SELECT ser_staffid INTO STAFFID_man FROM tbl_staffmaster WHERE Trim(ser_firstname) = 'Manager';
+SELECT ser_staffid INTO STAFFID_ste FROM tbl_staffmaster WHERE Trim(ser_firstname) = 'steward1';
+SELECT ser_staffid INTO STAFFID_str FROM tbl_staffmaster WHERE Trim(ser_firstname) = 'Store Manager';
+SELECT ser_staffid INTO STAFFID_del FROM tbl_staffmaster WHERE Trim(ser_firstname) = 'Delivery Boy';
+SELECT ser_staffid INTO STAFFID_acc FROM tbl_staffmaster WHERE Trim(ser_firstname) = 'Accountant';
+
+
+
+INSERT INTO `tbl_logindetails` (`ls_username`, `ls_password`, `ls_branchid`, `ls_applogin`, `ls_staffid`, `ls_status`) VALUES
+('admin', 'e6e061838856bf47e1de730719fb2609', BRANCHID, 'Y', STAFFID, 'Y'),
+('cashier', '6ac2470ed8ccf204fd5ff89b32a355cf', 1,  'N', STAFFID_cas, 'Y'),
+('manager', '1d0258c2440a8d19e716292b231e3190', 1,  'Y', STAFFID_man, 'Y'),
+('steward1', '567fac0b4d21b7c285272bd515f68ee4', 1, 'Y', STAFFID_ste, 'Y'),
+('Store Manager', '567fac0b4d21b7c285272bd515f68ee4', 1, 'Y', STAFFID_str, 'Y'),
+('Delivery Boy', '567fac0b4d21b7c285272bd515f68ee4', 1, 'Y', STAFFID_del, 'Y'),
+('Accountant', '567fac0b4d21b7c285272bd515f68ee4', 1, 'Y', STAFFID_acc, 'Y');
+
+
+INSERT INTO `tbl_modulemaster` (`mer_moduleid`, `mer_modulename`, `mer_modulelink`, `cloud_sync`) VALUES
+(1, 'Master Tables', '', 'N'),
+(2, 'Menu Masters', '', 'N'),
+(3, 'Reports', 'report', 'N'),
+(6, 'Table Order', 'table_selection', 'N'),
+(8, 'Bill Generation ', 'bill_generation_screen1', 'N'),
+(9, 'Alerts', '', 'N'),
+(10, 'User Permission', 'user_permission', 'N'),
+(11, 'Home Page', 'index', 'N'),
+(12, 'Admin Home', 'admin_home', 'N'),
+(14, 'Feedback', 'feedback', 'N'),
+(15, 'Analytics Report Old', 'main_report', 'N'),
+(16, 'Manage Stock', 'stock', 'N'),
+(17, 'Inventory', 'inventory', 'N'),
+(18, 'Take Away', 'take_away_', 'N'),
+(19, 'General Branch settings', 'branch_settings', 'N'),
+(20, 'Bill History', 'bill_history', 'N'),
+(21, 'Loyality Registration', 'registration', 'N'),
+(23, 'Food Recipe', 'food_recipe', 'N'),
+(24, 'Completed Order', 'completed_order', 'N'),
+(25, 'Payment Pending', 'payment_pending', 'N'),
+(26, 'Day In View', 'dayin', 'N'),
+(27, 'Day Close View', 'dayclose', 'N'),
+(28, 'Credit Settlement', 'credit', 'N'),
+(29, 'Credit Master', 'credit_master', 'N'),
+(30, 'Clear Assigned', 'clear_assigned', 'N'),
+(31, 'KOT History', 'kot_history', 'N'),
+(32, 'Load ', '', 'N'),
+(33, 'KOD Screen', 'kod_screen', 'N'),
+(34, 'Total Analytics', 'main_report', 'N'),
+(35, 'Packing Counter', 'packingcounter', 'N'),
+(36, 'Vouchers', 'voucher', 'N'),
+(37, 'Dine In', 'dinein', 'N'),
+(38, 'Counter Sales', 'counter_sales', 'N'),
+(39, 'Home Delivery Report', 'hd_report', 'N'),
+(40, 'Take Away Report', 'ta_report', 'N'),
+(41, 'Database Backup', 'database_backup', 'N'),
+(42, 'Consolidated Reports', 'consolidatedreport', 'N'),
+(43, 'Day Close Details', 'dayclosedetails', 'N'),
+(44, 'KOT TAHD History', 'kot_tahd_history', 'N'),
+(45, 'KOT CS History', 'kot_cs_history', 'N'),
+(46, 'Stock Master', 'stock_master', 'N'),
+(47, 'Banquet', '', 'N'),
+(48, 'Multi Language', '', 'N'),
+(49, 'Shift Details', 'shiftdetails', 'N'),
+(50, 'KOT TAHD History', 'kot_tahd_history', 'N'),
+(51, 'KOT CS History', 'kot_cs_history', 'N'),
+(52, 'Stock Master New', 'stock_master', 'N'),
+(53, 'Banquet', '', 'N'),
+(55, 'Menu Upload', 'menu_uploads', 'N'),
+(56, 'Banquet Report', 'banquet_report', 'N'),
+(57, 'Day Close Old', 'dayclosedetails1', 'N'),
+(58, 'Loyalty setting', 'loyalty_settings', 'N'),
+(59, 'Dayclose Settings', 'dayclose_report_settings', 'N'),
+(60, 'firebase', 'firebase_setting', 'N'),
+(61, 'Ledger', 'ledger', 'N'),
+(62, 'advance', 'advance_pay_bill', 'N'),
+(63, 'CONSOLIDATED KOT HISTORY', 'cons_kot_history', 'N'),
+(64, 'Online Integration', 'urban_piper', 'N');
+
+
+
+INSERT INTO `tbl_modulesubmaster` (`mser_submoduleid`, `mser_moduleid`, `mser_subname`, `mser_submodulelink`, `cloud_sync`) VALUES
+(1, 1, 'Default', '', 'N'),
+(3, 1, 'Country', 'country_master', 'N'),
+(4, 2, 'Category', 'category_master', 'N'),
+(5, 2, 'Sub Category', 'sub_category_master', 'N'),
+(6, 2, 'Menu Manager', 'menu', 'N'),
+(7, 9, 'Kot Alert', 'kot', 'N'),
+(8, 9, 'Bill Alert', 'bill', 'N'),
+(9, 9, 'Water Alert', 'water', 'N'),
+(10, 9, 'Steward Alert', 'steward', 'N'),
+(11, 1, 'State', 'state_master', 'N'),
+(13, 1, 'City', 'city_master', 'N'),
+(14, 1, 'Department', 'department_master', 'N'),
+(15, 1, 'Designation', 'designation_master', 'N'),
+(16, 1, 'Ingredient', 'ingredient_master', 'N'),
+(17, 1, 'Floor', 'floor_master', 'N'),
+(18, 1, 'Table', 'table_master', 'N'),
+(19, 1, 'Portion', 'portion_master', 'N'),
+(20, 1, 'Kot counter', 'kot_counter_master', 'N'),
+(21, 1, 'Staff', 'staff_master', 'N'),
+(22, 1, 'Discount', 'discount_master', 'N'),
+(23, 1, 'Corporate Discount', 'corporate_discount', 'N'),
+(24, 1, 'Voucher', 'voucher_master', 'N'),
+(25, 1, 'Coupon', 'coupon_company', 'N'),
+(26, 6, 'Load Menu Order', 'menu_order', 'N'),
+(27, 6, 'Load Div', 'load_div', 'N'),
+(28, 6, 'Load Response', 'response', 'N'),
+(29, 6, 'Load View Items', 'viewitems', 'N'),
+(30, 6, 'Load Item Edit', 'itemedit', 'N'),
+(31, 6, 'Load Print Details', 'print_details', 'N'),
+(32, 2, 'Load Subcategory', 'load_divsubcategory', 'N'),
+(34, 1, 'Load Country', 'load_divcountry', 'N'),
+(35, 1, 'Load State', 'load_divstate', 'N'),
+(36, 1, 'Load City', 'load_divcity', 'N'),
+(37, 1, 'Load Department', 'load_divdepartment', 'N'),
+(38, 1, 'Load Designation', 'load_divdesignation', 'N'),
+(39, 1, 'Load Ingredient', 'load_divingr', 'N'),
+(40, 1, 'Load Floor', 'load_divfloor', 'N'),
+(41, 1, 'Load Table', 'load_divtable', 'N'),
+(42, 1, 'Load Portion', 'load_divportion', 'N'),
+(43, 1, 'Load KOT', 'load_divkot', 'N'),
+(44, 1, 'Load Staff', 'load_divstaff', 'N'),
+(45, 1, 'Load Discount', 'load_divdiscount', 'N'),
+(46, 1, 'Load Corporate Discount', 'load_divcorporate', 'N'),
+(47, 1, 'Load Voucher Master', 'load_divvoucher', 'N'),
+(48, 1, 'Load Coupon Company', 'load_divcompany', 'N'),
+(49, 2, 'Load Category', 'load_divcategory', 'N'),
+(50, 2, 'Load Menu', 'load_divmenu', 'N'),
+(51, 2, 'Load Image', 'load_divimage', 'N'),
+(52, 2, 'Load Takeaway Rate', 'load_divtakeawayrate', 'N'),
+(53, 2, 'Load Dinein Rate', 'load_divdinein', 'N'),
+(54, 2, 'Load Combination', 'load_divcombination', 'N'),
+(55, 2, 'Load Preference', 'load_divpreference', 'N'),
+(56, 2, 'Load Ingredient', 'load_divingredient', 'N'),
+(57, 2, 'Load Nutrition', 'load_divnutrition', 'N'),
+(59, 6, 'Load popup', 'load_popupmenu', 'N'),
+(60, 10, 'Load Permission', 'load_permission', 'N'),
+(62, 8, 'Load Bill', 'load_bill', 'N'),
+(63, 8, 'Load Bill2', 'bill_generation_screen2', 'N'),
+(64, 8, 'Load Bill3', 'bill_generation_screen3', 'N'),
+(66, 3, 'Load Report', 'load_report', 'N'),
+(67, 3, 'Load Print Bill', 'print_bill', 'N'),
+(68, 3, 'Load Pdf Bill', 'pdf_bill', 'N'),
+(69, 1, 'Load Maater all', 'load_divmaster', 'N'),
+(70, 2, 'Load MenuTab', 'load_menu', 'N'),
+(71, 1, 'Printer Master', 'printer_master', 'N'),
+(72, 1, 'Database Backup Old', 'database_backup', 'N'),
+(75, 2, 'Load popup rate', 'menu_rate', 'N'),
+(76, 2, 'Load popup comb', 'menu_comb', 'N'),
+(77, 2, 'Load popup image', 'menu_image', 'N'),
+(78, 2, 'Load popup ingr', 'menu_ingr', 'N'),
+(79, 2, 'Load popup nutr', 'menu_nutr', 'N'),
+(80, 2, 'Load popup pref', 'menu_pref', 'N'),
+(81, 2, 'Load menu edit', 'menu_edit', 'N'),
+(82, 1, 'Load country edit', 'country_edit', 'N'),
+(83, 1, 'Load State edit', 'state_edit', 'N'),
+(84, 2, 'Load Category Edit', 'category_edit', 'N'),
+(85, 1, 'Load City Edit', 'city_edit', 'N'),
+(87, 2, 'Load Subcategory edit', 'subcategory_edit', 'N'),
+(88, 1, 'Load Printer edit', 'printer_edit', 'N'),
+(89, 1, 'Load KOT edit', 'kot_edit', 'N'),
+(90, 1, 'Load Table edit', 'table_edit', 'N'),
+(91, 1, 'Load Department Edit', 'dept_edit', 'N'),
+(92, 1, 'Load  Floor Edit', 'floor_edit', 'N'),
+(93, 1, 'Load Designation Edit', 'desg_edit', 'N'),
+(94, 2, 'Load Portion edit', 'portion_edit', 'N'),
+(95, 1, 'Load Discount Edit', 'disc_edit', 'N'),
+(96, 1, 'Load Corporate edit', 'corp_edit', 'N'),
+(97, 1, 'Load Voucher edit', 'voucher_edit', 'N'),
+(98, 1, 'Load Coupon Edit', 'coupon_edit', 'N'),
+(99, 1, 'Load Staff Edit', 'staff_edit', 'N'),
+(100, 2, 'Load autocomplete', 'find_keywords', 'N'),
+(101, 1, 'Load Change Password Edit', 'chng_password_edit', 'N'),
+(102, 1, 'Load Staff View', 'staff_view', 'N'),
+(103, 2, 'Load chkkkk', '', 'N'),
+(104, 2, 'Load Ingredient Edit', 'ingredient_edit', 'N'),
+(105, 2, 'Load menu view', 'menu_view', 'N'),
+(106, 2, 'Load Upload gal file', 'uploadGalFile', 'N'),
+(107, 1, 'Branch master', 'branch_master', 'N'),
+(108, 1, 'Load Feedback Rating', 'feedback_rating', 'N'),
+(109, 1, 'Preference Master', 'preference_master', 'N'),
+(110, 2, 'Edit Preference', 'preference_edit', 'N'),
+(111, 2, 'Load upload categoryimage', 'uploadCategory', 'N'),
+(112, 16, 'Load stock', 'load_divstock', 'N'),
+(113, 3, 'Load Report checker', 'load_reportcheck', 'N'),
+(114, 18, 'Load Take Away', 'load_takeaway', 'N'),
+(115, 18, 'Take away staff assign', 'take_away_staff_assign', 'N'),
+(116, 18, 'Take away KOT', 'take_away_kot', 'N'),
+(117, 18, 'Load Take Away print', 'print_details_kot', 'N'),
+(118, 18, 'Load take away pop up', 'takeaway_list', 'N'),
+(119, 18, 'Take away HD staff Bill', 'take_away_staff', 'N'),
+(120, 18, 'Take away Bill', 'take_away_list_bill', 'N'),
+(121, 1, 'Load Printer Type', 'printer_type_master', 'N'),
+(122, 1, 'Load Printer Type Edit', 'printer_type_edit', 'N'),
+(123, 1, 'Load  Country Flag', 'uploadFlag', 'N'),
+(124, 2, 'Load portion default', 'load_portiondefault', 'N'),
+(125, 15, 'Load analytics report check', 'load_analyiticscheck', 'N'),
+(126, 15, 'Load total sales report', 'total_sales_report', 'N'),
+(128, 3, 'Load excel_download', 'excel_download', 'N'),
+(129, 3, 'Load pdf_bill', 'pdf_bill', 'N'),
+(130, 3, 'Load  pdf_bill_page', 'pdf_bill_page', 'N'),
+(131, 3, 'Load pdfexcelcheck', 'load_pdfexcelcheck', 'N'),
+(143, 10, 'User Permission Edit', 'User_permission_edit', 'N'),
+(144, 19, 'Branch Settings edit', 'Edit branch', 'N'),
+(145, 18, 'Load Div Check Menu', 'load_divcheckmenu', 'N'),
+(146, 18, 'Take away Search todays', 'take_away_search', 'N'),
+(147, 20, 'Load Bill History', 'load_bill_history', 'N'),
+(148, 24, 'Load Completed order', 'load_completedorder', 'N'),
+(149, 25, 'Load Payment Pending', 'load_paymentpending', 'N'),
+(150, 28, 'Load Credit', 'load_credit', 'N'),
+(151, 31, 'Load KOT History', 'load_kothistory', 'N'),
+(152, 25, 'Bill Split', 'bill_split', 'N'),
+(153, 25, 'Load Bill split', 'load_billsplit', 'N'),
+(154, 1, 'Bank Master', 'bank_master', 'N'),
+(155, 1, 'Load Bank Master', 'bank_edit', 'N'),
+(156, 18, 'TA Bill History', 'ta_bill_history', 'N'),
+(157, 18, 'Load TA Bill History ', 'load_ta_history', 'N'),
+(158, 33, 'Load KOD screen two', 'kod_screen_two', 'N'),
+(159, 18, 'Payment Pending  TA', 'payments_ta_cs', 'N'),
+(160, 18, 'Total bill history TA', 'total_ta_bill_history', 'N'),
+(161, 18, 'Customer History TA', 'ta_customer_history', 'N'),
+(162, 36, 'Voucher payment', 'voucher_payment', 'N'),
+(163, 36, 'Voucher Head', 'voucher_head', 'N'),
+(164, 38, 'Load counter sales', 'load_counter_sales', 'N'),
+(165, 38, 'Load Counter popup', 'counter_popup', 'N'),
+(166, 18, 'Takeaway Popup', 'takeaway_popup', 'N'),
+(167, 18, 'Load Takeaway', 'load_takeaway', 'N'),
+(168, 18, 'Load Payments Takeaway', 'load_payments_takeaway', 'N'),
+(169, 18, 'Load Payments Takeaway', 'load_payments_takeaway', 'N'),
+(170, 18, 'Load Staff Assign', 'load_staff_assign', 'N'),
+(171, 18, 'Staff Assign Quaries', 'staff_assign_quaries', 'N'),
+(172, 18, 'Assigned Order', 'staff_assign_detail', 'N'),
+(173, 18, 'Load Staff Assign Detail', 'load_staff_assign_detail', 'N'),
+(174, 38, 'Counter Sale Kot', 'counter_sale_kot', 'N'),
+(175, 39, 'Load  HD Report', 'load_hdreport', 'N'),
+(176, 39, 'Load  HD Report Check', 'load_hdreportcheck', 'N'),
+(177, 39, 'load_hdrptcheck', 'load_hdrptcheck', 'N'),
+(178, 39, 'Printer Check_1', 'printercheck_1', 'N'),
+(181, 40, 'Load TA Report Check', 'load_tareportcheck', 'N'),
+(182, 40, 'Load TA Report', 'load_tareport', 'N'),
+(183, 40, 'Load TA rptcheck', 'load_tarptcheck', 'N'),
+(184, 40, 'TA Print Report', 'ta_print_report', 'N'),
+(185, 6, 'dinein_Editpopup', 'dine_Edit_popup', 'N'),
+(186, 38, 'Bill History', 'cs_bill_history', 'N'),
+(187, 18, 'Settle Bill', 'payments_takeaway', 'N'),
+(188, 6, 'load_kotcancel_popup', 'load_kotcancel_popup', 'N'),
+(189, 1, 'cancellation', 'cancellation', 'N'),
+(190, 42, 'Load Consolidatedreport', 'load_consolidatedreport', 'N'),
+(191, 42, 'Load consolidatedreportcheck', 'load_consolidatedreportcheck', 'N'),
+(192, 42, 'Load consolidated_a4print', 'consolidated_a4print', 'N'),
+(193, 1, 'complimentary_reason', 'complimentary_reason', 'N'),
+(194, 1, 'load_compedit', 'load_compedit', 'N'),
+(195, 1, 'cancel_edit', 'load_canceledit', 'N'),
+(196, 1, 'Denomination', 'denomination', 'N'),
+(197, 1, 'Load denomination edit', 'denomination_edit', 'N'),
+(198, 1, 'Regeneration Reason', 'regeneration', 'N'),
+(199, 1, 'Load regedit', 'regeneration_edit', 'N'),
+(200, 38, 'Payment_settle_cs', 'payments_ta_cs', 'N'),
+(201, 42, 'Load consolidatedexcel', 'consolidatedexcel_download', 'N'),
+(202, 42, 'Load consolidatedexcel', 'consolidatedexcel_download', 'N'),
+(203, 3, 'Load tacsexcel_download', 'taexcel_download', 'N'),
+(204, 40, 'Load taa4print', 'taprint_bill', 'N'),
+(205, 42, 'Load consolidatedexcel', 'consolidatedexcel_download', 'N'),
+(206, 3, 'Load tacsexcel_download', 'taexcel_download', 'N'),
+(207, 40, 'Load taa4print', 'taprint_bill', 'N'),
+(208, 1, 'Expodine Machines', 'expodine_machines', 'N'),
+(211, 1, 'Load machineedit', 'machines_edit', 'N'),
+(212, 1, 'Report Master', 'report_masternew', 'N'),
+(213, 43, 'Load Day Close Details', 'load_dayclosedetails', 'N'),
+(214, 44, 'Load TA KOT History', 'load_takothistory', 'N'),
+(215, 47, 'Banquet Registration', 'banquet_registration', 'N'),
+(216, 47, 'Banquet List', 'banquet_list', 'N'),
+(217, 47, 'Function Master', 'function_master', 'N'),
+(218, 47, 'Venue Master', 'venue_master', 'N'),
+(219, 47, 'Function Extracost Master', 'function_extracost_master', 'N'),
+(220, 47, 'Reminders', 'reminders', 'N'),
+(221, 1, 'Currency master', 'currencymaster', 'N'),
+(222, 1, 'Conversion Rate', 'conversionrate', 'N'),
+(223, 1, 'Cardmaster', 'cardmaster', 'N'),
+(224, 38, 'Load CS Bill History', 'load_cs_history', 'N'),
+(226, 56, 'Load Banquet Report', 'load_banquet_report', 'N'),
+(227, 2, 'Addons', 'addons_master', 'N'),
+(228, 2, 'Load addon_edit', 'load_addon_edit', 'N'),
+(229, 2, 'Load menu_addon', 'menu_addon', 'N'),
+(230, 2, 'Load addonadd', 'load_div_addon', 'N'),
+(231, 53, 'Load Banquest List Print', 'print_function_list', 'N'),
+(232, 49, 'Load Shift Details', 'load_shiftdetails', 'N'),
+(233, 1, 'Game station', 'game_station', 'N'),
+(234, 18, 'Hold TA', 'view_hold', 'N'),
+(235, 38, 'Hold CS', 'view_hold', 'N'),
+(236, 2, 'Unit master', 'unit_master', 'N'),
+(237, 2, 'Load unit_master', 'load_unitmaster_edit', 'N'),
+(238, 2, 'Baseunit', 'base_unit_master', 'N'),
+(239, 2, 'Load base_unit', 'load_base_unitmaster', 'N'),
+(240, 1, 'extra_tax', 'extra_tax', 'N'),
+(241, 48, 'Load multi_language_menu_download', 'multi_language_menu_download', 'N'),
+(242, 2, 'Load Menu Addons', 'menu_addons', 'N'),
+(243, 2, 'Load Addons', 'load_divaddons', 'N'),
+(244, 2, 'Load Menu Combo', 'combo_add_menuload', 'N'),
+(245, 2, 'Combo', 'combo', 'N'),
+(246, 6, 'Load Combo Ordering Popup', 'combo_ordering_popup', 'N'),
+(247, 49, 'Load Shift Details', 'load_shiftdetails', 'N'),
+(248, 18, 'Load Combo Ordering Popup TA', 'combo_ordering_popup_ta', 'N'),
+(249, 38, 'Load Combo Ordering Popup CS', 'combo_ordering_popup_cs', 'N'),
+(250, 42, 'Load banquet_a4', 'banquet_a4print', 'N'),
+(251, 42, 'Load banquet_excel', 'banquet_excel_download', 'N'),
+(252, 36, 'Ledger', 'ledger', 'N'),
+(253, 1, 'Load Salary', 'staff_salary_detail', 'N'),
+(254, 62, 'reminders_advance', 'load_advance_reminder', 'N'),
+(255, 61, 'accounts_name', 'accounts_name', 'N'),
+(256, 61, 'Accounts Data', 'load_accounts_data', 'N'),
+(257, 61, 'accounts_a4_download', 'accounts_a4_download', 'N'),
+(258, 1,  'online_partners', 'online_partners', 'N'),
+(259, 1,  'Load online partners', 'online_partners_edit', 'N'),
+(260, 61,  'stock_accounts', 'stock_accounts', 'N'),
+(261, 61,  'a4_daybook', 'a4_daybook', 'N'),
+(262, 61,  'excel_account_bl_pl', 'excel_account_bl_pl', 'N'),
+(263, 61,  'open_close_account', 'open_close_account', 'N'),
+(264, 3,  'online_order_report', 'online_order_report', 'N'),
+(265, 1,  'inv_kitchen', 'inv_kitchen', 'N'),
+(266, 1,  'load_cat_image', 'cat_upload', 'N'),
+(267, 61,  'Ledger Add', 'journals', 'N'),
+(268, 61,  'Balance Sheet Profit Loss', 'load_ledger_sheet', 'N'),
+(269, 61,  'Supplier Master', 'supplier', 'N'),
+(270, 61,  'Expense Voucher', 'expense_voucher', 'N'),
+(271, 61,  'Employee Master', 'employees', 'N'),
+(272, 61,  'Contra Voucher', 'contra_voucher', 'N'),
+(273, 61,  'Fixed Asset', 'asset_master', 'N'),
+(274, 61,  'Receipts', 'receipts', 'N'),
+(275, 61,  'Loan Advance', 'loan_advance', 'N'),
+(276, 61,  'Day Book', 'daybook', 'N');
+
+
+
+INSERT INTO `tbl_reportmaster` (`rm_id`, `rm_reportid`, `rm_reportname`, `rm_reportview`, `rm_printa4`, `rm_posprintofanother`, `rm_daycloseprint`, `rm_dayclosemail`, `rm_reporttype`, `rm_dayclose_print_order`, `cloud_sync`) VALUES
+(1, 'tot_sales', 'Total sales', 'Y', 'Y', 'tot_sales', 'N', 'Y', 'DI', 3, 'N'),
+(2, 'order', 'Item Ordered', 'Y', 'Y', 'order', 'N', 'N', 'DI', 0, 'N'),
+(3, 'bill_details', 'Bill Details', 'Y', 'N', 'bill_details', 'N', 'N', 'DI', 0, 'N'),
+(4, 'summary', 'Summary Report', 'Y', 'Y', 'summary', 'N', 'N', 'DI', 0, 'N'),
+(5, 'categorywise_report', 'Category Wise Report ', 'Y', 'Y', 'categorywise_report', 'N', 'N', 'DI', 0, 'N'),
+(6, 'cancel_history', 'Item Cancel History', 'Y', 'Y', 'cancel_history', 'N', 'Y', 'DI', 0, 'N'),
+(7, 'bill_cancel', 'Bill Cancel History', 'Y', 'Y', 'bill_cancel', 'N', 'Y', 'DI', 11, 'N'),
+(8, 'steward', 'Steward', 'Y', 'Y', 'steward', 'N', 'N', 'DI', 0, 'N'),
+(9, 'item', 'Items', 'Y', 'N', 'item', 'N', 'N', 'DI', 0, 'N'),
+(10, 'regenerate_bill_logs', 'Regenerate Bill Logs', 'Y', 'N', 'regenerate_bill_logs', 'N', 'Y', 'DI', 17, 'N'),
+(11, 'table_turnoversummary', 'Table TurnOver Summary', 'Y', 'Y', 'table_turnoversummary', 'N', 'N', 'DI', 0, 'N'),
+(12, 'tax_sales_summary', 'Tax Sales Summary', 'Y', 'Y', 'tax_sales_summary', 'N', 'N', 'DI', 0, 'N'),
+(13, 'steward_timely', 'Steward_Timely_Report', 'Y', 'N', 'steward_timely', 'N', 'N', 'DI', 0, 'N'),
+(14, 'loyality_customer', 'Loyality Customer Registration', 'Y', 'N', 'loyality_customer', 'N', 'N', 'DI', 0, 'N'),
+(15, 'feedback_report', 'Item Feedback Report', 'Y', 'N', 'feedback_report', 'N', 'N', 'DI', 0, 'N'),
+(16, 'general_feedback', 'General Feedback Rating', 'Y', 'N', 'general_feedback', 'N', 'N', 'DI', 0, 'N'),
+(17, 'feedback_summary', 'General Feedback Summary', 'Y', 'N', 'feedback_summary', 'N', 'N', 'DI', 0, 'N'),
+(18, 'no_sale_report', 'No Sale Report', 'Y', 'N', 'no_sale_report', 'N', 'N', 'DI', 0, 'N'),
+(19, 'stewards_performance_report', 'Stewards Performance Report', 'Y', 'Y', 'stewards_performance_report', 'N', 'N', 'DI', 0, 'N'),
+(20, 'credit_details', 'Credit Details', 'N', 'Y', 'credit_details', 'N', 'Y', 'DI', 0, 'N'),
+(21, 'totalsales_cs', 'Total Sales Counter', 'Y', 'Y', 'totalsales_cs', 'N', 'Y', 'CS', 4, 'N'),
+(22, 'itemordered_cs', 'Item ordered CS', 'Y', 'Y', 'itemordered_cs', 'N', 'N', 'CS', 0, 'N'),
+(23, 'categorywise_report_cs', 'Category Wise Report ', 'Y', 'Y', 'categorywise_report_cs', 'N', 'N', 'CS', 0, 'N'),
+
+(24, 'billcancel_cs', 'Cancelled Bill ', 'Y', 'N', 'billcancel_cs', 'N', 'Y', 'CS', 12, 'N'),
+(25, 'billreport_cs', 'Bill Report', 'Y', 'Y', 'billreport_cs', 'N', 'N', 'CS', 0, 'N'),
+(26, 'cancelhistory_cs', 'Item Cancel History', 'Y', 'Y', 'cancelhistory_cs', 'N', 'Y', 'CS', 0, 'N'),
+(27, 'summary_cs', 'Summary Report CS', 'Y', 'N', 'summary_cs', 'N', 'N', 'CS', 0, 'N'),
+(28, 'tot_sales_hd', 'Total sales', 'Y', 'Y', 'tot_sales_hd', 'N', 'Y', 'HD', 5, 'N'),
+(29, 'order_hd', 'Item Ordered', 'Y', 'Y', 'order_hd', 'N', 'N', 'HD', 0, 'N'),
+(30, 'categorywise_report_hd', 'Category Wise Report ', 'Y', 'Y', 'categorywise_report_hd', 'N', 'N', 'HD', 0, 'N'),
+(31, 'cancel_history_hd', 'Bill Canceled History', 'Y', 'Y', 'cancel_history_hd', 'N', 'Y', 'HD', 13, 'N'),
+(32, 'summary_hd', 'Summary', 'Y', 'Y', 'summary_hd', 'N', 'N', 'HD', 0, 'N'),
+(33, 'tot_sales_ta', 'Total Sales', 'Y', 'Y', 'tot_sales_ta', 'N', 'Y', 'TA', 6, 'N'),
+(34, 'order_ta', 'Item Ordered', 'Y', 'Y', 'order_ta', 'N', 'N', 'TA', 0, 'N'),
+(35, 'categorywise_report_ta', 'Category Wise Report ', 'Y', 'Y', 'categorywise_report_ta', 'N', 'N', 'TA', 0, 'N'),
+(36, 'cancel_history_ta', 'Bill Canceled History', 'Y', 'Y', 'cancel_history_ta', 'N', 'Y', 'TA', 14, 'N'),
+(37, 'summary_ta', 'Summary', 'Y', 'Y', 'summary_ta', 'N', 'N', 'TA', 0, 'N'),
+(38, 'sales_summary_report_cr', 'Sale Summary Report', 'Y', 'Y', 'sales_summary_report_cr', 'Y', 'Y', 'CR', 1, 'N'),
+(39, 'summary_report_cr', 'Summary Report Consolidated', 'Y', 'Y', 'summary_report_cr', 'Y', 'Y', 'CR', 2, 'N'),
+(40, 'total_summary_details_cr', 'Total Summary Details', 'Y', 'N', 'total_summary_details_cr', 'N', 'N', 'CR', 0, 'N'),
+(41, 'item_ordered_cr', 'Item Ordered Report', 'Y', 'Y', 'item_ordered_cr', 'N', 'Y', 'CR', 7, 'N'),
+(42, 'categorywise_report_cr', 'Categorywise Report', 'Y', 'Y', 'categorywise_report_cr', 'N', 'Y', 'CR', 8, 'N'),
+(43, 'cash_settling_report_cr', 'Staff Wise Settlement Report ', 'Y', 'Y', 'cash_settling_report_cr', 'N', 'N', 'CR', 0, 'N'),
+(44, 'kitchen_wise_report_cr', 'Kitchen Wise Report', 'Y', 'Y', 'kitchen_wise_report_cr', 'N', 'N', 'CR', 0, 'N'),
+(45, 'discount_report_cr', 'Discount Report Consolidated', 'Y', 'Y', 'discount_report_cr', 'N', 'Y', 'CR', 9, 'N'),
+(46, 'complimentary_cr', 'Consolidated Complimentary Report', 'Y', 'Y', 'complimentary_cr', 'N', 'Y', 'CR', 10, 'N'),
+(47, 'tax_report', 'Tax Report', 'Y', 'N', 'tax_report', 'N', 'N', 'CR', 0, 'N'),
+(48, 'consolidated_credit_summury', 'Credit Summary Report', 'Y', 'Y', 'consolidated_credit_summury', 'N', 'N', 'CR', 0, 'N'),
+(49, 'consolidated_cancel_report', 'Item Cancel Report ', 'Y', 'Y', 'consolidated_cancel_report', 'N', 'Y', 'CR', 0, 'N'),
+(50, 'consolidated_payment_cr', 'Payment Report Consolidated', 'Y', 'Y', 'consolidated_payment_cr', 'N', 'Y', 'CR', 0, 'N'),
+(51, 'most_revenue_generated_item_cr', 'Most Revenue Generated Items', 'Y', 'Y', 'most_revenue_generated_item_cr', 'N', 'N', 'CR', 0, 'N'),
+(52, 'hourlywise_report_cr', 'Hourly Wise Report', 'Y', 'Y', 'hourlywise_report_cr', 'N', 'N', 'CR', 15, 'N'),
+(53, 'consolidated_timely_report', 'Hourly Report Day Close', 'N', 'Y', 'consolidated_timely_report', 'N', 'N', 'CR', 0, 'N'),
+(54, 'consolidated_shift_report', 'Shift Login Report', 'Y', 'N', 'consolidated_shift_report', 'N', 'N', 'CR', 0, 'N'),
+(55, 'voucher_expense', 'Voucher Expense', 'Y', 'Y', 'voucher_expense', 'N', 'Y', 'CR', 0, 'N'),
+(56, 'regenerate_logs', 'Regenerate', 'N', 'Y', 'regenerate_logs', 'N', 'Y', 'CR', 0, 'N'),
+(57, 'banquet_sales_report', 'Banquet Sales', 'Y', 'N', 'banquet_sales_report', 'N', 'N', 'BQ', 0, 'N'),
+(58, 'billreport_ta', 'Bill Report', 'Y', 'N', 'billreport_ta', 'N', 'N', 'TA', 0, 'N'),
+(59, 'billreport_hd', 'Bill Report', 'Y', 'N', 'billreport_hd', 'N', 'N', 'HD', 0, 'N'),
+(60, 'billreport_cr', 'Bill Report', 'N', 'N', 'billreport_cr', 'N', 'N', 'CR', 0, 'N'),
+(61, 'summary_specified_consolidated', 'Specified Summary Report', 'Y', 'Y', 'summary_specified_consolidated', 'Y', 'Y', 'CR', 16, 'N'),
+(62, 'tips_collected_consolidated', 'Tips Collected Report', 'Y', 'Y', 'tips_collected_consolidated', 'N', 'N', 'CR', 0, 'N'),
+(63, 'totalsales_consolidate_report_cr', 'ADSR Total Sales Report Consolidated', 'Y', 'N', 'totalsales_consolidate_report_cr', 'N', 'N', 'CR', 2, 'N'),
+(64, 'delivery_report_hd', 'Delivery Report', 'Y', 'Y', 'delivery_report_hd', 'N', 'N', 'HD', 24, 'N'),
+(65, 'staff_change_log_report', 'Staff Change Log', 'Y', 'N', 'staff_change_log_report', 'N', 'N', 'CR', 30, 'N'),
+(66, 'customers_ta', 'Customer Details Takeaway', 'Y', 'N', 'customers_ta', 'N', 'N', 'TA', 25, 'N'),
+(67, 'billwise_item_cr', 'Consolidated Bill Details Report', 'Y', 'N', 'billwise_item_cr', 'N', 'N', 'CR', 0, 'N'),
+(68, 'advance_payment_cr', 'Advance Payment Report', 'Y', 'N', 'advance_payment_cr', 'N', 'N', 'CR', 0, 'N'),
+(69, 'loyalty_staff_cr', 'Customer Loyalty Report', 'Y', 'N', 'loyalty_staff_cr', 'N', 'N', 'CR', 0, 'N'),
+(70, 'bill_cancel_consolidated', 'Bill Cancel Consolidated', 'Y', 'N', 'bill_cancel_consolidated', 'N', 'N', 'CR', 0, 'N'),
+(71, 'tot_sale_online', 'Online Sale', 'Y', 'N', 'tot_sale_online', 'N', 'N', 'OL', 0, 'N'),
+(72, 'credit_summary_client', 'Summary Credit Report', 'Y', 'N', 'credit_summary_client', 'N', 'N', 'CR', 0, 'N'),
+(73, 'stock_daywise_report', 'Stock Report', 'Y', 'N', 'stock_daywise_report', 'N', 'N', 'CR', 0, 'N'),
+(74, 'reprint_report', 'Reprint Report', 'Y', 'N', 'reprint_report', 'N', 'N', 'CR', 0, 'N'),
+(75, 'qr_sale_timely', 'QR Sale Timely', 'Y', 'N', 'qr_sale_timely', 'N', 'N', 'OL', 0, 'N'),
+(76, 'qr_customer_report', 'QR Customer Report', 'Y', 'N', 'qr_customer_report', 'N', 'N', 'OL', 0, 'N'),
+(77, 'qr_item_report', 'QR Item Report', 'Y', 'N', 'qr_item_report', 'N', 'N', 'OL', 0, 'N'),
+(78, 'expense_acc_report', 'Expense Account Report', 'Y', 'N', 'expense_acc_report', 'N', 'N', 'CR', 0, 'N'),
+(79, 'online_item_report', 'Online Item Report', 'Y', 'N', 'online_item_report', 'N', 'N', 'OL', 0, 'N'),
+(80, 'counter_shift_cr', 'Counter Shift Report', 'Y', 'Y', 'counter_shift_cr', 'N', 'N', 'CR', 0, 'N'),
+(81, 'bill_wise_lukado', 'Bill Wise Report', 'Y', 'N', 'bill_wise_lukado', 'N', 'N', 'CR', 0, 'N'),
+(82, 'purchase_acc_report', 'Purchase Account Report', 'Y', 'Y', 'purchase_acc_report', 'N', 'N', 'CR', 0, 'N'),
+(83, 'mult_card_bank_report', 'Multi Card / Bank Report', 'Y', 'Y', 'mult_card_bank_report', 'N', 'N', 'CR', 0, 'N'),
+(84, 'shift_detail_cr', 'Shift Detail Report', 'Y', 'N', 'shift_detail_cr', 'N', 'N', 'CR', 0, 'N');
+
+
+
+
+INSERT INTO `tbl_usermodules` (`um_username`, `um_moduleid`, `um_submoduleid`, `um_access`) VALUES
+('admin', 1, 1, 'Y'),
+('admin', 1, 3, 'Y'),
+('admin', 1, 11, 'Y'),
+('admin', 1, 13, 'Y'),
+('admin', 1, 14, 'Y'),
+('admin', 1, 15, 'Y'),
+('admin', 1, 16, 'Y'),
+('admin', 1, 17, 'Y'),
+('admin', 1, 18, 'Y'),
+('admin', 1, 19, 'Y'),
+('admin', 1, 20, 'Y'),
+('admin', 1, 21, 'Y'),
+('admin', 1, 22, 'Y'),
+('admin', 1, 23, 'Y'),
+('admin', 1, 24, 'Y'),
+('admin', 1, 25, 'Y'),
+('admin', 1, 34, 'Y'),
+('admin', 1, 35, 'Y'),
+('admin', 1, 36, 'Y'),
+('admin', 1, 37, 'Y'),
+('admin', 1, 38, 'Y'),
+('admin', 1, 39, 'Y'),
+('admin', 1, 40, 'Y'),
+('admin', 1, 41, 'Y'),
+('admin', 1, 42, 'Y'),
+('admin', 1, 43, 'Y'),
+('admin', 1, 44, 'Y'),
+('admin', 1, 45, 'Y'),
+('admin', 1, 46, 'Y'),
+('admin', 1, 47, 'Y'),
+('admin', 1, 48, 'Y'),
+('admin', 1, 69, 'Y'),
+('admin', 1, 71, 'Y'),
+('admin', 1, 72, 'Y'),
+('admin', 1, 82, 'Y'),
+('admin', 1, 83, 'Y'),
+('admin', 1, 85, 'Y'),
+('admin', 1, 88, 'Y'),
+('admin', 1, 89, 'Y'),
+('admin', 1, 90, 'Y'),
+('admin', 1, 91, 'Y'),
+('admin', 1, 92, 'Y'),
+('admin', 1, 93, 'Y'),
+('admin', 1, 95, 'Y'),
+('admin', 1, 96, 'Y'),
+('admin', 1, 97, 'Y'),
+('admin', 1, 98, 'Y'),
+('admin', 1, 99, 'Y'),
+('admin', 1, 101, 'Y'),
+('admin', 1, 102, 'Y'),
+('admin', 1, 107, 'Y'),
+('admin', 1, 108, 'Y'),
+('admin', 1, 109, 'Y'),
+('admin', 1, 121, 'Y'),
+('admin', 1, 122, 'Y'),
+('admin', 1, 123, 'Y'),
+('admin', 1, 154, 'Y'),
+('admin', 1, 155, 'Y'),
+('admin', 1, 189, 'Y'),
+('admin', 1, 193, 'Y'),
+('admin', 1, 194, 'Y'),
+('admin', 1, 195, 'Y'),
+('admin', 1, 196, 'Y'),
+('admin', 1, 197, 'Y'),
+('admin', 1, 198, 'Y'),
+('admin', 1, 199, 'Y'),
+('admin', 1, 208, 'Y'),
+('admin', 1, 211, 'Y'),
+('admin', 1, 212, 'Y'),
+('admin', 1, 221, 'Y'),
+('admin', 1, 222, 'Y'),
+('admin', 1, 223, 'Y'),
+('admin', 1, 233, 'Y'),
+('admin', 1, 240, 'Y'),
+('admin', 1, 253, 'Y'),
+('admin', 1, 258, 'Y'),
+('admin', 1, 259, 'Y'),
+('admin', 1, 265, 'Y'),
+('admin', 2, 1, 'Y'),
+('admin', 2, 4, 'Y'),
+('admin', 2, 5, 'Y'),
+('admin', 2, 6, 'Y'),
+('admin', 2, 32, 'Y'),
+('admin', 2, 49, 'Y'),
+('admin', 2, 50, 'Y'),
+('admin', 2, 51, 'Y'),
+('admin', 2, 52, 'Y'),
+('admin', 2, 53, 'Y'),
+('admin', 2, 54, 'Y'),
+('admin', 2, 55, 'Y'),
+('admin', 2, 56, 'Y'),
+('admin', 2, 57, 'Y'),
+('admin', 2, 70, 'Y'),
+('admin', 2, 75, 'Y'),
+('admin', 2, 76, 'Y'),
+('admin', 2, 77, 'Y'),
+('admin', 2, 78, 'Y'),
+('admin', 2, 79, 'Y'),
+('admin', 2, 80, 'Y'),
+('admin', 2, 81, 'Y'),
+('admin', 2, 84, 'Y'),
+('admin', 2, 87, 'Y'),
+('admin', 2, 94, 'Y'),
+('admin', 2, 100, 'Y'),
+('admin', 2, 103, 'Y'),
+('admin', 2, 104, 'Y'),
+('admin', 2, 105, 'Y'),
+('admin', 2, 106, 'Y'),
+('admin', 2, 110, 'Y'),
+('admin', 2, 111, 'Y'),
+('admin', 2, 124, 'Y'),
+('admin', 2, 227, 'Y'),
+('admin', 2, 228, 'Y'),
+('admin', 2, 229, 'Y'),
+('admin', 2, 230, 'Y'),
+('admin', 2, 236, 'Y'),
+('admin', 2, 237, 'Y'),
+('admin', 2, 238, 'Y'),
+('admin', 2, 239, 'Y'),
+('admin', 2, 242, 'Y'),
+('admin', 2, 243, 'Y'),
+('admin', 2, 244, 'Y'),
+('admin', 2, 245, 'Y'),
+('admin', 2, 258, 'Y'),
+('admin', 2, 259, 'Y'),
+('admin', 2, 265, 'Y'),
+('admin', 3, 1, 'Y'),
+('admin', 3, 66, 'Y'),
+('admin', 3, 67, 'Y'),
+('admin', 3, 68, 'Y'),
+('admin', 3, 113, 'Y'),
+('admin', 3, 128, 'Y'),
+('admin', 3, 129, 'Y'),
+('admin', 3, 130, 'Y'),
+('admin', 3, 131, 'Y'),
+('admin', 3, 203, 'Y'),
+('admin', 3, 206, 'Y'),
+('admin', 6, 1, 'Y'),
+('admin', 6, 26, 'Y'),
+('admin', 6, 27, 'Y'),
+('admin', 6, 28, 'Y'),
+('admin', 6, 29, 'Y'),
+('admin', 6, 30, 'Y'),
+('admin', 6, 31, 'Y'),
+('admin', 6, 59, 'Y'),
+('admin', 6, 185, 'Y'),
+('admin', 6, 188, 'Y'),
+('admin', 6, 246, 'Y'),
+('admin', 8, 1, 'Y'),
+('admin', 8, 62, 'Y'),
+('admin', 8, 63, 'Y'),
+('admin', 8, 64, 'Y'),
+('admin', 9, 1, 'Y'),
+('admin', 9, 7, 'Y'),
+('admin', 9, 8, 'Y'),
+('admin', 9, 9, 'Y'),
+('admin', 9, 10, 'Y'),
+('admin', 10, 1, 'Y'),
+('admin', 10, 60, 'Y'),
+('admin', 10, 143, 'Y'),
+('admin', 11, 1, 'Y'),
+('admin', 14, 1, 'Y'),
+('admin', 15, 1, 'Y'),
+('admin', 15, 125, 'Y'),
+('admin', 15, 126, 'Y'),
+('admin', 16, 1, 'Y'),
+('admin', 16, 112, 'Y'),
+('admin', 17, 1, 'Y'),
+('admin', 18, 1, 'Y'),
+('admin', 18, 114, 'Y'),
+('admin', 18, 115, 'Y'),
+('admin', 18, 116, 'Y'),
+('admin', 18, 117, 'Y'),
+('admin', 18, 118, 'Y'),
+('admin', 18, 119, 'Y'),
+('admin', 18, 120, 'Y'),
+('admin', 18, 145, 'Y'),
+('admin', 18, 146, 'Y'),
+('admin', 18, 156, 'Y'),
+('admin', 18, 157, 'Y'),
+('admin', 18, 159, 'Y'),
+('admin', 18, 160, 'Y'),
+('admin', 18, 161, 'Y'),
+('admin', 18, 166, 'Y'),
+('admin', 18, 167, 'Y'),
+('admin', 18, 168, 'Y'),
+('admin', 18, 169, 'Y'),
+('admin', 18, 170, 'Y'),
+('admin', 18, 171, 'Y'),
+('admin', 18, 172, 'Y'),
+('admin', 18, 173, 'Y'),
+('admin', 18, 187, 'Y'),
+('admin', 18, 234, 'Y'),
+('admin', 18, 248, 'Y'),
+('admin', 19, 1, 'Y'),
+('admin', 19, 144, 'Y'),
+('admin', 20, 1, 'Y'),
+('admin', 20, 147, 'Y'),
+('admin', 21, 1, 'Y'),
+('admin', 23, 1, 'Y'),
+('admin', 24, 1, 'Y'),
+('admin', 24, 148, 'Y'),
+('admin', 25, 1, 'Y'),
+('admin', 25, 149, 'Y'),
+('admin', 25, 152, 'Y'),
+('admin', 25, 153, 'Y'),
+('admin', 26, 1, 'Y'),
+('admin', 27, 1, 'Y'),
+('admin', 28, 1, 'Y'),
+('admin', 28, 150, 'Y'),
+('admin', 29, 1, 'Y'),
+('admin', 30, 1, 'Y'),
+('admin', 31, 1, 'Y'),
+('admin', 31, 151, 'Y'),
+('admin', 32, 1, 'Y'),
+('admin', 33, 1, 'Y'),
+('admin', 33, 158, 'Y'),
+('admin', 34, 1, 'Y'),
+('admin', 35, 1, 'Y'),
+('admin', 36, 1, 'Y'),
+('admin', 36, 162, 'Y'),
+('admin', 36, 163, 'Y'),
+('admin', 36, 252, 'Y'),
+('admin', 37, 1, 'Y'),
+('admin', 38, 1, 'Y'),
+('admin', 38, 164, 'Y'),
+('admin', 38, 165, 'Y'),
+('admin', 38, 174, 'Y'),
+('admin', 38, 186, 'Y'),
+('admin', 38, 200, 'Y'),
+('admin', 38, 224, 'Y'),
+('admin', 38, 235, 'Y'),
+('admin', 38, 249, 'Y'),
+('admin', 39, 1, 'Y'),
+('admin', 39, 175, 'Y'),
+('admin', 39, 176, 'Y'),
+('admin', 39, 177, 'Y'),
+('admin', 39, 178, 'Y'),
+('admin', 40, 1, 'Y'),
+('admin', 40, 181, 'Y'),
+('admin', 40, 182, 'Y'),
+('admin', 40, 183, 'Y'),
+('admin', 40, 184, 'Y'),
+('admin', 40, 204, 'Y'),
+('admin', 40, 207, 'Y'),
+('admin', 41, 1, 'Y'),
+('admin', 42, 1, 'Y'),
+('admin', 42, 190, 'Y'),
+('admin', 42, 191, 'Y'),
+('admin', 42, 192, 'Y'),
+('admin', 42, 201, 'Y'),
+('admin', 42, 202, 'Y'),
+('admin', 42, 205, 'Y'),
+('admin', 43, 1, 'Y'),
+('admin', 43, 213, 'Y'),
+('admin', 44, 1, 'Y'),
+('admin', 44, 214, 'Y'),
+('admin', 45, 1, 'Y'),
+('admin', 46, 1, 'Y'),
+('admin', 48, 1, 'Y'),
+('admin', 48, 241, 'Y'),
+('admin', 49, 1, 'Y'),
+('admin', 49, 232, 'Y'),
+('admin', 49, 247, 'Y'),
+('admin', 50, 1, 'Y'),
+('admin', 51, 1, 'Y'),
+('admin', 52, 1, 'Y'),
+('admin', 55, 1, 'Y'),
+('admin', 57, 1, 'Y'),
+('admin', 58, 1, 'Y'),
+('admin', 59, 1, 'Y'),
+('admin', 60, 1, 'Y'),
+('admin', 61, 1, 'Y'),
+('admin', 61, 255, 'Y'),
+('admin', 61, 256, 'Y'),
+('admin', 61, 257, 'Y'),
+('admin', 61, 260, 'Y'),
+('admin', 61, 261, 'Y'),
+('admin', 61, 262, 'Y'),
+('admin', 61, 263, 'Y'),
+('admin', 63, 1, 'Y'),
+('admin', 64, 1, 'Y'),
+('cashier', 1, 1, 'Y'),
+('cashier', 1, 34, 'Y'),
+('cashier', 1, 35, 'Y'),
+('cashier', 1, 36, 'Y'),
+('cashier', 1, 37, 'Y'),
+('cashier', 1, 38, 'Y'),
+('cashier', 1, 39, 'Y'),
+('cashier', 1, 40, 'Y'),
+('cashier', 1, 41, 'Y'),
+('cashier', 1, 42, 'Y'),
+('cashier', 1, 43, 'Y'),
+('cashier', 1, 44, 'Y'),
+('cashier', 1, 45, 'Y'),
+('cashier', 1, 46, 'Y'),
+('cashier', 1, 47, 'Y'),
+('cashier', 1, 48, 'Y'),
+('cashier', 1, 69, 'Y'),
+('cashier', 1, 82, 'Y'),
+('cashier', 1, 83, 'Y'),
+('cashier', 1, 85, 'Y'),
+('cashier', 1, 88, 'Y'),
+('cashier', 1, 89, 'Y'),
+('cashier', 1, 90, 'Y'),
+('cashier', 1, 91, 'Y'),
+('cashier', 1, 92, 'Y'),
+('cashier', 1, 93, 'Y'),
+('cashier', 1, 95, 'Y'),
+('cashier', 1, 96, 'Y'),
+('cashier', 1, 97, 'Y'),
+('cashier', 1, 98, 'Y'),
+('cashier', 1, 99, 'Y'),
+('cashier', 1, 101, 'Y'),
+('cashier', 1, 102, 'Y'),
+('cashier', 1, 108, 'Y'),
+('cashier', 1, 121, 'Y'),
+('cashier', 1, 122, 'Y'),
+('cashier', 1, 123, 'Y'),
+('cashier', 1, 155, 'Y'),
+('cashier', 1, 197, 'Y'),
+('cashier', 1, 199, 'Y'),
+('cashier', 1, 211, 'Y'),
+('cashier', 1, 253, 'Y'),
+('cashier', 6, 1, 'Y'),
+('cashier', 6, 26, 'Y'),
+('cashier', 6, 27, 'Y'),
+('cashier', 6, 28, 'Y'),
+('cashier', 6, 29, 'Y'),
+('cashier', 6, 30, 'Y'),
+('cashier', 6, 31, 'Y'),
+('cashier', 6, 59, 'Y'),
+('cashier', 6, 185, 'Y'),
+('cashier', 6, 188, 'Y'),
+('cashier', 6, 246, 'Y'),
+('cashier', 8, 1, 'Y'),
+('cashier', 8, 62, 'Y'),
+('cashier', 8, 63, 'Y'),
+('cashier', 8, 64, 'Y'),
+('cashier', 11, 1, 'Y'),
+('cashier', 18, 1, 'Y'),
+('cashier', 18, 114, 'Y'),
+('cashier', 18, 115, 'Y'),
+('cashier', 18, 117, 'Y'),
+('cashier', 18, 118, 'Y'),
+('cashier', 18, 120, 'Y'),
+('cashier', 18, 145, 'Y'),
+('cashier', 18, 146, 'Y'),
+('cashier', 18, 156, 'Y'),
+('cashier', 18, 157, 'Y'),
+('cashier', 18, 159, 'Y'),
+('cashier', 18, 160, 'Y'),
+('cashier', 18, 161, 'Y'),
+('cashier', 18, 166, 'Y'),
+('cashier', 18, 167, 'Y'),
+('cashier', 18, 168, 'Y'),
+('cashier', 18, 169, 'Y'),
+('cashier', 18, 170, 'Y'),
+('cashier', 18, 172, 'Y'),
+('cashier', 18, 173, 'Y'),
+('cashier', 18, 187, 'Y'),
+('cashier', 18, 248, 'Y'),
+('cashier', 19, 1, 'Y'),
+('cashier', 19, 144, 'Y'),
+('cashier', 20, 1, 'Y'),
+('cashier', 20, 147, 'Y'),
+('cashier', 24, 1, 'Y'),
+('cashier', 24, 148, 'Y'),
+('cashier', 25, 1, 'Y'),
+('cashier', 25, 149, 'Y'),
+('cashier', 25, 152, 'Y'),
+('cashier', 25, 153, 'Y'),
+('cashier', 26, 1, 'Y'),
+('cashier', 27, 1, 'Y'),
+('cashier', 28, 1, 'Y'),
+('cashier', 28, 150, 'Y'),
+('cashier', 29, 1, 'Y'),
+('cashier', 30, 1, 'Y'),
+('cashier', 32, 1, 'Y'),
+('cashier', 36, 1, 'Y'),
+('cashier', 36, 162, 'Y'),
+('cashier', 36, 163, 'Y'),
+('cashier', 37, 1, 'Y'),
+('cashier', 38, 1, 'Y'),
+('cashier', 38, 164, 'Y'),
+('cashier', 38, 165, 'Y'),
+('cashier', 38, 186, 'Y'),
+('cashier', 38, 200, 'Y'),
+('cashier', 38, 224, 'Y'),
+('cashier', 38, 235, 'Y'),
+('cashier', 38, 249, 'Y'),
+('cashier', 49, 1, 'Y'),
+('cashier', 49, 232, 'Y'),
+('cashier', 49, 247, 'Y'),
+('manager', 1, 1, 'Y'),
+('manager', 1, 3, 'Y'),
+('manager', 1, 11, 'Y'),
+('manager', 1, 13, 'Y'),
+('manager', 1, 14, 'Y'),
+('manager', 1, 15, 'Y'),
+('manager', 1, 16, 'Y'),
+('manager', 1, 17, 'Y'),
+('manager', 1, 18, 'Y'),
+('manager', 1, 19, 'Y'),
+('manager', 1, 20, 'Y'),
+('manager', 1, 21, 'Y'),
+('manager', 1, 22, 'Y'),
+('manager', 1, 23, 'Y'),
+('manager', 1, 24, 'Y'),
+('manager', 1, 25, 'Y'),
+('manager', 1, 34, 'Y'),
+('manager', 1, 35, 'Y'),
+('manager', 1, 36, 'Y'),
+('manager', 1, 37, 'Y'),
+('manager', 1, 38, 'Y'),
+('manager', 1, 39, 'Y'),
+('manager', 1, 40, 'Y'),
+('manager', 1, 41, 'Y'),
+('manager', 1, 42, 'Y'),
+('manager', 1, 43, 'Y'),
+('manager', 1, 44, 'Y'),
+('manager', 1, 45, 'Y'),
+('manager', 1, 46, 'Y'),
+('manager', 1, 47, 'Y'),
+('manager', 1, 48, 'Y'),
+('manager', 1, 69, 'Y'),
+('manager', 1, 71, 'Y'),
+('manager', 1, 72, 'Y'),
+('manager', 1, 82, 'Y'),
+('manager', 1, 83, 'Y'),
+('manager', 1, 85, 'Y'),
+('manager', 1, 88, 'Y'),
+('manager', 1, 89, 'Y'),
+('manager', 1, 90, 'Y'),
+('manager', 1, 91, 'Y'),
+('manager', 1, 92, 'Y'),
+('manager', 1, 93, 'Y'),
+('manager', 1, 95, 'Y'),
+('manager', 1, 96, 'Y'),
+('manager', 1, 97, 'Y'),
+('manager', 1, 98, 'Y'),
+('manager', 1, 99, 'Y'),
+('manager', 1, 101, 'Y'),
+('manager', 1, 102, 'Y'),
+('manager', 1, 107, 'Y'),
+('manager', 1, 108, 'Y'),
+('manager', 1, 109, 'Y'),
+('manager', 1, 121, 'Y'),
+('manager', 1, 122, 'Y'),
+('manager', 1, 123, 'Y'),
+('manager', 1, 154, 'Y'),
+('manager', 1, 155, 'Y'),
+('manager', 1, 189, 'Y'),
+('manager', 1, 193, 'Y'),
+('manager', 1, 194, 'Y'),
+('manager', 1, 195, 'Y'),
+('manager', 1, 196, 'Y'),
+('manager', 1, 197, 'Y'),
+('manager', 1, 198, 'Y'),
+('manager', 1, 199, 'Y'),
+('manager', 1, 208, 'Y'),
+('manager', 1, 211, 'Y'),
+('manager', 1, 212, 'Y'),
+('manager', 1, 221, 'Y'),
+('manager', 1, 222, 'Y'),
+('manager', 1, 223, 'Y'),
+('manager', 1, 233, 'Y'),
+('manager', 1, 240, 'Y'),
+('manager', 1, 253, 'Y'),
+('manager', 2, 1, 'Y'),
+('manager', 2, 4, 'Y'),
+('manager', 2, 5, 'Y'),
+('manager', 2, 6, 'Y'),
+('manager', 2, 32, 'Y'),
+('manager', 2, 49, 'Y'),
+('manager', 2, 50, 'Y'),
+('manager', 2, 51, 'Y'),
+('manager', 2, 52, 'Y'),
+('manager', 2, 53, 'Y'),
+('manager', 2, 54, 'Y'),
+('manager', 2, 55, 'Y'),
+('manager', 2, 56, 'Y'),
+('manager', 2, 57, 'Y'),
+('manager', 2, 70, 'Y'),
+('manager', 2, 75, 'Y'),
+('manager', 2, 76, 'Y'),
+('manager', 2, 77, 'Y'),
+('manager', 2, 78, 'Y'),
+('manager', 2, 79, 'Y'),
+('manager', 2, 80, 'Y'),
+('manager', 2, 81, 'Y'),
+('manager', 2, 84, 'Y'),
+('manager', 2, 87, 'Y'),
+('manager', 2, 94, 'Y'),
+('manager', 2, 100, 'Y'),
+('manager', 2, 103, 'Y'),
+('manager', 2, 104, 'Y'),
+('manager', 2, 105, 'Y'),
+('manager', 2, 106, 'Y'),
+('manager', 2, 110, 'Y'),
+('manager', 2, 111, 'Y'),
+('manager', 2, 124, 'Y'),
+('manager', 2, 227, 'Y'),
+('manager', 2, 228, 'Y'),
+('manager', 2, 229, 'Y'),
+('manager', 2, 230, 'Y'),
+('manager', 2, 236, 'Y'),
+('manager', 2, 237, 'Y'),
+('manager', 2, 238, 'Y'),
+('manager', 2, 239, 'Y'),
+('manager', 2, 242, 'Y'),
+('manager', 2, 243, 'Y'),
+('manager', 2, 244, 'Y'),
+('manager', 2, 245, 'Y'),
+('manager', 3, 1, 'Y'),
+('manager', 3, 66, 'Y'),
+('manager', 3, 67, 'Y'),
+('manager', 3, 68, 'Y'),
+('manager', 3, 113, 'Y'),
+('manager', 3, 128, 'Y'),
+('manager', 3, 129, 'Y'),
+('manager', 3, 130, 'Y'),
+('manager', 3, 131, 'Y'),
+('manager', 3, 203, 'Y'),
+('manager', 3, 206, 'Y'),
+('manager', 6, 1, 'Y'),
+('manager', 6, 26, 'Y'),
+('manager', 6, 27, 'Y'),
+('manager', 6, 28, 'Y'),
+('manager', 6, 29, 'Y'),
+('manager', 6, 30, 'Y'),
+('manager', 6, 31, 'Y'),
+('manager', 6, 59, 'Y'),
+('manager', 6, 185, 'Y'),
+('manager', 6, 188, 'Y'),
+('manager', 6, 246, 'Y'),
+('manager', 8, 1, 'Y'),
+('manager', 8, 62, 'Y'),
+('manager', 8, 63, 'Y'),
+('manager', 8, 64, 'Y'),
+('manager', 9, 1, 'Y'),
+('manager', 9, 7, 'Y'),
+('manager', 9, 8, 'Y'),
+('manager', 9, 9, 'Y'),
+('manager', 9, 10, 'Y'),
+('manager', 10, 1, 'Y'),
+('manager', 10, 60, 'Y'),
+('manager', 10, 143, 'Y'),
+('manager', 11, 1, 'Y'),
+('manager', 12, 1, 'Y'),
+('manager', 14, 1, 'Y'),
+('manager', 15, 1, 'Y'),
+('manager', 15, 125, 'Y'),
+('manager', 15, 126, 'Y'),
+('manager', 16, 1, 'Y'),
+('manager', 16, 112, 'Y'),
+('manager', 17, 1, 'Y'),
+('manager', 18, 1, 'Y'),
+('manager', 18, 114, 'Y'),
+('manager', 18, 115, 'Y'),
+('manager', 18, 116, 'Y'),
+('manager', 18, 117, 'Y'),
+('manager', 18, 118, 'Y'),
+('manager', 18, 119, 'Y'),
+('manager', 18, 120, 'Y'),
+('manager', 18, 145, 'Y'),
+('manager', 18, 146, 'Y'),
+('manager', 18, 156, 'Y'),
+('manager', 18, 157, 'Y'),
+('manager', 18, 159, 'Y'),
+('manager', 18, 160, 'Y'),
+('manager', 18, 161, 'Y'),
+('manager', 18, 166, 'Y'),
+('manager', 18, 167, 'Y'),
+('manager', 18, 168, 'Y'),
+('manager', 18, 169, 'Y'),
+('manager', 18, 170, 'Y'),
+('manager', 18, 171, 'Y'),
+('manager', 18, 172, 'Y'),
+('manager', 18, 173, 'Y'),
+('manager', 18, 187, 'Y'),
+('manager', 18, 234, 'Y'),
+('manager', 18, 248, 'Y'),
+('manager', 19, 1, 'Y'),
+('manager', 19, 144, 'Y'),
+('manager', 20, 1, 'Y'),
+('manager', 20, 147, 'Y'),
+('manager', 21, 1, 'Y'),
+('manager', 23, 1, 'Y'),
+('manager', 24, 1, 'Y'),
+('manager', 24, 148, 'Y'),
+('manager', 25, 1, 'Y'),
+('manager', 25, 149, 'Y'),
+('manager', 25, 152, 'Y'),
+('manager', 25, 153, 'Y'),
+('manager', 26, 1, 'Y'),
+('manager', 27, 1, 'Y'),
+('manager', 28, 1, 'Y'),
+('manager', 28, 150, 'Y'),
+('manager', 29, 1, 'Y'),
+('manager', 30, 1, 'Y'),
+('manager', 31, 1, 'Y'),
+('manager', 31, 151, 'Y'),
+('manager', 32, 1, 'Y'),
+('manager', 33, 1, 'Y'),
+('manager', 33, 158, 'Y'),
+('manager', 34, 1, 'Y'),
+('manager', 35, 1, 'Y'),
+('manager', 36, 1, 'Y'),
+('manager', 36, 162, 'Y'),
+('manager', 36, 163, 'Y'),
+('manager', 36, 252, 'Y'),
+('manager', 37, 1, 'Y'),
+('manager', 38, 1, 'Y'),
+('manager', 38, 164, 'Y'),
+('manager', 38, 165, 'Y'),
+('manager', 38, 174, 'Y'),
+('manager', 38, 186, 'Y'),
+('manager', 38, 200, 'Y'),
+('manager', 38, 224, 'Y'),
+('manager', 38, 235, 'Y'),
+('manager', 38, 249, 'Y'),
+('manager', 39, 1, 'Y'),
+('manager', 39, 175, 'Y'),
+('manager', 39, 176, 'Y'),
+('manager', 39, 177, 'Y'),
+('manager', 39, 178, 'Y'),
+('manager', 40, 1, 'Y'),
+('manager', 40, 181, 'Y'),
+('manager', 40, 182, 'Y'),
+('manager', 40, 183, 'Y'),
+('manager', 40, 184, 'Y'),
+('manager', 40, 204, 'Y'),
+('manager', 40, 207, 'Y'),
+('manager', 41, 1, 'Y'),
+('manager', 42, 1, 'Y'),
+('manager', 42, 190, 'Y'),
+('manager', 42, 191, 'Y'),
+('manager', 42, 192, 'Y'),
+('manager', 42, 201, 'Y'),
+('manager', 42, 202, 'Y'),
+('manager', 42, 205, 'Y'),
+('manager', 43, 1, 'Y'),
+('manager', 43, 213, 'Y'),
+('manager', 44, 1, 'Y'),
+('manager', 44, 214, 'Y'),
+('manager', 45, 1, 'Y'),
+('manager', 46, 1, 'Y'),
+('manager', 48, 1, 'Y'),
+('manager', 48, 241, 'Y'),
+('manager', 49, 1, 'Y'),
+('manager', 49, 232, 'Y'),
+('manager', 49, 247, 'Y'),
+('manager', 50, 1, 'Y'),
+('manager', 51, 1, 'Y'),
+('manager', 52, 1, 'Y'),
+('manager', 55, 1, 'Y'),
+('manager', 57, 1, 'Y'),
+('manager', 58, 1, 'Y'),
+('manager', 59, 1, 'Y'),
+('manager', 61, 1, 'Y'),
+('manager', 61, 255, 'Y'),
+('manager', 61, 256, 'Y'),
+('manager', 61, 257, 'Y'),
+('manager', 61, 260, 'Y'),
+('manager', 61, 261, 'Y'),
+('manager', 61, 262, 'Y'),
+('manager', 61, 263, 'Y'),
+('manager', 63, 1, 'Y'),
+('manager', 64, 1, 'Y'),
+('steward1', 1, 1, 'Y'),
+('steward1', 1, 34, 'Y'),
+('steward1', 1, 35, 'Y'),
+('steward1', 1, 36, 'Y'),
+('steward1', 1, 37, 'Y'),
+('steward1', 1, 38, 'Y'),
+('steward1', 1, 39, 'Y'),
+('steward1', 1, 40, 'Y'),
+('steward1', 1, 41, 'Y'),
+('steward1', 1, 42, 'Y'),
+('steward1', 1, 43, 'Y'),
+('steward1', 1, 44, 'Y'),
+('steward1', 1, 45, 'Y'),
+('steward1', 1, 46, 'Y'),
+('steward1', 1, 47, 'Y'),
+('steward1', 1, 48, 'Y'),
+('steward1', 1, 69, 'Y'),
+('steward1', 1, 82, 'Y'),
+('steward1', 1, 83, 'Y'),
+('steward1', 1, 85, 'Y'),
+('steward1', 1, 88, 'Y'),
+('steward1', 1, 89, 'Y'),
+('steward1', 1, 90, 'Y'),
+('steward1', 1, 91, 'Y'),
+('steward1', 1, 92, 'Y'),
+('steward1', 1, 93, 'Y'),
+('steward1', 1, 95, 'Y'),
+('steward1', 1, 96, 'Y'),
+('steward1', 1, 97, 'Y'),
+('steward1', 1, 98, 'Y'),
+('steward1', 1, 99, 'Y'),
+('steward1', 1, 101, 'Y'),
+('steward1', 1, 102, 'Y'),
+('steward1', 1, 108, 'Y'),
+('steward1', 1, 121, 'Y'),
+('steward1', 1, 122, 'Y'),
+('steward1', 1, 123, 'Y'),
+('steward1', 1, 155, 'Y'),
+('steward1', 1, 197, 'Y'),
+('steward1', 1, 199, 'Y'),
+('steward1', 1, 211, 'Y'),
+('steward1', 6, 1, 'Y'),
+('steward1', 6, 26, 'Y'),
+('steward1', 6, 27, 'Y'),
+('steward1', 6, 28, 'Y'),
+('steward1', 6, 29, 'Y'),
+('steward1', 6, 30, 'Y'),
+('steward1', 6, 31, 'Y'),
+('steward1', 6, 59, 'Y'),
+('steward1', 6, 185, 'Y'),
+('steward1', 6, 188, 'Y'),
+('steward1', 6, 246, 'Y'),
+('steward1', 8, 1, 'Y'),
+('steward1', 8, 62, 'Y'),
+('steward1', 8, 63, 'Y'),
+('steward1', 8, 64, 'Y'),
+('steward1', 11, 1, 'Y'),
+('steward1', 18, 1, 'Y'),
+('steward1', 18, 114, 'Y'),
+('steward1', 18, 117, 'Y'),
+('steward1', 18, 118, 'Y'),
+('steward1', 18, 145, 'Y'),
+('steward1', 18, 157, 'Y'),
+('steward1', 18, 166, 'Y'),
+('steward1', 18, 167, 'Y'),
+('steward1', 18, 168, 'Y'),
+('steward1', 18, 169, 'Y'),
+('steward1', 18, 170, 'Y'),
+('steward1', 18, 173, 'Y'),
+('steward1', 18, 248, 'Y'),
+('steward1', 24, 1, 'Y'),
+('steward1', 24, 148, 'Y'),
+('steward1', 34, 1, 'Y'),
+('steward1', 36, 1, 'Y'),
+('steward1', 36, 162, 'Y'),
+('steward1', 37, 1, 'Y'),
+('steward1', 38, 1, 'Y'),
+('steward1', 38, 164, 'Y'),
+('steward1', 38, 165, 'Y'),
+('steward1', 38, 224, 'Y'),
+('steward1', 38, 249, 'Y');
+
+
+
+INSERT INTO `tbl_languages` (`ls_id`, `ls_language`, `ls_status`) VALUES
+(1, 'english', 'Y'),
+(2, 'arabic', 'N');
+
+INSERT INTO `tbl_paymentmode` (`pym_id`, `pym_code`, `pym_name`, `pym_active`, `pym_credit_view`, `pym_changesettled_view`, `pym_takeaway_view`, `pym_counter_view`) VALUES
+(1, 'cash', 'Cash', 'Y', 'Y', 'Y', 'Y', 'Y'),
+(2, 'credit', 'Credit / Debit', 'Y', 'Y', 'Y', 'Y', 'Y'),
+(3, 'coupon', 'Coupons', 'N', 'N', 'N', 'Y', 'Y'),
+(4, 'voucher', 'Voucher', 'N', 'N', 'N', 'N', 'N'),
+(5, 'cheque', 'Cheque', 'N', 'N', 'N', 'N', 'N'),
+(6, 'credit_person', 'Credit Types', 'Y', 'N', 'N', 'Y', 'Y'),
+(7, 'complimentary', 'Complimentary', 'Y', 'N', 'N', 'Y', 'Y'),
+(8, 'upi', 'UPI ', 'N', 'N', 'N', 'Y', 'Y');
+
+INSERT INTO `tbl_portionmaster` (`pm_id`, `pm_portionname`, `pm_portionshortcode`, `pm_viewinbill`, `pm_viewinkot`, `pm_ratio`, `pm_android_sync`) VALUES
+(1, 'Single', 'S', 'N', 'Y', '1.00', 'Y'),
+(2, 'Half', 'H', 'Y', 'Y', '1.00', 'Y'),
+(3, 'Quarter', 'Q', 'Y', 'Y', '1.00', 'Y'),
+(4, 'Full', 'F', 'Y', 'Y', '1.00', 'Y'),
+(5, 'Small', 'S', 'Y', 'Y', '1.00', 'Y'),
+(6, 'Medium', 'M', 'Y', 'Y', '1.00', 'Y'),
+(7, 'Large', 'L', 'Y', 'Y', '1.00', 'Y');
+
+INSERT INTO `tbl_printertype` (`pt_id`, `pt_typename`, `pt_kotstatus`, `pt_floorvisible`, `cloud_sync`) VALUES
+(1, 'KOT Print', 'Y', 'Y', 'N'),
+(2, 'Bill Print', 'N', 'Y', 'N'),
+(3, 'Report Print', 'N', 'N', 'N'),
+(4, 'KOT Print TA CS', 'Y', 'N', 'N'),
+(5, 'Bill Print TA CS', 'N', 'N', 'N'),
+(6, 'Consolidated', 'Y', 'Y', 'N'),
+(7, 'Consolidated TA CS', 'N', 'N', 'N'),
+(8, 'Shift Report Print', 'N', 'N', 'N'),
+(9, 'Online KOT', 'Y', 'N', 'N'),
+(10, 'Online Bill', 'N', 'N', 'N'),
+(11, 'Bill Print CS', 'N', 'N', 'N');
+
+INSERT INTO `tbl_printer_styles` (`ps_id`, `ps_name`, `ps_description`) VALUES
+(1, 'style 1', 'length 46-'),
+(2, 'style 2', 'length 42-TVS MODELS'),
+(3, 'style 3', 'china rocket 300 - 60'),
+(4, 'style 4', 'rugtek - 60');
+
+INSERT INTO `tbl_menusearchtype` (`me_id`, `me_type`, `me_description`, `me_active`) VALUES
+(1, 'name_with_rate', 'first two letters of menuname ,- quantity', 'N'),
+(2, 'name_only', 'fullname search', 'Y');
+
+
+INSERT INTO `tbl_credit_types` (`ct_creditid`, `ct_credit_type`, `ct_active`, `ct_labels`) VALUES
+(1, 'By Room', 'N', 'Room name'),
+(2, 'By Staff', 'Y', 'Staff name'),
+(3, 'By Company', 'Y', 'Company Name'),
+(4, 'By Guest', 'Y', 'Guest Name');
+
+INSERT INTO `tbl_version`(`pv_current_version`, `pv_date_of_change`, `pv_time_of_change`, `pv_expodine_staff_by`,pv_apk_ver_name,pv_apk_ver_code)
+VALUES(version_code,current_date(),current_time(),'Fresh-Installation',apk_version_name,apk_version_code);
+
+
+INSERT INTO `tbl_currency_master` (`c_id`, `c_name`, `c_short_code`, `c_status`) VALUES
+(1, 'Indian Rupees', 'INR', 'Active'),
+(2, 'Dollar', '$', 'Active'),
+(3, 'Dirham', 'AED', 'Active'),
+(4, 'Qatar Riyal', 'QAR', 'Active'),
+(5, 'Saudi Riyal', 'SAR', 'Active'),
+(6, 'Georgian Lari', 'GEL', 'Active'),
+(7, 'Kuwait Dinar', 'KWD', 'Active'),
+(8, 'Bahrain Dinar', 'BD', 'Active'),
+(9, 'Oman Rial', 'OMR', 'Active'),
+(10,'South African Rand', 'ZAR', 'Active'),
+(11,'Fijian Dollar', 'FJD', 'Active');
+
+
+
+
+UPDATE `tbl_branchmaster` SET `be_base_currency` = '1',be_consolidated_print = 'N',be_appstring='http://192.168.0.150:8021/Dropbox/expodine';
+
+INSERT INTO `tbl_generalsettings` (`be_id`, `be_mail_server`, `be_mail_port`, `be_mail_emailid`, `be_mail_password`, `be_mail_secure`, `be_mail_from`, `be_sms_username`, `be_sms_apipassword`, `be_sms_senderid`, `be_sms_domainid`, `be_sms_priority`, `be_sms_method`, `be_merchant_id`, `be_collector_id`, `be_client_id`, `be_client_secret`, `be_merchant_username`, `be_merchant_password`, `be_upi_auth_token`, `be_client_hash_salt`, `be_upi_money_api`, `be_upi_status_api`,shortlink_api,shortlink_token) VALUES
+(1, 'smtp.gmail.com', '587', 'alerts@expodine.com', 'ksmr tnqc jqur ytdt', 'TLS', 'noreply@expodine.com', NULL, NULL, NULL, NULL,NULL,NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,'https://api-ssl.bitly.com/v4/shorten','1973908bf1947a7dd341e60a3a4fc3ccaeadd790');
+
+INSERT INTO `tbl_sms_report_settings` (`ss_id`, `ss_label`, `ss_show`) VALUES
+(1, 'Total Sales Inclusive Tax', 'Y'),
+(2, 'Total Sales Exclusive Tax', 'Y'),
+(3, 'Kot Value', 'Y'),
+(4, 'Stewards Sale', 'Y'),
+(5, 'Total Bill Count','Y'),
+(6, 'Total Pax', 'Y'),
+(7, 'DI Sale', 'Y'),
+(8, 'TA Sale', 'Y'),
+(9, 'HD Sale', 'Y'),
+(10, 'CS Sale', 'Y'),
+(11, 'Bill Cancel Value', 'Y');
+
+
+INSERT INTO `tbl_unit_master` (`u_id`, `u_name`, `cloud_sync`) VALUES
+(1, 'GM', 'N'),
+(2, 'KG', 'N'),
+(3, 'LTR', 'N'),
+(4, 'MLTR', 'N'),
+(5, 'Nos', 'N');
+
+INSERT INTO `tbl_base_unit_master` (`bu_id`, `bu_name`, `cloud_sync`) VALUES
+(1, 'KG', 'N'),
+(2, 'LTR', 'N'),
+(3, 'Nos', 'N');
+
+
+
+INSERT INTO `tbl_unit_master_combination` (`um_first_id`, `um_second_id`, `cloud_sync`) VALUES
+(1, 1, 'N'),
+(1, 2, 'N'),
+(2, 3, 'N'),
+(2, 4, 'N'),
+(3, 5, 'N');
+
+
+
+INSERT INTO `tbl_br_cloud_tables` (`id`, `table_name`, `status`) VALUES
+(1, 'tbl_tableorder', 'Y'),
+(2, 'tbl_tableorder_changes', 'Y'),
+(3, 'tbl_takeaway_cancel_items', 'Y'),
+(4, 'tbl_online_order', 'Y'),
+(5, 'tbl_menumaster', 'Y'),
+(6, 'tbl_menurate_counter', 'Y'),
+(7, 'tbl_menuratemaster', 'Y'),
+(8, 'tbl_menuratetakeaway', 'Y'),
+(9, 'tbl_portionmaster', 'Y'),
+(10, 'tbl_floormaster', 'Y'),
+(11, 'tbl_menumaincategory', 'Y'),
+(12, 'tbl_extra_tax_master', 'Y'),
+(13, 'tbl_menusubcategory', 'Y'),
+(14, 'tbl_staffmaster', 'Y'),
+(15, 'tbl_takeaway_customer', 'Y'),
+(16, 'tbl_unit_master', 'Y'),
+(17, 'tbl_unit_master_combination', 'Y'),
+(18, 'tbl_base_unit_master', 'Y'),
+(19, 'tbl_paymentmode', 'Y'),
+(20, 'tbl_credit_master', 'Y'),
+(21, 'tbl_credit_types', 'Y'),
+(22, 'tbl_bankmaster', 'Y'),
+(23, 'tbl_kotmaster', 'Y'),
+(24, 'tbl_tablemaster', 'Y'),
+(25, 'tbl_loyalty_reg', 'Y'),
+(26, 'tbl_corporatemaster', 'Y'),
+(27, 'tbl_discountmaster', 'Y'),
+(28, 'tbl_logindetails', 'Y'),
+(29, 'tbl_dayclose', 'Y'),
+(30, 'tbl_menustock', 'Y'),
+(31, 'tbl_departmentmaster', 'Y'),
+(32, 'tbl_designationmaster', 'Y'),
+(33, 'tbl_floor_tax', 'Y'),
+(34, 'tbl_bill_card_payments', 'Y'),
+(35, 'tbl_cancellation_reasons', 'Y'),
+(36, 'tbl_cardmaster', 'Y'),
+(37, 'tbl_combo_bill_details', 'N'),
+(38, 'tbl_combo_bill_details_ta', 'N'),
+(39, 'tbl_combo_stock', 'N'),
+(40, 'tbl_complementory_reasons', 'Y'),
+(41, 'tbl_couponcompany', 'Y'),
+(42, 'tbl_currency_conv_rate', 'N'),
+(43, 'tbl_currency_master', 'Y'),
+(44, 'tbl_delivery_status', 'Y'),
+(45, 'tbl_denomination_master', 'Y'),
+(46, 'tbl_kotcountermaster', 'Y'),
+(47, 'tbl_expodine_machines', 'N'),
+(48, 'tbl_feedbackmaster', 'N'),
+(49, 'tbl_feedbackrating', 'N'),
+(50, 'tbl_feedbackratingcount', 'N'),
+(51, 'tbl_function_details', 'N'),
+(52, 'tbl_function_details_menu', 'N'),
+(53, 'tbl_function_extra_costs', 'N'),
+(54, 'tbl_function_invoice', 'N'),
+(55, 'tbl_function_invoice_extras', 'N'),
+(56, 'tbl_function_type', 'N'),
+(57, 'tbl_function_venue', 'N'),
+(58, 'tbl_ingredientmaster', 'N'),
+(59, 'tbl_kot_cancellation', 'Y'),
+(60, 'tbl_loyalty_campaign', 'N'),
+(61, 'tbl_loyalty_discount', 'N'),
+(62, 'tbl_loyalty_levels', 'N'),
+(63, 'tbl_loyalty_point_transfers', 'N'),
+(64, 'tbl_loyalty_pointadd_bill', 'Y'),
+(65, 'tbl_loyalty_pointrule', 'N'),
+(66, 'tbl_loyalty_redeem_rule', 'N'),
+(67, 'tbl_loyalty_rules', 'N'),
+(68, 'tbl_loyalty_rules_type', 'N'),
+(69, 'tbl_loyalty_sendto', 'N'),
+(70, 'tbl_loyalty_sms_source', 'N'),
+(71, 'tbl_loyalty_voucher', 'N'),
+(72, 'tbl_menu_addons', 'Y'),
+(73, 'tbl_menu_discount', 'Y'),
+(74, 'tbl_menu_tax_master', 'Y'),
+(75, 'tbl_accounthead', 'Y'),
+(76, 'tbl_online_billdetails', 'N'),
+(77, 'tbl_online_billmaster', 'N'),
+(78, 'tbl_order_addon', 'Y'),
+(79, 'tbl_order_addon_changes', 'Y'),
+(80, 'tbl_regenerate_reasons', 'Y'),
+(81, 'tbl_regenrate_log', 'N'),
+(82, 'tbl_roommaster', 'N'),
+(83, 'tbl_shift_close_denomination', 'N'),
+(84, 'tbl_shift_details', 'Y'),
+(85, 'tbl_shift_open_denomination', 'N'),
+(86, 'tbl_tablebill_paymentchange', 'Y'),
+(87, 'tbl_preferencemaster', 'Y'),
+(88, 'tbl_voucherhead', 'N'),
+(89, 'tbl_voucherpayment', 'N'),
+(90, 'tbl_combo_menu_labels', 'N'),
+(91, 'tbl_combo_name', 'N'),
+(92, 'tbl_combo_ordering_details', 'N'),
+(93, 'tbl_combo_packs', 'N'),
+(94, 'tbl_combo_pack_menus', 'N'),
+(95, 'tbl_combo_pack_rates', 'N'),
+(96, 'tbl_combo_type', 'N'),
+(97, 'tbl_ledger_setting', 'N'),
+(98, 'tbl_login_restrict_logs', 'N'),
+(99, 'tbl_loyalty_campaign_group', 'N'),
+(100, 'tbl_loyalty_group_details', 'N'),
+(101, 'tbl_shift_card_detail_close', 'N'),
+(102, 'tbl_shift_card_detail_open', 'N'),
+(103, 'tbl_menurate_roomservice', 'N'),
+(104, 'tbl_appmachinedetails', 'N'),
+(105, 'tbl_tablebill_split', 'N'),
+(106, 'tbl_credit_details', 'Y'),
+(107, 'tbl_credit_details_payment', 'Y'),
+(108, 'tbl_expense_voucher', 'Y'),
+(109, 'tbl_supplier_voucher', 'Y'),
+(110, 'tbl_employee_voucher', 'Y'),
+(111, 'tbl_ledger_master', 'Y'),
+(112, 'tbl_ledger_group', 'Y'),
+(113, 'tbl_online_tax', 'Y'),
+(114, 'tbl_store_stock', 'N'),
+(115, 'tbl_requisition', 'N'),
+(116, 'tbl_purchase_order', 'N'),
+(117, 'tbl_grn_order', 'Y'),
+(118, 'tbl_store_transfer', 'N'),
+(119, 'tbl_physical_stock', 'N'),
+(120, 'tbl_purchase_return', 'N'),
+(121, 'tbl_grn_summary', 'Y'),
+(122, 'tbl_consumption', 'N'),
+(123, 'tbl_inv_settings', 'N'),
+(124, 'tbl_stock_details', 'N'),
+(125, 'tbl_wastage', 'N'),
+(126, 'tbl_production', 'N'),
+(127, 'tbl_menu_ingredient_detail', 'N'),
+(128, 'tbl_product_conversion', 'N'),
+(129, 'tbl_inv_kitchen', 'Y'),
+(130, 'tbl_vendor_master', 'Y'),
+(131, 'tbl_food_cost', 'N'),
+(132, 'tbl_central_kitchen_transfer', 'N'),
+(133, 'tbl_amc_setup', 'Y');
+
+
+
+
+
+INSERT INTO `tbl_firebase_notification_report` (`tf_id`, `tf_report_head`, `tf_active`) VALUES
+(1, 'Day Open', 'Y'),
+(2, 'Day Close', 'Y'),
+(3, 'Bill Cancel', 'Y'),
+(4, 'Item Cancel', 'Y'),
+(5, 'Complimentary Settle', 'Y'),
+(6, 'Credit Settle', 'Y'),
+(7, 'Timely Report', 'Y'),
+(8, 'Regenerate', 'Y'),
+(9, 'Dayclose Revert', 'Y');
+
+
+INSERT INTO `tbl_combo_type` (`ct_id`, `ct_type`, `cloud_sync`) VALUES
+(1, 'Qty Specific', 'N'),
+(2, 'Fixed', 'N'),
+(3, 'Optional', 'N');
+
+INSERT INTO `tbl_bankmaster` (`bm_id`, `bm_name`, `bm_active`,`cloud_sync`,`bm_account`,`bm_lukado`) VALUES
+(1, 'UPI','Y', 'N',null,'N'),
+(2, 'Bank','Y', 'N',null,'N');
+
+
+INSERT INTO `tbl_inv_settings`(`ti_requistion_id`, `ti_purchase_id`, `ti_grn_id`, `ti_transfer_id`, `ti_physical_id`, `ti_return_id`,`ti_consumption_id`,`ti_wastage_id`,`ti_production_id`,`cloud_sync`,`ti_central_id`) values('1','1','1','1','1','1','1','1','1','Y','1');
+
+
+INSERT INTO `tbl_denomination_master`(`dm_id`, `dm_denomination`, `dm_active`, `dm_display_order`, `cloud_sync`) VALUES
+(1, '500','Y', '1','N'),
+(2, '200','Y', '2','N'),
+(3, '100','Y', '3','N'),
+(4, '50','Y', '4','N'),
+(5, '20','Y', '5','N'),
+(6, '10','Y', '6','N');
+
+
+INSERT INTO `tbl_online_order`(`tol_id`, `tol_name`, `tol_urban_name`, `tol_local_order`, `tol_discount`, `tol_tax`, `tol_tax_value`, `tol_credit_settle`, `tol_status`, `tol_order_status`, `tol_logo_url`, `tol_qr_order`) VALUES (1,'Takeaway','Takeaway','Y','0.000','N','0.000','N','Y','Y',null,'N');
+
+
+INSERT INTO `tbl_ledger_group` (`tlg_id`, `tlg_name`,`tlg_status`, `tlg_group_type`,`tlg_exp_inc_type`) VALUES
+(1, 'Current Assets', 'Y','asset',null),
+(2, 'Fixed Assets', 'Y','asset',null),
+(3, 'Current Liability', 'Y','liability',null),
+(4, 'Direct Expense', 'Y',null,'expense'),
+(5, 'Indirect Expense', 'Y',null,'expense'),
+(6, 'Direct Income', 'Y',null,'income'),
+(7, 'Indirect Income', 'Y',null,'income'),
+(8, 'Purchase Acc', 'Y',null,'expense'),
+(9, 'Sales Acc', 'Y',null,'income'),
+(10, 'Capital Account', 'Y','liability',null),
+(11, 'Investments', 'Y','asset',null),
+(12, 'Loan (Liability)', 'Y','liability',null),
+(13, 'Sales Return', 'Y',null,'expense'),
+(14, 'Purchase Return', 'Y',null,'income'),
+(15, 'Deposits (Assets)', 'Y','asset',null),
+(16, 'Cash in Hand', 'Y','asset',null),
+(17, 'Bank Accounts', 'Y','asset',null),
+(18, 'Sundry Debtors', 'Y','asset',null),
+(19, 'Bank OD/CC ACC', 'Y','liability',null),
+(20, 'Sundry Creditors', 'Y','liability',null),
+(21, 'Loans and Advances', 'Y','asset',null);
+
+update `tbl_branch_settings_cloud` set `bsc_branchid`="1",`bsc_cloud_branchid`="0",`cloud_url`="https://www.expodinereports.com/expodine_reports/", `avoid_tables`="'tbl_tablebilldetails','tbl_tablebillmaster','tbl_tablebill_extra_tax_details','tbl_tablebill_extra_tax_master','tbl_tablebill_item_discount','tbl_takeaway_billdetails','tbl_takeaway_billmaster','tbl_takeaway_bill_extra_tax_details','tbl_takeaway_bill_extra_tax_master','tbl_takeaway_item_discount','tbl_archive_settings','tbl_archive_settings_log','tbl_billcancel_log','tbl_branch_settings_cloud' ,'tbl_branch_settings_counter','tbl_branch_settings_loyality' , 'tbl_branch_settings_printer', 'tbl_branch_settings_ta_hd' , 'tbl_branchmaster' ,'tbl_branchsettings_android','tbl_cash_drawer_log', 'tbl_cloud_backup_history', 'tbl_combo_menu_labels',  'tbl_combo_name',  'tbl_combo_ordering_details', 'tbl_combo_pack_menus','tbl_combo_pack_rates','tbl_combo_packs' ,'tbl_combo_type','tbl_databank' ,'tbl_datesettings','tbl_generalsettings','tbl_language_feedback' ,'tbl_language_floor','tbl_language_menu_main' ,'tbl_language_menu_master','tbl_language_menu_sub' ,'tbl_language_portion','tbl_language_preference','tbl_language_staff', 'tbl_language_table_master' , 'tbl_login_restrict_logs','tbl_menu_import' ,'tbl_menu_upload','tbl_menucombination','tbl_menuimages' ,'tbl_menuingredients','tbl_menunutitionfacts','tbl_menuprefmaster','tbl_menusearchtype''tbl_menustock' ,'tbl_modulemaster' , 'tbl_modulesubmaster','tbl_notifications', 'tbl_printer_styles', 'tbl_printersettings', 'tbl_printersettings_ip','tbl_printersettings_log','tbl_printertype', 'tbl_report_bydate' ,'tbl_reportmaster', 'tbl_secretkeymaster', 'tbl_sms_report_settings','tbl_sms_report_slab','tbl_sms_time_settings','tbl_table_cloud' ,'tbl_tablebill_split','tbl_tabledetails' ,'tbl_tableinsertion','tbl_temp_orderno_details' ,'tbl_temp_regenerate' , 'tbl_temp_tablebilldetails','tbl_temp_tablebillmaster' , 'tbl_timely_sms_entry', 'tbl_track_l', 'tbl_track_l_details', 'tbl_usermodules', 'tbl_year_bill_series' , 'tbl_yearsettings','temp_loyalty_reg''tbl_tablebilldetails','tbl_tablebillmaster','tbl_tablebill_extra_tax_details','tbl_tablebill_extra_tax_master','tbl_tablebill_item_discount','tbl_takeaway_billdetails','tbl_takeaway_billmaster','tbl_takeaway_bill_extra_tax_details','tbl_takeaway_bill_extra_tax_master','tbl_takeaway_item_discount','tbl_archive_settings','tbl_archive_settings_log','tbl_billcancel_log','tbl_branch_settings_cloud' ,'tbl_branch_settings_counter','tbl_branch_settings_loyality' , 'tbl_branch_settings_printer', 'tbl_branch_settings_ta_hd' , 'tbl_branchmaster' ,'tbl_branchsettings_android','tbl_cash_drawer_log', 'tbl_cloud_backup_history', 'tbl_combo_menu_labels',  'tbl_combo_name',  'tbl_combo_ordering_details', 'tbl_combo_pack_menus','tbl_combo_pack_rates','tbl_combo_packs' ,'tbl_combo_type','tbl_databank' ,'tbl_datesettings','tbl_generalsettings','tbl_language_feedback' ,'tbl_language_floor','tbl_language_menu_main' ,'tbl_language_menu_master','tbl_language_menu_sub' ,'tbl_language_portion','tbl_language_preference','tbl_language_staff', 'tbl_language_table_master' , 'tbl_login_restrict_logs','tbl_menu_import' ,'tbl_menu_upload','tbl_menucombination','tbl_menuimages' ,'tbl_menuingredients','tbl_menunutitionfacts','tbl_menuprefmaster','tbl_menusearchtype''tbl_menustock' ,'tbl_modulemaster' , 'tbl_modulesubmaster','tbl_notifications', 'tbl_printer_styles', 'tbl_printersettings', 'tbl_printersettings_ip','tbl_printersettings_log','tbl_printertype', 'tbl_report_bydate' ,'tbl_reportmaster', 'tbl_secretkeymaster', 'tbl_sms_report_settings','tbl_sms_report_slab','tbl_sms_time_settings','tbl_table_cloud' ,'tbl_tablebill_split','tbl_tabledetails' ,'tbl_tableinsertion','tbl_temp_orderno_details' ,'tbl_temp_regenerate' , 'tbl_temp_tablebilldetails','tbl_temp_tablebillmaster' , 'tbl_timely_sms_entry', 'tbl_track_l', 'tbl_track_l_details', 'tbl_usermodules', 'tbl_year_bill_series' , 'tbl_yearsettings','temp_loyalty_reg','tbl_languages','tbl_menusearchtype','tbl_tableorder_discount' ";
+
+INSERT INTO `tbl_archive_settings` (`archive_enabled`, `archive_db`,`clear_tables`,`all_time_sync_tables`) VALUES
+('N', 'expodine_archive','tbl_kotmaster,tbl_tableorder,tbl_tableorder_changes,tbl_tablebillmaster,tbl_tablebilldetails,tbl_tablebill_extra_tax_master,tbl_takeaway_billmaster,tbl_takeaway_billdetails,tbl_takeaway_bill_extra_tax_master,tbl_takeaway_cancel_items,tbl_bill_card_payments,tbl_shift_details,tbl_printersettings_log,tbl_login_restrict_logs,tbl_shift_open_denomination,tbl_sync_log', 'tbl_appmachinedetails,tbl_billcancel_log,tbl_bill_card_payments,tbl_cash_drawer_log,tbl_combo_bill_details,tbl_combo_bill_details_ta,tbl_corporatemaster,tbl_couponcompany,tbl_credit_details,tbl_credit_details_payment,tbl_credit_master,tbl_credit_types,tbl_dayclose,tbl_function_details,tbl_function_details_menu,tbl_function_extra_costs,tbl_function_invoice,tbl_function_invoice_extras,tbl_kotmaster,tbl_kot_cancellation,tbl_login_restrict_logs,tbl_loyalty_campaign,tbl_loyalty_campaign_group,tbl_loyalty_discount,tbl_loyalty_group_details,tbl_loyalty_levels,tbl_loyalty_pointadd_bill,tbl_loyalty_pointrule,tbl_loyalty_point_transfers,tbl_loyalty_redeem_rule,tbl_loyalty_reg,tbl_loyalty_rules,tbl_loyalty_rules_type,tbl_loyalty_sendto,tbl_loyalty_sms_source,tbl_loyalty_voucher,tbl_order_addon,tbl_order_addon_changes,tbl_regenrate_log,tbl_shift_card_detail_close,tbl_shift_card_detail_open,tbl_shift_close_denomination,tbl_shift_details,tbl_shift_open_denomination,tbl_tablebilldetails,tbl_tablebillmaster,tbl_tablebill_extra_tax_details,tbl_tablebill_extra_tax_master,tbl_tablebill_item_discount,tbl_tablebill_paymentchange,tbl_tablebill_split,tbl_tabledetails,tbl_tableorder,tbl_tableorder_changes,tbl_tableorder_discount,tbl_takeaway_billdetails,tbl_takeaway_billmaster,tbl_takeaway_bill_extra_tax_details,tbl_takeaway_bill_extra_tax_master,tbl_takeaway_cancel_items,tbl_takeaway_customer,tbl_takeaway_item_discount');
+
+CALL proc_daystart(@OUT_MESSAGE);
+ SET Message = 'Database Refreshed Successfully';
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_itemorder_discount` (IN `menuid` VARCHAR(30), IN `mode` CHAR(2), IN `order_no` VARCHAR(15), IN `slno` INT, OUT `MESSAGE` VARCHAR(50))  NO SQL
+proc_itemorder_discount:BEGIN
+
+  DECLARE SUCCESS,SUCCESS_TIME,SUCCESS_DATE,SUCCESS_DAY TINYINT;
+  DECLARE date_limit,time_limit,day_limit,mode_rate CHAR(1);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE rate,org_rate,discount_value,sum_of_discount DECIMAL(15,3);
+  DECLARE label VARCHAR(60);
+  DECLARE discount DECIMAL(8,3);
+  DECLARE discount_name,rate_type VARCHAR(30);
+  DECLARE discount_id VARCHAR(20);
+  DECLARE portion,unit_id,base_unit_id INT ; 
+  DECLARE unit_type VARCHAR(50) ; 
+  DECLARE unit_weight DECIMAL(15,5);
+
+  DECLARE done INT DEFAULT FALSE;
+  
+   
+   
+  DECLARE cur1 CURSOR FOR SELECT dm.ds_discountid, dm.ds_discountname,dm.ds_discountof,dm.ds_mode,m.md_date_limit,m.md_time_limit,md_day_limit
+  FROM  tbl_discountmaster dm,  tbl_menu_discount m
+  WHERE dm.ds_discountid = m.md_discount AND m.md_menuid = menuid AND m.md_di_active = 'Y' AND m.md_active  = 'Y';
+
+  DECLARE cur2 CURSOR FOR SELECT  dm.ds_discountid,dm.ds_discountname,dm.ds_discountof,dm.ds_mode,m.md_date_limit,m.md_time_limit,md_day_limit
+  FROM tbl_discountmaster dm,  tbl_menu_discount m
+  WHERE dm.ds_discountid = m.md_discount AND m.md_menuid = menuid AND m.md_cs_active = 'Y' AND m.md_active  = 'Y';
+
+  DECLARE cur3 CURSOR FOR SELECT  dm.ds_discountid,dm.ds_discountname,dm.ds_discountof,dm.ds_mode,m.md_date_limit,m.md_time_limit,md_day_limit
+  FROM  tbl_discountmaster dm,  tbl_menu_discount m
+  WHERE dm.ds_discountid = m.md_discount AND m.md_menuid = menuid AND m.md_ta_active = 'Y' AND m.md_active  = 'Y';
+
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+
+  SET discount = 0;
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+
+
+
+
+
+
+  IF(mode = 'DI') THEN
+  BEGIN
+
+    OPEN cur1;
+
+    read_loop: LOOP
+    FETCH cur1 INTO discount_id,discount_name,discount,mode_rate,date_limit,time_limit,day_limit;
+
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+
+    IF((discount IS NOT NULL) AND (discount !=0))THEN
+    BEGIN
+      SET SUCCESS = 1;
+
+
+      IF(date_limit ='Y')THEN
+      BEGIN
+
+        IF EXISTS(SELECT * FROM tbl_menu_discount WHERE md_menuid = menuid AND md_active = 'Y' AND DAYCLOSEDATE BETWEEN md_from_date AND md_to_date)THEN
+          SET SUCCESS_DATE = 1;
+        ELSE
+          SET SUCCESS_DATE = 0;
+        END IF;
+      END;
+      END IF;
+
+      IF(time_limit='Y')THEN
+      BEGIN
+        IF EXISTS(SELECT * FROM tbl_menu_discount WHERE md_menuid = menuid AND md_active = 'Y' AND CURRENT_TIME() BETWEEN md_from_time AND md_to_time)THEN
+           SET SUCCESS_TIME = 1;
+        ELSE
+          SET SUCCESS_TIME = 0;
+        END IF;
+      END;
+      END IF;
+       IF(day_limit='Y')THEN
+      BEGIN
+        IF EXISTS(SELECT * FROM tbl_menu_discount WHERE md_menuid = menuid AND md_active = 'Y' AND DAYNAME(DAYCLOSEDATE)= md_day)THEN
+           SET SUCCESS_DAY = 1;
+        ELSE
+          SET SUCCESS_DAY = 0;
+        END IF;
+      END;
+      END IF;
+      IF((SUCCESS_TIME = 0) OR (SUCCESS_DATE = 0) OR (SUCCESS_DAY = 0))THEN
+        SET SUCCESS = 0;
+      END IF;
+
+      IF(SUCCESS = 1)THEN
+      BEGIN
+        SELECT t.ter_org_rate INTO rate FROM tbl_tableorder t WHERE t.ter_orderno = order_no AND t.ter_slno = slno;
+         SET org_rate = rate;
+         IF(mode_rate= 'V')THEN
+        BEGIN
+          SET discount_value = discount;
+          SET label =concat(discount_name,' (',discount,')');
+        END;
+        ELSEIF(mode_rate= 'P')THEN
+        BEGIN
+           SET discount = cast(discount AS DECIMAL(6,2));
+           SET discount_value = ((rate*discount)/100);
+           SET label =concat(discount_name,' (',discount,'%)');
+        END;
+        END IF;
+
+        IF EXISTS(SELECT * FROM tbl_tableorder_discount WHERE d_orderno = order_no AND  d_slno = slno AND d_discount_id = discount_id)THEN
+        BEGIN
+          DELETE FROM tbl_tableorder_discount WHERE d_orderno = order_no AND  d_slno = slno AND d_discount_id = discount_id;
+        END;
+        END IF;
+        INSERT INTO `tbl_tableorder_discount`(`d_orderno`, `d_slno`, `d_discount_id`, `d_discount_of`, `d_mode`, `d_discount_remarks`, `d_discount`)
+        VALUES (order_no,slno,discount_id,discount_value,mode_rate,label ,discount_value);
+
+      END;
+      END IF;
+    END;
+    END IF;
+
+    END LOOP;
+    CLOSE cur1;
+
+    SELECT SUM(d_discount) INTO sum_of_discount FROM tbl_tableorder_discount WHERE d_orderno = order_no AND d_slno = slno;
+
+    IF(sum_of_discount>0) THEN
+   
+      UPDATE  tbl_tableorder t SET t.ter_discount = sum_of_discount,ter_rate= ter_rate-sum_of_discount  WHERE t.ter_orderno = order_no AND ter_slno = slno;
+      UPDATE  tbl_tableorder t SET t.ter_total_rate = (t.ter_qty*t.ter_rate) WHERE t.ter_orderno = order_no AND ter_slno = slno;
+      
+      
+    END IF;
+
+  END;
+  ELSEIF(mode = 'TA') THEN
+  BEGIN
+
+    OPEN cur3;
+
+    read_loop: LOOP
+    FETCH cur3 INTO discount_id,discount_name,discount,mode_rate,date_limit,time_limit,day_limit;
+
+    IF done THEN
+      LEAVE read_loop;
+    END IF;
+
+    IF((discount IS NOT NULL) AND (discount !=0))THEN
+    BEGIN
+      SET SUCCESS = 1;
+
+
+      IF(date_limit ='Y')THEN
+      BEGIN
+
+        IF EXISTS(SELECT * FROM tbl_menu_discount WHERE md_menuid = menuid AND md_active = 'Y' AND DAYCLOSEDATE BETWEEN md_from_date AND md_to_date)THEN
+          SET SUCCESS_DATE = 1;
+        ELSE
+          SET SUCCESS_DATE = 0;
+        END IF;
+      END;
+      END IF;
+
+      IF(time_limit='Y')THEN
+      BEGIN
+        IF EXISTS(SELECT * FROM tbl_menu_discount WHERE md_menuid = menuid AND md_active = 'Y' AND CURRENT_TIME() BETWEEN md_from_time AND md_to_time)THEN
+           SET SUCCESS_TIME = 1;
+        ELSE
+          SET SUCCESS_TIME = 0;
+        END IF;
+      END;
+      END IF;
+       IF(day_limit='Y')THEN
+      BEGIN
+        IF EXISTS(SELECT * FROM tbl_menu_discount WHERE md_menuid = menuid AND md_active = 'Y' AND DAYNAME(DAYCLOSEDATE)= md_day)THEN
+           SET SUCCESS_DAY = 1;
+        ELSE
+          SET SUCCESS_DAY = 0;
+        END IF;
+      END;
+      END IF;
+      IF((SUCCESS_TIME = 0) OR (SUCCESS_DATE = 0) OR (SUCCESS_DAY = 0))THEN
+        SET SUCCESS = 0;
+      END IF;
+
+      IF(SUCCESS = 1)THEN
+      BEGIN
+        SELECT tab_org_rate INTO rate FROM tbl_takeaway_billdetails t WHERE tab_billno = order_no AND tab_slno = slno;
+         SET org_rate = rate;
+         IF(mode_rate= 'V')THEN
+        BEGIN
+          SET discount_value = discount;
+          SET label =concat(discount_name,' (',discount,')');
+        END;
+        ELSEIF(mode_rate= 'P')THEN
+        BEGIN
+           SET discount = cast(discount AS DECIMAL(6,2));
+           SET discount_value = ((rate*discount)/100);
+           SET label =concat(discount_name,' (',discount,'%)');
+        END;
+        END IF;
+
+        IF EXISTS(SELECT * FROM tbl_takeaway_item_discount WHERE tbd_billno = order_no AND  tbd_slno = slno AND tbd_discount_id = discount_id)THEN
+        BEGIN
+          DELETE FROM tbl_takeaway_item_discount WHERE tbd_billno = order_no AND  tbd_slno = slno AND tbd_discount_id = discount_id;
+        END;
+        END IF;
+        INSERT INTO `tbl_takeaway_item_discount`(`tbd_billno`, `tbd_slno`, `tbd_menuid`, `tbd_discount_id`, `tbd_discount_of`, `tbd_mode`, `tbd_discount_remarks`, `tbd_discount`)
+        VALUES (order_no,slno,menuid,discount_id,discount_value,mode_rate,label ,discount_value);
+
+      END;
+      END IF;
+    END;
+    END IF;
+
+    END LOOP;
+    CLOSE cur3;
+
+    SELECT SUM(tbd_discount) INTO sum_of_discount FROM tbl_takeaway_item_discount WHERE tbd_billno = order_no AND tbd_slno = slno;
+
+    IF(sum_of_discount>0) THEN
+      UPDATE tbl_takeaway_billdetails SET tab_discount = sum_of_discount,tab_rate= tab_rate-sum_of_discount
+      WHERE tab_billno = order_no AND tab_slno = slno;
+      UPDATE  tbl_takeaway_billdetails ta SET ta.tab_amount = (ta.tab_qty*ta.tab_rate) WHERE ta.tab_billno = order_no AND ta.tab_slno = slno;
+    END IF;
+
+  END;
+  END IF;
+
+
+
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_kot_cancel` (IN `branchid` BIGINT, IN `temp_id` VARCHAR(30), IN `mode` CHAR(2), OUT `cancel_id` VARCHAR(30))  BEGIN
+
+	DECLARE DAYCLOSEDATE DATE;
+  DECLARE cancel_no INT;
+
+  SET cancel_no = NULL;
+  
+  
+    
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+  SELECT ds_kot_cancellation_id INTO cancel_no FROM tbl_datesettings WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+    
+  IF(cancel_no is NULL) THEN
+    INSERT INTO tbl_datesettings(ds_branchid,ds_date) VALUES(branchid, DAYCLOSEDATE);
+    SELECT ds_kot_cancellation_id INTO cancel_no FROM tbl_datesettings WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+  END IF;
+  
+    SET cancel_id = cancel_no;
+ 
+  UPDATE tbl_datesettings SET ds_kot_cancellation_id = ds_kot_cancellation_id +1 WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_loyalty_upload` (OUT `Message` VARCHAR(100))  BEGIN
+
+SET Message = '';
+
+ 
+  UPDATE `temp_loyalty_reg` SET ly_id = 'NEW' WHERE TRIM(ly_id) = '';
+ 
+  
+  INSERT INTO `tbl_loyalty_reg`(`ly_id`, `ly_firstname`, `ly_lastname`, `ly_gender`,`ly_mobileno`, `ly_emailid`, `ly_birthdaydate`, `ly_maritalstatus`, `ly_anniversarydate`, `ly_profession`, `ly_totalvisit`, `ly_mailreceive`, `ly_smsreceive`, `ly_entrydatetime`, `ly_branchid`, `ly_status`, `ly_entry_from`,`ly_points`,`ly_voucher_count`)
+  SELECT 0,trim(ly_firstname),ly_lastname,ly_gender,ly_mobileno,ly_emailid,ly_birthdaydate,ly_maritalstatus,ly_anniversarydate,ly_profession,ly_totalvisit,ly_mailreceive,ly_smsreceive,ly_entrydatetime,ly_branchid,ly_status,ly_entry_from,ly_points,ly_voucher_count FROM temp_loyalty_reg WHERE ly_id NOT IN (SELECT ly_id from tbl_loyalty_reg) and ly_mobileno NOT IN (SELECT ly_mobileno from tbl_loyalty_reg); 
+  
+  UPDATE tbl_loyalty_reg mm, temp_loyalty_reg mup 
+  SET mm.ly_firstname=mup.ly_firstname,mm.ly_lastname=mup.ly_lastname,mm.ly_gender=mup.ly_gender,mm.ly_mobileno=mup.ly_mobileno,mm.ly_emailid=mup.ly_emailid,mm.ly_birthdaydate=mup.ly_birthdaydate,
+  mm.ly_maritalstatus=mup.ly_maritalstatus,mm.ly_anniversarydate=mup.ly_anniversarydate,mm.ly_profession=mup.ly_profession,mm.ly_totalvisit=mup.ly_totalvisit,mm.ly_mailreceive=mup.ly_mailreceive,mm.ly_smsreceive=mup.ly_smsreceive,mm.ly_entrydatetime=mup.ly_entrydatetime,
+  mm.ly_branchid=mup.ly_branchid,mm.ly_status=mup.ly_status,mm.ly_entry_from=mup.ly_entry_from,mm.ly_points=mup.ly_points,mm.ly_voucher_count=mup.ly_voucher_count
+  WHERE trim(mm.ly_id) = trim(mup.ly_id);
+  
+  SET Message = 'Loyalty Data Succesfully Updated....';
+
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_menustock_entry` (IN `menuid` VARCHAR(30), IN `rate_type` VARCHAR(30), IN `portionid` INT, IN `unit_type` VARCHAR(50), IN `weight` DECIMAL(15,5), IN `unit_id` INT, IN `base_unit_id` INT)  MODIFIES SQL DATA
+proc_menustock_entry:BEGIN
+  
+  DECLARE DAYCLOSEDATE DATE; 
+  
+   
+  
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+  
+  IF(unit_id = 0)then
+    SET unit_id = NULL;
+  END IF;
+  
+   IF(base_unit_id = 0)then
+    SET base_unit_id = NULL;
+  END IF;
+ 
+   IF(unit_type = '0')then
+    SET unit_type = NULL;
+  END IF;
+  
+  IF(portionid = 0)then
+    SET portionid = NULL;
+  END IF;
+  
+  if(DAYCLOSEDATE is NULL)THEN
+  LEAVE proc_menustock_entry ;
+  END IF;
+  
+  if(rate_type = 'Portion')then
+  begin
+    if not exists(select * from tbl_menustock where mk_date = DAYCLOSEDATE and  mk_menuid = menuid and mk_portion = portionid )then
+    begin
+      INSERT INTO `tbl_menustock`(`mk_date`, `mk_menuid`, `mk_portion`,`mk_stock`,`mk_stocktime`)VALUES(DAYCLOSEDATE,menuid,portionid,'Y',NOW());
+    end;
+    end if;
+  end;
+  elseif(rate_type= 'Unit') then
+  begin
+    if(unit_type = 'Packet')then
+    begin
+      if not exists(select * from tbl_menustock where mk_date = DAYCLOSEDATE and  mk_menuid = menuid and  mk_unit_type = unit_type and mk_unit_weight = weight and mk_unit_id = unit_id)then
+      begin
+        INSERT INTO `tbl_menustock`(`mk_date`, `mk_menuid`, `mk_unit_type`,mk_unit_weight,mk_unit_id,`mk_stock`,`mk_stocktime`)VALUES(DAYCLOSEDATE,menuid,unit_type,weight,unit_id,'Y',NOW());
+      end;
+      end if;
+    end;
+    elseif(unit_type = 'Loose')then
+    begin
+      if not exists(select * from tbl_menustock where mk_date = DAYCLOSEDATE and  mk_menuid = menuid and  mk_unit_type = unit_type and mk_base_unit_id = base_unit_id )then
+      begin
+        INSERT INTO `tbl_menustock`(`mk_date`, `mk_menuid`, `mk_unit_type`,mk_base_unit_id,`mk_stock`,`mk_stocktime`)VALUES(DAYCLOSEDATE,menuid,unit_type,base_unit_id,'Y',NOW());
+      end;
+      end if;
+    end;
+    end if;
+  end;
+  end if;
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_menu_dis_check` (IN `menuid` VARCHAR(30), IN `mode` CHAR(2), OUT `discount` DECIMAL(8,3), OUT `discount_name` VARCHAR(50), OUT `discount_id` VARCHAR(20))  NO SQL
+BEGIN
+  DECLARE SUCCESS,SUCCESS_TIME,SUCCESS_DATE TINYINT;
+  DECLARE date_limit,time_limit,day_limit CHAR(1);
+  DECLARE DAYCLOSEDATE DATE;
+
+  set discount = 0;
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+  IF(mode = 'DI') THEN
+  BEGIN
+    SELECT dm.ds_discountid, dm.ds_discountname,dm.ds_discountof,m.md_date_limit,m.md_time_limit,md_day_limit  
+    INTO discount_id,discount_name,discount,date_limit,time_limit,day_limit
+    FROM  tbl_discountmaster dm,  tbl_menu_discount m 
+    WHERE dm.ds_discountid = m.md_discount and m.md_menuid = menuid and m.md_di_active = 'Y' AND m.md_active  = 'Y'ORDER BY m.md_slno ASC LIMIT 1 ;
+  END;  
+  ELSEIF(mode = 'CS') THEN
+  BEGIN
+    SELECT  dm.ds_discountid,dm.ds_discountname,dm.ds_discountof,m.md_date_limit,m.md_time_limit,md_day_limit  
+    INTO discount_id,discount_name,discount,date_limit,time_limit,day_limit
+    FROM  tbl_discountmaster dm,  tbl_menu_discount m 
+    WHERE dm.ds_discountid = m.md_discount and m.md_menuid = menuid and m.md_cs_active = 'Y' AND m.md_active  = 'Y' ORDER BY m.md_slno ASC LIMIT 1 ;
+  END;  
+  ELSEIF(mode = 'TA') THEN
+  BEGIN
+    SELECT  dm.ds_discountid,dm.ds_discountname,dm.ds_discountof,m.md_date_limit,m.md_time_limit,md_day_limit 
+    INTO discount_id,discount_name,discount,date_limit,time_limit,day_limit
+    FROM  tbl_discountmaster dm,  tbl_menu_discount m 
+    WHERE dm.ds_discountid = m.md_discount and m.md_menuid = menuid and m.md_ta_active = 'Y' AND m.md_active  = 'Y' ORDER BY m.md_slno ASC LIMIT 1;
+  END; 
+  END IF;
+  
+  IF(discount IS NOT NULL)THEN
+  BEGIN
+   IF(date_limit ='Y')THEN
+    BEGIN
+      IF EXISTS(SELECT * FROM tbl_menu_discount WHERE md_menuid = menuid and md_active = 'Y' AND DAYCLOSEDATE BETWEEN md_from_date AND md_to_date)THEN
+        SET SUCCESS_DATE = 1;
+      ELSE
+        SET SUCCESS_DATE = 0;
+      END IF;
+    END;
+    END IF;
+    IF(time_limit='Y')THEN
+    BEGIN
+      IF EXISTS(SELECT * FROM tbl_menu_discount WHERE md_menuid = menuid and md_active = 'Y' AND CURRENT_TIME() BETWEEN md_from_time AND md_to_time)THEN
+         SET SUCCESS_TIME = 1;
+      ELSE
+        SET SUCCESS_TIME = 0;
+      END IF;
+  
+    END;
+    END IF;
+     IF(day_limit='Y')THEN
+    BEGIN
+      IF EXISTS(SELECT * FROM tbl_menu_discount WHERE md_menuid = menuid and md_active = 'Y' AND DAYNAME(DAYCLOSEDATE)= md_day)THEN
+         SET SUCCESS_TIME = 1;
+      ELSE
+        SET SUCCESS_TIME = 0;
+      END IF;
+  
+    END;
+    END IF;
+    IF(SUCCESS_TIME = 0 OR SUCCESS_DATE = 0)THEN
+      SET SUCCESS = 0;
+    END IF;
+    
+    if(SUCCESS = 0)then
+      set discount = 0;
+    END IF;
+  END;
+  ELSE
+   set discount = 0;
+  
+  END IF;
+  
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_menu_extra_tax` (IN `billno` VARCHAR(15), IN `mode` CHAR(2))  MODIFIES SQL DATA
+BEGIN
+  DECLARE BILL_SLNO,BILL_SLNO_CS smallint(6);
+  DECLARE MENUID,MENUID_CS varchar(30);
+  DECLARE AMOUNT,AMOUNT_CS decimal(15,2);
+  
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE cur1 CURSOR FOR SELECT bd_billslno, bd_menuid, bd_amount FROM tbl_tablebilldetails WHERE bd_billno = trim(billno) AND bd_cancelled = 'N';
+  DECLARE cur2 CURSOR FOR SELECT tab_slno, tab_menuid, tab_amount FROM tbl_takeaway_billdetails WHERE tab_billno = trim(billno) AND tab_cancelled = 'N';
+  
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+  IF(mode = 'DI') then
+  BEGIN
+  
+    OPEN cur1;
+
+    read_loop: LOOP
+    FETCH cur1 INTO BILL_SLNO, MENUID, AMOUNT;
+
+    IF done THEN
+
+      LEAVE read_loop;
+    END IF;
+     
+         INSERT INTO `tbl_tablebill_extra_tax_details`(`bet_billno`, `bet_billslno`, `bet_tax_id`, `bet_tax_value`)
+    SELECT billno,BILL_SLNO,t.mtm_tax_id,e.amc_value from tbl_menu_tax_master t left join tbl_extra_tax_master e on e.amc_id = t.mtm_tax_id where t.mtm_menuid = MENUID AND e.amc_active = 'Y';
+    UPDATE tbl_tablebill_extra_tax_details SET bet_tax_amount = ((AMOUNT*bet_tax_value)/100) WHERE bet_billno = billno and bet_billslno = BILL_SLNO;
+    
+    END LOOP;
+    CLOSE cur1;
+    
+         INSERT INTO `tbl_tablebill_extra_tax_master`(`bem_billno`, `bem_taxid`, `bem_total_value`, `bem_label`)
+    SELECT billno,et.bet_tax_id,SUM(et.bet_tax_amount),concat(amc_symbol,amc_label,' (',amc_value,'%)') FROM tbl_tablebill_extra_tax_details et left join tbl_extra_tax_master e on e.amc_id = et.bet_tax_id
+    WHERE et.bet_billno = billno GROUP BY et.bet_tax_id;
+  
+
+  END;
+  ELSEIF((mode = 'CS')OR (mode = 'TA')OR (mode = 'HD')) then
+  BEGIN
+  
+    OPEN cur2;
+
+    read_loop: LOOP
+    FETCH cur2 INTO BILL_SLNO_CS, MENUID_CS, AMOUNT_CS;
+
+    IF done THEN
+
+      LEAVE read_loop;
+    END IF;
+     
+          INSERT INTO `tbl_takeaway_bill_extra_tax_details`(`tbet_billno`, `tbet_slno`, `tbet_tax_id`, `tbet_tax_value`)
+    SELECT billno,BILL_SLNO_CS,t.mtm_tax_id,e.amc_value from tbl_menu_tax_master t 
+    left join tbl_extra_tax_master e on e.amc_id = t.mtm_tax_id 
+    where t.mtm_menuid = MENUID_CS AND e.amc_active = 'Y';
+    
+    UPDATE tbl_takeaway_bill_extra_tax_details SET tbet_tax_amount = ((AMOUNT_CS*tbet_tax_value)/100)
+    WHERE tbet_billno = billno and tbet_slno = BILL_SLNO_CS;
+    
+    END LOOP;
+    CLOSE cur2;
+    
+        INSERT INTO `tbl_takeaway_bill_extra_tax_master`(`tbe_billno`, `tbe_taxid`, `tbe_total_value`, `tbe_label`)
+    SELECT billno,et.tbet_tax_id,SUM(et.tbet_tax_amount),concat(amc_symbol,amc_label,' (',amc_value,'%)') 
+    FROM tbl_takeaway_bill_extra_tax_details et left join tbl_extra_tax_master e on e.amc_id = et.tbet_tax_id
+    WHERE et.tbet_billno = billno GROUP BY et.tbet_tax_id;
+  
+
+  END;
+  END IF;
+  
+
+
+end$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_menu_import` (OUT `Message` VARCHAR(100), IN `RATE_1_FOR` VARCHAR(30), IN `RATE_2_FOR` VARCHAR(30), IN `RATE_3_FOR` VARCHAR(30), IN `RATE_4_FOR` VARCHAR(30), IN `RATE_5_FOR` VARCHAR(30))  BEGIN
+    DECLARE floor_1_table,sub_id VARCHAR(10);
+    
+    SET Message = 'Error';
+     
+    DELETE FROM tbl_menumaincategory;
+    DELETE FROM tbl_menusubcategory;
+    DELETE FROM tbl_unit_master;
+    DELETE FROM tbl_base_unit_master;
+    
+    INSERT INTO tbl_unit_master(u_name) SELECT distinct(i.UNIT) FROM tbl_menu_import i WHERE TYPE='Packet';
+    INSERT INTO tbl_base_unit_master(bu_name) SELECT distinct(i.UNIT) FROM tbl_menu_import i WHERE TYPE='Loose';
+    
+    
+    IF((RATE_1_FOR = '')OR(RATE_1_FOR = 'etc')) THEN SET RATE_1_FOR = NULL; END IF;
+    IF((RATE_2_FOR = '')OR(RATE_2_FOR = 'etc'))THEN SET RATE_2_FOR = NULL; END IF;
+    IF((RATE_3_FOR = '')OR(RATE_3_FOR = 'etc'))THEN SET RATE_3_FOR = NULL; END IF;
+    IF((RATE_4_FOR = '')OR(RATE_4_FOR = 'etc'))THEN SET RATE_4_FOR = NULL; END IF;
+    IF((RATE_5_FOR = '')OR(RATE_5_FOR = 'etc'))THEN SET RATE_5_FOR = NULL; END IF;
+
+    IF((trim(RATE_1_FOR) != NULL) OR (trim(RATE_1_FOR) != '')OR (trim(RATE_1_FOR) != 'Take Away'))THEN
+    BEGIN
+    INSERT INTO `tbl_floormaster`(`fr_floorid`, `fr_branchid`, `fr_floorname`)VALUES (0,1,trim(RATE_1_FOR));
+    UPDATE tbl_menu_import i , tbl_floormaster f SET i.FLOOR_ID_1 = f.fr_floorid WHERE trim(f.fr_floorname) = trim(RATE_1_FOR);
+    END;
+    END IF;
+
+    IF((trim(RATE_2_FOR) != NULL) OR (trim(RATE_2_FOR) != '')OR (trim(RATE_2_FOR) != 'Take Away'))THEN
+    BEGIN
+    INSERT INTO `tbl_floormaster`(`fr_floorid`, `fr_branchid`, `fr_floorname`)VALUES (0,1,trim(RATE_2_FOR));
+    UPDATE tbl_menu_import i , tbl_floormaster f SET i.FLOOR_ID_2 = f.fr_floorid WHERE trim(f.fr_floorname) = trim(RATE_2_FOR);
+    END;
+    END IF;
+
+    IF((trim(RATE_3_FOR) != NULL) OR (trim(RATE_3_FOR) != '')OR (trim(RATE_3_FOR) != 'Take Away'))THEN
+    BEGIN
+    INSERT INTO `tbl_floormaster`(`fr_floorid`, `fr_branchid`, `fr_floorname`)VALUES (0,1,trim(RATE_3_FOR));
+    UPDATE tbl_menu_import i , tbl_floormaster f SET i.FLOOR_ID_3 = f.fr_floorid WHERE trim(f.fr_floorname) = trim(RATE_3_FOR);
+    END;
+    END IF;
+
+    IF((trim(RATE_4_FOR) != NULL) OR (trim(RATE_4_FOR) != '')OR (trim(RATE_4_FOR) != 'Take Away'))THEN
+    BEGIN
+    INSERT INTO `tbl_floormaster`(`fr_floorid`, `fr_branchid`, `fr_floorname`)VALUES (0,1,trim(RATE_4_FOR));
+    UPDATE tbl_menu_import i , tbl_floormaster f SET i.FLOOR_ID_4 = f.fr_floorid WHERE trim(f.fr_floorname) = trim(RATE_4_FOR);
+    END;
+    END IF;
+
+    IF((trim(RATE_5_FOR) != NULL) OR (trim(RATE_5_FOR) != '')OR (trim(RATE_5_FOR) != 'Take Away'))THEN
+    BEGIN
+    INSERT INTO `tbl_floormaster`(`fr_floorid`, `fr_branchid`, `fr_floorname`)VALUES (0,1,trim(RATE_5_FOR));
+    UPDATE tbl_menu_import i , tbl_floormaster f SET i.FLOOR_ID_5 = f.fr_floorid WHERE trim(f.fr_floorname) = trim(RATE_5_FOR);
+    END;
+    END IF;
+
+
+    INSERT INTO `tbl_menumaincategory`(`mmy_maincategoryid`, `mmy_maincategoryname`, `mmy_active`, `mmy_branchid`)SELECT DISTINCT 0,trim(CATEGORY),'Y',1 FROM tbl_menu_import;
+
+    INSERT INTO `tbl_menusubcategory`(`msy_subcategoryid`, `msy_branchid`, `msy_subcategoryname`, `msy_active`)SELECT DISTINCT 0,1,trim(SUB_CATEGORY),'Y' FROM tbl_menu_import;
+
+    INSERT INTO `tbl_kotcountermaster`(`kr_kotcode`, `kr_branchid`, `kr_kotname`)SELECT DISTINCT 0,1,trim(KOT_KITCHEN) FROM tbl_menu_import;
+
+    UPDATE tbl_menu_import i , tbl_menumaincategory m SET i.CATEGORY_ID = m.mmy_maincategoryid WHERE trim(m.mmy_maincategoryname) = trim(i.CATEGORY);
+
+    UPDATE tbl_menu_import i , tbl_menusubcategory s SET i.SUB_CATEGORY_ID = s.msy_subcategoryid WHERE trim(s.msy_subcategoryname) = trim(i.SUB_CATEGORY);
+
+    UPDATE tbl_menu_import i , tbl_kotcountermaster k SET i.KOT_COUNTER_ID = k.kr_kotcode WHERE trim(k.kr_kotname) = trim(i.KOT_KITCHEN);
+    
+    UPDATE tbl_menu_import SET MENU_CODE = NULL WHERE TRIM(MENU_CODE) ='';
+    
+    
+      INSERT INTO `tbl_menumaster`(`mr_menuid`, `mr_menuname`, `mr_maincatid`, `mr_subcatid`, `mr_description`, `mr_diet`, `mr_time_min`, `mr_active`, `mr_kotcounter`, `mr_prepmode`, `mr_branchid`, `mr_itemshortcode`, `mr_dailystock`, `mr_manualrateentry`, `mr_itemcode`, `mr_dailystock_in_number`)
+      SELECT 0,trim(MENU_NAME),CATEGORY_ID,SUB_CATEGORY_ID,DESCRIPTION,DIET,ESTIMATED_TIME,'Y',KOT_COUNTER_ID,PREPARATION_MODE,1,ITEM_SHORTCODE,DAILY_STOCK,DYNAMIC_RATE,MENU_CODE,STOCK_IN_NUMBERS FROM tbl_menu_import group by trim(MENU_NAME);
+      
+      UPDATE tbl_menu_import i , tbl_portionmaster p SET i.UNIT_ID = p.pm_id WHERE trim(p.pm_portionname) = trim(i.UNIT) and i.TYPE = 'Portion';
+    UPDATE tbl_menu_import i, tbl_unit_master u SET i.UNIT_ID=u.u_id WHERE trim(u.u_name)=trim(i.UNIT) AND i.TYPE='Packet';
+    UPDATE tbl_menu_import i, tbl_base_unit_master bu SET i.UNIT_ID=bu.bu_id WHERE trim(bu.bu_name)=trim(i.UNIT) AND i.TYPE='Loose';
+    
+    UPDATE tbl_menu_import i , tbl_menumaster m SET i.MENU_ID = m.mr_menuid,m.mr_rate_type=i.TYPE WHERE trim(m.mr_menuname) = trim(i.MENU_NAME) and i.TYPE='Portion';
+    UPDATE tbl_menu_import i , tbl_menumaster m SET i.MENU_ID = m.mr_menuid,m.mr_rate_type='Unit',m.mr_unit_type=i.TYPE WHERE trim(m.mr_menuname) = trim(i.MENU_NAME) and i.TYPE='Packet';
+    UPDATE tbl_menu_import i , tbl_menumaster m SET i.MENU_ID = m.mr_menuid,m.mr_rate_type='Unit',m.mr_unit_type=i.TYPE,m.mr_base_unit=i.UNIT_ID WHERE trim(m.mr_menuname) = trim(i.MENU_NAME) and i.TYPE='Loose';
+    
+    
+    
+    IF((trim(RATE_1_FOR) != NULL) OR (trim(RATE_1_FOR) != '')OR (trim(RATE_1_FOR) != 'Take Away'))THEN
+    BEGIN
+    INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type, `mmr_portion`, `mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_1,'Portion',UNIT_ID,RATE_1,'Y' FROM tbl_menu_import WHERE (RATE_1 >0) and TYPE='Portion';
+    
+    INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type,mmr_unit_type, `mmr_unit_id`,mmr_unit_weight, `mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_1,'Unit',TYPE,UNIT_ID,WEIGHT,RATE_1,'Y' FROM tbl_menu_import WHERE (RATE_1 >0) and TYPE='Packet';
+    
+    INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type,mmr_unit_type,`mmr_base_unit_id`,`mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_1,'Unit',TYPE,UNIT_ID,RATE_1,'Y' FROM tbl_menu_import WHERE (RATE_1 >0) and TYPE='Loose';
+    
+    SELECT DISTINCT FLOOR_ID_1 INTO floor_1_table FROM tbl_menu_import WHERE (RATE_1 >0);
+       CALL proc_table_import(@Message,floor_1_table);
+       
+       
+    END;
+    END IF;
+
+    IF((trim(RATE_2_FOR) != NULL) OR (trim(RATE_2_FOR) != '')OR (trim(RATE_2_FOR) != 'Take Away'))THEN
+    BEGIN
+     INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type, `mmr_portion`, `mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_2,'Portion',UNIT_ID,RATE_2,'Y' FROM tbl_menu_import WHERE (RATE_2 >0) and TYPE='Portion';
+    
+    INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type,mmr_unit_type, `mmr_unit_id`,mmr_unit_weight, `mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_2,'Unit',TYPE,UNIT_ID,WEIGHT,RATE_2,'Y' FROM tbl_menu_import WHERE (RATE_2 >0) and TYPE='Packet';
+    
+    INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type,mmr_unit_type,`mmr_base_unit_id`,`mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_2,'Unit',TYPE,UNIT_ID,RATE_2,'Y' FROM tbl_menu_import WHERE (RATE_2 >0) and TYPE='Loose';
+    END;
+    END IF;
+
+
+    IF((trim(RATE_3_FOR) != NULL) OR (trim(RATE_3_FOR) != '')OR (trim(RATE_3_FOR) != 'Take Away'))THEN
+    BEGIN
+    INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type, `mmr_portion`, `mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_3,'Portion',UNIT_ID,RATE_3,'Y' FROM tbl_menu_import WHERE (RATE_3 >0) and TYPE='Portion';
+    
+    INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type,mmr_unit_type, `mmr_unit_id`,mmr_unit_weight, `mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_3,'Unit',TYPE,UNIT_ID,WEIGHT,RATE_3,'Y' FROM tbl_menu_import WHERE (RATE_3 >0) and TYPE='Packet';
+    
+    INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type,mmr_unit_type,`mmr_base_unit_id`,`mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_3,'Unit',TYPE,UNIT_ID,RATE_3,'Y' FROM tbl_menu_import WHERE (RATE_3 >0) and TYPE='Loose';
+    END;
+    END IF;
+
+    IF((trim(RATE_4_FOR) != NULL) OR (trim(RATE_4_FOR) != '')OR (trim(RATE_4_FOR) != 'Take Away'))THEN
+    BEGIN
+     INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type, `mmr_portion`, `mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_4,'Portion',UNIT_ID,RATE_4,'Y' FROM tbl_menu_import WHERE (RATE_4 >0) and TYPE='Portion';
+    
+    INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type,mmr_unit_type, `mmr_unit_id`,mmr_unit_weight, `mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_4,'Unit',TYPE,UNIT_ID,WEIGHT,RATE_4,'Y' FROM tbl_menu_import WHERE (RATE_4 >0) and TYPE='Packet';
+    
+    INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type,mmr_unit_type,`mmr_base_unit_id`,`mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_4,'Unit',TYPE,UNIT_ID,RATE_4,'Y' FROM tbl_menu_import WHERE (RATE_4 >0) and TYPE='Loose';
+    END;
+    END IF;
+
+    IF((trim(RATE_5_FOR) != NULL) OR (trim(RATE_5_FOR) != '')OR (trim(RATE_5_FOR) != 'Take Away'))THEN
+    BEGIN
+     INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type, `mmr_portion`, `mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_5,'Portion',UNIT_ID,RATE_5,'Y' FROM tbl_menu_import WHERE (RATE_5 >0) and TYPE='Portion';
+    
+    INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type,mmr_unit_type, `mmr_unit_id`,mmr_unit_weight, `mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_5,'Unit',TYPE,UNIT_ID,WEIGHT,RATE_5,'Y' FROM tbl_menu_import WHERE (RATE_5 >0) and TYPE='Packet';
+    
+    INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`,mmr_rate_type,mmr_unit_type,`mmr_base_unit_id`,`mmr_rate`, `mmr_default`)
+    SELECT MENU_ID,FLOOR_ID_5,'Unit',TYPE,UNIT_ID,RATE_5,'Y' FROM tbl_menu_import WHERE (RATE_5 >0) and TYPE='Loose';
+    END;
+    END IF;
+
+    /*INSERT INTO `tbl_menuratetakeaway`(`mta_menuid`, `mta_portion`, `mta_branchid`, `mta_rate`)
+    SELECT MENU_ID,UNIT_ID,1,RATE_6 FROM tbl_menu_import WHERE (RATE_6 >0);*/
+    
+    INSERT INTO `tbl_menuratetakeaway`(`mta_menuid`, mta_rate_type, `mta_portion`,`mta_branchid`, `mta_rate`)
+    SELECT MENU_ID,'Portion',UNIT_ID,1,RATE_6 FROM tbl_menu_import WHERE (RATE_6 >0) and TYPE='Portion';
+    
+    INSERT INTO `tbl_menuratetakeaway`(`mta_menuid`,mta_rate_type,mta_unit_type,`mta_unit_id`,mta_unit_weight,`mta_branchid`,`mta_rate`)
+    SELECT MENU_ID,'Unit',TYPE,UNIT_ID,WEIGHT,1,RATE_6 FROM tbl_menu_import WHERE (RATE_6 >0) and TYPE='Packet';
+    
+    INSERT INTO `tbl_menuratetakeaway`(`mta_menuid`,mta_rate_type,mta_unit_type,`mta_base_unit_id`,`mta_branchid`,`mta_rate`)
+    SELECT MENU_ID,'Unit',TYPE,UNIT_ID,1,RATE_6 FROM tbl_menu_import WHERE (RATE_6 >0) and TYPE='Loose';
+    
+    
+    UPDATE tbl_menumaster m ,tbl_menusubcategory ms SET m.mr_subcatid = NULL WHERE ms.msy_subcategoryname ='';
+
+    DELETE FROM tbl_menusubcategory WHERE msy_subcategoryname ='';
+
+    CALL proc_printer_import();
+    
+    SET Message = 'Menu & Rates Succesfully Imported....';
+
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_menu_rate_applyall` (IN `menuid` VARCHAR(30), IN `rate_type` VARCHAR(30), IN `portion` INT, IN `unit_type` VARCHAR(50), IN `unit_weight` DECIMAL(15,5), IN `unit_id` INT, IN `base_unit_id` INT, IN `barcode` VARCHAR(250), IN `rate` DECIMAL(15,3), IN `tax_value` DECIMAL(15,3), IN `tax_amount` DECIMAL(15,3), IN `final_rate` DECIMAL(15,3), OUT `message` VARCHAR(50))  NO SQL
+proc_menu_rate_applyall:begin
+
+  DECLARE floor_id varchar(10);
+  DECLARE onl_id varchar(10);
+  DECLARE done INT DEFAULT FALSE;
+   
+  DECLARE cur1 CURSOR FOR SELECT `fr_floorid` FROM `tbl_floormaster` WHERE `fr_status` = 'Active';
+  DECLARE cur2 CURSOR FOR SELECT `tol_id` FROM `tbl_online_order` WHERE `tol_status` = 'Y';
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  
+  
+    
+  
+  SET message = 'Error!!!';
+  if(barcode = '')then
+    set barcode = NULL;
+  END IF;
+  
+  
+  
+  IF(rate_type = 'Portion')THEN
+  BEGIN
+    set unit_type = NULL;
+    SET unit_weight = 0.00;
+    SET unit_id = NULL;
+    SET base_unit_id = NULL;
+    DELETE FROM `tbl_menuratetakeaway` WHERE `mta_menuid`=menuid AND `mta_rate_type`= rate_type AND `mta_portion`= portion ;  
+    DELETE FROM `tbl_menurate_counter` WHERE `mrc_menuid`=menuid AND `mrc_rate_type`= rate_type AND `mrc_portion`= portion ; 
+    DELETE FROM `tbl_menuratemaster`  WHERE `mmr_menuid`=menuid AND  `mmr_rate_type`= rate_type AND `mmr_portion`= portion ;  
+  
+  END;
+  ELSEIF(rate_type= 'Unit') THEN
+  BEGIN
+    IF(unit_type = 'Packet')THEN
+    BEGIN
+      SET portion = NULL;
+      SET base_unit_id = NULL;
+      DELETE FROM `tbl_menuratetakeaway` WHERE `mta_menuid`=menuid AND `mta_rate_type`= rate_type AND   `mta_unit_type`= unit_type AND  `mta_unit_weight` = unit_weight AND  `mta_unit_id` = unit_id ;  
+      DELETE FROM `tbl_menurate_counter` WHERE `mrc_menuid`=menuid AND `mrc_rate_type`= rate_type AND   `mrc_unit_type`= unit_type AND  `mrc_unit_weight` = unit_weight AND  `mrc_unit_id` = unit_id ; 
+      DELETE FROM `tbl_menuratemaster` WHERE `mmr_menuid`=menuid AND  `mmr_rate_type`= rate_type AND   `mmr_unit_type`= unit_type AND  `mmr_unit_weight` = unit_weight AND  `mmr_unit_id` = unit_id ;  
+  
+    END;
+    ELSEIF(unit_type = 'Loose')THEN
+    BEGIN
+      SET portion = NULL;
+      SET unit_weight = 0.00;
+      SET unit_id = NULL;
+      DELETE FROM `tbl_menuratetakeaway` WHERE `mta_menuid`=menuid AND `mta_rate_type`= rate_type AND  `mta_unit_type`= unit_type AND   `mta_base_unit_id` = base_unit_id;  
+      DELETE FROM `tbl_menurate_counter` WHERE `mrc_menuid`=menuid AND `mrc_rate_type`= rate_type  AND  `mrc_unit_type`= unit_type AND   `mrc_base_unit_id` = base_unit_id; 
+      DELETE FROM `tbl_menuratemaster` WHERE `mmr_menuid`=menuid AND  `mmr_rate_type`= rate_type AND  `mmr_unit_type`= unit_type AND    `mmr_base_unit_id` = base_unit_id;  
+  
+    END;
+    END IF;
+  END;
+  END IF;
+  
+
+
+  
+
+  
+
+  
+  INSERT INTO `tbl_menurate_counter`(`mrc_menuid`, `mrc_rate_type`, `mrc_portion`, `mrc_unit_type`, `mrc_unit_weight`, `mrc_unit_id`, `mrc_base_unit_id`, `mrc_branchid`, `mrc_rate`, `mrc_barcode`,`mrc_menu_tax_amount`,`mrc_menu_final_amount`,`mrc_menu_tax_value` )
+  VALUES(menuid,rate_type,portion,unit_type,unit_weight,unit_id,base_unit_id,1,rate,barcode,tax_amount,final_rate,tax_value);
+   
+  
+
+  
+  OPEN cur1;
+
+  read_loop: LOOP
+   FETCH cur1 INTO floor_id;
+
+  IF done THEN
+
+    LEAVE read_loop;
+  END IF;
+  
+    
+    
+  
+  INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`, `mmr_rate_type`, `mmr_portion`, `mmr_unit_type`, `mmr_unit_weight`, `mmr_unit_id`, `mmr_base_unit_id`, `mmr_rate`, `mmr_barcode`,`mmr_menu_tax_amount`,`mmr_menu_final_amount`,`mmr_menu_tax_value`)
+  VALUES(menuid,floor_id,rate_type,portion,unit_type,unit_weight,unit_id,base_unit_id,rate,barcode,tax_amount,final_rate,tax_value);
+ 
+  END LOOP;
+  CLOSE cur1;
+  
+SET Done=0;
+
+OPEN cur2;
+
+  read_loop: LOOP
+   FETCH cur2 INTO onl_id;
+
+  IF done THEN
+
+    LEAVE read_loop;
+  END IF;
+  
+  
+  INSERT INTO `tbl_menuratetakeaway`(`mta_menuid`, `mta_rate_type`, `mta_portion`, `mta_unit_type`, `mta_unit_weight`, `mta_unit_id`, `mta_base_unit_id`, `mta_branchid`, `mta_rate`, `mta_barcode`,`mta_food_partner`,`mta_menu_tax_amount`,`mta_menu_final_amount`,`mta_menu_tax_value`)
+  VALUES(menuid,rate_type,portion,unit_type,unit_weight,unit_id,base_unit_id,1,rate,barcode,onl_id,tax_amount,final_rate,tax_value);
+  
+  END LOOP;
+  CLOSE cur2;
+
+
+  
+    SET message = 'Rate Applied to all';
+  
+  
+  
+  
+end$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_menu_upload` (OUT `Message` VARCHAR(100))  BEGIN
+   SET Message = '';
+   
+  UPDATE `tbl_menu_upload` SET mr_menuid = 'NEW' WHERE TRIM(mr_menuid) = '';
+  UPDATE `tbl_menu_upload` SET mr_subcatid = NULL WHERE TRIM(mr_subcatid) = '';
+  UPDATE `tbl_menu_upload` SET mr_maincatid = NULL WHERE TRIM(mr_maincatid) = '';
+  UPDATE `tbl_menu_upload` SET mr_itemcode = NULL WHERE TRIM(mr_itemcode) = ''; 
+  INSERT INTO `tbl_menumaincategory`(`mmy_maincategoryname`,`mmy_branchid`)SELECT DISTINCT(`mr_maincatid`),1 FROM tbl_menu_upload WHERE mr_maincatid NOT IN (SELECT mmy_maincategoryname FROM tbl_menumaincategory);
+  INSERT INTO `tbl_menusubcategory`(`msy_subcategoryname`,`msy_branchid`)SELECT DISTINCT(`mr_subcatid`),1 FROM tbl_menu_upload WHERE mr_subcatid NOT IN (SELECT msy_subcategoryname FROM tbl_menusubcategory);
+  INSERT INTO `tbl_kotcountermaster`(`kr_kotname`,`kr_branchid`)SELECT DISTINCT(`mr_kotcounter`),1 FROM tbl_menu_upload WHERE mr_kotcounter NOT IN (SELECT kr_kotname FROM tbl_kotcountermaster);
+  
+  UPDATE tbl_menu_upload mup , tbl_menumaincategory mmc SET mup.mr_maincatid_org = mmc.mmy_maincategoryid WHERE trim(mmc.mmy_maincategoryname) = trim(mup.mr_maincatid);
+  UPDATE tbl_menu_upload mup , tbl_menusubcategory msc SET mup.mr_subcatid_org = msc.msy_subcategoryid WHERE trim(msc.msy_subcategoryname) = trim(mup.mr_subcatid);
+  UPDATE tbl_menu_upload mup , tbl_kotcountermaster km SET mup.mr_kotcounter_org = km.kr_kotcode WHERE trim(km.kr_kotname) = trim(mup.mr_kotcounter);
+  
+  INSERT INTO `tbl_menumaster`(`mr_menuid`, `mr_menuname`, `mr_maincatid`, `mr_subcatid`, `mr_description`, `mr_diet`, `mr_time_min`, `mr_active`, `mr_kotcounter`,mr_modifieddate,mr_modifieduser, `mr_prepmode`, `mr_branchid`, `mr_itemshortcode`, `mr_dailystock`, `mr_manualrateentry`, `mr_itemcode`, `mr_dailystock_in_number`)
+  SELECT 0,trim(mr_menuname),mr_maincatid_org,mr_subcatid_org,mr_description,mr_diet,mr_time_min,mr_active,mr_kotcounter_org,mr_modifieddate,mr_modifieduser,mr_prepmode,mr_branchid,mr_itemshortcode,mr_dailystock,mr_manualrateentry,mr_itemcode,mr_dailystock_in_number FROM tbl_menu_upload WHERE mr_menuid NOT IN (SELECT mr_menuid from tbl_menumaster); 
+  
+  UPDATE tbl_menumaster mm, tbl_menu_upload mup 
+  SET mm.mr_menuname=mup.mr_menuname,mm.mr_maincatid=mup.mr_maincatid_org,mm.mr_subcatid=mup.mr_subcatid_org,mm.mr_description=mup.mr_description,mm.mr_diet=mup.mr_diet,
+  mm.mr_time_min=mup.mr_time_min,mm.mr_active=mup.mr_active,mm.mr_kotcounter=mup.mr_kotcounter_org,mm.mr_modifieddate=mup.mr_modifieddate,mm.mr_modifieduser=mup.mr_modifieduser,mm.mr_prepmode=mup.mr_prepmode,mm.mr_branchid=mup.mr_branchid,
+  mm.mr_itemshortcode=mup.mr_itemshortcode,mm.mr_dailystock=mup.mr_dailystock,mm.mr_manualrateentry=mup.mr_manualrateentry,mm.mr_itemcode=mup.mr_itemcode,mm.mr_dailystock_in_number=mup.mr_dailystock_in_number
+  WHERE trim(mm.mr_menuid) = trim(mup.mr_menuid);
+  
+  SET Message = 'Menus  Succesfully Updated....';
+  
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_next_ascii` (IN `tableid` VARCHAR(10))  NO SQL
+BEGIN
+  
+   DECLARE max_ascii, i INT;
+   DECLARE prefix char(1);
+
+    SELECT tr_max_ascii INTO max_ascii  FROM tbl_tablemaster WHERE tr_tableid = TRIM(tableid);
+  
+   SET i = 65;
+   ORDER_LOOP: WHILE (i <= max_ascii) DO
+   SELECT ASCIITOCHAR(i) INTO prefix;
+   IF NOT EXISTS(select * from tbl_tabledetails where ts_tableid = trim(tableid) and ts_tableidprefix = trim(prefix)) THEN
+   BEGIN
+     
+          UPDATE tbl_tablemaster SET tr_nextprefix_ascii = i where tr_tableid = trim(tableid);
+    LEAVE ORDER_LOOP;
+    
+   END;
+   END IF;
+   
+  
+    SET i= i+1;
+    END WHILE;
+    
+
+end$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_online_billgenerate` (IN `tempbillno` VARCHAR(100), OUT `new_billno` VARCHAR(16), OUT `Message` VARCHAR(250))  MODIFIES SQL DATA
+proc_online_billgenerate:BEGIN
+
+  DECLARE SERIES_SLNO,bill_ref_count,check1,check2,branchid INT;
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE bill_ref varchar(30);
+  DECLARE kotno varchar(50);
+
+   DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
+  BEGIN
+
+    ROLLBACK;
+  END;
+
+
+  SELECT GET_LOCK('onlinebillgenerate', 5) INTO check1;
+
+
+  START TRANSACTION;
+
+  SET Message = 'Error!!!';
+  SET branchid = 1;
+  
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+  IF(DAYCLOSEDATE IS NULL)THEN
+  BEGIN
+    SET Message = 'Error!!!Sale is Closed for the day!';
+    LEAVE proc_online_billgenerate;
+  END;
+  END IF;
+
+  SELECT bsth_bill_series INTO SERIES_SLNO FROM tbl_branch_settings_ta_hd;
+
+  CALL proc_bill_series_gen('T',NULL,SERIES_SLNO,new_billno);
+
+  SET bill_ref_count = NULL;
+  SELECT ds_bill_ref_ta INTO bill_ref_count FROM tbl_datesettings
+  WHERE ds_date = DAYCLOSEDATE;
+
+  IF(bill_ref_count IS NULL) THEN
+  BEGIN
+    INSERT INTO tbl_datesettings(ds_branchid,ds_date) VALUES(branchid, DAYCLOSEDATE);
+    SELECT ds_bill_ref_ta INTO bill_ref_count FROM tbl_datesettings
+    WHERE  ds_date = DAYCLOSEDATE;
+  END;
+  END IF;
+  SET bill_ref = CONCAT('T',bill_ref_count);
+  UPDATE tbl_datesettings SET ds_bill_ref_ta = ds_bill_ref_ta +1 WHERE ds_date = DAYCLOSEDATE;
+
+  CALL proc_genkotno(kotno,branchid,'Online Order',NULL);
+
+  UPDATE `tbl_online_billmaster` SET `on_billno` =new_billno ,`on_bill_ref` = bill_ref, on_kotno = kotno WHERE trim(on_billno) = trim(tempbillno);
+  SET Message = 'Bill Number Genereated';
+  COMMIT;
+   SELECT RELEASE_LOCK('onlinebillgenerate') INTO check2;
+
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_order_split_generate` (IN `temp_billno` VARCHAR(250), IN `floor_id` VARCHAR(10), IN `discount_of` FLOAT, IN `discount_unit` CHAR(1), IN `discount` CHAR(1), IN `discountid` VARCHAR(20), IN `redeem` DECIMAL(15,3), OUT `billnumber` VARCHAR(16), OUT `Message` VARCHAR(250))  MODIFIES SQL DATA
+proc_order_split_generate:BEGIN
+
+
+  DECLARE commacount,bill_ref_count,table_pax,total_pax,commacount_s INT;
+  DECLARE discount_mode,FLAG_SUCCESS,ENABLE_EXTRA_TAX,EXTRA_PREFIX char(1);
+  DECLARE i,portion,sum_qty_bill,SERIES_SLNO INT;
+  DECLARE bdate,bILLdate varchar(6);
+  DECLARE prefx varchar(3);
+  DECLARE discount_label varchar(10);
+  DECLARE ordernumber,ordernumber_s,servicetaxunit,servicechargeunit,vatunit varchar(15);
+  DECLARE del_tax,subtotal,finaltotal,discountvalue,sum_extra_tax,tax_exempt_total,taxable_amount,discount_tax_exempt,tax_total decimal(15,3);
+  DECLARE after_roundoff,roundoff_value,discountvalue_P,rate_combo decimal(15,3);
+  DECLARE billno_missed varchar(15);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE discountof float;
+  DECLARE REGENERATE_BILLNO varchar(15);
+  DECLARE order_status varchar(20);
+  DECLARE bill_ref varchar(30);
+  DECLARE nearest_roundoff decimal(5,4);
+  DECLARE check_billno varchar(15);
+  DECLARE bill_custom_message varchar(250);
+  DECLARE bill_steward varchar(50);
+  DECLARE decimal1,branchid int;
+  DECLARE uaetax char(1);
+  DECLARE uaeval decimal(15,3);
+  
+
+   DECLARE EXIT HANDLER FOR SQLEXCEPTION, SQLWARNING
+  BEGIN
+  
+    ROLLBACK;
+  END;
+  
+  START TRANSACTION;
+  
+  
+  SET FLAG_SUCCESS = 'N';
+  set branchid = 1;
+  SET Message = 'Error..In Bill Generatation';
+  
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+  DELETE FROM tbl_tableorder WHERE ter_portion = 0 OR ter_qty = 0;
+
+
+  SET discountvalue = 0.00;
+
+  
+  SELECT be_branchprefix,be_nearest_roundoff_value,be_decimal INTO prefx,nearest_roundoff,decimal1 FROM
+  tbl_branchmaster WHERE be_branchid = '1';
+  
+  SELECT DISTINCT f.fr_enable_extra_tax,f.fr_extra_prefix,f.fr_bill_series
+      INTO ENABLE_EXTRA_TAX,EXTRA_PREFIX,SERIES_SLNO
+      FROM tbl_floormaster f WHERE f.fr_floorid = floor_id ;
+
+
+  
+
+
+
+  SELECT SUM(RATE) into rate_combo FROM(SELECT DISTINCT cbd_count_combo_ordering, cbd_combo_total_rate AS RATE  FROM tbl_combo_bill_details  WHERE `cbd_billno` = temp_billno)Z;
+   
+   
+  if(rate_combo is NULL)THEN
+  SET rate_combo = 0;
+  END IF;
+  
+  SELECT  SUM(bd_amount) INTO  subtotal FROM tbl_tablebilldetails WHERE bd_billno = temp_billno;
+  
+  if(subtotal is NULL)THEN
+  SET subtotal = 0;
+  END IF;
+  
+  set subtotal = rate_combo + subtotal;
+  
+  
+  SELECT be_uae_tax_concept,be_uae_tax_value INTO uaetax,uaeval FROM  tbl_branchmaster;
+  
+  UPDATE tbl_tablebillmaster SET bm_subtotal = subtotal  WHERE  bm_billno = temp_billno;  
+ 
+      
+  SET finaltotal = 0;
+  SET taxable_amount = 0;
+  SET tax_exempt_total = 0;
+  SET bill_custom_message = NULL;
+
+ 
+  IF(Discount ='Y')THEN
+  BEGIN
+    IF(discountid = '0') THEN
+    BEGIN
+      SET discountof = discount_of;
+      SET discount_mode = discount_unit;
+      SET discountid = NULL;
+    END;
+    ELSE
+    BEGIN
+      SELECT ds_discountof,ds_mode INTO discountof,discount_mode FROM  tbl_discountmaster WHERE ds_discountid = discountid;
+    END;
+    END IF;
+  
+    SET discount_label = NULL;
+    IF(discount_mode = 'P')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(((discountof * subtotal)/100),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+      SET discount_label = CONCAT('(',discountof,'%)');
+    END;
+    ELSEIF(discount_mode = 'V')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(discountof,3);
+      SET discountvalue_P = TRUNCATE(((discountof * 100)/subtotal),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+
+    END;
+    END IF;
+   
+  END;
+  ELSE
+  BEGIN
+    SET discountvalue = 0.00;
+    SET discount_label = NULL;
+    SET discountid = NULL; 
+  END;
+  END IF;
+
+
+  
+  
+   
+  
+  if(redeem>0) then
+  Begin
+    UPDATE tbl_tablebillmaster SET bm_redeem_amount=redeem WHERE bm_billno = temp_billno;
+    Set subtotal=subtotal-redeem;
+  End;
+  End if;
+  
+  
+  
+   if(uaetax =  'Y') then
+  Begin
+  
+   set del_tax= TRUNCATE( subtotal/(1+(uaeval/100)),3);
+  
+  set subtotal=del_tax;
+  
+  End;
+  End if;
+  
+    /* loyality ends*/
+      
+  IF(subtotal<0)THEN
+  BEGIN
+      SET Message = 'DISCOUNT GIVEN MORE THAN BILL AMOUNT';
+      LEAVE proc_order_split_generate;
+  END;
+  ELSEIF(subtotal>0)THEN
+  BEGIN
+    UPDATE tbl_tablebillmaster SET  bm_subtotal_final = subtotal,bm_discountvalue = discountvalue,bm_discountlabel = discount_label,bm_discountid = discountid
+    WHERE bm_billno = temp_billno;
+
+  END;
+  END IF;
+
+  
+  IF EXISTS(SELECT * FROM tbl_tablebilldetails WHERE bd_billno = temp_billno AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster
+  WHERE mr_excempt_tax  ='Y'))THEN
+  BEGIN
+
+    SELECT sum(bd_amount) INTO tax_exempt_total FROM tbl_tablebilldetails
+    WHERE bd_billno = temp_billno AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+
+
+    IF(Discount ='Y')THEN
+    BEGIN
+      IF(discount_mode = 'P')THEN
+      BEGIN
+          SET discount_tax_exempt = ((discountof * tax_exempt_total)/100);
+          SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      ELSEIF(discount_mode = 'V')THEN
+      BEGIN
+
+        SET discount_tax_exempt = ((discountvalue_P * tax_exempt_total)/100);
+        SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+
+      END;
+      END IF;
+    END;
+    END IF;
+
+    SET taxable_amount = subtotal - tax_exempt_total;
+    SET subtotal = taxable_amount;
+
+   
+      
+    UPDATE tbl_tablebilldetails SET bd_symbol_for_tax = '*' WHERE bd_billno = temp_billno AND bd_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+
+     SET bill_custom_message = concat('* TAX EXEMPTED AMOUNT - ',FORMAT(tax_exempt_total,decimal1),'/b TAXABLE AMOUNT - ',FORMAT(taxable_amount,decimal1));
+
+  END;
+   ELSE
+  BEGIN
+   SET taxable_amount = subtotal;
+   SET tax_exempt_total = 0;
+  END;
+  END IF;
+
+  
+  
+  UPDATE tbl_tablebillmaster SET  bm_tax_exempt = tax_exempt_total,bm_taxable_amount = taxable_amount WHERE bm_billno = temp_billno;
+  IF(taxable_amount > 0 ) THEN
+  BEGIN
+    DELETE FROM `tbl_tablebill_extra_tax_master` WHERE `bem_billno` = temp_billno;
+  
+    CALL proc_tax(temp_billno,'DI',floor_id);
+
+  END;
+  END IF;
+  
+  if exists( select *FROM tbl_tablebill_extra_tax_master WHERE bem_billno = temp_billno)then
+  begin
+    SELECT SUM(bem_total_value)INTO tax_total FROM tbl_tablebill_extra_tax_master WHERE bem_billno = temp_billno;
+  END;
+  ELSE 
+    SET tax_total = 0;
+  END IF;
+
+  SET finaltotal = taxable_amount  +  tax_exempt_total + tax_total;
+  
+  
+   
+
+
+  IF((finaltotal != 0)OR (finaltotal > 0))THEN
+  BEGIN
+
+    IF(nearest_roundoff =0) THEN
+    BEGIN
+      SET after_roundoff = finaltotal;
+      SET roundoff_value = 0.00;
+    END;
+    ELSE
+    BEGIN
+
+      SET after_roundoff = (nearest_roundoff *ROUND(finaltotal/ nearest_roundoff));
+      SET roundoff_value =  (after_roundoff - finaltotal);
+    END;
+    END IF;
+
+
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = temp_billno) THEN
+    BEGIN
+      SET Message = 'Bill not generated - N1';
+      LEAVE proc_order_split_generate;
+    END;
+    END IF;
+
+    SET check_billno = NULL;
+    IF(check_billno IS NULL) THEN
+    BEGIN
+      
+      IF EXISTS(SELECT * FROM tbl_temp_regenerate WHERE order_no IS NULL)then
+      BEGIN
+        SELECT bill_no INTO billno_missed FROM tbl_temp_regenerate WHERE order_no IS NULL LIMIT 1; 
+        DELETE FROM tbl_tablebillmaster WHERE bm_billno = TRIM(billno_missed);
+        DELETE FROM tbl_tablebill_item_discount WHERE  bd_billno = TRIM(billno_missed);
+        DELETE FROM tbl_temp_regenerate WHERE bill_no  = TRIM(billno_missed);
+        DELETE FROM tbl_tablebill_extra_tax_master WHERE bem_billno  = TRIM(billno_missed);
+        DELETE FROM tbl_tablebill_extra_tax_details WHERE bet_billno  = TRIM(billno_missed);
+        
+        SET billnumber = TRIM(billno_missed);
+      END;
+      ELSE
+      BEGIN
+        CALL proc_bill_series_gen('D',EXTRA_PREFIX,SERIES_SLNO,billnumber);
+      END;
+      END IF;
+      
+      SET bill_ref_count = NULL;
+      SELECT ds_bill_ref_dine_in INTO bill_ref_count FROM tbl_datesettings
+      WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+
+      IF(bill_ref_count = NULL) THEN
+      BEGIN
+        INSERT INTO tbl_datesettings(ds_branchid,ds_date) VALUES(branchid, DAYCLOSEDATE);
+        SELECT ds_bill_ref_dine_in INTO bill_ref_count FROM tbl_datesettings
+        WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+
+      END;
+      END IF;
+      SET bill_ref = CONCAT('D',bill_ref_count);
+      UPDATE tbl_datesettings SET ds_bill_ref_dine_in = ds_bill_ref_dine_in +1 WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+    
+    END;
+    END IF;
+    
+    UPDATE tbl_tablebillmaster SET bm_billno = billnumber,bm_total= finaltotal, bm_finaltotal = after_roundoff , bm_floorid = floor_id,bm_totalpax = total_pax,
+    bm_roundoff_value = roundoff_value,bm_bill_ref= bill_ref,bm_comments =  bill_custom_message
+    WHERE bm_billno = temp_billno;
+    
+    UPDATE tbl_tablebill_item_discount SET bd_billno =billnumber  WHERE bd_billno  = temp_billno;
+
+
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = billnumber) THEN
+    BEGIN
+      SET Message = 'Bill not generated - N2';
+      LEAVE proc_order_split_generate;
+    END;
+    END IF;
+
+    SET Message = 'Bill generated sucessfully';
+
+  END;
+  END IF;
+
+  
+  UPDATE tbl_tabledetails SET ts_status ='Occupied',ts_completed_order = 'Y' WHERE ts_status = 'Billed' AND ((ts_billnumber IS NULL)OR(ts_billnumber = ''));
+   
+  COMMIT;
+
+
+   
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_printer_import` ()  BEGIN
+
+  
+  INSERT INTO `tbl_printersettings`(`pr_id`, `pr_printername`, `pr_printerip`, `pr_printerport`, `pr_branchid`, `pr_printertype`, `pr_floorid`,pr_kotcode, `pr_style`) 
+  select 0,concat('KOT ',c.kr_kotname),'192.168.1.88','9100',1,1,fr_floorid,c.kr_kotcode,1 from tbl_floormaster f ,tbl_kotcountermaster c group by c.kr_kotcode
+  union select 0,concat('KOT ',c.kr_kotname),'192.168.1.88','9100',1,1,fr_floorid,c.kr_kotcode,1 from tbl_floormaster f ,tbl_kotcountermaster c ;
+
+  INSERT INTO `tbl_printersettings`(`pr_id`, `pr_printername`, `pr_printerip`, `pr_printerport`, `pr_branchid`, `pr_printertype`, `pr_floorid`, `pr_style`) 
+  select 0,concat('KOT CONS ',f.fr_floorname),'192.168.1.88','9100',1,6,fr_floorid,1 from tbl_floormaster f ,tbl_kotcountermaster c group by f.fr_floorid;
+    
+  INSERT INTO `tbl_printersettings`(`pr_id`, `pr_printername`, `pr_printerip`, `pr_printerport`, `pr_branchid`, `pr_printertype`, `pr_floorid`, `pr_style`) 
+  select 0,concat('BILL ',f.fr_floorname),'192.168.1.88','9100',1,2,fr_floorid,1 from tbl_floormaster f ,tbl_kotcountermaster c group by f.fr_floorid;
+  
+  INSERT INTO `tbl_printersettings`(`pr_id`, `pr_printername`, `pr_printerip`, `pr_printerport`, `pr_branchid`, `pr_printertype`, pr_kotcode, `pr_style`) 
+  select 0,'TA KOT','192.168.1.88','9100',1,4,c.kr_kotcode,1 from tbl_kotcountermaster c group by c.kr_kotcode;
+    
+  INSERT INTO `tbl_printersettings`(`pr_id`, `pr_printername`, `pr_printerip`, `pr_printerport`, `pr_branchid`, `pr_printertype`,  `pr_style`) 
+  VALUES(0,'TA KOT CONS','192.168.1.88','9100',1,7,1);
+  
+  INSERT INTO `tbl_printersettings`(`pr_id`, `pr_printername`, `pr_printerip`, `pr_printerport`, `pr_branchid`, `pr_printertype`, `pr_style`) 
+  VALUES(0,'TA BILL','192.168.1.88','9100',1,5,1);
+  
+  INSERT INTO `tbl_printersettings`(`pr_id`, `pr_printername`, `pr_printerip`, `pr_printerport`, `pr_branchid`, `pr_printertype`, `pr_style`) 
+  VALUES(0,'CS BILL','192.168.1.88','9100',1,11,1);
+  
+  INSERT INTO `tbl_printersettings`(`pr_id`, `pr_printername`, `pr_printerip`, `pr_printerport`, `pr_branchid`, `pr_printertype`, `pr_style`) 
+  VALUES(0,'REPORT', '192.168.1.88', '9100', 1, 3,1);
+  
+  
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_ratechange` (IN `rate` DECIMAL(15,2), IN `type` VARCHAR(20), IN `mode` VARCHAR(20), OUT `message` VARCHAR(250), IN `floorid` VARCHAR(10), IN `categoryid` VARCHAR(10), IN `module` VARCHAR(10))  NO SQL
+BEGIN
+  
+  
+
+  IF(type = '%')  THEN
+  BEGIN
+    IF(mode = 'inc') THEN
+    BEGIN
+      IF(categoryid='All') THEN
+      BEGIN
+        IF(module='All') THEN
+        BEGIN
+          UPDATE `tbl_menuratetakeaway` SET mta_rate = mta_rate+ (mta_rate*   (rate/100));
+          UPDATE `tbl_menurate_counter` SET mrc_rate = mrc_rate+ (mrc_rate*   (rate/100));
+        END;
+        ELSEIF(module='ta/hd') THEN
+        BEGIN
+          UPDATE `tbl_menuratetakeaway` SET mta_rate = mta_rate+ (mta_rate*   (rate/100));
+        END;
+        ELSEIF (module='cs') THEN
+        BEGIN
+          UPDATE `tbl_menurate_counter` SET mrc_rate = mrc_rate+ (mrc_rate*   (rate/100));
+        END;
+        END IF;
+      END;
+      ELSE
+      BEGIN
+        IF(module='All') THEN
+        BEGIN
+          UPDATE tbl_menuratetakeaway LEFT JOIN tbl_menumaster on mr_menuid=mta_menuid  SET  mta_rate = mta_rate+ (mta_rate*   (rate/100)) WHERE mr_maincatid=categoryid ;
+          UPDATE tbl_menurate_counter LEFT JOIN tbl_menumaster on mr_menuid=mrc_menuid  SET  mrc_rate = mrc_rate+ (mrc_rate*   (rate/100)) WHERE mr_maincatid=categoryid ;
+        END;
+        ELSEIF(module='ta/hd') THEN
+        BEGIN
+          UPDATE tbl_menuratetakeaway LEFT JOIN tbl_menumaster on mr_menuid=mta_menuid  SET  mta_rate = mta_rate+ (mta_rate*   (rate/100)) WHERE mr_maincatid=categoryid ;
+        END;
+        ELSEIF(module='cs') THEN
+        BEGIN
+          UPDATE tbl_menurate_counter LEFT JOIN tbl_menumaster on mr_menuid=mrc_menuid  SET  mrc_rate = mrc_rate+ (mrc_rate*   (rate/100)) WHERE mr_maincatid=categoryid ;
+        END;
+        END IF;
+      END;
+      END IF;
+      IF(floorid = 'All') THEN
+      BEGIN
+        IF(categoryid='All') THEN
+          BEGIN
+            IF(module='All') THEN
+            BEGIN
+              UPDATE tbl_menuratemaster SET  mmr_rate = mmr_rate + (mmr_rate*   (rate/100));
+            END;
+            ELSEIF(module='dine') THEN
+            BEGIN
+              UPDATE tbl_menuratemaster SET  mmr_rate = mmr_rate + (mmr_rate*   (rate/100));
+            END;
+            END IF;
+          END;
+          ELSE
+          BEGIN
+            IF(module='All') THEN
+            BEGIN
+              UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET mmr_rate = mmr_rate + (mmr_rate*   (rate/100)) WHERE mr_maincatid=categoryid ;
+            END;
+            ELSEIF(module='dine') THEN
+            BEGIN
+              UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET mmr_rate = mmr_rate + (mmr_rate*   (rate/100)) WHERE mr_maincatid=categoryid ;
+            END;
+            END IF;
+          END;
+        END IF;
+      END;
+      ELSE
+      BEGIN
+        IF(categoryid='All') THEN
+        BEGIN
+          IF(module='All') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster  SET   mmr_rate = mmr_rate + (mmr_rate*   (rate/100)) WHERE    mmr_floorid = floorid ;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN
+           UPDATE tbl_menuratemaster  SET   mmr_rate = mmr_rate + (mmr_rate*   (rate/100)) WHERE    mmr_floorid = floorid ;
+          END;
+          END IF;
+        END;
+        ELSE
+        BEGIN
+          IF(module='All') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET   mmr_rate = mmr_rate + (mmr_rate*   (rate/100)) WHERE    mmr_floorid = floorid AND mr_maincatid=categoryid;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET   mmr_rate = mmr_rate + (mmr_rate*   (rate/100)) WHERE    mmr_floorid = floorid AND mr_maincatid=categoryid;
+          END;
+          END IF;
+        END;
+        END IF;
+      END;
+      END IF;
+
+      END;
+      ELSEIF(mode = 'dec') THEN
+      BEGIN
+        IF(categoryid='All') THEN
+        BEGIN
+          IF(module='All') THEN
+          BEGIN
+            UPDATE `tbl_menuratetakeaway` SET mta_rate = mta_rate- (mta_rate*   (rate/100));
+            UPDATE `tbl_menurate_counter` SET mrc_rate = mrc_rate- (mrc_rate*   (rate/100));
+          END;
+          ELSEIF(module='ta/hd') THEN
+          BEGIN
+            UPDATE `tbl_menuratetakeaway` SET mta_rate = mta_rate- (mta_rate*   (rate/100));
+          END;
+          ELSEIF(module='cs') THEN
+          BEGIN
+            UPDATE `tbl_menurate_counter` SET mrc_rate = mrc_rate- (mrc_rate*   (rate/100));
+          END;
+          END IF;
+        END;
+        ELSE
+        BEGIN
+            IF(module='All') THEN
+            BEGIN
+              UPDATE tbl_menuratetakeaway LEFT JOIN tbl_menumaster on mr_menuid=mta_menuid  SET  mta_rate = mta_rate- (mta_rate*   (rate/100)) WHERE mr_maincatid=categoryid ;
+              UPDATE tbl_menurate_counter LEFT JOIN tbl_menumaster on mr_menuid=mrc_menuid  SET  mrc_rate = mrc_rate- (mrc_rate*   (rate/100)) WHERE mr_maincatid=categoryid ;
+            END;
+            ELSEIF(module='ta/hd') THEN
+            BEGIN
+              UPDATE tbl_menuratetakeaway LEFT JOIN tbl_menumaster on mr_menuid=mta_menuid  SET  mta_rate = mta_rate- (mta_rate*   (rate/100)) WHERE mr_maincatid=categoryid ;
+            END;
+            ELSEIF(module='cs') THEN
+            BEGIN
+              UPDATE tbl_menurate_counter LEFT JOIN tbl_menumaster on mr_menuid=mrc_menuid  SET  mrc_rate = mrc_rate- (mrc_rate*   (rate/100)) WHERE mr_maincatid=categoryid ;
+            END;  
+          END IF;
+        END;
+        END IF;
+      IF(floorid = 'All') THEN
+      BEGIN
+        IF(categoryid='All') THEN
+          BEGIN
+              IF(module='All') THEN
+              BEGIN
+                UPDATE tbl_menuratemaster SET  mmr_rate = mmr_rate - (mmr_rate*   (rate/100));
+              END;
+              ELSEIF(module='dine') THEN
+              BEGIN
+                UPDATE tbl_menuratemaster SET  mmr_rate = mmr_rate - (mmr_rate*   (rate/100));
+              END;
+              END IF;
+          END;
+          ELSE
+          BEGIN
+            IF(module='All') THEN
+            BEGIN
+              UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET mmr_rate = mmr_rate - (mmr_rate*   (rate/100)) WHERE mr_maincatid=categoryid ;
+            END;
+            ELSEIF(module='dine') THEN
+            BEGIN
+              UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET mmr_rate = mmr_rate - (mmr_rate*   (rate/100)) WHERE mr_maincatid=categoryid ;
+            END;
+            END IF;
+          END;
+        END IF;
+      END;
+      ELSE
+      BEGIN
+        IF(categoryid='All') THEN
+        BEGIN
+          IF(module='All') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster  SET   mmr_rate = mmr_rate - (mmr_rate*   (rate/100)) WHERE    mmr_floorid = floorid ;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster  SET   mmr_rate = mmr_rate - (mmr_rate*   (rate/100)) WHERE    mmr_floorid = floorid ;
+          END;
+          END IF;
+        END;
+        ELSE
+        BEGIN
+          IF(module='All') THEN
+          BEGIN 
+          UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET   mmr_rate = mmr_rate - (mmr_rate*   (rate/100)) WHERE    mmr_floorid = floorid AND mr_maincatid=categoryid;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN 
+          UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET   mmr_rate = mmr_rate - (mmr_rate*   (rate/100)) WHERE    mmr_floorid = floorid AND mr_maincatid=categoryid;
+          END;
+          END IF;
+        END;
+        END IF;
+      END;
+      END IF;
+
+    END;
+    END IF;
+  END;
+  ELSEIF(type = 'Value') THEN
+  BEGIN
+    IF(mode = 'inc') THEN
+    BEGIN
+      IF(categoryid='All') THEN
+      BEGIN
+        IF(module='All') THEN
+        BEGIN
+          UPDATE `tbl_menuratetakeaway` SET mta_rate = mta_rate+ rate;
+          UPDATE `tbl_menurate_counter` SET mrc_rate = mrc_rate+ rate;
+        END;
+        ELSEIF(module='ta/hd') THEN
+        BEGIN
+          UPDATE `tbl_menuratetakeaway` SET mta_rate = mta_rate+ rate;
+        END;
+        ELSEIF(module='cs') THEN
+        BEGIN
+          UPDATE `tbl_menurate_counter` SET mrc_rate = mrc_rate+ rate;
+        END;
+        END IF;
+      END;
+      ELSE
+      BEGIN
+        IF(module='All') THEN
+        BEGIN
+          UPDATE tbl_menuratetakeaway LEFT JOIN tbl_menumaster on mr_menuid=mta_menuid  SET mta_rate = mta_rate+ rate WHERE mr_maincatid=categoryid ;
+          UPDATE tbl_menurate_counter LEFT JOIN tbl_menumaster on mr_menuid=mrc_menuid  SET mrc_rate = mrc_rate+ rate WHERE mr_maincatid=categoryid ;
+        END;
+        ELSEIF(module='ta/hd') THEN
+        BEGIN
+          UPDATE tbl_menuratetakeaway LEFT JOIN tbl_menumaster on mr_menuid=mta_menuid  SET mta_rate = mta_rate+ rate WHERE mr_maincatid=categoryid ;
+        END;
+        ELSEIF(module='cs') THEN
+        BEGIN
+          UPDATE tbl_menurate_counter LEFT JOIN tbl_menumaster on mr_menuid=mrc_menuid  SET mrc_rate = mrc_rate+ rate WHERE mr_maincatid=categoryid ;
+        END;
+        END IF;
+      END;
+      END IF;
+      IF(floorid = 'All') THEN
+      BEGIN
+        IF(categoryid='All') THEN
+        BEGIN
+          IF(module='All') THEN 
+          BEGIN
+            UPDATE tbl_menuratemaster SET  mmr_rate = mmr_rate + rate ;
+          END;
+          ELSEIF(module='dine') THEN 
+          BEGIN
+            UPDATE tbl_menuratemaster SET  mmr_rate = mmr_rate + rate ;
+          END;
+          END IF;
+        END;
+        ELSE
+        BEGIN
+          IF(module='All') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate + rate WHERE mr_maincatid=categoryid ;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate + rate WHERE mr_maincatid=categoryid ;
+          END;
+          END IF;
+        END;
+        END IF;
+      END;  
+      ELSE
+      BEGIN
+        IF(categoryid='All') THEN
+        BEGIN
+          IF(module='All') THEN
+
+          BEGIN
+            UPDATE tbl_menuratemaster  SET  mmr_rate = mmr_rate + rate WHERE    mmr_floorid = floorid ;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster  SET  mmr_rate = mmr_rate + rate WHERE    mmr_floorid = floorid ;
+          END;
+          END IF;
+        END;
+        ELSE
+        BEGIN
+          IF(module='All') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate + rate WHERE    mmr_floorid = floorid AND mr_maincatid=categoryid;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate + rate WHERE    mmr_floorid = floorid AND mr_maincatid=categoryid;
+          END;
+          END IF;
+        END;
+        END IF;
+      END;
+      END IF;
+    END;
+    
+    /* multiply start */
+    ELSEIF(mode = 'multiply') THEN
+    BEGIN
+      IF(categoryid='All') THEN
+      BEGIN
+        IF(module='All') THEN
+        BEGIN
+          UPDATE `tbl_menuratetakeaway` SET mta_rate = mta_rate * rate;
+          UPDATE `tbl_menurate_counter` SET mrc_rate = mrc_rate * rate;
+        END;
+        ELSEIF(module='ta/hd') THEN
+        BEGIN
+          UPDATE `tbl_menuratetakeaway` SET mta_rate = mta_rate * rate;
+        END;
+        ELSEIF(module='cs') THEN
+        BEGIN
+          UPDATE `tbl_menurate_counter` SET mrc_rate = mrc_rate * rate;
+        END;
+        END IF;
+      END;
+      ELSE
+      BEGIN
+        IF(module='All') THEN
+        BEGIN
+          UPDATE tbl_menuratetakeaway LEFT JOIN tbl_menumaster on mr_menuid=mta_menuid  SET mta_rate = mta_rate * rate WHERE mr_maincatid=categoryid ;
+          UPDATE tbl_menurate_counter LEFT JOIN tbl_menumaster on mr_menuid=mrc_menuid  SET mrc_rate = mrc_rate * rate WHERE mr_maincatid=categoryid ;
+        END;
+        ELSEIF(module='ta/hd') THEN
+        BEGIN
+          UPDATE tbl_menuratetakeaway LEFT JOIN tbl_menumaster on mr_menuid=mta_menuid  SET mta_rate = mta_rate * rate WHERE mr_maincatid=categoryid ;
+        END;
+        ELSEIF(module='cs') THEN
+        BEGIN
+          UPDATE tbl_menurate_counter LEFT JOIN tbl_menumaster on mr_menuid=mrc_menuid  SET mrc_rate = mrc_rate * rate WHERE mr_maincatid=categoryid ;
+        END;
+        END IF;
+      END;
+      END IF;
+      IF(floorid = 'All') THEN
+      BEGIN
+        IF(categoryid='All') THEN
+        BEGIN
+          IF(module='All') THEN 
+          BEGIN
+            UPDATE tbl_menuratemaster SET  mmr_rate = mmr_rate * rate ;
+          END;
+          ELSEIF(module='dine') THEN 
+          BEGIN
+            UPDATE tbl_menuratemaster SET  mmr_rate = mmr_rate * rate ;
+          END;
+          END IF;
+        END;
+        ELSE
+        BEGIN
+          IF(module='All') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate * rate WHERE mr_maincatid=categoryid ;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate * rate WHERE mr_maincatid=categoryid ;
+          END;
+          END IF;
+        END;
+        END IF;
+      END;  
+      ELSE
+      BEGIN
+        IF(categoryid='All') THEN
+        BEGIN
+          IF(module='All') THEN
+
+          BEGIN
+            UPDATE tbl_menuratemaster  SET  mmr_rate = mmr_rate * rate WHERE    mmr_floorid = floorid ;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster  SET  mmr_rate = mmr_rate * rate WHERE    mmr_floorid = floorid ;
+          END;
+          END IF;
+        END;
+        ELSE
+        BEGIN
+          IF(module='All') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate * rate WHERE    mmr_floorid = floorid AND mr_maincatid=categoryid;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate * rate WHERE    mmr_floorid = floorid AND mr_maincatid=categoryid;
+          END;
+          END IF;
+        END;
+        END IF;
+      END;
+      END IF;
+    END;
+    
+      /* multiply end */
+    
+    
+    
+     /* divide start */
+    ELSEIF(mode = 'divide') THEN
+    BEGIN
+      IF(categoryid='All') THEN
+      BEGIN
+        IF(module='All') THEN
+        BEGIN
+          UPDATE `tbl_menuratetakeaway` SET mta_rate = mta_rate / rate;
+          UPDATE `tbl_menurate_counter` SET mrc_rate = mrc_rate / rate;
+        END;
+        ELSEIF(module='ta/hd') THEN
+        BEGIN
+          UPDATE `tbl_menuratetakeaway` SET mta_rate = mta_rate / rate;
+        END;
+        ELSEIF(module='cs') THEN
+        BEGIN
+          UPDATE `tbl_menurate_counter` SET mrc_rate = mrc_rate / rate;
+        END;
+        END IF;
+      END;
+      ELSE
+      BEGIN
+        IF(module='All') THEN
+        BEGIN
+          UPDATE tbl_menuratetakeaway LEFT JOIN tbl_menumaster on mr_menuid=mta_menuid  SET mta_rate = mta_rate / rate WHERE mr_maincatid=categoryid ;
+          UPDATE tbl_menurate_counter LEFT JOIN tbl_menumaster on mr_menuid=mrc_menuid  SET mrc_rate = mrc_rate / rate WHERE mr_maincatid=categoryid ;
+        END;
+        ELSEIF(module='ta/hd') THEN
+        BEGIN
+          UPDATE tbl_menuratetakeaway LEFT JOIN tbl_menumaster on mr_menuid=mta_menuid  SET mta_rate = mta_rate / rate WHERE mr_maincatid=categoryid ;
+        END;
+        ELSEIF(module='cs') THEN
+        BEGIN
+          UPDATE tbl_menurate_counter LEFT JOIN tbl_menumaster on mr_menuid=mrc_menuid  SET mrc_rate = mrc_rate / rate WHERE mr_maincatid=categoryid ;
+        END;
+        END IF;
+      END;
+      END IF;
+      IF(floorid = 'All') THEN
+      BEGIN
+        IF(categoryid='All') THEN
+        BEGIN
+          IF(module='All') THEN 
+          BEGIN
+            UPDATE tbl_menuratemaster SET  mmr_rate = mmr_rate / rate ;
+          END;
+          ELSEIF(module='dine') THEN 
+          BEGIN
+            UPDATE tbl_menuratemaster SET  mmr_rate = mmr_rate / rate ;
+          END;
+          END IF;
+        END;
+        ELSE
+        BEGIN
+          IF(module='All') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate / rate WHERE mr_maincatid=categoryid ;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate / rate WHERE mr_maincatid=categoryid ;
+          END;
+          END IF;
+        END;
+        END IF;
+      END;  
+      ELSE
+      BEGIN
+        IF(categoryid='All') THEN
+        BEGIN
+          IF(module='All') THEN
+
+          BEGIN
+            UPDATE tbl_menuratemaster  SET  mmr_rate = mmr_rate / rate WHERE    mmr_floorid = floorid ;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster  SET  mmr_rate = mmr_rate / rate WHERE    mmr_floorid = floorid ;
+          END;
+          END IF;
+        END;
+        ELSE
+        BEGIN
+          IF(module='All') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate / rate WHERE    mmr_floorid = floorid AND mr_maincatid=categoryid;
+          END;
+          ELSEIF(module='dine') THEN
+          BEGIN
+            UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate / rate WHERE    mmr_floorid = floorid AND mr_maincatid=categoryid;
+          END;
+          END IF;
+        END;
+        END IF;
+      END;
+      END IF;
+    END;
+    
+      /* divide end */
+    
+    ELSEIF(mode = 'dec') THEN
+    BEGIN
+      IF(categoryid='All') THEN
+      BEGIN
+        IF(module='All') THEN
+        BEGIN
+          UPDATE `tbl_menuratetakeaway` SET mta_rate = mta_rate- rate;
+          UPDATE `tbl_menurate_counter` SET mrc_rate = mrc_rate- rate;
+        END;
+        ELSEIF(module='ta/hd') THEN
+        BEGIN
+          UPDATE `tbl_menuratetakeaway` SET mta_rate = mta_rate- rate;
+        END;
+        ELSEIF(module='cs') THEN
+        BEGIN
+          UPDATE `tbl_menurate_counter` SET mrc_rate = mrc_rate- rate;
+        END;
+        END IF;
+        
+      END;
+      ELSE
+      BEGIN
+        IF(module='All') THEN
+        BEGIN
+          UPDATE tbl_menuratetakeaway LEFT JOIN tbl_menumaster on mr_menuid=mta_menuid  SET mta_rate = mta_rate- rate WHERE mr_maincatid=categoryid ;
+          UPDATE tbl_menurate_counter LEFT JOIN tbl_menumaster on mr_menuid=mrc_menuid  SET mrc_rate = mrc_rate- rate WHERE mr_maincatid=categoryid ;
+        END;
+        ELSEIF(module='ta/hd') THEN
+        BEGIN
+          UPDATE tbl_menuratetakeaway LEFT JOIN tbl_menumaster on mr_menuid=mta_menuid  SET mta_rate = mta_rate- rate WHERE mr_maincatid=categoryid ;
+        END;
+        ELSEIF(module='cs') THEN
+        BEGIN
+          UPDATE tbl_menurate_counter LEFT JOIN tbl_menumaster on mr_menuid=mrc_menuid  SET mrc_rate = mrc_rate- rate WHERE mr_maincatid=categoryid ;
+        END;
+        END IF;
+      END;
+      END IF;
+      IF(floorid = 'All') THEN
+        BEGIN
+          IF(categoryid='All') THEN
+          BEGIN
+              IF(module='All') THEN
+              BEGIN
+                UPDATE tbl_menuratemaster SET  mmr_rate = mmr_rate - rate ;
+              END;
+              ELSEIF(module='dine') THEN
+              BEGIN
+                UPDATE tbl_menuratemaster SET  mmr_rate = mmr_rate - rate ;
+              END;
+              END IF;
+          END;
+          ELSE
+          BEGIN
+            IF(module='All') THEN
+            BEGIN
+              UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate - rate WHERE mr_maincatid=categoryid ;
+            END;
+            ELSEIF(module='dien') THEN
+            BEGIN
+              UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate - rate WHERE mr_maincatid=categoryid ;
+            END;
+            END IF;
+          END;
+          END IF;
+        END;  
+        ELSE
+        BEGIN
+          IF(categoryid='All') THEN
+          BEGIN
+            IF(module='All') THEN
+            BEGIN
+              UPDATE tbl_menuratemaster  SET  mmr_rate = mmr_rate - rate WHERE    mmr_floorid = floorid ;
+            END;
+            ELSEIF(module='dine') THEN
+            BEGIN
+              UPDATE tbl_menuratemaster  SET  mmr_rate = mmr_rate - rate WHERE    mmr_floorid = floorid ;
+            END;
+            END IF;
+          END;
+          ELSE
+          BEGIN
+            IF(module='All') THEN
+            BEGIN
+              UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate - rate WHERE    mmr_floorid = floorid AND mr_maincatid=categoryid;
+            END;
+            ELSEIF(module='dine') THEN
+            BEGIN
+              UPDATE tbl_menuratemaster LEFT JOIN tbl_menumaster on mr_menuid=mmr_menuid SET  mmr_rate = mmr_rate - rate WHERE    mmr_floorid = floorid AND mr_maincatid=categoryid;
+            END;
+            END IF;
+            
+          END;
+          END IF;
+        END;
+      END IF;
+      
+    END;
+    END IF;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  END;
+  END IF;
+
+  SET message = 'Rate Changed Sucessfully';
+
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_rate_copy` (IN `from_mode` CHAR(2), IN `floorid` VARCHAR(10), IN `branchid` BIGINT, IN `mode` CHAR(2), IN `online` VARCHAR(10), OUT `message` VARCHAR(250))  NO SQL
+proc_rate_copy:begin
+  DECLARE floorname varchar(30);
+  
+  
+  SET message = 'Error in copying';
+  select fr_floorname into floorname from tbl_floormaster where fr_floorid = trim(floorid);
+  IF(from_mode = 'DI')THEN
+  BEGIN
+     
+    IF NOT EXISTS(SELECT * FROM tbl_menuratemaster WHERE mmr_floorid = floorid and mmr_rate is not null)THEN
+    BEGIN
+      SET message = concat('Error!!! Rate is not defined for ', floorname);
+      LEAVE  proc_rate_copy;
+    END;
+    end if;
+
+    if(trim(mode)='TA')then
+    begin
+
+    DELETE FROM tbl_menuratetakeaway WHERE mta_food_partner = TRIM(online);
+      
+      INSERT INTO `tbl_menuratetakeaway`(`mta_menuid`, `mta_rate_type`,`mta_food_partner`, `mta_portion`, `mta_unit_type`, `mta_unit_weight`, `mta_unit_id`, `mta_base_unit_id`, `mta_branchid`, `mta_rate`, `mta_default`, `mta_barcode`,mta_menu_tax_amount,mta_menu_final_amount,mta_menu_tax_value)
+      SELECT `mmr_menuid`, `mmr_rate_type`,trim(online), `mmr_portion`, `mmr_unit_type`, `mmr_unit_weight`, `mmr_unit_id`, `mmr_base_unit_id`,'1', `mmr_rate`, `mmr_default`, `mmr_barcode`,mmr_menu_tax_amount,mmr_menu_final_amount,mmr_menu_tax_value
+      FROM tbl_menuratemaster WHERE mmr_floorid = floorid and mmr_rate is not null ;
+
+      SET message = concat('Take away Rate Copied Successfully from ', floorname);
+        
+    end;
+    elseif(trim(mode)='CS')then
+    begin
+      DELETE FROM tbl_menurate_counter WHERE mrc_branchid = branchid; 
+      TRUNCATE tbl_menurate_counter;
+      INSERT INTO `tbl_menurate_counter`(`mrc_menuid`, `mrc_rate_type`, `mrc_portion`, `mrc_unit_type`, `mrc_unit_weight`, `mrc_unit_id`, `mrc_base_unit_id`, `mrc_branchid`, `mrc_rate`, `mrc_default`, `mrc_barcode`,mrc_menu_tax_amount,mrc_menu_final_amount,mrc_menu_tax_value)
+      SELECT `mmr_menuid`, `mmr_rate_type`, `mmr_portion`, `mmr_unit_type`, `mmr_unit_weight`, `mmr_unit_id`, `mmr_base_unit_id`,'1', `mmr_rate`, `mmr_default`, `mmr_barcode`,mmr_menu_tax_amount,mmr_menu_final_amount,mmr_menu_tax_value
+      FROM tbl_menuratemaster WHERE mmr_floorid = floorid and  mmr_rate is not null ;
+      SET message = concat('Counter Rate Copied Successfully from ', floorname);
+    end;
+    end if;
+  end;
+  ELSEIF(from_mode = 'CS')THEN
+  BEGIN
+  
+    IF NOT EXISTS(SELECT * FROM tbl_menurate_counter WHERE mrc_rate is not null)THEN
+    BEGIN
+      SET message = concat('Error!!! Rate is not defined for Counter Sale Module');
+      LEAVE  proc_rate_copy;
+    END;
+    end if;
+      
+    if(trim(mode)='TA')then
+    begin
+    
+      
+     DELETE FROM tbl_menuratetakeaway WHERE mta_food_partner = TRIM(online);
+
+      INSERT INTO `tbl_menuratetakeaway`(`mta_menuid`, `mta_rate_type`,`mta_food_partner`, `mta_portion`, `mta_unit_type`, `mta_unit_weight`, `mta_unit_id`, `mta_base_unit_id`, `mta_branchid`, `mta_rate`, `mta_default`, `mta_barcode`,mta_menu_tax_amount,mta_menu_final_amount,mta_menu_tax_value )
+      SELECT `mrc_menuid`, `mrc_rate_type`,trim(online), `mrc_portion`, `mrc_unit_type`, `mrc_unit_weight`, `mrc_unit_id`, `mrc_base_unit_id`, `mrc_branchid`, `mrc_rate`, `mrc_default`, `mrc_barcode`,mrc_menu_tax_amount,mrc_menu_final_amount,mrc_menu_tax_value
+      FROM tbl_menurate_counter
+      where mrc_rate is not null;
+
+      SET message = concat('Take away Rate Copied Successfully from Counter Sale Module');
+        
+    end;
+    elseif(trim(mode)='DI')then
+    begin
+  
+      DELETE FROM tbl_menuratemaster WHERE mmr_floorid = TRIM(floorid);
+      INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`, `mmr_rate_type`, `mmr_portion`, `mmr_unit_type`, `mmr_unit_weight`, `mmr_unit_id`, `mmr_base_unit_id`, `mmr_rate`, `mmr_default`, `mmr_barcode`,mmr_menu_tax_amount,mmr_menu_final_amount,mmr_menu_tax_value)
+      SELECT `mrc_menuid`,TRIM(floorid), `mrc_rate_type`, `mrc_portion`, `mrc_unit_type`, `mrc_unit_weight`, `mrc_unit_id`, `mrc_base_unit_id`,  `mrc_rate`, `mrc_default`, `mrc_barcode`,mrc_menu_tax_amount,mrc_menu_final_amount,mrc_menu_tax_value
+      FROM tbl_menurate_counter
+      where mrc_rate is not null;
+      SET message = concat('Dine Rate for the floor - ',floorname,' Copied Successfully from Counter Sale Module');
+        
+    end;
+    end if;
+ 
+  end;
+  ELSEIF(from_mode = 'TA')THEN
+  BEGIN
+    
+    IF NOT EXISTS(SELECT * FROM tbl_menuratetakeaway WHERE mta_food_partner=trim(online) and  mta_rate is not null)THEN
+    BEGIN
+      SET message = concat('Error!!! Rate is not defined for Take away Module');
+      LEAVE  proc_rate_copy;
+    END;
+    end if;
+    
+    if(trim(mode)='CS')then
+    begin
+  
+      TRUNCATE tbl_menurate_counter;
+      INSERT INTO `tbl_menurate_counter`(`mrc_menuid`, `mrc_rate_type`, `mrc_portion`, `mrc_unit_type`, `mrc_unit_weight`, `mrc_unit_id`, `mrc_base_unit_id`, `mrc_branchid`, `mrc_rate`, `mrc_default`, `mrc_barcode`)
+      SELECT  `mta_menuid`, `mta_rate_type`, `mta_portion`, `mta_unit_type`, `mta_unit_weight`, `mta_unit_id`, `mta_base_unit_id`, `mta_branchid`, `mta_rate`, `mta_default`, `mta_barcode`
+      FROM `tbl_menuratetakeaway` 
+      where mta_food_partner=trim(online) and mta_rate is not null;
+      SET message = concat('Counter Sale Rate Copied Successfully from Take away Module - ',online);
+        
+    end;
+    elseif(trim(mode)='DI')then
+    begin
+  
+      DELETE FROM tbl_menuratemaster WHERE mmr_floorid = TRIM(floorid);
+      INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`, `mmr_rate_type`, `mmr_portion`, `mmr_unit_type`, `mmr_unit_weight`, `mmr_unit_id`, `mmr_base_unit_id`, `mmr_rate`, `mmr_default`, `mmr_barcode`,mmr_menu_tax_amount,mmr_menu_final_amount,mmr_menu_tax_value)
+      SELECT  `mta_menuid`,TRIM(floorid), `mta_rate_type`, `mta_portion`, `mta_unit_type`, `mta_unit_weight`, `mta_unit_id`, `mta_base_unit_id`, `mta_rate`, `mta_default`, `mta_barcode`,mta_menu_tax_amount,mta_menu_final_amount,mta_menu_tax_value 
+      FROM `tbl_menuratetakeaway`
+      where mta_food_partner=trim(online) and mta_rate is not null;
+      SET message = concat('Dine Rate for the floor - ',floorname,' Copied Successfully from Take away Module - ',online);
+        
+    end;
+    end if;
+ 
+  end;
+  end if;
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_report_bill_cancel` (IN `From_date` DATE, IN `To_date` DATE, IN `Date_typeid` INT)  NO SQL
+BEGIN
+
+
+  IF((Date_typeid IS NOT NULL) AND (Date_typeid != '')) THEN
+  BEGIN
+    SELECT Report_Dt_Gen(Date_typeid) INTO From_date;
+    SET To_date = CURDATE();
+  END;
+  END IF;
+
+SELECT 'Dine-In' AS Section, b.bm_dayclosedate AS Date,b.bm_billno AS Bill ,b.bm_billdate AS Bill_Date ,b.bm_billtime AS Bill_Time,b.bm_finaltotal AS Bill_total,
+b.ter_cancelledreason AS Reason ,concat(s.ser_firstname,'',s.ser_lastname) AS Cancelled_Care_of, b.ter_cancelledlogin AS Cancelled_Login
+FROM tbl_tablebillmaster b
+LEFT JOIN tbl_staffmaster s ON s.ser_staffid = b.ter_cancelledby_careof
+WHERE b.bm_status = 'Cancelled'
+AND bm_dayclosedate BETWEEN From_date AND To_date
+GROUP BY b.bm_dayclosedate
+ORDER BY b.bm_dayclosedate ASC;
+
+SELECT 'Counter' AS Section, b.tab_dayclosedate AS Date,b.tab_billno AS Bill ,b.tab_date AS Bill_Date ,b.tab_time AS Bill_Time,b.tab_netamt AS Bill_total,
+b.tab_cancelledreason AS Reason ,concat(s.ser_firstname,'',s.ser_lastname) AS Cancelled_Care_of, b.tab_cancelledlogin AS Cancelled_Login
+FROM tbl_takeaway_billmaster b
+LEFT JOIN tbl_staffmaster s ON s.ser_staffid = b.tab_cancelledby_careof
+WHERE b.tab_status = 'Cancelled' AND  b.tab_mode = 'CS'
+AND tab_dayclosedate BETWEEN From_date AND To_date
+GROUP BY b.tab_dayclosedate
+ORDER BY b.tab_dayclosedate ASC;
+
+
+SELECT 'TA/HD' AS Section, b.tab_dayclosedate AS Date,b.tab_billno AS Bill ,b.tab_date AS Bill_Date ,b.tab_time AS Bill_Time,b.tab_netamt AS Bill_total,
+b.tab_cancelledreason AS Reason ,concat(s.ser_firstname,'',s.ser_lastname) AS Cancelled_Care_of, b.tab_cancelledlogin AS Cancelled_Login
+FROM tbl_takeaway_billmaster b
+LEFT JOIN tbl_staffmaster s ON s.ser_staffid = b.tab_cancelledby_careof
+WHERE b.tab_status = 'Cancelled'AND b.tab_mode REGEXP 'TA|HD'
+AND tab_dayclosedate BETWEEN From_date AND To_date
+GROUP BY b.tab_dayclosedate
+ORDER BY b.tab_dayclosedate ASC;
+
+
+
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_report_steward_performace` (IN `From_date` DATE, IN `To_date` DATE, IN `Date_typeid` INT, IN `Staff_id` VARCHAR(50))  NO SQL
+BEGIN
+
+  IF((Date_typeid IS NOT NULL) AND (Date_typeid != '')) THEN
+  BEGIN
+    SELECT Report_Dt_Gen(Date_typeid) INTO From_date;
+    SET To_date = CURDATE();
+  END;
+  END IF;
+
+
+SELECT DATE_FORMAT(t.ter_dayclosedate,'%d-%m-%y') AS Date,concat(s.ser_firstname,'',s.ser_lastname ) AS Steward, sum(t.ter_rate * t.ter_qty) AS Total_Amount
+FROM tbl_tableorder t LEFT JOIN tbl_staffmaster s ON s.ser_staffid = t.ter_staff
+WHERE t.ter_staff = Staff_id AND t.ter_status='Closed' AND t.ter_dayclosedate BETWEEN From_date AND To_date
+GROUP BY t.ter_dayclosedate,t.ter_staff
+ORDER BY t.ter_dayclosedate ASC;
+
+
+SELECT DATE_FORMAT(t.ter_dayclosedate,'%d-%m-%y') AS Date,concat(s.ser_firstname,'',s.ser_lastname ) AS Steward, count(t.ter_billnumber) AS Bill_Count
+FROM tbl_tableorder t LEFT JOIN tbl_staffmaster s ON s.ser_staffid = t.ter_staff
+WHERE  t.ter_staff = Staff_id AND t.ter_status='Closed' AND t.ter_dayclosedate BETWEEN From_date AND To_date
+GROUP BY t.ter_dayclosedate,t.ter_staff
+ORDER BY ter_dayclosedate ASC;
+
+
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_report_total_summary_details` (IN `From_date` DATE, IN `To_date` DATE, IN `Date_in_string_id` INT)  NO SQL
+BEGIN
+
+  IF((Date_typeid IS NOT NULL) AND (Date_typeid != '')) THEN
+  BEGIN
+    SELECT Report_Dt_Gen(Date_typeid) INTO From_date;
+    SET To_date = CURDATE();
+  END;
+  END IF;
+
+
+SELECT bm_dayclosedate AS Sale_Date,(sum(bm_amountpaid) - sum(bm_amountbalace)) AS Dinein_Cash FROM tbl_tablebillmaster
+LEFT JOIN tbl_paymentmode ON tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id WHERE
+bm_status='Closed' AND ((pym_code='cash') OR (pym_code='credit') OR (pym_code='coupon') OR (pym_code='voucher') OR (pym_code='cheque') OR (pym_code='credit_person') OR (pym_code='complimentary'))
+AND  bm_dayclosedate BETWEEN From_date AND To_date
+GROUP BY bm_dayclosedate
+ORDER BY bm_dayclosedate ASC;
+
+SELECT t.tab_dayclosedate AS Sale_Date,(sum(t.tab_amountpaid) - sum(t.tab_amountbalace)) AS TACSHD_Cash FROM  tbl_takeaway_billmaster t
+LEFT JOIN tbl_paymentmode p ON t.tab_paymode = p.pym_id WHERE
+t.tab_status = 'Closed' AND ((p.pym_code='cash') OR (p.pym_code='credit') OR (p.pym_code='coupon') OR (p.pym_code='voucher') OR (p.pym_code='cheque') OR (p.pym_code='credit_person') OR (p.pym_code='complimentary'))
+AND  t.tab_dayclosedate BETWEEN From_date AND To_date
+GROUP BY t.tab_dayclosedate
+ORDER BY t.tab_dayclosedate ASC;
+
+
+
+
+SELECT bm_dayclosedate AS Sale_Date,sum(bm_transactionamount) AS Cards FROM tbl_tablebillmaster tb
+LEFT JOIN tbl_paymentmode ON tb.bm_paymode=tbl_paymentmode.pym_id, tbl_bankmaster b
+WHERE  b.bm_id = tb.bm_transcbank AND tb.bm_status='Closed' AND pym_code='credit'
+AND bm_dayclosedate BETWEEN From_date AND To_date
+GROUP BY bm_dayclosedate, b.bm_name
+ORDER BY tb.bm_dayclosedate ASC;
+
+
+SELECT bm_dayclosedate AS Sale_Date,sum(bm_finaltotal) AS Coupon FROM tbl_tablebillmaster
+LEFT JOIN tbl_paymentmode ON tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id
+WHERE bm_status='Closed' AND pym_code='coupon'
+AND bm_dayclosedate BETWEEN From_date AND To_date
+GROUP BY bm_dayclosedate
+ORDER BY bm_dayclosedate ASC;
+
+
+SELECT bm_dayclosedate AS Sale_Date,sum(bm_finaltotal) AS Voucher FROM tbl_tablebillmaster
+LEFT JOIN tbl_paymentmode ON tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id
+WHERE bm_status='Closed' AND pym_code='voucher' AND
+bm_dayclosedate BETWEEN From_date AND To_date
+ORDER BY bm_dayclosedate ASC;
+
+
+SELECT bm_dayclosedate AS Sale_Date,sum(bm_finaltotal) AS Cheque FROM tbl_tablebillmaster
+LEFT JOIN tbl_paymentmode ON tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id
+WHERE bm_status='Closed' AND pym_code='cheque'
+AND bm_dayclosedate BETWEEN From_date AND To_date
+GROUP BY bm_dayclosedate
+ORDER BY bm_dayclosedate ASC;
+
+
+SELECT bm_dayclosedate AS Sale_Date,sum(bm_finaltotal) AS Credits
+FROM tbl_tablebillmaster LEFT JOIN tbl_paymentmode ON tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id
+WHERE bm_status='Closed' AND pym_code='credit_person'
+AND bm_dayclosedate BETWEEN From_date AND To_date
+GROUP BY bm_dayclosedate
+ORDER BY bm_dayclosedate ASC;
+
+
+SELECT bm_dayclosedate AS Sale_Date,sum(bm_finaltotal) AS Complementary FROM tbl_tablebillmaster
+LEFT JOIN tbl_paymentmode ON tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id
+WHERE bm_status='Closed' AND pym_code='complimentary'
+GROUP BY bm_dayclosedate
+AND bm_dayclosedate BETWEEN From_date AND To_date
+ORDER BY bm_dayclosedate ASC;
+
+
+SELECT bm_dayclosedate AS Sale_Date,sum(bm_totalpax) AS Total_pax FROM `tbl_tablebillmaster`
+WHERE  bm_status='Closed' AND bm_dayclosedate BETWEEN From_date AND To_date
+GROUP BY bm_dayclosedate;
+
+
+
+
+
+SELECT  (sum(bm_amountpaid) - sum(bm_amountbalace)) AS Total_Cash FROM tbl_tablebillmaster LEFT JOIN tbl_paymentmode ON tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id WHERE
+bm_status='Closed' AND ((pym_code='cash') OR (pym_code='credit') OR (pym_code='coupon') OR (pym_code='voucher') OR (pym_code='cheque') OR (pym_code='credit_person') OR (pym_code='complimentary'))
+AND  bm_dayclosedate BETWEEN From_date AND To_date
+ORDER BY bm_dayclosedate ASC;
+
+SELECT sum(bm_transactionamount) AS Total_Cards FROM tbl_tablebillmaster tb
+LEFT JOIN tbl_paymentmode ON tb.bm_paymode=tbl_paymentmode.pym_id, tbl_bankmaster b
+WHERE  b.bm_id = tb.bm_transcbank AND tb.bm_status='Closed' AND pym_code='credit'
+AND bm_dayclosedate BETWEEN From_date AND To_date
+GROUP BY b.bm_name
+ORDER BY tb.bm_dayclosedate ASC;
+
+SELECT sum(bm_finaltotal) AS Total_Coupon FROM tbl_tablebillmaster
+LEFT JOIN tbl_paymentmode ON tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id
+WHERE bm_status='Closed' AND pym_code='coupon'
+AND bm_dayclosedate BETWEEN From_date AND To_date
+ORDER BY bm_dayclosedate ASC;
+
+SELECT sum(bm_finaltotal) AS Total_Voucher FROM tbl_tablebillmaster
+LEFT JOIN tbl_paymentmode ON tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id
+WHERE bm_status='Closed' AND pym_code='voucher' AND
+bm_dayclosedate BETWEEN From_date AND To_date
+ORDER BY bm_dayclosedate ASC;
+
+SELECT sum(bm_finaltotal) AS Total_Cheque FROM tbl_tablebillmaster
+LEFT JOIN tbl_paymentmode ON tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id
+WHERE bm_status='Closed' AND pym_code='cheque'
+AND bm_dayclosedate BETWEEN From_date AND To_date
+ORDER BY bm_dayclosedate ASC;
+
+SELECT sum(bm_finaltotal) AS Total_Credits
+FROM tbl_tablebillmaster LEFT JOIN tbl_paymentmode ON tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id
+WHERE bm_status='Closed' AND pym_code='credit_person'
+AND bm_dayclosedate BETWEEN From_date AND To_date
+ORDER BY bm_dayclosedate ASC;
+
+SELECT sum(bm_finaltotal) AS Total_Complementary FROM tbl_tablebillmaster
+LEFT JOIN tbl_paymentmode ON tbl_tablebillmaster.bm_paymode=tbl_paymentmode.pym_id
+WHERE bm_status='Closed' AND pym_code='complimentary'
+AND bm_dayclosedate BETWEEN From_date AND To_date
+ORDER BY bm_dayclosedate ASC;
+
+SELECT sum(bm_totalpax) AS Total_report_pax FROM `tbl_tablebillmaster`
+WHERE  bm_status='Closed'
+AND bm_dayclosedate BETWEEN From_date AND To_date;
+
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_report_turnover` (IN `From_date` DATE, IN `To_date` DATE, IN `Date_typeid` VARCHAR(2))  NO SQL
+BEGIN
+
+  IF((Date_typeid IS NOT NULL) AND (Date_typeid != '')) THEN
+  BEGIN
+    SELECT Report_Dt_Gen(Date_typeid) INTO From_date;
+    SET To_date = CURDATE();
+  END;
+  END IF;
+
+    SELECT 'Dine-In' AS Section,bm_dayclosedate AS Date ,(sum(bm_subtotal) - sum(bm_cancelamount)) AS Gross_Total,
+    sum(bm_vat) AS VAT,sum(bm_servicetax) AS SER_TAX ,sum(bm_totalpax) AS Total_PAX,((sum(bm_subtotal) - sum(bm_cancelamount))+(sum(bm_vat)+sum(bm_servicetax))) AS Net_Total
+    FROM tbl_tablebillmaster
+    WHERE (bm_status = 'Closed') AND (bm_complimentary != 'Y')
+    AND  bm_dayclosedate BETWEEN From_date AND To_date
+    GROUP BY bm_dayclosedate;
+
+
+     SELECT 'Counter' AS Section,tab_dayclosedate AS Date ,(sum(tab_subtotal) - sum(tab_cancelamount)) AS Gross_Total,
+    sum(tab_vat) AS VAT,sum(tab_servicetax) AS SER_TAX ,((sum(tab_subtotal) - sum(tab_cancelamount))+(sum(tab_vat)+sum(tab_servicetax))) AS Net_Total
+    FROM tbl_takeaway_billmaster
+    WHERE (tab_status = 'Closed') AND tab_mode = 'CS'  AND (tab_complimentary != 'Y')
+    AND  tab_dayclosedate BETWEEN From_date AND To_date
+    GROUP BY tab_dayclosedate;
+
+     SELECT 'TA/HD' AS Section,tab_dayclosedate AS Date ,(sum(tab_subtotal) - sum(tab_cancelamount)) AS Gross_Total,
+    sum(tab_vat) AS VAT,sum(tab_servicetax) AS SER_TAX ,((sum(tab_subtotal) - sum(tab_cancelamount))+(sum(tab_vat)+sum(tab_servicetax))) AS Net_Total
+    FROM tbl_takeaway_billmaster
+    WHERE (tab_status = 'Closed') AND  (tab_complimentary != 'Y')
+    AND tab_mode REGEXP 'TA|HD'
+    AND  tab_dayclosedate BETWEEN From_date AND To_date
+    GROUP BY tab_dayclosedate;
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_reset_bills` (OUT `MESSAGE` VARCHAR(100))  BEGIN
+
+
+
+  SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE `tbl_appmachinedetails`;
+TRUNCATE `tbl_billcancel_log`;
+TRUNCATE `tbl_bill_card_payments`;
+TRUNCATE `tbl_cash_drawer_log`;
+TRUNCATE `tbl_credit_details`;
+TRUNCATE `tbl_credit_details_payment`;
+TRUNCATE `tbl_credit_master`;
+TRUNCATE `tbl_datesettings`;
+TRUNCATE `tbl_dayclose`;
+TRUNCATE `tbl_feedbackrating`;
+TRUNCATE `tbl_feedbackratingcount`;
+TRUNCATE `tbl_function_details`;
+TRUNCATE `tbl_function_details_menu`;
+TRUNCATE `tbl_function_extra_costs`;
+TRUNCATE `tbl_function_invoice`;
+TRUNCATE `tbl_function_invoice_extras`;
+TRUNCATE `tbl_function_type`;
+TRUNCATE `tbl_function_venue`;
+TRUNCATE `tbl_kotmaster`;
+TRUNCATE `tbl_kot_cancellation`;
+TRUNCATE `tbl_login_restrict_logs`;
+TRUNCATE `tbl_notifications`;
+TRUNCATE `tbl_regenrate_log`;
+TRUNCATE `tbl_shift_close_denomination`;
+TRUNCATE `tbl_shift_details`;
+TRUNCATE `tbl_shift_open_denomination`;
+TRUNCATE `tbl_tablebilldetails`;
+TRUNCATE `tbl_tablebillmaster`;
+TRUNCATE `tbl_tablebill_extra_tax_details`;
+TRUNCATE `tbl_tablebill_extra_tax_master`;
+TRUNCATE `tbl_tablebill_item_discount`;
+TRUNCATE `tbl_tablebill_paymentchange`;
+TRUNCATE `tbl_tablebill_split`;
+TRUNCATE `tbl_tabledetails`;
+TRUNCATE `tbl_tableinsertion`;
+TRUNCATE `tbl_tableorder`;
+TRUNCATE `tbl_tableorder_changes`;
+TRUNCATE `tbl_tableorder_discount`;
+TRUNCATE `tbl_takeaway_billdetails`;
+TRUNCATE `tbl_takeaway_billmaster`;
+TRUNCATE `tbl_takeaway_bill_extra_tax_details`;
+TRUNCATE `tbl_takeaway_bill_extra_tax_master`;
+TRUNCATE `tbl_takeaway_cancel_items`;
+TRUNCATE `tbl_takeaway_customer`;
+TRUNCATE `tbl_takeaway_item_discount`;
+TRUNCATE `tbl_temp_orderno_details`;
+TRUNCATE `tbl_temp_regenerate`;
+TRUNCATE `tbl_temp_tablebilldetails`;
+TRUNCATE `tbl_temp_tablebillmaster`;
+TRUNCATE `temp_loyalty_reg`;
+TRUNCATE tbl_combo_bill_details;
+TRUNCATE tbl_combo_bill_details_ta;
+TRUNCATE tbl_combo_ordering_details;
+TRUNCATE tbl_combo_stock;
+TRUNCATE tbl_order_addon;
+TRUNCATE tbl_order_addon_changes;
+TRUNCATE `tbl_loyalty_campaign`;
+TRUNCATE `tbl_loyalty_campaign_group`;
+TRUNCATE `tbl_loyalty_discount`;
+TRUNCATE `tbl_loyalty_group_details`;
+TRUNCATE `tbl_loyalty_pointadd_bill`;
+TRUNCATE `tbl_loyalty_point_transfers`;
+TRUNCATE `tbl_loyalty_reg`;
+TRUNCATE `tbl_loyalty_sendto`;
+TRUNCATE `tbl_loyalty_sms_source`;
+
+UPDATE `tbl_tablemaster` SET `tr_vaccantcount` = `tr_maxchaircount`, `tr_nextprefix_ascii` = 65, `tr_max_ascii` = 65+`tr_maxchaircount`;
+update tbl_branchmaster set be_takeawaycustcount = 1;
+UPDATE tbl_year_bill_series SET  b_count = 1 WHERE b_fin_year = (SELECT ys_fin_year FROM tbl_yearsettings WHERE ys_fin_year_current= 'Y');
+UPDATE `tbl_year_bill_series` SET`b_count` = 1;
+  SET FOREIGN_KEY_CHECKS = 1;
+  
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_retrive_menustock_no` ()  NO SQL
+BEGIN
+   DECLARE branchid_inv int;
+   DECLARE done INT DEFAULT FALSE;
+   DECLARE menuid varchar(30);
+   DECLARE menu_stock decimal(15,2);
+   DECLARE DAYCLOSEDATE DATE;
+    
+      DECLARE cur1 CURSOR FOR SELECT mr_menuid FROM tbl_menumaster where mr_dailystock = 'Y' AND mr_dailystock_in_number = 'Y';
+          
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+   
+   select be_inventorybranch_id into branchid_inv from tbl_branchmaster;
+   
+   SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+   
+   OPEN cur1;
+   read_loop: LOOP
+  
+   FETCH cur1 INTO menuid;
+   
+   IF done THEN
+    
+      LEAVE read_loop;
+    END IF;
+
+     IF EXISTS(SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE  SCHEMA_NAME = 'inventory')THEN
+   BEGIN
+      
+      SELECT mnst_stock into menu_stock FROM inventory.inv_tbl_menustock_manager WHERE mnst_menuid = menuid and mnst_branchid = branchid_inv;
+      
+      if(!(menu_stock is NULL)) then
+      BEGIN
+     	 if(menu_stock=0)THEN
+      		UPDATE tbl_menustock set mk_stock_number = menu_stock,mk_stock= 'N' where mk_menuid = menuid and mk_date = DAYCLOSEDATE ;
+      	else 
+       		UPDATE tbl_menustock set mk_stock_number = menu_stock where mk_menuid = menuid and mk_date = DAYCLOSEDATE ;
+          end if;
+      
+      end;
+      end if;
+   
+   END;
+   END IF;
+    
+    END LOOP;
+ 
+  CLOSE cur1;
+
+
+end$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_shift_close` (IN `staff_id` VARCHAR(50), IN `close_balance` DECIMAL(15,4), IN `close_petty` DECIMAL(15,4), IN `machineid` VARCHAR(50), IN `change_close` DECIMAL(15,4), OUT `slno` INT)  NO SQL
+BEGIN
+    DECLARE DAYCLOSEDATE DATE;
+    
+    SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose ORDER BY dc_id DESC LIMIT 1;
+
+    SELECT sd_id INTO slno FROM tbl_shift_details WHERE sd_day = DAYCLOSEDATE AND sd_close IS NULL AND sd_open_staff = staff_id;
+
+    UPDATE tbl_shift_details  SET sd_close= now(),sd_close_balance = close_balance, sd_close_petty = close_petty,sd_total_value_close = (close_balance+close_petty),sd_close_machineid = machineid,sd_changein_close=change_close
+    WHERE sd_day = DAYCLOSEDATE AND sd_id = slno;
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_shift_open` (IN `staff_id` VARCHAR(50), IN `open_balance` DECIMAL(15,4), IN `open_petty` DECIMAL(15,4), IN `machineid` VARCHAR(50), IN `change_open` DECIMAL(15,4), OUT `slno` INT)  NO SQL
+BEGIN
+    DECLARE DAYCLOSEDATE DATE;
+    
+    
+    SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+
+    INSERT INTO `tbl_shift_details`(`sd_day`, `sd_id`, `sd_open`, `sd_open_staff`, `sd_open_balance`, `sd_open_petty`, `sd_total_value`,sd_open_machineid,sd_changein_open)
+    VALUES (DAYCLOSEDATE,0,now(),staff_id,open_balance,open_petty,open_balance+open_petty,machineid,change_open);
+
+    SELECT max(sd_id) INTO slno FROM tbl_shift_details WHERE sd_day = DAYCLOSEDATE;
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_specialdayrate` ()  NO SQL
+BEGIN
+
+	DECLARE id,id_all int;
+	DECLARE specialday char(1);
+	DECLARE DAYNAME VARCHAR(50);
+	DECLARE DAYCLOSEDATE date;
+
+	SELECT be_specialday INTO specialday FROM tbl_branchmaster;
+
+	IF(specialday = 'Y')THEN
+	BEGIN
+    	SELECT pm_id INTO id FROM tbl_portionmaster WHERE pm_portionname ='SP HOLIDAY';
+    	SELECT pm_id INTO id_all FROM tbl_portionmaster WHERE pm_portionname ='ALL';
+
+    	UPDATE tbl_menuratemaster SET mmr_default = 'N' WHERE mmr_portion != '8';
+
+    	UPDATE tbl_menuratemaster SET mmr_default = 'Y' WHERE mmr_portion = id;
+
+
+
+	END;
+	ELSEIF(specialday = 'N')THEN
+	BEGIN
+  	SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+
+	SELECT DAYNAME(DAYCLOSEDATE) INTO DAYNAME;
+
+
+	SELECT pm_id INTO id FROM tbl_portionmaster WHERE pm_portionname =DAYNAME;
+
+	UPDATE tbl_menuratemaster SET mmr_default = 'N' WHERE mmr_portion != '8';
+
+	UPDATE tbl_menuratemaster SET mmr_default = 'Y' WHERE  mmr_portion = id;
+
+
+
+
+	END;
+
+	END IF;
+
+
+
+
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_stock_counter` ()  MODIFIES SQL DATA
+BEGIN
+   DECLARE menuid,ratetype varchar(30);
+   DECLARE unit_type varchar(50);
+   DECLARE weight decimal(15,5);
+   DECLARE unit_id,base_unit_id,PORTION INT;
+   DECLARE DAYCLOSEDATE DATE; 
+
+  DECLARE done INT DEFAULT FALSE;
+  
+  DECLARE cur1 CURSOR FOR SELECT `mrc_menuid`, `mrc_rate_type`, `mrc_portion`, `mrc_unit_type`, `mrc_unit_weight`, `mrc_unit_id`, `mrc_base_unit_id` 
+  FROM tbl_menurate_counter;
+      
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  
+  
+  
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+ 
+ 
+ 
+
+ OPEN cur1;
+
+  read_loop: LOOP
+
+
+ FETCH cur1 INTO menuid,ratetype,PORTION,unit_type,weight,unit_id,base_unit_id;
+
+   IF done THEN
+
+     LEAVE read_loop;
+   END IF;
+  IF(unit_id IS NULL)THEN
+    SET  unit_id = 0;
+   END IF;
+   
+   IF(base_unit_id IS NULL)THEN
+    SET  base_unit_id = 0;
+   END IF;
+   
+   IF(unit_type IS NULL)THEN
+    SET  unit_type = '0';
+   END IF;
+   
+   IF(PORTION IS NULL)THEN
+    SET  PORTION = 0;
+   END IF;
+   
+   
+   
+   call proc_menustock_entry(menuid,ratetype,PORTION,unit_type,weight,unit_id,base_unit_id);
+
+  END LOOP;
+
+ CLOSE cur1;
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_stock_dinein` ()  MODIFIES SQL DATA
+BEGIN
+   DECLARE menuid,ratetype varchar(30);
+   DECLARE unit_type varchar(50);
+   DECLARE weight decimal(15,5);
+   DECLARE unit_id,base_unit_id,PORTION INT;
+   DECLARE DAYCLOSEDATE DATE; 
+
+  DECLARE done INT DEFAULT FALSE;
+  
+  DECLARE cur1 CURSOR FOR SELECT `mmr_menuid`, `mmr_rate_type`, `mmr_portion`, `mmr_unit_type`, `mmr_unit_weight`, `mmr_unit_id`, `mmr_base_unit_id` 
+  FROM tbl_menuratemaster;
+      
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+ 
+
+  OPEN cur1;
+
+  read_loop: LOOP
+
+
+ FETCH cur1 INTO menuid,ratetype,PORTION,unit_type,weight,unit_id,base_unit_id;
+
+   IF done THEN
+
+
+     LEAVE read_loop;
+   END IF;
+   
+   IF(unit_id IS NULL)THEN
+    SET  unit_id = 0;
+   END IF;
+   
+   IF(base_unit_id IS NULL)THEN
+    SET  base_unit_id = 0;
+   END IF;
+   
+   IF(unit_type IS NULL)THEN
+    SET  unit_type = '0';
+   END IF;
+   
+   IF(PORTION IS NULL)THEN
+    SET  PORTION = 0;
+   END IF;
+
+   call proc_menustock_entry(menuid,ratetype,PORTION,unit_type,weight,unit_id,base_unit_id);
+
+  END LOOP;
+
+ CLOSE cur1;
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_stock_ta` ()  MODIFIES SQL DATA
+BEGIN
+   DECLARE menuid,ratetype varchar(30);
+   DECLARE unit_type varchar(50);
+   DECLARE weight decimal(15,3);
+   DECLARE unit_id,base_unit_id,PORTION INT;
+   DECLARE DAYCLOSEDATE DATE; 
+
+  DECLARE done INT DEFAULT FALSE;
+  
+  DECLARE cur1 CURSOR FOR SELECT `mta_menuid`, `mta_rate_type`, `mta_portion`, `mta_unit_type`, `mta_unit_weight`, `mta_unit_id`, `mta_base_unit_id` 
+  FROM tbl_menuratetakeaway;
+      
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  
+  
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+ 
+ 
+ 
+
+ OPEN cur1;
+
+  read_loop: LOOP
+
+
+  FETCH cur1 INTO menuid,ratetype,PORTION,unit_type,weight,unit_id,base_unit_id;
+
+   IF done THEN
+
+     LEAVE read_loop;
+   END IF;
+
+   call proc_menustock_entry(menuid,ratetype,PORTION,unit_type,weight,unit_id,base_unit_id);
+
+  END LOOP;
+
+ CLOSE cur1;
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_tablechange` (IN `prev_tableid` VARCHAR(10), IN `prev_prefix` CHAR(1), IN `new_tableid` VARCHAR(10), IN `new_prefix` CHAR(1), IN `new_floor_id` VARCHAR(10), OUT `message` VARCHAR(150))  MODIFIES SQL DATA
+BEGIN
+
+ DECLARE table_split CHAR(1);
+    DECLARE table_label varchar(20);
+    DECLARE vacant,guestcount,personcount int;
+      
+    
+    
+    SELECT  `be_tableprefix_split` INTO table_split FROM `tbl_branchmaster`;
+
+
+   IF(new_floor_id = 'no')THEN
+    SELECT tr_vaccantcount,tr_tableno INTO vacant,table_label FROM tbl_tablemaster WHERE tr_tableid = TRIM(new_tableid);
+    ELSE 
+        BEGIN
+    SELECT tr_vaccantcount,tr_tableno INTO vacant,table_label FROM tbl_tablemaster WHERE tr_tableid = TRIM(new_tableid) AND tr_floorid = TRIM(new_floor_id);
+         END;
+       END IF;
+
+
+         SET message = "";
+
+     IF(trim(table_label) = 'PARCEL')THEN
+     BEGIN
+
+     SET message = "Table is Parcel";
+
+  END;
+     ELSE
+     BEGIN
+
+      SELECT  ts_noofpersons INTO guestcount  FROM tbl_tabledetails WHERE ts_tableid = TRIM(prev_tableid) AND ts_tableidprefix = TRIM(prev_prefix);
+
+      IF(table_split = 'Y')THEN
+         SET personcount = guestcount;
+        ELSEIF (table_split = 'N')THEN
+        BEGIN
+            SET personcount = vacant;
+        END;
+       END IF;
+       
+       
+        IF(new_floor_id = 'no')THEN
+        INSERT INTO `tbl_tabledetails`(`ts_tableid`, `ts_tableidprefix`, `ts_status`, `ts_dineintime`, `ts_noofpersons`, `ts_orderno`, `ts_floorid`, `ts_orderstaff`, `ts_reservetime`, `ts_totalamount`, `ts_entrydate`, `ts_interface`, `ts_billnumber`,ts_paxcount,ts_username,ts_in_access,ts_completed_order,ts_machineid) SELECT TRIM(new_tableid),TRIM(new_prefix),`ts_status`, `ts_dineintime`, personcount, `ts_orderno`, `ts_floorid`, `ts_orderstaff`, `ts_reservetime`, `ts_totalamount`, `ts_entrydate`, `ts_interface`, `ts_billnumber`,ts_paxcount,ts_username,ts_in_access, ts_completed_order,ts_machineid FROM tbl_tabledetails WHERE ts_tableid = TRIM(prev_tableid) AND ts_tableidprefix = TRIM(prev_prefix);
+        ELSE 
+        BEGIN
+            INSERT INTO `tbl_tabledetails`(`ts_tableid`, `ts_tableidprefix`, `ts_status`, `ts_dineintime`, `ts_noofpersons`, `ts_orderno`, `ts_floorid`, `ts_orderstaff`, `ts_reservetime`, `ts_totalamount`, `ts_entrydate`, `ts_interface`, `ts_billnumber`,ts_paxcount,ts_username,ts_in_access,ts_completed_order,ts_machineid) SELECT TRIM(new_tableid),TRIM(new_prefix),`ts_status`, `ts_dineintime`, personcount, `ts_orderno`, TRIM(new_floor_id), `ts_orderstaff`, `ts_reservetime`, `ts_totalamount`, `ts_entrydate`, `ts_interface`, `ts_billnumber`,ts_paxcount,ts_username,ts_in_access, ts_completed_order,ts_machineid FROM tbl_tabledetails WHERE ts_tableid = TRIM(prev_tableid) AND ts_tableidprefix = TRIM(prev_prefix);
+        END;
+       END IF;
+       
+
+
+            
+
+ SET message = "Table has been changed";
+
+ DELETE FROM tbl_tabledetails WHERE ts_tableid = TRIM(prev_tableid) AND ts_tableidprefix = TRIM(prev_prefix);
+
+     END;
+     END IF;
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_tabledetailentry` (OUT `orderid` VARCHAR(15), IN `tableid` VARCHAR(500), IN `guestcount` INT, IN `category` VARCHAR(10), IN `Reserve` CHAR(1), IN `staffid` VARCHAR(50), IN `reservertime` TIME, IN `interface` CHAR(1), IN `machine_id` VARCHAR(40))  MODIFIES SQL DATA
+BEGIN
+
+  DECLARE commacount INT;
+  DECLARE tablename,floorid varchar(10);
+  DECLARE i,FLAG int;
+  DECLARE personcount int;
+  DECLARE vacant int;
+  DECLARE prefixASCII int;
+  DECLARE prefix,table_split CHAR(1);
+  DECLARE Status varchar(10);
+  DECLARE table_label varchar(20);
+
+  SELECT  `be_tableprefix_split` INTO table_split FROM `tbl_branchmaster`;
+    
+        
+  REPEAT
+    SET orderid =  CONCAT('TEMP-',FLOOR(10000000 + ( RAND( ) *8999 )));
+    IF EXISTS(SELECT to_temp_id FROM tbl_temp_orderno_details where to_temp_id = orderid limit 5)THEN
+    SET FLAG = 1;
+    ELSEIF EXISTS(SELECT ter_orderno FROM tbl_tableorder where ter_orderno_temp = orderid limit 5)THEN
+    SET FLAG = 1;
+    ELSE
+    set FLAG = 0;
+    END IF;
+    UNTIL(FLAG = 0)
+  END REPEAT;
+   
+
+  SELECT LENGTH(TRIM(tableid)) - LENGTH(REPLACE(TRIM(tableid), ',', ''))  INTO commacount;
+
+  SET i=1;
+  WHILE (i <= commacount+1) DO
+    SELECT split_str(tableid,',',i) INTO tablename;
+    SELECT tr_vaccantcount,tr_nextprefix_ascii,tr_floorid,tr_tableno 
+    INTO vacant,prefixASCII,floorid,table_label FROM tbl_tablemaster WHERE  tr_tableid = TRIM(tablename);
+
+    IF(vacant < 0) THEN SET vacant = 0; END IF;
+    SELECT ASCIITOCHAR(prefixASCII) INTO prefix;
+
+
+
+    IF(table_split = 'Y')THEN
+    begin
+    	SET   category = 'Single';
+    END;
+    ELSEIF (table_split = 'N')THEN
+        SET category = 'Group';
+    END IF;
+   
+    IF(trim(table_label) = 'PARCEL')THEN
+    BEGIN
+      SET   personcount = 1;
+      SET   guestcount = 1;
+    END;
+    ELSE 
+    BEGIN
+       IF(category = 'Group') THEN
+       	SET personcount = vacant;
+       ELSEIF(category = 'Single') THEN
+       BEGIN
+        if(vacant < guestcount)THEN
+        	set personcount = guestcount;
+        else
+            SET personcount = guestcount;
+        end if;  
+        END;
+        END IF;
+		END;
+    END IF;
+  	SET Status = 'Occupied';
+    
+    IF(table_split = 'N' AND trim(table_label) != 'PARCEL')THEN
+    begin
+      IF EXISTS(SELECT * FROM tbl_tabledetails WHERE ts_tableid = tablename)THEN
+      BEGIN
+        SELECT ts_orderno INTO orderid from tbl_tabledetails   WHERE ts_tableid = tablename;
+      END;
+      
+        
+      
+      END IF;
+    END;
+    END IF;  
+ 		SET i= i+1;
+    INSERT INTO tbl_tabledetails(ts_tableid,ts_tableidprefix, ts_status,ts_noofpersons,ts_orderno,ts_floorid,ts_orderstaff,ts_interface,ts_paxcount,ts_machineid) 
+        VALUES(TRIM(tablename),prefix, Status,personcount,orderid,floorid,staffid,interface,guestcount,machine_id);
+  END WHILE;
+  
+  IF NOT EXISTS(SELECT * FROM tbl_temp_orderno_details WHERE to_temp_id = orderid)THEN
+  BEGIN
+    INSERT INTO `tbl_temp_orderno_details`(`to_temp_id`, `to_created_interface`) VALUES (orderid,interface);
+  END;
+  END IF;  
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_tableorder` (IN `temp_orderno` VARCHAR(15), IN `branchid` INT, OUT `neworderno` VARCHAR(15), OUT `kotnum` VARCHAR(20), IN `waiter_id` VARCHAR(50), IN `order_confirming_staff` VARCHAR(50))  MODIFIES SQL DATA
+BEGIN
+   DECLARE prefx                                  varchar(3);
+   DECLARE orderno, check2, check1                int;
+   DECLARE date                                   date;
+   DECLARE odate                                  varchar(6);
+   DECLARE staffid, orderstatus, order_from       varchar(50);
+   DECLARE DAYCLOSEDATE                           DATE;
+   DECLARE KOTSTATUS, COMPLETED, KOT_WAITER_DIS   CHAR(1);
+
+   SELECT GET_LOCK('tableorder', 3)
+   INTO check1;
+
+   
+   IF (waiter_id = '')
+   THEN
+      BEGIN
+         SET waiter_id = NULL;
+      END;
+   END IF;
+
+   SELECT dc_day
+   INTO DAYCLOSEDATE
+   FROM tbl_dayclose
+   WHERE dc_dateclose IS NULL;
+
+   SET COMPLETED = 'N';
+
+   SELECT be_branchprefix, be_kotstatuschange, be_kotwaiter_name_dis
+   INTO prefx, KOTSTATUS, KOT_WAITER_DIS
+   FROM tbl_branchmaster
+   WHERE be_branchid = branchid;
+
+
+   SELECT `ter_orderfrom`
+   INTO order_from
+   FROM tbl_tableorder
+   WHERE `ter_orderno` = TRIM(temp_orderno)
+   LIMIT 1;
+
+   SELECT DATE_FORMAT(DAYCLOSEDATE, '%d%m%y')
+   INTO odate;
+
+   SET orderno = NULL;
+
+   SELECT ds_ordercount
+   INTO orderno
+   FROM tbl_datesettings
+   WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+
+   IF (orderno IS NULL)
+   THEN
+      INSERT INTO tbl_datesettings(ds_branchid, ds_date)
+      VALUES (branchid, DAYCLOSEDATE);
+
+      SELECT ds_ordercount
+      INTO orderno
+      FROM tbl_datesettings
+      WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+   END IF;
+
+   SET neworderno = CONCAT(odate, orderno);
+
+   IF (KOTSTATUS = 'Y')
+   THEN
+      SET orderstatus = 'Opened';
+   ELSEIF (KOTSTATUS = 'N')
+   THEN
+      SET orderstatus = 'Served';
+   END IF;
+
+   IF (KOT_WAITER_DIS = 'N')
+   THEN
+      SET waiter_id = NULL;
+   END IF;
+
+   
+
+   CALL proc_genkotno(@kotno, branchid, 'DINE-IN',order_confirming_staff);
+
+   SELECT @kotno
+   INTO kotnum;
+
+
+
+   UPDATE tbl_tableorder
+   SET ter_orderno = neworderno,
+       ter_kotno = kotnum,
+       ter_status = orderstatus,
+       ter_waiter_id = waiter_id
+   WHERE ter_orderno = TRIM(temp_orderno);
+   
+   UPDATE tbl_combo_ordering_details 
+   SET cod_orderno=neworderno,
+   cod_kot_no=kotnum,
+   cod_order_status=orderstatus 
+   WHERE cod_orderno=TRIM(temp_orderno) and cod_order_status='Added' and cod_kot_no IS NULL;
+   
+   UPDATE tbl_tableorder t, tbl_menumaster m SET t.ter_status = 'Served' where ter_orderno = neworderno and t.ter_menuid = m.mr_menuid and m.mr_show_in_kod = 'N';
+   
+
+   UPDATE tbl_temp_orderno_details
+   SET to_orderno = neworderno, to_orderno_createdtime = now()
+   WHERE to_temp_id = TRIM(temp_orderno);
+
+   UPDATE tbl_tableorder_discount
+   SET d_orderno = neworderno
+   WHERE d_orderno = TRIM(temp_orderno);
+
+   SELECT `ter_staff`
+   INTO staffid
+   FROM tbl_tableorder
+   WHERE `ter_orderno` = TRIM(neworderno)
+   LIMIT 0, 1;
+
+   UPDATE tbl_datesettings
+   SET ds_ordercount = ds_ordercount + 1
+   WHERE ds_branchid = branchid AND ds_date = DAYCLOSEDATE;
+
+
+
+   UPDATE tbl_tabledetails
+   SET ts_orderno = neworderno,
+       ts_orderstaff = staffid,
+       ts_completed_order = COMPLETED
+   WHERE ts_orderno = temp_orderno;
+
+   CALL proc_table_status(neworderno);
+
+   UPDATE tbl_order_addon
+   SET ad_orderno = neworderno, ad_kotno = kotnum
+   WHERE ad_orderno = temp_orderno;
+
+   SELECT RELEASE_LOCK('tableorder')
+   INTO check2;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_tableorderedit` (IN `orderno` VARCHAR(15), IN `slno` INT, IN `qty` INT, IN `pref_text` VARCHAR(200), IN `rate` DECIMAL(15,3), IN `unit_weight` DECIMAL(15,4), OUT `messsage` VARCHAR(200))  MODIFIES SQL DATA
+proc_tableorderedit:BEGIN
+  DECLARE menuid,rate_type varchar(30);
+  DECLARE floorid varchar(10);
+  DECLARE ratio DECIMAL(3,2);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE numberinstock DECIMAL(15,2);
+  DECLARE prefid,portion,unit_id,base_unit_id,menu_stock_id,discount int;
+  DECLARE oldqty,qt_withratio,qtystock_withratio,NEWqty int;
+  DECLARE preftext varchar(200);
+  DECLARE manualrate,dailystock,dailystock_in_number,is_instock char(1);
+  DECLARE flag varchar(20);
+  DECLARE unit_type varchar(50);
+  DECLARE discount_label,discount_remarks VARCHAR(60);
+  DECLARE discount_id varchar(20);
+  DECLARE discount_rate,org_rate DECIMAL (15,3);
+  
+  
+
+  IF(TRIM(pref_text) = NULL || TRIM(pref_text)='') THEN
+     SET preftext = NULL;
+  ELSE
+     SET preftext = pref_text;
+  END IF;
+
+  IF(rate !=0) THEN
+  BEGIN
+    IF(qty >0)THEN
+    BEGIN
+      SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+     SELECT ter_menuid,ter_floorid,ter_portion,ter_rate_type,ter_unit_type,ter_unit_id,ter_base_unit_id
+      INTO menuid,floorid,portion,rate_type,unit_type,unit_id,base_unit_id
+        FROM tbl_tableorder WHERE  ter_orderno = TRIM(orderno) AND ter_slno = slno;
+
+  IF(unit_type='')THEN
+        SET unit_type = NULL;
+         END IF;
+        IF(unit_weight='')THEN
+        SET unit_weight = NULL;
+         END IF;
+        IF(unit_id =0)THEN
+        SET unit_id = NULL;
+         END IF;
+        IF(base_unit_id =0)THEN
+        SET base_unit_id = NULL;
+         END IF;
+
+
+
+
+    SELECT mr_manualrateentry,mr_dailystock,mr_dailystock_in_number INTO manualrate,dailystock,dailystock_in_number FROM tbl_menumaster WHERE mr_menuid = menuid;
+        SELECT ter_qty INTO oldqty FROM tbl_tableorder  WHERE ter_orderno = TRIM(orderno) AND ter_slno = slno;
+
+        IF(dailystock ='Y')THEN
+        BEGIN
+          IF(dailystock_in_number = 'Y')THEN
+          BEGIN
+            IF(rate_type = 'Portion')THEN
+              BEGIN
+                SELECT mk_stock_number INTO numberinstock FROM tbl_menustock WHERE mk_menuid = menuid AND mk_portion=portion AND mk_date = DAYCLOSEDATE;
+                SELECT mk_id INTO menu_stock_id FROM  tbl_menustock ms WHERE ms.mk_menuid = menuid AND  ms.mk_portion =  portion;
+
+               END;
+              ELSEIF(rate_type= 'Unit') THEN
+              BEGIN
+                IF(unit_type = 'Packet')THEN
+                BEGIN
+                  SELECT m.mk_stock_number INTO numberinstock FROM tbl_menustock m WHERE m.mk_menuid = menuid AND m.mk_unit_type = unit_type AND m.mk_unit_weight = unit_weight AND m.mk_unit_id = unit_id;
+                  SELECT mk_id INTO menu_stock_id FROM
+                  tbl_menustock ms WHERE ms.mk_menuid = menuid AND ms.mk_unit_type =  unit_type  AND ms.mk_unit_weight = unit_weight    AND  ms.mk_unit_id = unit_id;
+
+                END;
+                ELSEIF(unit_type = 'Loose')THEN
+                BEGIN
+                  SELECT m.mk_stock_number INTO numberinstock FROM tbl_menustock m WHERE m.mk_menuid = menuid AND m.mk_unit_type = unit_type AND m.mk_base_unit_id = base_unit_id;
+                END;
+                END IF;
+              END;
+              END IF;
+
+
+            IF(qty>oldqty) THEN
+            BEGIN
+
+
+              IF(numberinstock = 0.00) THEN
+              BEGIN
+                SET messsage = 'Ordered Item is Stock Out';
+                LEAVE proc_tableorderedit;
+              END;
+              ELSE
+              BEGIN
+                SET NEWqty = qty-oldqty;
+                IF(NEWqty > numberinstock)THEN
+                BEGIN
+                  SET messsage = 'Quantity ordered is less than in Stock';
+                  LEAVE proc_tableorderedit;
+                END;
+                ELSE
+                  SET flag = 'Qty_Reduce';
+                END IF;
+              END;
+              END IF;
+            END;
+            ELSE
+            BEGIN
+
+              SET NEWqty = oldqty - qty;
+              SET flag = 'Qty_increase';
+            END;
+            END IF;
+          END;
+          ELSE
+          BEGIN
+            IF(rate_type = 'Portion')THEN
+            BEGIN
+              SELECT mk_stock INTO is_instock FROM tbl_menustock WHERE mk_menuid = menuid AND mk_portion = portion AND mk_date = DAYCLOSEDATE;
+              SELECT mk_id INTO menu_stock_id FROM  tbl_menustock ms WHERE ms.mk_menuid = menuid AND  ms.mk_portion =  portion;
+            END;
+            ELSEIF(rate_type= 'Unit') THEN
+            BEGIN
+              IF(unit_type = 'Packet')THEN
+              BEGIN
+               SELECT mk_id INTO menu_stock_id FROM
+                  tbl_menustock ms WHERE ms.mk_menuid = menuid AND ms.mk_unit_type =  unit_type  AND ms.mk_unit_weight = unit_weight    AND  ms.mk_unit_id = unit_id;
+              END;
+              ELSEIF(unit_type = 'Loose')THEN
+              BEGIN
+                SELECT mk_stock INTO is_instock FROM tbl_menustock
+                WHERE mk_menuid = menuid AND mk_unit_type = unit_type AND mk_base_unit_id = base_unit_id;
+              END;
+              END IF;
+
+            END;
+            END IF;
+
+            IF(is_instock = 'N')THEN
+            BEGIN
+              SET messsage = 'Ordered Item not in Stock';
+              LEAVE proc_tableorderedit;
+            END;
+            END IF;
+          END;
+          END IF;
+        END;
+        END IF;
+
+
+        IF(portion='')OR(portion =0)THEN
+        SET portion = NULL;
+        END IF;
+
+
+
+
+        
+
+
+        UPDATE tbl_tableorder SET ter_qty = qty,ter_preferencetext = preftext, ter_rate = rate ,ter_unit_weight = unit_weight, ter_total_rate = rate*qty,
+        ter_org_rate= rate WHERE ter_orderno = TRIM(orderno) AND ter_slno = slno;
+        
+        
+        
+        CALL proc_itemorder_discount(trim(menuid),'DI',TRIM(orderno),slno,@message_discount);
+         
+
+         SET messsage = 'UPDATED SUCESSFULLY';
+
+        IF(trim(flag)= 'Qty_Reduce') THEN
+        BEGIN
+
+           IF(rate_type = 'Portion')THEN
+            BEGIN
+              UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number -NEWqty)
+               WHERE mk_id =menu_stock_id;
+            END;
+            ELSEIF(rate_type= 'Unit') THEN
+            BEGIN
+
+              IF(unit_type = 'Packet')THEN
+              BEGIN
+                 UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number -NEWqty)
+                 WHERE mk_id =menu_stock_id;
+              END;
+              ELSEIF(unit_type = 'Loose')THEN
+              BEGIN
+                UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number -NEWqty)
+                WHERE mk_menuid = menuid AND mk_unit_type = unit_type AND mk_base_unit_id = base_unit_id;
+              END;
+              END IF;
+            END;
+            END IF;
+        END;
+        ELSEIF(trim(flag)= 'Qty_increase') THEN
+        BEGIN
+            IF(rate_type = 'Portion')THEN
+            BEGIN
+              UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number +NEWqty)
+             WHERE mk_id =menu_stock_id;
+
+            END;
+            ELSEIF(rate_type= 'Unit') THEN
+            BEGIN
+              IF(unit_type = 'Packet')THEN
+              BEGIN
+                UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number +NEWqty)
+                   WHERE mk_id =menu_stock_id;
+              END;
+              ELSEIF(unit_type = 'Loose')THEN
+              BEGIN
+                UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number +NEWqty)
+                WHERE mk_menuid = menuid AND mk_unit_type = unit_type AND mk_base_unit_id = base_unit_id;
+              END;
+              END IF;
+            END;
+            END IF;
+        END;
+        END IF;
+
+
+   END;
+   END IF;
+  END;
+  END IF;
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_tableordernentry` (IN `temporderno` VARCHAR(15), IN `branchid` BIGINT, IN `menuid` VARCHAR(30), IN `rate_type` VARCHAR(30), IN `portion` INT, IN `unit_type` VARCHAR(50), IN `unit_weight` DECIMAL(15,5), IN `unit_id` INT, IN `base_unit_id` INT, IN `qty` INT, IN `status` VARCHAR(50), IN `orderfrom` VARCHAR(30), IN `entryuser` VARCHAR(15), IN `est_time` VARCHAR(10), IN `staff` VARCHAR(50), IN `type` VARCHAR(50), IN `floorid` VARCHAR(10), IN `manual_rate` FLOAT, IN `preferencetext` VARCHAR(200), IN `addon_slno` VARCHAR(30), OUT `messsage` VARCHAR(100))  NO SQL
+proc_tableordernentry:BEGIN
+  DECLARE item_rate,item_base_rate,org_rate,discount_rate,new_rate DECIMAL (15,3);
+  DECLARE prefid,diff_time,disc_slno,SLNO_OLD,check1,check2 int;
+  DECLARE preftext,pref_old varchar(200);
+  DECLARE slno,oldqty,discount int;
+  DECLARE is_manualrate char(1);
+  DECLARE dailystock,dailystock_in_number,is_instock char(1);
+  DECLARE numberinstock DECIMAL(15,2);
+  DECLARE ratio DECIMAL(3,2);
+  DECLARE flag,todo varchar(10);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE CHECK_TEMP char(4);
+  DECLARE NEW_ORDER_NO,OLD_TEMP_NO varchar(15);
+  DECLARE entrytime time;
+  DECLARE message_discount VARCHAR(50);
+    SELECT GET_LOCK('tableorderentry', 3) INTO check1;
+
+
+  SET flag = 'not_set';
+  SET messsage = 'Error';
+
+  IF(unit_type ='')THEN
+   SET unit_type = NULL;
+  END IF;
+  IF(unit_weight ='')THEN
+   SET unit_weight = NULL;
+  END IF;
+   IF(unit_id =0)THEN
+   SET unit_id = NULL;
+  END IF;
+  IF(base_unit_id = 0)THEN
+   SET base_unit_id = NULL;
+  END IF;
+
+
+
+  SELECT LEFT(temporderno, 4) INTO CHECK_TEMP;
+  IF(trim(CHECK_TEMP) = 'TEMP')THEN
+  BEGIN
+    SELECT to_orderno,to_temp_id INTO NEW_ORDER_NO,OLD_TEMP_NO  FROM tbl_temp_orderno_details WHERE to_temp_id = TRIM(temporderno);
+    IF(!(NEW_ORDER_NO IS NULL))THEN
+    BEGIN
+      SET temporderno = NEW_ORDER_NO;
+    END;
+    END IF;
+  END;
+  ELSE
+  BEGIN
+    SELECT to_temp_id INTO OLD_TEMP_NO FROM tbl_temp_orderno_details WHERE to_orderno = TRIM(temporderno);
+  END;
+  END IF;
+
+
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+  IF(qty>0)THEN
+  BEGIN
+ IF NOT EXISTS(SELECT (1) FROM `tbl_tableorder` WHERE `ter_orderno`= TRIM(temporderno) AND `ter_status` = 'Billed') THEN
+    BEGIN
+
+      SELECT mr_manualrateentry,mr_dailystock,mr_dailystock_in_number INTO is_manualrate,dailystock,dailystock_in_number
+      FROM tbl_menumaster WHERE mr_menuid = trim(menuid);
+      IF(dailystock ='Y')THEN
+      BEGIN
+
+        IF(dailystock_in_number = 'Y')THEN
+        BEGIN
+          IF(rate_type = 'Portion')THEN
+          BEGIN
+            SELECT mk_stock_number INTO numberinstock FROM tbl_menustock WHERE mk_menuid = menuid AND mk_portion=portion;
+          END;
+          ELSEIF(rate_type= 'Unit') THEN
+          BEGIN
+            IF(unit_type = 'Packet')THEN
+            BEGIN
+              SELECT m.mk_stock_number INTO numberinstock FROM tbl_menustock m WHERE m.mk_menuid = menuid AND m.mk_unit_type = unit_type AND m.mk_unit_weight = unit_weight AND m.mk_unit_id = unit_id;
+            END;
+            ELSEIF(unit_type = 'Loose')THEN
+            BEGIN
+              SELECT m.mk_stock_number INTO numberinstock FROM tbl_menustock m WHERE m.mk_menuid = menuid AND m.mk_unit_type = unit_type AND m.mk_base_unit_id = base_unit_id;
+            END;
+            END IF;
+          END;
+          END IF;
+
+          IF(numberinstock = 0.00) THEN
+          BEGIN
+            SET messsage = 'Ordered Item is Stock Out';
+            LEAVE proc_tableordernentry;
+          END;
+          ELSE
+          BEGIN
+            IF(qty > numberinstock)THEN
+            BEGIN
+              SET messsage = 'Quantity ordered is less than in Stock';
+              LEAVE proc_tableordernentry;
+            END;
+            ELSE
+              SET flag = 'Qty_Reduce';
+            END IF;
+          END;
+          END IF;
+        END;
+
+        ELSE
+        BEGIN
+          IF(rate_type = 'Portion')THEN
+          BEGIN
+            SELECT mk_stock INTO is_instock FROM tbl_menustock WHERE mk_menuid = menuid AND mk_portion = portion AND mk_date = DAYCLOSEDATE;
+          END;
+          ELSEIF(rate_type= 'Unit') THEN
+          BEGIN
+            IF(unit_type = 'Packet')THEN
+            BEGIN
+              SELECT mk_stock INTO is_instock FROM tbl_menustock  WHERE mk_menuid = menuid AND mk_unit_type = unit_type AND mk_unit_weight = unit_weight AND mk_unit_id = unit_id;
+            END;
+            ELSEIF(unit_type = 'Loose')THEN
+            BEGIN
+              SELECT mk_stock INTO is_instock FROM tbl_menustock WHERE mk_menuid = menuid AND mk_unit_type = unit_type AND mk_base_unit_id = base_unit_id;
+            END;
+            END IF;
+          END;
+          END IF;
+
+          IF(is_instock = 'N')THEN
+          BEGIN
+            SET messsage = 'Ordered Item not in Stock';
+            LEAVE proc_tableordernentry;
+          END;
+          END IF;
+        END;
+        END IF;
+
+      END;
+      END IF;
+      SET item_rate = 0;
+
+      IF(is_manualrate = 'Y') THEN
+      BEGIN
+        SET item_rate = manual_rate;
+      END;
+      ELSEIF(is_manualrate = 'N') THEN
+      BEGIN
+        IF(rate_type = 'Portion')THEN
+        BEGIN
+          SELECT mmr_rate INTO item_rate FROM tbl_menuratemaster WHERE mmr_menuid = trim(menuid) AND  mmr_floorid = trim(floorid)
+          AND mmr_portion = portion;
+        END;
+        ELSEIF(rate_type= 'Unit') THEN
+        BEGIN
+          IF(unit_type = 'Packet')THEN
+          BEGIN
+            SELECT mmr_rate INTO item_rate FROM tbl_menuratemaster WHERE mmr_menuid = trim(menuid) AND  mmr_floorid = trim(floorid)
+            AND mmr_unit_type = unit_type AND mmr_unit_weight = unit_weight AND mmr_unit_id = unit_id;
+          END;
+          ELSEIF(unit_type = 'Loose')THEN
+          BEGIN
+            SELECT mmr_rate INTO item_base_rate FROM tbl_menuratemaster WHERE mmr_menuid = trim(menuid) AND  mmr_floorid = trim(floorid)
+            AND mmr_unit_type = unit_type AND mmr_base_unit_id = base_unit_id;
+            SET item_rate=manual_rate;
+          END;
+          END IF;
+        END;
+        END IF;
+
+      END;
+      END IF;
+
+
+
+
+      SET org_rate = item_rate;
+
+      IF(item_rate != 0)THEN
+      BEGIN
+
+        IF(((TRIM(preferencetext) = 'NULL') OR (TRIM(preferencetext) = '0')OR (TRIM(preferencetext) = ''))) THEN
+          SET preftext = NULL;
+        ELSE
+          SET preftext = preferencetext;
+        END IF;
+        IF(rate_type = 'Portion')THEN
+        BEGIN
+          IF EXISTS(SELECT * FROM tbl_tableorder WHERE ter_orderno= temporderno AND ter_menuid= menuid AND  ter_portion = portion AND ter_type = type AND ter_status= 'Added' AND ter_cancel = 'N' AND ter_rate = item_rate AND ter_addon_slno IS NULL  LIMIT 0, 1) THEN
+          BEGIN
+            SELECT ter_slno,ter_qty,ter_entrytime,ter_preferencetext  INTO slno,oldqty,entrytime,pref_old FROM tbl_tableorder WHERE
+            ter_orderno= temporderno AND ter_menuid= menuid AND ter_portion = portion AND ter_type = type AND ter_status= 'Added' AND ter_cancel = 'N'  AND ter_rate = item_rate AND ter_addon_slno IS NULL LIMIT 0, 1;
+           SELECT timediff(time(now()),entrytime) INTO diff_time;
+              IF(diff_time >2)THEN
+                IF(addon_slno!='') THEN
+                  SET todo = 'ADD';
+                ELSE
+                  SET todo = 'UPDATE';
+                END IF;
+              ELSE
+                LEAVE proc_tableordernentry;
+              END IF;
+
+          END;
+          ELSE
+          BEGIN
+            SET todo = 'ADD';
+            SET unit_weight = 0.00;
+            SET unit_id = NULL;
+            SET base_unit_id = NULL;
+            SET unit_type = NULL;
+            SET item_base_rate = NULL;
+          END;
+          END IF;
+        END;
+        ELSEIF(rate_type= 'Unit') THEN
+        BEGIN
+          IF(unit_type = 'Packet')THEN
+          BEGIN
+            IF EXISTS(SELECT * FROM tbl_tableorder WHERE ter_orderno= temporderno AND ter_menuid= menuid AND  ter_unit_type = unit_type AND ter_unit_weight = unit_weight AND ter_unit_id = unit_id
+            AND ter_type = type AND ter_status= 'Added' AND ter_cancel = 'N' AND ter_rate = item_rate  LIMIT 0, 1) THEN
+            BEGIN
+              SELECT ter_slno,ter_qty,ter_entrytime,ter_preferencetext INTO slno,oldqty,entrytime,pref_old FROM tbl_tableorder WHERE
+              ter_orderno= temporderno AND ter_menuid= menuid AND  ter_unit_type = unit_type AND ter_unit_weight = unit_weight AND ter_unit_id = unit_id AND
+              ter_type = type AND ter_status= 'Added' AND ter_cancel = 'N'  AND ter_rate = item_rate LIMIT 0, 1;
+               SELECT timediff(time(now()),entrytime) INTO diff_time;
+              IF(diff_time >2)THEN
+                SET todo = 'UPDATE';
+              ELSE
+                LEAVE proc_tableordernentry;
+              END IF;
+            END;
+            ELSE
+            BEGIN
+              SET todo = 'ADD';
+              SET portion = NULL;
+              SET item_base_rate = NULL;
+            END;
+            END IF;
+          END;
+          ELSEIF(unit_type = 'Loose')THEN
+          BEGIN
+            IF EXISTS(SELECT * FROM tbl_tableorder WHERE ter_orderno= temporderno AND ter_menuid= menuid AND ter_unit_type = unit_type AND ter_unit_weight =unit_weight AND ter_base_unit_id = base_unit_id
+            AND ter_type = type AND ter_status= 'Added' AND ter_cancel = 'N' AND ter_rate = item_rate  LIMIT 0, 1) THEN
+            BEGIN
+              SELECT ter_slno,ter_qty,ter_entrytime,ter_preferencetext INTO slno,oldqty,entrytime,pref_old FROM tbl_tableorder WHERE
+              ter_orderno= temporderno AND ter_menuid= menuid AND ter_unit_type = unit_type AND ter_base_unit_id = base_unit_id AND ter_unit_weight =unit_weight  AND
+              ter_type = type AND ter_status= 'Added' AND ter_cancel = 'N'  AND ter_rate = item_rate LIMIT 0, 1;
+              SELECT timediff(time(now()),entrytime) INTO diff_time;
+              IF(diff_time >2)THEN
+                SET todo = 'UPDATE';
+              ELSE
+                LEAVE proc_tableordernentry;
+              END IF;
+            END;
+            ELSE
+            BEGIN
+              SET todo = 'ADD';
+              SET portion = NULL;
+              SET unit_id = NULL;
+
+            END;
+            END IF;
+          END;
+          END IF;
+
+        END;
+        END IF;
+
+        IF(todo = 'UPDATE') THEN
+        BEGIN
+
+          IF(TRIM(orderfrom) != 'Android_Interface') THEN
+          BEGIN
+
+            UPDATE  tbl_tableorder SET ter_qty = (qty + oldqty), ter_total_rate= ter_rate*(qty + oldqty), ter_preference = prefid, ter_preferencetext = CONCAT(pref_old,',',TRIM(preftext)),ter_entrytime = time(now())
+            WHERE ter_orderno= temporderno AND ter_slno= slno;
+            SET messsage = 'Item Updated';
+          END;
+            END IF;
+        END;
+        ELSEIF (todo = 'ADD')THEN
+        BEGIN
+          IF(addon_slno!='') THEN
+          BEGIN
+            INSERT INTO `tbl_tableorder`(`ter_orderno`, `ter_slno`, `ter_branchid`, `ter_menuid`,ter_rate_type,ter_unit_type,`ter_portion`,ter_unit_weight,ter_unit_id,ter_base_unit_id,ter_base_rate,`ter_rate`, `ter_qty`,ter_total_rate, `ter_status`, `ter_orderfrom`, `ter_entryuser`, `ter_esttime`, `ter_staff`,`ter_type`,`ter_preference`,`ter_preferencetext`,`ter_floorid`,ter_orderno_temp,ter_org_rate,ter_addon_slno)
+            VALUES (temporderno, 0, branchid,menuid,rate_type,unit_type,portion,unit_weight,unit_id,base_unit_id,item_base_rate,item_rate,qty,(item_rate*qty),status,orderfrom,entryuser,est_time,staff,type,prefid,preftext,floorid,OLD_TEMP_NO,org_rate,addon_slno);
+          END;
+          ELSE
+          BEGIN
+            INSERT INTO `tbl_tableorder`(`ter_orderno`, `ter_slno`, `ter_branchid`, `ter_menuid`,ter_rate_type,ter_unit_type,`ter_portion`,ter_unit_weight,ter_unit_id,ter_base_unit_id,ter_base_rate,`ter_rate`, `ter_qty`,ter_total_rate, `ter_status`, `ter_orderfrom`, `ter_entryuser`, `ter_esttime`, `ter_staff`,`ter_type`,`ter_preference`,`ter_preferencetext`,`ter_floorid`,ter_orderno_temp,ter_org_rate)
+            VALUES (temporderno, 0, branchid,menuid,rate_type,unit_type,portion,unit_weight,unit_id,base_unit_id,item_base_rate,item_rate,qty,(item_rate*qty),status,orderfrom,entryuser,est_time,staff,type,prefid,preftext,floorid,OLD_TEMP_NO,org_rate);
+          END;
+          END IF;
+          SET messsage = 'Item Added Sucessfully';
+          SELECT MAX(o.ter_slno) INTO disc_slno  FROM tbl_tableorder o WHERE ter_orderno = temporderno;
+
+          CALL proc_itemorder_discount(trim(menuid),'DI',temporderno,disc_slno,@message_discount);
+
+
+          IF(disc_slno != 1)THEN
+          BEGIN
+
+            SELECT ter_rate INTO new_rate FROM tbl_tableorder WHERE ter_orderno = temporderno AND ter_slno = disc_slno;
+            IF(addon_slno='') THEN
+            IF EXISTS(SELECT * FROM tbl_tableorder WHERE ter_orderno = temporderno AND  ter_menuid = menuid AND ter_rate_type = rate_type AND ter_rate = new_rate AND ter_status= 'Added' AND ter_cancel = 'N' AND ter_slno != disc_slno AND ter_addon_slno IS NULL )THEN
+            BEGIN
+              SELECT ter_slno,ter_entrytime INTO SLNO_OLD,entrytime
+              FROM tbl_tableorder WHERE ter_orderno = temporderno AND ter_menuid = menuid AND ter_rate_type = rate_type AND ter_rate = new_rate AND ter_status= 'Added' AND ter_cancel = 'N' AND ter_slno != disc_slno AND ter_addon_slno IS NULL LIMIT 1;
+              SELECT timediff(time(now()),entrytime) INTO diff_time;
+              IF(diff_time >2)THEN
+              BEGIN
+                UPDATE tbl_tableorder SET  ter_qty = qty +ter_qty,ter_entrytime = time(now()) WHERE ter_orderno = temporderno AND ter_slno = SLNO_OLD;
+                UPDATE tbl_tableorder SET ter_total_rate = ter_qty*ter_rate WHERE ter_orderno = temporderno AND ter_slno = SLNO_OLD;
+                DELETE FROM tbl_tableorder WHERE ter_orderno = temporderno AND ter_slno = disc_slno;
+
+
+              END;
+              ELSE
+                DELETE FROM tbl_tableorder WHERE ter_orderno = temporderno AND ter_slno = disc_slno;
+
+              END IF;
+
+            END;
+            END IF;
+            END IF;
+          END;
+          END IF;
+        END;
+        END IF;
+
+        IF(trim(flag)= 'Qty_Reduce') THEN
+        BEGIN
+          IF(dailystock_in_number = 'Y')THEN
+          BEGIN
+            IF(rate_type = 'Portion')THEN
+            BEGIN
+              UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number -qty) WHERE mk_menuid = menuid  AND mk_portion = portion AND mk_date = DAYCLOSEDATE;
+            END;
+            ELSEIF(rate_type= 'Unit') THEN
+            BEGIN
+              IF(unit_type = 'Packet')THEN
+              BEGIN
+                UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number -qty) WHERE mk_menuid = menuid AND mk_unit_type = unit_type AND mk_unit_weight = unit_weight AND mk_unit_id = unit_id;
+              END;
+              ELSEIF(unit_type = 'Loose')THEN
+              BEGIN
+                UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number -qty) WHERE mk_menuid = menuid AND mk_unit_type = unit_type AND mk_base_unit_id = base_unit_id;
+              END;
+              END IF;
+            END;
+            END IF;
+          END;
+          END IF;
+        END;
+
+        END IF;
+      END;
+      ELSEIF(item_rate = 0) THEN
+      BEGIN
+        SET messsage = 'Item Not added-Rate 0';
+
+
+      END;
+      END IF;
+
+    END;
+    ELSE
+      SET messsage = 'Order Already Billed';
+    END IF;
+
+  END;
+  ELSE
+      SET messsage = 'Quanity less than 0';
+  END IF;
+
+
+   SELECT RELEASE_LOCK('tableorderentry') INTO check2;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_tableorder_update` (IN `orderno` VARCHAR(15), IN `branchid` INT, OUT `kotnum` VARCHAR(20), OUT `message` VARCHAR(100), IN `waiter_id` VARCHAR(50), IN `order_confirming_staff` VARCHAR(50))  MODIFIES SQL DATA
+BEGIN
+   
+   
+   
+    DECLARE orderstatus varchar(50);
+    DECLARE KOTSTATUS,KOT_WAITER_DIS CHAR(1);
+    DECLARE check2, check1 INT;
+    
+    SELECT GET_LOCK('orderupdate', 3) INTO check1;
+    
+    if(trim(waiter_id)='') then set waiter_id=NULL; end if;
+    
+    set message = '';
+    SELECT be_kotstatuschange,be_kotwaiter_name_dis INTO KOTSTATUS,KOT_WAITER_DIS FROM
+    tbl_branchmaster WHERE be_branchid = branchid;
+    
+    IF NOT EXISTS(SELECT (1) FROM `tbl_tableorder` WHERE `ter_orderno`= TRIM(orderno) and `ter_status` = 'Billed') THEN
+    begin
+    IF(KOTSTATUS = 'Y')THEN
+    SET orderstatus = 'Opened';
+    ELSEIF(KOTSTATUS = 'N') THEN
+    SET orderstatus = 'Served';
+    END IF;
+    
+   
+        CALL proc_genkotno(@kotno,branchid,'DINE-IN (RUNNING ORDER)',order_confirming_staff);select @kotno into kotnum;
+ 
+    
+    IF(KOT_WAITER_DIS = 'N') then
+       set waiter_id = NULL;
+    END IF; 
+    
+    UPDATE tbl_tableorder SET ter_kotno = kotnum, ter_status = orderstatus,ter_waiter_id=waiter_id WHERE ter_orderno = TRIM(orderno) and ter_status = 'Added';
+    
+    UPDATE tbl_combo_ordering_details SET cod_kot_no=kotnum,cod_order_status=orderstatus WHERE cod_orderno=TRIM(orderno) and cod_order_status='Added' and cod_kot_no IS NULL;
+    
+    UPDATE tbl_order_addon SET ad_kotno = kotnum WHERE ad_orderno=TRIM(orderno) and ad_kotno is null;  
+    IF(KOTSTATUS = 'Y')THEN
+    BEGIN
+      UPDATE `tbl_tableorder` SET `ter_status` = 'Served' where `ter_orderno` = TRIM(orderno) AND `ter_menuid` IN (SELECT `mr_menuid` FROM tbl_menumaster where  `mr_show_in_kod` = 'N');
+      UPDATE tbl_combo_ordering_details SET cod_order_status='Served' WHERE cod_orderno=TRIM(orderno) and cod_menu_id IN (SELECT `mr_menuid` FROM tbl_menumaster where  `mr_show_in_kod` = 'N') and cod_kot_no IS NULL;
+    END;
+    END IF;
+    
+    
+    
+    set message = 'Items sucessfully added to order';
+ end;
+ else
+    set message = 'Order Already Billed';
+ end if;
+ 
+ SELECT RELEASE_LOCK('orderupdate') INTO check2;
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_table_import` (OUT `Message` VARCHAR(100), IN `FLOOR_ID` VARCHAR(10))  BEGIN
+
+ 
+    SET Message = 'Error';
+
+    INSERT INTO `tbl_tablemaster` (`tr_tableid`, `tr_branchid`, `tr_floorid`, `tr_tableno`, `tr_status`, `tr_maxchaircount`, `tr_vaccantcount`, `tr_nextprefix_ascii`, `tr_displayorder`, `tr_max_ascii`, `tr_timealloted`) VALUES
+(0, 1, FLOOR_ID, '1', 'Active', 4, 4, 65, 1, 69, 0),
+(0, 1, FLOOR_ID, '2', 'Active', 4, 4, 65, 2, 69, 0),
+(0, 1, FLOOR_ID, '3', 'Active', 4, 4, 65, 3, 69, 0),
+(0, 1, FLOOR_ID, '4', 'Active', 4, 4, 65, 4, 69, 0),
+(0, 1, FLOOR_ID, '6', 'Active', 6, 6, 65, 6, 71, 0),
+(0, 1, FLOOR_ID, '5', 'Active', 4, 4, 65, 5, 69, 0),
+(0, 1, FLOOR_ID, '7', 'Active', 6, 6, 65, 7, 71, 0),
+(0, 1, FLOOR_ID, '8', 'Active', 4, 4, 65, 8, 69, 0);
+
+    SET Message = 'Tables import....';
+
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_table_list` (IN `floor_id` VARCHAR(10))  NO SQL
+BEGIN
+
+SELECT  tableid ,tableno ,table_prefix,status ,asci ,maxchair ,vacant ,display ,orderno,staff ,firstname ,lastname,reservetime ,orderstaff ,totalamount ,noofpersons,in_access,billnumber ,dineintime ,timealloted,interface,macid FROM (
+SELECT GROUP_CONCAT(t.tr_tableid SEPARATOR ',') AS tableid,GROUP_CONCAT(t.tr_tableno SEPARATOR ',') AS tableno,GROUP_CONCAT((trim(td.ts_tableidprefix)) SEPARATOR ',') AS table_prefix,
+td.ts_status as status,GROUP_CONCAT(t.tr_nextprefix_ascii SEPARATOR ',') AS asci,GROUP_CONCAT(t.tr_maxchaircount SEPARATOR ',') AS maxchair, 
+t.tr_vaccantcount AS vacant,
+MIN(t.tr_displayorder) AS display,
+td.ts_orderno AS orderno,
+td.ts_orderstaff  AS staff,
+s.ser_firstname firstname ,
+ser_lastname as lastname,
+GROUP_CONCAT(td.ts_reservetime SEPARATOR ',') as reservetime, 
+td.ts_orderstaff  as orderstaff ,
+td.ts_totalamount as totalamount,
+GROUP_CONCAT(td.ts_noofpersons SEPARATOR ',') as noofpersons ,
+td.ts_in_access  as in_access,
+GROUP_CONCAT(td.ts_billnumber SEPARATOR ',') as billnumber,
+td.ts_dineintime as dineintime,
+GROUP_CONCAT(t.tr_timealloted SEPARATOR ',') as timealloted,td.ts_interface as interface,td.ts_machineid as macid
+FROM tbl_tablemaster t
+LEFT JOIN tbl_tabledetails td ON t.tr_tableid = td.ts_tableid
+LEFT JOIN tbl_staffmaster s ON s.ser_staffid = td.ts_orderstaff
+WHERE tr_branchid='1' AND tr_floorid=floor_id AND tr_status = 'Active' AND ts_status IN('Occupied','Billed','Ready','Opened','Added','Served') group by ts_orderno  UNION ALL
+
+SELECT m.tr_tableid AS tableid,m.tr_tableno  AS tableno ,ASCIITOCHAR(tr_nextprefix_ascii) AS table_prefix,NULL AS status,m.tr_nextprefix_ascii AS asci,m.tr_maxchaircount AS maxchair,m.tr_vaccantcount AS vacant ,m.tr_displayorder AS display,NULL  AS orderno,NULL  AS staff,
+NULL as firstname , NULL as lastname,NULL as reservetime, NULL as orderstaff ,NULL as totalamount ,
+NULL as noofpersons ,NULL as in_access,NULL as billnumber ,NULL as dineintime,NULL as timealloted,NULL as interface,NULL as macid
+FROM tbl_tablemaster m
+WHERE tr_branchid='1' AND tr_floorid= floor_id AND tr_status = 'Active' AND tr_vaccantcount>0)x  ORDER BY display,table_prefix ASC;
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_table_status` (IN `orderno` VARCHAR(15))  NO SQL
+proc_table_status:BEGIN
+   
+   
+   
+  IF EXISTS(SELECT * FROM tbl_tableorder WHERE ter_orderno = orderno and ter_status ='Added')then
+  begin
+    UPDATE tbl_tabledetails SET ts_status = 'Added',ts_completed_order = 'N' WHERE ts_orderno = orderno;
+     leave proc_table_status;
+  END;
+  END IF;
+  IF EXISTS(SELECT * FROM tbl_tableorder WHERE ter_orderno = orderno and ter_status ='Opened')then
+  begin
+    UPDATE tbl_tabledetails SET ts_status = 'Opened',ts_completed_order = 'N' WHERE ts_orderno = orderno;
+     leave proc_table_status;
+  END;
+  END IF;
+  IF EXISTS(SELECT * FROM tbl_tableorder WHERE ter_orderno = orderno and ter_status ='Ready')then
+  begin
+    UPDATE tbl_tabledetails SET ts_status = 'Ready',ts_completed_order = 'N' WHERE ts_orderno = orderno;
+     leave proc_table_status;
+  END;
+  END IF;
+  
+  IF NOT EXISTS(SELECT * FROM tbl_tableorder WHERE ter_orderno =orderno AND ter_status !='Served' )THEN
+  begin
+    UPDATE tbl_tabledetails SET ts_status = 'Served',ts_completed_order = 'Y' WHERE ts_orderno = orderno;
+     leave proc_table_status;
+  END;
+  END IF;
+  
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_tax` (IN `billno` VARCHAR(15), IN `mode` CHAR(2), IN `FLOOR_ID` VARCHAR(10))  MODIFIES SQL DATA
+BEGIN
+  DECLARE BILL_SLNO,noofitems smallint(6);
+  DECLARE MENUID varchar(30);
+  DECLARE AMOUNT,AMOUNT_CS,taxable_amount,discount,discount_per_item decimal(15,3);
+  DECLARE excempt_tax char(1);
+  DECLARE daytax DATE;
+  
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE cur1 CURSOR FOR SELECT t.bd_billslno, t.bd_menuid, t.bd_amount ,m.mr_excempt_tax FROM tbl_tablebilldetails t, tbl_menumaster m WHERE  t.bd_menuid= m.mr_menuid and bd_billno = trim(billno) AND bd_cancelled = 'N';
+  DECLARE cur2 CURSOR FOR SELECT tab_slno, tab_menuid, tab_amount,m.mr_excempt_tax FROM tbl_takeaway_billdetails t, tbl_menumaster m WHERE t.tab_menuid = m.mr_menuid and tab_billno = trim(billno) AND tab_cancelled = 'N';
+  
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+   
+  
+  
+  IF(mode = 'DI') then
+  BEGIN
+    
+    SELECT bm_dayclosedate,bm_taxable_amount,bm_discountvalue INTO daytax,taxable_amount,discount FROM  tbl_tablebillmaster WHERE bm_billno = billno;
+    SELECT count(*) INTO noofitems from tbl_tablebilldetails where bd_billno = billno;
+    if(discount>0.00)THEN
+      set discount_per_item = (discount/noofitems);
+    else
+      set discount_per_item = 0;
+    end if;
+    
+      
+    
+    INSERT INTO `tbl_tablebill_extra_tax_master`(`bem_billno`, `bem_taxid`, `bem_total_value`, `bem_label`,bem_dayclose) 
+    SELECT billno,ft.ft_tax_id,TRUNCATE(((taxable_amount*t.amc_value)/100),3),concat(t.amc_label,' (',t.amc_value,'%)'),daytax
+    from tbl_extra_tax_master t,tbl_floor_tax ft 
+    where ft.ft_tax_id = t.amc_id  AND  ft.ft_floorid = FLOOR_ID and ft.ft_active = 'Y'  AND t.amc_active = 'Y' and t.amc_unit ='P' and t.amc_item_tax = 'N';
+    
+      
+    INSERT INTO `tbl_tablebill_extra_tax_master`(`bem_billno`, `bem_taxid`, `bem_total_value`, `bem_label`,bem_dayclose) 
+    SELECT billno,ft.ft_tax_id,t.amc_value,concat(t.amc_label,' (',t.amc_value,')'),daytax
+    from tbl_extra_tax_master t,tbl_floor_tax ft 
+    where ft.ft_tax_id = t.amc_id  AND  ft.ft_floorid = FLOOR_ID and ft.ft_active = 'Y'  AND t.amc_active = 'Y' and t.amc_unit ='V' and t.amc_item_tax = 'N';
+    
+    
+    
+    OPEN cur1;
+
+    read_loop: LOOP
+    FETCH cur1 INTO BILL_SLNO, MENUID, AMOUNT,excempt_tax;
+
+    IF done THEN
+
+      LEAVE read_loop;
+    END IF;
+     
+    IF(excempt_tax ='N')then
+    begin
+  
+       
+      INSERT INTO `tbl_tablebill_extra_tax_details`(`bet_billno`, `bet_billslno`, `bet_tax_id`,bet_menuid, `bet_tax_value`,bet_tax_amount,bet_dayclose)
+      SELECT billno,BILL_SLNO,t.mtm_tax_id,MENUID,e.amc_value,(((AMOUNT-discount_per_item)*e.amc_value)/100) ,daytax
+      from tbl_menu_tax_master t 
+      left join tbl_extra_tax_master e on e.amc_id = t.mtm_tax_id 
+      where t.mtm_menuid = MENUID AND e.amc_active = 'Y' and e.amc_unit ='P';
+      
+       INSERT INTO `tbl_tablebill_extra_tax_details`(`bet_billno`, `bet_billslno`, `bet_tax_id`,bet_menuid, `bet_tax_value`,bet_tax_amount,bet_dayclose)
+      SELECT billno,BILL_SLNO,t.mtm_tax_id,MENUID,e.amc_value,e.amc_value,daytax
+      from tbl_menu_tax_master t 
+      left join tbl_extra_tax_master e on e.amc_id = t.mtm_tax_id 
+      where t.mtm_menuid = MENUID AND e.amc_active = 'Y' and e.amc_unit ='V';
+
+    
+    end;
+    end if;
+   
+    END LOOP;
+    CLOSE cur1;
+   
+     INSERT INTO `tbl_tablebill_extra_tax_master`(`bem_billno`, `bem_taxid`, `bem_total_value`, `bem_label`,bem_dayclose)
+    SELECT billno,et.bet_tax_id,SUM(et.bet_tax_amount),concat(amc_symbol,amc_label,' (',amc_value,'%)') ,daytax
+    FROM tbl_tablebill_extra_tax_details et left join tbl_extra_tax_master e on e.amc_id = et.bet_tax_id
+    WHERE e.amc_item_tax = 'Y' and et.bet_billno = billno  GROUP BY et.bet_tax_id;
+
+  
+
+  END;
+  ELSEIF(mode = 'TA') then
+  BEGIN
+  
+    
+  
+    SELECT tab_dayclosedate,tab_taxable_amount,tab_discountvalue INTO daytax,taxable_amount,discount FROM  tbl_takeaway_billmaster WHERE tab_billno = billno;
+    SELECT count(*) INTO noofitems from tbl_takeaway_billdetails where tab_billno = billno and tab_status != 'Cancelled';
+    if(discount>0.00)THEN
+      set discount_per_item = (discount/noofitems);
+    else
+      set discount_per_item = 0;
+    end if;
+    
+    
+    
+    INSERT INTO `tbl_takeaway_bill_extra_tax_master`(`tbe_billno`, `tbe_taxid`, `tbe_total_value`, `tbe_label`,tbe_dayclose) 
+    SELECT billno,t.amc_id,TRUNCATE(((taxable_amount*t.amc_value)/100),3),concat(t.amc_label,' (',t.amc_value,'%)'),daytax
+    from tbl_extra_tax_master t,tbl_online_tax tx
+    where tx.tox_tax_id = t.amc_id  AND  tx.tox_partner = FLOOR_ID and  t.amc_enable_ta = 'Y'  AND t.amc_active = 'Y' and t.amc_unit ='P' and t.amc_item_tax = 'N';
+    
+    INSERT INTO `tbl_takeaway_bill_extra_tax_master`(`tbe_billno`, `tbe_taxid`, `tbe_total_value`, `tbe_label`,tbe_dayclose) 
+    SELECT billno,t.amc_id,t.amc_value,concat(t.amc_label,' (',t.amc_value,')'),daytax
+    from tbl_extra_tax_master t,tbl_online_tax tx
+    where tx.tox_tax_id = t.amc_id  AND  tx.tox_partner = FLOOR_ID and t.amc_enable_ta = 'Y'  AND t.amc_active = 'Y' and t.amc_unit ='V' and t.amc_item_tax = 'N';
+      
+    
+    OPEN cur2;
+
+    read_loop: LOOP
+    FETCH cur2 INTO BILL_SLNO, MENUID, AMOUNT,excempt_tax;
+
+    IF done THEN
+
+      LEAVE read_loop;
+    END IF;
+     
+    IF(excempt_tax ='N')then
+    begin
+      
+      INSERT INTO `tbl_takeaway_bill_extra_tax_details`(`tbet_billno`, `tbet_slno`, `tbet_tax_id`,tbet_menuid, `tbet_tax_value`,tbet_tax_amount,tbet_daycolse)
+      SELECT billno,BILL_SLNO,t.mtm_tax_id,MENUID,e.amc_value,(((AMOUNT-discount_per_item)*e.amc_value)/100) ,daytax
+      from tbl_menu_tax_master t 
+      left join tbl_extra_tax_master e on e.amc_id = t.mtm_tax_id 
+      where t.mtm_menuid = MENUID AND e.amc_active = 'Y' and e.amc_unit ='P' and e.amc_enable_ta = 'Y';
+      
+      INSERT INTO `tbl_takeaway_bill_extra_tax_details`(`tbet_billno`, `tbet_slno`, `tbet_tax_id`,tbet_menuid, `tbet_tax_value`,tbet_tax_amount,tbet_daycolse)
+       SELECT billno,BILL_SLNO,t.mtm_tax_id,MENUID,e.amc_value,e.amc_value,daytax
+      from tbl_menu_tax_master t 
+      left join tbl_extra_tax_master e on e.amc_id = t.mtm_tax_id 
+      where t.mtm_menuid = MENUID AND e.amc_active = 'Y' and e.amc_unit ='V'  and e.amc_enable_ta = 'Y';
+    
+    end;
+    end if;
+   
+    END LOOP;
+    CLOSE cur2;
+
+    INSERT INTO `tbl_takeaway_bill_extra_tax_master`(`tbe_billno`, `tbe_taxid`, `tbe_total_value`, `tbe_label`,tbe_dayclose)
+    SELECT billno,et.tbet_tax_id,SUM(et.tbet_tax_amount),concat(amc_symbol,amc_label,' (',amc_value,'%)') ,daytax
+    FROM tbl_takeaway_bill_extra_tax_details et left join tbl_extra_tax_master e on e.amc_id = et.tbet_tax_id
+    WHERE e.amc_item_tax = 'Y' AND et.tbet_billno = billno GROUP BY et.tbet_tax_id;
+
+  END;
+  ELSEIF(mode = 'HD') then
+  BEGIN
+  
+   
+    
+    SELECT tab_dayclosedate,tab_taxable_amount,tab_discountvalue INTO daytax,taxable_amount,discount FROM  tbl_takeaway_billmaster WHERE tab_billno = billno;
+    SELECT count(*) INTO noofitems from tbl_takeaway_billdetails where tab_billno = billno and tab_status != 'Cancelled';
+    if(discount>0.00)THEN
+      set discount_per_item = (discount/noofitems);
+    else
+      set discount_per_item = 0;
+    end if;
+
+      
+    INSERT INTO `tbl_takeaway_bill_extra_tax_master`(`tbe_billno`, `tbe_taxid`, `tbe_total_value`, `tbe_label`,tbe_dayclose) 
+    SELECT billno,t.amc_id,TRUNCATE(((taxable_amount*t.amc_value)/100),3),concat(t.amc_label,' (',t.amc_value,'%)'),daytax
+    from tbl_extra_tax_master t,tbl_online_tax tx
+    where tx.tox_tax_id = t.amc_id  AND  tx.tox_partner = FLOOR_ID and t.amc_enable_hd = 'Y'  AND t.amc_active = 'Y' and t.amc_unit ='P' and t.amc_item_tax = 'N';
+    
+    INSERT INTO `tbl_takeaway_bill_extra_tax_master`(`tbe_billno`, `tbe_taxid`, `tbe_total_value`, `tbe_label`,tbe_dayclose) 
+    SELECT billno,t.amc_id,t.amc_value,concat(t.amc_label,' (',t.amc_value,')'),daytax
+    from tbl_extra_tax_master t,tbl_online_tax tx
+    where tx.tox_tax_id = t.amc_id  AND  tx.tox_partner = FLOOR_ID and t.amc_enable_hd = 'Y'  AND t.amc_active = 'Y' and t.amc_unit ='V' and t.amc_item_tax = 'N';
+
+    OPEN cur2;
+
+    read_loop: LOOP
+    FETCH cur2 INTO BILL_SLNO, MENUID, AMOUNT,excempt_tax;
+
+    IF done THEN
+
+      LEAVE read_loop;
+    END IF;
+     
+    IF(excempt_tax ='N')then
+    begin
+      
+      INSERT INTO `tbl_takeaway_bill_extra_tax_details`(`tbet_billno`, `tbet_slno`, `tbet_tax_id`,tbet_menuid, `tbet_tax_value`,tbet_tax_amount,tbet_daycolse)
+      SELECT billno,BILL_SLNO,t.mtm_tax_id,MENUID,e.amc_value,(((AMOUNT-discount_per_item)*e.amc_value)/100) ,daytax
+      from tbl_menu_tax_master t 
+      left join tbl_extra_tax_master e on e.amc_id = t.mtm_tax_id 
+      where t.mtm_menuid = MENUID AND e.amc_active = 'Y' and e.amc_unit ='P' and e.amc_enable_hd = 'Y';
+      
+      INSERT INTO `tbl_takeaway_bill_extra_tax_details`(`tbet_billno`, `tbet_slno`, `tbet_tax_id`,tbet_menuid, `tbet_tax_value`,tbet_tax_amount,tbet_daycolse)
+       SELECT billno,BILL_SLNO,t.mtm_tax_id,MENUID,e.amc_value,e.amc_value,daytax
+      from tbl_menu_tax_master t 
+      left join tbl_extra_tax_master e on e.amc_id = t.mtm_tax_id 
+      where t.mtm_menuid = MENUID AND e.amc_active = 'Y' and e.amc_unit ='V'  and e.amc_enable_hd = 'Y';
+    
+    end;
+    end if;
+   
+    END LOOP;
+    CLOSE cur2;
+
+    INSERT INTO `tbl_takeaway_bill_extra_tax_master`(`tbe_billno`, `tbe_taxid`, `tbe_total_value`, `tbe_label`,tbe_dayclose)
+    SELECT billno,et.tbet_tax_id,SUM(et.tbet_tax_amount),concat(amc_symbol,amc_label,' (',amc_value,'%)') ,daytax
+    FROM tbl_takeaway_bill_extra_tax_details et left join tbl_extra_tax_master e on e.amc_id = et.tbet_tax_id
+    WHERE e.amc_item_tax = 'Y' AND et.tbet_billno = billno GROUP BY et.tbet_tax_id;
+
+  END;
+  ELSEIF((mode = 'CS')) then
+  BEGIN
+  
+  
+  
+    SELECT tab_dayclosedate,tab_taxable_amount,tab_discountvalue INTO daytax,taxable_amount,discount FROM  tbl_takeaway_billmaster WHERE tab_billno = billno;
+    SELECT count(*) INTO noofitems from tbl_takeaway_billdetails where tab_billno = billno and tab_status != 'Cancelled';
+    if(discount>0.00)THEN
+    
+    set discount_per_item = (discount/noofitems);
+    else
+      set discount_per_item = 0;
+    end if;
+    
+    
+    
+    
+
+    
+    INSERT INTO `tbl_takeaway_bill_extra_tax_master`(`tbe_billno`, `tbe_taxid`, `tbe_total_value`, `tbe_label`,tbe_dayclose) 
+    SELECT billno,t.amc_id,TRUNCATE(((taxable_amount*t.amc_value)/100),3),concat(t.amc_label,' (',t.amc_value,'%)'),daytax
+    from tbl_extra_tax_master t
+    where t.amc_enable_cs = 'Y'  AND t.amc_active = 'Y' and t.amc_unit ='P' and t.amc_item_tax = 'N';
+    
+    INSERT INTO `tbl_takeaway_bill_extra_tax_master`(`tbe_billno`, `tbe_taxid`, `tbe_total_value`, `tbe_label`,tbe_dayclose) 
+    SELECT billno,t.amc_id,t.amc_value,concat(t.amc_label,' (',t.amc_value,')'),daytax
+    from tbl_extra_tax_master t
+    where t.amc_enable_cs = 'Y'  AND t.amc_active = 'Y' and t.amc_unit ='V' and t.amc_item_tax = 'N';
+      
+    
+    OPEN cur2;
+
+    read_loop: LOOP
+    FETCH cur2 INTO BILL_SLNO, MENUID, AMOUNT,excempt_tax;
+
+    IF done THEN
+
+      LEAVE read_loop;
+    END IF;
+     
+    IF(excempt_tax ='N')then
+    begin
+      
+        
+        
+      INSERT INTO `tbl_takeaway_bill_extra_tax_details`(`tbet_billno`, `tbet_slno`, `tbet_tax_id`,tbet_menuid, `tbet_tax_value`,tbet_tax_amount,tbet_daycolse)
+      SELECT billno,BILL_SLNO,t.mtm_tax_id,MENUID,e.amc_value,(((AMOUNT-discount_per_item)*e.amc_value)/100) ,daytax
+      from tbl_menu_tax_master t 
+      left join tbl_extra_tax_master e on e.amc_id = t.mtm_tax_id 
+      where t.mtm_menuid = MENUID AND e.amc_active = 'Y' and e.amc_unit ='P' and e.amc_enable_cs = 'Y';
+      
+      INSERT INTO `tbl_takeaway_bill_extra_tax_details`(`tbet_billno`, `tbet_slno`, `tbet_tax_id`,tbet_menuid, `tbet_tax_value`,tbet_tax_amount,tbet_daycolse)
+       SELECT billno,BILL_SLNO,t.mtm_tax_id,MENUID,e.amc_value,e.amc_value,daytax
+      from tbl_menu_tax_master t 
+      left join tbl_extra_tax_master e on e.amc_id = t.mtm_tax_id 
+      where t.mtm_menuid = MENUID AND e.amc_active = 'Y' and e.amc_unit ='V'  and e.amc_enable_cs = 'Y';
+    
+    end;
+    end if;
+   
+    END LOOP;
+    CLOSE cur2;
+
+    INSERT INTO `tbl_takeaway_bill_extra_tax_master`(`tbe_billno`, `tbe_taxid`, `tbe_total_value`, `tbe_label`,tbe_dayclose)
+    SELECT billno,et.tbet_tax_id,SUM(et.tbet_tax_amount),concat(amc_symbol,amc_label,' (',amc_value,'%)') ,daytax
+    FROM tbl_takeaway_bill_extra_tax_details et left join tbl_extra_tax_master e on e.amc_id = et.tbet_tax_id
+    WHERE e.amc_item_tax = 'Y' AND et.tbet_billno = billno GROUP BY et.tbet_tax_id;
+
+  END;
+  END IF;
+  
+
+
+end$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_ta_billpayment` (IN `billno` VARCHAR(15), IN `branchid` BIGINT, IN `paymodeid` INT, IN `amountpaid` DECIMAL(15,2), IN `upiamount` DECIMAL(15,3), IN `upitxnid` VARCHAR(100), IN `transactionamount` DECIMAL(15,2), IN `card_bank` INT, IN `complementary` CHAR(1), IN `remark` VARCHAR(200), IN `voucherid` VARCHAR(20), IN `couponcompany` VARCHAR(100), IN `couponamt` DECIMAL(15,2), IN `chequeno` VARCHAR(150), IN `chequebankname` VARCHAR(150), IN `chequeamount` DECIMAL(15,2), IN `credit` CHAR(1), IN `creditmasterid` VARCHAR(15), IN `creditamount` DECIMAL(15,2), IN `balanceamt` DECIMAL(15,2), IN `complementary_staff` VARCHAR(50), IN `payment_login` VARCHAR(15), IN `credit_remark_ta` VARCHAR(250), OUT `message` VARCHAR(250))  NO SQL
+proc_ta_billpayment:BEGIN
+    DECLARE DAYCLOSE DATE;
+       DECLARE payment_mode     VARCHAR(15);
+     DECLARE balance,bill_final decimal(15,3);
+     DECLARE staff_id,status_tobe VARCHAR(50);
+     DECLARE shift_permission       char(1);
+     DECLARE bmode,delivery_status char(2);
+ 
+
+ SELECT dc_day INTO DAYCLOSE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+
+
+  
+  SELECT ser_staffid,ser_shift_permission INTO staff_id,shift_permission
+  FROM tbl_staffmaster s
+  LEFT JOIN tbl_logindetails l ON l.ls_staffid =s.ser_staffid WHERE l.ls_username = payment_login;
+
+  IF(shift_permission = 'Y')THEN
+  BEGIN
+     IF NOT EXISTS(SELECT * FROM `tbl_shift_details` WHERE `sd_open_staff` = staff_id AND `sd_day` =DAYCLOSE AND  `sd_close` IS NULL) THEN
+     BEGIN
+
+       SET MESSAGE = Concat('Please open the shift for the current login');
+      LEAVE proc_ta_billpayment;
+
+     END;
+     END IF;
+
+
+  END;
+  END IF;
+  
+
+
+  SELECT pym_code INTO payment_mode FROM  tbl_paymentmode WHERE pym_id = paymodeid;
+
+  SELECT tab_netamt,tab_mode,trim(tab_delivery_status) INTO bill_final,bmode,delivery_status FROM tbl_takeaway_billmaster WHERE tab_billno = billno;
+
+  IF(payment_mode = 'cash')THEN
+  BEGIN
+    SET balance = (amountpaid-bill_final);
+  END;
+  ELSEIF(payment_mode = 'credit')THEN
+  BEGIN
+    IF ((amountpaid = '') OR (amountpaid = 'NULL')OR (amountpaid IS NULL))THEN
+      SET amountpaid =0;
+    END IF;
+
+    SET balance = ((amountpaid+transactionamount)- bill_final);
+  END;
+  ELSEIF(payment_mode = 'coupon')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  ELSEIF(payment_mode = 'voucher')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  ELSEIF(payment_mode = 'cheque')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  ELSEIF(payment_mode = 'credit_person')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  ELSEIF(payment_mode = 'complimentary')THEN
+  BEGIN
+    SET balance = balanceamt;
+
+    DELETE FROM `tbl_takeaway_bill_extra_tax_master` WHERE `tbe_billno` = billno;
+    UPDATE `tbl_takeaway_billmaster` SET `tab_taxable_amount` = 0, `tab_total` = `tab_subtotal_final`,`tab_taxable_amount` = `tab_subtotal_final`,tab_netamt = tab_subtotal_final,`tab_roundoff_value`= 0
+    WHERE tab_billno = billno;
+
+
+  END;
+  ELSEIF(payment_mode = 'upi')THEN
+  BEGIN
+    SET balance = balanceamt;
+  END;
+  END IF;
+
+
+
+       IF((voucherid = '') OR (voucherid = 'NULL'))THEN
+    SET voucherid = NULL;
+    END IF;
+
+    IF((couponcompany = '') OR (couponcompany = 'NULL'))THEN
+    SET couponcompany = NULL;
+    END IF;
+
+     IF((chequeno = '') OR (chequeno = 'NULL'))THEN
+    SET chequeno = NULL;
+    END IF;
+
+    IF((chequebankname = '') OR (chequebankname = 'NULL'))THEN
+    SET chequebankname = NULL;
+    END IF;
+
+    IF((creditmasterid = '') OR (creditmasterid = 'NULL'))THEN
+    SET creditmasterid = NULL;
+    END IF;
+
+    IF((complementary_staff = '') OR (complementary_staff = 'NULL'))THEN
+    SET complementary_staff = NULL;
+    END IF;
+
+    IF((upitxnid = '') OR (upitxnid = 'NULL'))THEN
+    SET upitxnid = NULL;
+    END IF;
+
+    SET MESSAGE = 'Error';
+
+    IF EXISTS(SELECT * FROM tbl_takeaway_billmaster WHERE tab_billno = billno AND tab_branchid = branchid AND  tab_paymode IS NOT NULL)THEN
+    BEGIN
+     SET MESSAGE = 'Payment already processed';
+    LEAVE proc_ta_billpayment;
+    END;
+    END IF;
+
+    IF (bmode = 'HD')THEN
+    BEGIN
+      IF(delivery_status = 'D')THEN
+        SET status_tobe = 'Closed';
+      ELSE
+      BEGIN
+        IF EXISTS(SELECT * FROM tbl_takeaway_billdetails WHERE tab_status NOT IN('Packed','Closed') AND tab_billno = billno )THEN
+        BEGIN
+          SET status_tobe = 'Processing';
+        END;
+        ELSE
+          SET status_tobe = 'Settled';
+        END IF;
+      END;
+      END IF;
+    END;
+    ELSEIF (bmode = 'TA')THEN
+    BEGIN
+      IF EXISTS(SELECT * FROM tbl_takeaway_billdetails WHERE tab_status NOT IN('Packed','Closed') AND tab_billno = billno )THEN
+      BEGIN
+        SET status_tobe = 'Processing';
+      END;
+      ELSE
+        SET status_tobe = 'Closed';
+      END IF;
+    END;
+    ELSE
+    BEGIN
+      SET status_tobe = 'Closed';
+    END;
+    END IF;
+
+
+
+        UPDATE tbl_takeaway_billmaster SET tab_paymode = paymodeid,tab_amountpaid =amountpaid,tab_upi_amount=upiamount,tab_upi_txn_id=upitxnid,tab_transactionamount = transactionamount,tab_amountbalace = balance,tab_transcbank = card_bank,tab_complimentary = complementary, tab_complimentaryremark = remark,tab_voucherid = voucherid,tab_couponcompany = couponcompany,
+        tab_couponamt = couponamt,tab_chequeno= chequeno, tab_chequebankname = chequebankname, tab_chequebankamount = chequeamount, tab_credit = credit,
+        tab_creditmasterid = creditmasterid,tab_status = status_tobe,tab_payment_settled ='Y',tab_settlement_login=payment_login,tab_creditremark=credit_remark_ta,tab_settlement_time = now()
+        WHERE tab_billno = billno AND tab_branchid = branchid;
+
+     IF(credit = 'Y') THEN
+    BEGIN
+
+        INSERT INTO `tbl_credit_details`(`cd_billno`,cd_modeofentry, `cd_masterid`, `cd_amount`,cd_dayclosedate)VALUES(billno,'TA',creditmasterid,creditamount,DAYCLOSE);
+
+    END;
+    END IF;
+
+  IF(paymodeid = 2) THEN
+      BEGIN
+
+   UPDATE tbl_bill_card_payments SET mc_billno=billno WHERE mc_billno=concat('temp_',billno);
+END;
+ELSE
+BEGIN
+DELETE FROM tbl_bill_card_payments  WHERE mc_billno=concat('temp_',billno);
+END;
+END IF;
+
+DELETE FROM `tbl_bill_card_payments` WHERE ((`mc_billno` = '') OR (`mc_billno` IS NULL));
+
+
+    SET MESSAGE = 'Payment succesfully processed';
+    
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_ta_bill_reorder` (IN `bill_number` VARCHAR(15), IN `temp_bill_number` VARCHAR(15))  NO SQL
+BEGIN
+
+  update tbl_takeaway_billmaster  set tab_billno = temp_bill_number,tab_bill_reorder = bill_number,tab_status ='Generated' where tab_billno = bill_number;
+  update tbl_takeaway_billdetails set tab_billno = temp_bill_number,tab_status ='Generated' where tab_billno = bill_number;
+  
+  
+
+
+
+
+
+
+
+
+
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_ta_discount` (IN `temp_billno` VARCHAR(15), IN `branchid` BIGINT, IN `discount_of` FLOAT, IN `discount_unit` CHAR(1), IN `discountid` VARCHAR(20), IN `loginid` VARCHAR(20), IN `redeem` DECIMAL(15,3), OUT `message` VARCHAR(250))  MODIFIES SQL DATA
+proc_ta_discount:BEGIN
+  DECLARE nearest_round_off decimal(5,4);
+  DECLARE discount_mode,ENABLE_EXTRA_TAX,discount char(1);
+  DECLARE billcount,custcount,bill_ref_count INT;
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE discountof float;
+  DECLARE del_tax,subtotal,finaltotal,discountvalue,sum_extra_tax,tax_exempt_total,taxable_amount,discount_tax_exempt,delivery_charge decimal(15,3);
+  DECLARE after_roundoff,roundoff_value,discountvalue_P,tax_total,rate_combo decimal(15,3);
+  DECLARE discount_label varchar(10);
+  DECLARE bill_custom_message varchar(250);
+  DECLARE bmode char(2);
+  DECLARE decimal1,FLOOR_ID int;
+ DECLARE uaetax char(1);
+   DECLARE uaeval decimal(15,3);
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+  SELECT be_decimal INTO decimal1 FROM tbl_branchmaster ;
+  
+   SELECT SUM(RATE) into rate_combo FROM(SELECT DISTINCT cbd_count_combo_ordering, cbd_combo_total_rate AS RATE  FROM tbl_combo_bill_details_ta WHERE `cbd_billno` = temp_billno)Z;
+   
+  if(rate_combo is NULL)THEN
+  SET rate_combo = 0;
+  END IF;
+  
+ SELECT sum(`tab_amount`) INTO subtotal FROM `tbl_takeaway_billdetails` WHERE `tab_billno` = temp_billno;
+  
+  if(subtotal is NULL)THEN
+  SET subtotal = 0;
+  END IF;
+  
+  set subtotal = rate_combo + subtotal;
+
+
+    SELECT be_uae_tax_concept,be_uae_tax_value INTO uaetax,uaeval FROM  tbl_branchmaster;
+   
+   UPDATE tbl_takeaway_billmaster SET tab_subtotal = subtotal  WHERE tab_billno = temp_billno;
+   
+   
+
+  
+  
+  
+  
+  SELECT tab_mode,tab_food_partner INTO bmode,FLOOR_ID FROM tbl_takeaway_billmaster WHERE tab_billno = temp_billno;
+  SELECT bsth_nearest_roundoff,bsth_delivery_charge INTO nearest_round_off,delivery_charge FROM tbl_branch_settings_ta_hd WHERE bsth_branchid = branchid;
+   IF((trim(discountid) = 'none')or(trim(discountid) = '')or(trim(discountid) = '0'))then
+    set  discountid = NULL;
+  END IF;
+  SET finaltotal = 0;
+  SET taxable_amount = 0;
+  SET tax_exempt_total = 0;
+  SET bill_custom_message = NULL;
+  SET discount = 'Y';
+  IF(discount = 'Y')THEN
+  BEGIN
+    IF(discountid IS NOT NULL) THEN
+     BEGIN
+      SELECT ds_discountof,ds_mode INTO discountof,discount_mode FROM  tbl_discountmaster WHERE ds_discountid = discountid;
+     END;
+     ELSEIF (discountid IS NULL) THEN
+     BEGIN
+        SET discountof = discount_of;
+        SET discount_mode = discount_unit;
+        SET discountid = NULL;
+     END;
+     END IF;
+    IF(discount_mode = 'P')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(((discountof * subtotal)/100),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+      SET discount_label = CONCAT('(',discountof,'%)');
+    END;
+    ELSEIF(discount_mode = 'V')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(discountof,3);
+      SET discountvalue_P = TRUNCATE(((discountof * 100)/subtotal),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+    END;
+    END IF;
+  END;
+  ELSE
+  BEGIN
+    SET discountvalue = 0.00;
+    SET discount_label = NULL;
+    SET discountid = NULL; 
+    set discountof = 0.00;
+  END;
+  END IF;
+  if(redeem>0) then
+  Begin
+    UPDATE tbl_takeaway_billmaster SET tab_redeem_amount=redeem WHERE tab_billno = temp_billno;
+    Set subtotal=subtotal-redeem;
+  End;
+  End if;
+
+if(uaetax =  'Y') then
+  Begin
+  
+    set del_tax=subtotal/(1+(uaeval/100));
+  
+  set subtotal=del_tax;
+  
+  End;
+  End if;
+
+  IF(subtotal<0)THEN
+  BEGIN
+      SET Message = 'DISCOUNT GIVEN MORE THAN BILL AMOUNT';
+      LEAVE proc_ta_discount;
+  END;
+  ELSEIF(subtotal>0)THEN
+  BEGIN
+    UPDATE tbl_takeaway_billmaster SET  tab_subtotal_final = subtotal,tab_discountvalue = discountvalue,tab_discount_label = discount_label,
+    tab_discountid = discountid,tab_discount_mode = discount_mode,tab_discount_of =discountof
+    WHERE tab_billno = temp_billno;
+  END;
+  END IF;
+  IF EXISTS(SELECT * FROM tbl_takeaway_billdetails WHERE tab_billno = temp_billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster
+  WHERE mr_excempt_tax  ='Y'))THEN
+  BEGIN
+    SELECT sum(tab_amount) INTO tax_exempt_total FROM tbl_takeaway_billdetails
+    WHERE tab_billno = temp_billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+    IF(discount ='Y')THEN
+    BEGIN
+      IF(discount_mode = 'P')THEN
+      BEGIN                           
+          SET discount_tax_exempt = REPLACE(FORMAT(((discountof * tax_exempt_total)/100),decimal1), ',', '');
+          SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      ELSEIF(discount_mode = 'V')THEN
+      BEGIN
+        SET discount_tax_exempt = REPLACE(FORMAT(((discountvalue_P * tax_exempt_total)/100),decimal1), ',', '');
+        SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      END IF;
+    END;
+    END IF;
+    SET taxable_amount = subtotal - tax_exempt_total;
+    SET subtotal = taxable_amount;
+    UPDATE tbl_takeaway_billdetails SET tab_symbol_for_tax = '*' WHERE  tab_billno = temp_billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+    SET bill_custom_message = concat('* TAX EXEMPTED AMOUNT - ',tax_exempt_total,'/b TAXABLE AMOUNT - ',taxable_amount);
+  END;
+  ELSE
+  BEGIN
+    SET taxable_amount = subtotal;
+    SET tax_exempt_total = 0;
+  END;
+  END IF;
+  UPDATE tbl_takeaway_billmaster SET  tab_tax_exempt = tax_exempt_total,tab_taxable_amount = taxable_amount WHERE tab_billno = temp_billno;
+  IF(taxable_amount > 0 ) THEN
+  BEGIN
+  DELETE FROM `tbl_takeaway_bill_extra_tax_master` WHERE `tbe_billno` = temp_billno;
+  DELETE FROM  tbl_takeaway_bill_extra_tax_details WHERE `tbet_billno` = temp_billno;
+    CALL proc_tax(temp_billno,'TA',FLOOR_ID);
+  END;
+  END IF;
+  if exists( select *FROM  tbl_takeaway_bill_extra_tax_master WHERE tbe_billno = temp_billno)then
+  begin
+     SELECT REPLACE(FORMAT(SUM(tbe_total_value),decimal1), ',', '')INTO tax_total FROM tbl_takeaway_bill_extra_tax_master WHERE tbe_billno = temp_billno;
+  END;
+  ELSE 
+    SET tax_total = 0;
+  END IF;
+  SET finaltotal = taxable_amount + tax_exempt_total + tax_total;
+  IF((finaltotal != 0)OR (finaltotal > 0))THEN
+  BEGIN
+    IF(nearest_round_off =0) THEN
+    BEGIN
+      SET after_roundoff = finaltotal;
+      SET roundoff_value = 0.00;
+    END;
+    ELSE
+    BEGIN
+      SET after_roundoff = (nearest_round_off *ROUND(finaltotal/ nearest_round_off));
+       SET roundoff_value =  (after_roundoff - finaltotal);
+    END;
+    END IF;
+      IF(bmode = 'HD') then
+      begin
+        if(delivery_charge>0) then
+        begin
+            set after_roundoff = after_roundoff + delivery_charge;
+        end;
+        end if;
+      end;
+      else
+        set delivery_charge = 0;
+      end if;  
+   UPDATE tbl_takeaway_billmaster SET tab_total= finaltotal,tab_netamt = after_roundoff,tab_roundoff_value = roundoff_value,tab_bill_gen_login = loginid,
+        tab_comments =  bill_custom_message, tab_tax_exempt = tax_exempt_total,tab_taxable_amount = taxable_amount,tab_delivery_charge = delivery_charge
+        WHERE tab_billno = temp_billno;
+        
+        
+        IF EXISTS(select * from tbl_takeaway_billmaster where tab_billno = temp_billno AND tab_paymode IS NOT NULL) THEN
+        BEGIN
+                
+        UPDATE tbl_takeaway_billmaster SET tab_amountbalace = ((tab_transactionamount+tab_amountpaid)-tab_netamt), cloud_sync ='Y' WHERE tab_billno = temp_billno;
+        
+        END;
+        END IF;
+
+   END;
+   END IF;
+   SET message = 'Discount applied succefully!';
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_ta_discount_after` (IN `temp_billno` VARCHAR(15), IN `branchid` BIGINT, IN `discount_of` FLOAT, IN `discount_unit` CHAR(1), IN `discountid` VARCHAR(20), IN `loginid` VARCHAR(20), IN `redeem` DECIMAL(15,3), OUT `message` VARCHAR(250))  MODIFIES SQL DATA
+proc_ta_discount_after:BEGIN
+  DECLARE nearest_round_off decimal(5,4);
+  DECLARE discount_mode,ENABLE_EXTRA_TAX,discount char(1);
+  DECLARE billcount,custcount,bill_ref_count INT;
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE discountof float;
+  DECLARE del_tax,subtotal,finaltotal,discountvalue,sum_extra_tax,tax_exempt_total,taxable_amount,discount_tax_exempt,delivery_charge decimal(15,3);
+  DECLARE after_roundoff,roundoff_value,discountvalue_P,tax_total,rate_combo decimal(15,3);
+  DECLARE discount_label varchar(10);
+  DECLARE bill_custom_message varchar(250);
+  DECLARE bmode char(2);
+  DECLARE decimal1,FLOOR_ID int;
+    DECLARE uaetax char(1);
+   DECLARE uaeval decimal(15,3);
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+  SELECT be_decimal INTO decimal1 FROM tbl_branchmaster ;
+  
+   SELECT SUM(RATE) into rate_combo FROM(SELECT DISTINCT cbd_count_combo_ordering, cbd_combo_total_rate AS RATE  FROM tbl_combo_bill_details_ta WHERE `cbd_billno` = temp_billno)Z;
+   
+  if(rate_combo is NULL)THEN
+  SET rate_combo = 0;
+  END IF;
+  
+ SELECT sum(`tab_amount`) INTO subtotal FROM `tbl_takeaway_billdetails` WHERE `tab_billno` = temp_billno;
+  
+  if(subtotal is NULL)THEN
+  SET subtotal = 0;
+  END IF;
+  
+  set subtotal = rate_combo + subtotal;
+
+   SELECT be_uae_tax_concept,be_uae_tax_value INTO uaetax,uaeval FROM  tbl_branchmaster;
+   
+   UPDATE tbl_takeaway_billmaster SET tab_subtotal = subtotal  WHERE tab_billno = temp_billno;
+   
+   
+
+  
+  SELECT tab_mode,tab_food_partner INTO bmode,FLOOR_ID FROM tbl_takeaway_billmaster WHERE tab_billno = temp_billno;
+  SELECT bsth_nearest_roundoff,bsth_delivery_charge INTO nearest_round_off,delivery_charge FROM tbl_branch_settings_ta_hd WHERE bsth_branchid = branchid;
+   IF((trim(discountid) = 'none')or(trim(discountid) = '')or(trim(discountid) = '0'))then
+    set  discountid = NULL;
+  END IF;
+  SET finaltotal = 0;
+  SET taxable_amount = 0;
+  SET tax_exempt_total = 0;
+  SET bill_custom_message = NULL;
+  SET discount = 'Y';
+  IF(discount = 'Y')THEN
+  BEGIN
+    IF(discountid IS NOT NULL) THEN
+     BEGIN
+      SELECT ds_discountof,ds_mode INTO discountof,discount_mode FROM  tbl_discountmaster WHERE ds_discountid = discountid;
+     END;
+     ELSEIF (discountid IS NULL) THEN
+     BEGIN
+        SET discountof = discount_of;
+        SET discount_mode = discount_unit;
+        SET discountid = NULL;
+     END;
+     END IF;
+    IF(discount_mode = 'P')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(((discountof * subtotal)/100),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+      SET discount_label = CONCAT('(',discountof,'%)');
+    END;
+    ELSEIF(discount_mode = 'V')THEN
+    BEGIN
+      SET discountvalue = TRUNCATE(discountof,3);
+      SET discountvalue_P = TRUNCATE(((discountof * 100)/subtotal),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+    END;
+    END IF;
+  END;
+  ELSE
+  BEGIN
+    SET discountvalue = 0.00;
+    SET discount_label = NULL;
+    SET discountid = NULL; 
+    set discountof = 0.00;
+  END;
+  END IF;
+  if(redeem>0) then
+  Begin
+    UPDATE tbl_takeaway_billmaster SET tab_redeem_amount=redeem WHERE tab_billno = temp_billno;
+    Set subtotal=subtotal-redeem;
+  End;
+  End if;
+  
+   if(uaetax =  'Y') then
+  Begin
+  
+    set del_tax=subtotal/(1+(uaeval/100));
+  
+  set subtotal=del_tax;
+  
+  End;
+  End if;
+  
+  
+  IF(subtotal<0)THEN
+  BEGIN
+      SET Message = 'DISCOUNT GIVEN MORE THAN BILL AMOUNT';
+      LEAVE proc_ta_discount_after;
+  END;
+  ELSEIF(subtotal>0)THEN
+  BEGIN
+    UPDATE tbl_takeaway_billmaster SET  tab_subtotal_final = subtotal,tab_discountvalue = discountvalue,tab_discount_label = discount_label,
+    tab_discountid = discountid,tab_discount_mode = discount_mode,tab_discount_of =discountof
+    WHERE tab_billno = temp_billno;
+  END;
+  END IF;
+  IF EXISTS(SELECT * FROM tbl_takeaway_billdetails WHERE tab_billno = temp_billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster
+  WHERE mr_excempt_tax  ='Y'))THEN
+  BEGIN
+    SELECT sum(tab_amount) INTO tax_exempt_total FROM tbl_takeaway_billdetails
+    WHERE tab_billno = temp_billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+    IF(discount ='Y')THEN
+    BEGIN
+      IF(discount_mode = 'P')THEN
+      BEGIN                           
+          SET discount_tax_exempt = REPLACE(FORMAT(((discountof * tax_exempt_total)/100),decimal1), ',', '');
+          SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      ELSEIF(discount_mode = 'V')THEN
+      BEGIN
+        SET discount_tax_exempt = REPLACE(FORMAT(((discountvalue_P * tax_exempt_total)/100),decimal1), ',', '');
+        SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      END IF;
+    END;
+    END IF;
+    SET taxable_amount = subtotal - tax_exempt_total;
+    SET subtotal = taxable_amount;
+    UPDATE tbl_takeaway_billdetails SET tab_symbol_for_tax = '*' WHERE  tab_billno = temp_billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+    SET bill_custom_message = concat('* TAX EXEMPTED AMOUNT - ',tax_exempt_total,'/b TAXABLE AMOUNT - ',taxable_amount);
+  END;
+  ELSE
+  BEGIN
+    SET taxable_amount = subtotal;
+    SET tax_exempt_total = 0;
+  END;
+  END IF;
+  UPDATE tbl_takeaway_billmaster SET  tab_tax_exempt = tax_exempt_total,tab_taxable_amount = taxable_amount WHERE tab_billno = temp_billno;
+  IF(taxable_amount > 0 ) THEN
+  BEGIN
+  DELETE FROM `tbl_takeaway_bill_extra_tax_master` WHERE `tbe_billno` = temp_billno;
+  DELETE FROM  tbl_takeaway_bill_extra_tax_details WHERE `tbet_billno` = temp_billno;
+    CALL proc_tax(temp_billno,bmode,FLOOR_ID);
+  END;
+  END IF;
+  if exists( select *FROM  tbl_takeaway_bill_extra_tax_master WHERE tbe_billno = temp_billno)then
+  begin
+     SELECT REPLACE(FORMAT(SUM(tbe_total_value),decimal1), ',', '')INTO tax_total FROM tbl_takeaway_bill_extra_tax_master WHERE tbe_billno = temp_billno;
+  END;
+  ELSE 
+    SET tax_total = 0;
+  END IF;
+  SET finaltotal = taxable_amount + tax_exempt_total + tax_total;
+  IF((finaltotal != 0)OR (finaltotal > 0))THEN
+  BEGIN
+    IF(nearest_round_off =0) THEN
+    BEGIN
+      SET after_roundoff = finaltotal;
+      SET roundoff_value = 0.00;
+    END;
+    ELSE
+    BEGIN
+      SET after_roundoff = (nearest_round_off *ROUND(finaltotal/ nearest_round_off));
+       SET roundoff_value =  (after_roundoff - finaltotal);
+    END;
+    END IF;
+      IF(bmode = 'HD') then
+      begin
+        if(delivery_charge>0) then
+        begin
+            set after_roundoff = after_roundoff + delivery_charge;
+        end;
+        end if;
+      end;
+      else
+        set delivery_charge = 0;
+      end if;  
+   UPDATE tbl_takeaway_billmaster SET tab_total= finaltotal,tab_netamt = after_roundoff,tab_roundoff_value = roundoff_value,tab_bill_gen_login = loginid,
+        tab_comments =  bill_custom_message, tab_tax_exempt = tax_exempt_total,tab_taxable_amount = taxable_amount,tab_delivery_charge = delivery_charge
+        WHERE tab_billno = temp_billno;
+        
+        
+        IF EXISTS(select * from tbl_takeaway_billmaster where tab_billno = temp_billno AND tab_paymode IS NOT NULL) THEN
+        BEGIN
+                
+        
+        
+        END;
+        END IF;
+
+   END;
+   END IF;
+   SET message = 'Discount applied succefully!';
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_ta_kot_cancel` (IN `billno` VARCHAR(15), IN `branchid` BIGINT, IN `bmode` CHAR(2), OUT `MESSAGE` VARCHAR(50))  MODIFIES SQL DATA
+proc_ta_kot_cancel:BEGIN
+  DECLARE prefix varchar(3);
+  DECLARE bdate varchar(6);
+  DECLARE finyear char(4);
+  DECLARE nearest_round_off decimal(5,4);
+  DECLARE billno_daily,discount_mode,kotbypass,ENABLE_EXTRA_TAX,KOT_CANCEL char(1);
+  DECLARE billcount,custcount,bill_ref_count,SERIES_SLNO INT;
+  DECLARE customerid3,customerid,BILL_REORDER varchar(15);
+  DECLARE kotstatus char(1);
+  DECLARE status_tobe varchar(100);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE discountof float;
+  DECLARE subtotal,finaltotal,discountvalue,sum_extra_tax,tax_exempt_total,taxable_amount,discount_tax_exempt decimal(15,3);
+  DECLARE after_roundoff,roundoff_value decimal(15,3);
+  DECLARE discount_label varchar(10);
+  DECLARE bill_ref varchar(30);
+  DECLARE eat_in_,cancel_msg varchar(100);
+  DECLARE bill_custom_message varchar(250);
+  DECLARE reorder_kotno VARCHAR(20);
+  DECLARE discount_of,discountvalue_P,tax_total,delivery_charge DECIMAL(15,3);
+  DECLARE discount_unit CHAR(1);
+  DECLARE discountid VARCHAR(20);
+  DECLARE discount CHAR(1);
+  DECLARE decimal1,FLOOR_ID int;
+  DECLARE redeem,rate_combo DECIMAL(15,3);
+   DECLARE pointadd,pointredeem DECIMAL (15,2);
+   DECLARE point_customer INT;
+   DECLARE uaetax char(1);
+  DECLARE uaeval,del_tax decimal(15,3);
+   SELECT be_decimal INTO decimal1 FROM tbl_branchmaster ;
+  SELECT be_uae_tax_concept,be_uae_tax_value INTO uaetax,uaeval FROM  tbl_branchmaster;
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+  SELECT `tab_discount_of`,tab_discount_mode,`tab_discountid`,tab_status,tab_redeem_amount,tab_mode INTO discount_of,discount_unit,discountid,status_tobe,redeem,bmode
+  FROM `tbl_takeaway_billmaster` WHERE tab_billno = billno;
+  IF((discount_of >0)or(discountid!='')or(discountid IS NOT NULL))then
+    SET discount = 'Y';
+  ELSE
+    SET discount = 'N';
+  END IF;
+  SELECT bsth_nearest_roundoff,bsth_delivery_charge
+  INTO nearest_round_off,delivery_charge
+  FROM tbl_branch_settings_ta_hd WHERE bsth_branchid = branchid;
+  
+  
+   SELECT SUM(RATE) into rate_combo FROM(SELECT DISTINCT cbd_count_combo_ordering, cbd_combo_total_rate AS RATE  FROM tbl_combo_bill_details_ta WHERE `cbd_billno` = billno)Z;
+   
+  if(rate_combo is NULL)THEN
+  SET rate_combo = 0;
+  END IF;
+  
+  SELECT sum(`tab_amount`) INTO subtotal FROM `tbl_takeaway_billdetails` WHERE `tab_billno` = billno;
+  
+  if(subtotal is NULL)THEN
+  SET subtotal = 0;
+  END IF;
+  
+  set subtotal = rate_combo + subtotal;
+
+  UPDATE tbl_takeaway_billmaster SET tab_subtotal = subtotal  WHERE tab_billno = billno;
+   
+
+  
+  
+  
+  
+  SELECT tab_bill_reorder,tab_kotno,tab_food_partner INTO BILL_REORDER,reorder_kotno ,FLOOR_ID
+  FROM tbl_takeaway_billmaster WHERE tab_billno = billno;
+  SET finaltotal = 0;
+  SET taxable_amount = 0;
+  SET tax_exempt_total = 0;
+  SET bill_custom_message = NULL;
+  IF(discount ='Y')THEN
+  BEGIN
+    IF((discountid != '0')OR(discountid IS NOT NULL)) THEN
+    BEGIN
+      SELECT ds_discountof,ds_mode INTO discountof,discount_mode FROM  tbl_discountmaster WHERE ds_discountid = discountid;
+    END;
+    ELSEIF ((discountid = '0')OR(discountid IS NULL)) THEN
+    BEGIN
+        SET discountof = discount_of;
+        SET discount_mode = discount_unit;
+        SET discountid = NULL;
+    END;
+    END IF;
+    SET discount_label = NULL;
+    IF(discount_mode = 'P')THEN
+    BEGIN
+      SET discountvalue =  TRUNCATE(((discountof * subtotal)/100),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+      SET discount_label = CONCAT('(',discountof,'%)');
+    END;
+    ELSEIF(discount_mode = 'V')THEN
+    BEGIN
+      SET discountvalue =  TRUNCATE(discountof,3);
+      SET discountvalue_P = TRUNCATE(((discountof * 100)/subtotal),3);
+      SET subtotal = TRUNCATE((subtotal - discountvalue),3);
+    END;
+    END IF;
+  END;
+  ELSE
+  BEGIN
+    SET discountvalue = 0.00;
+    SET discount_label = NULL;
+    SET discountid = NULL; 
+    SET discount_mode = NULL;
+  END;
+  END IF;
+  if(redeem>0) then
+  Begin
+    if(redeem<subtotal) then
+    Begin
+     UPDATE tbl_loyalty_pointadd_bill SET  lob_bill_amount = subtotal  WHERE lob_billno = billno;
+     Set subtotal=subtotal-redeem;
+    END;
+    ELSE 
+    Begin
+      SELECT `lob_point_add`,`lob_point_redeem`,`lob_loyalty_customer` INTO pointadd,pointredeem,point_customer
+      FROM `tbl_loyalty_pointadd_bill` WHERE lob_billno = billno;
+    UPDATE tbl_takeaway_billmaster SET tab_redeem_amount=0 where tab_billno = billno;
+      UPDATE tbl_loyalty_reg SET ly_points=(ly_points+pointredeem)-pointadd , ly_totalvisit=ly_totalvisit-1 where ly_id=point_customer;
+      DELETE FROM tbl_loyalty_pointadd_bill  WHERE lob_billno = billno;
+    END;  
+  End if;
+  End;
+  End if;
+  
+  if(uaetax =  'Y') then
+  Begin
+    set del_tax=subtotal/(1+(uaeval/100));
+    set subtotal=TRUNCATE(del_tax,3); 
+  End;
+  End if;
+  
+  IF(subtotal<0)THEN
+  BEGIN
+      SET Message = 'DISCOUNT GIVEN MORE THAN BILL AMOUNT';
+      LEAVE proc_ta_kot_cancel;
+  END;
+  ELSEIF(subtotal>0)THEN
+  BEGIN
+    UPDATE tbl_takeaway_billmaster SET  tab_subtotal_final = subtotal,tab_discountvalue = discountvalue,tab_discount_label = discount_label,tab_discountid = discountid
+    WHERE tab_billno = billno;
+  END;
+  END IF;
+  IF EXISTS(SELECT * FROM tbl_takeaway_billdetails WHERE tab_billno = billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster
+  WHERE mr_excempt_tax  ='Y'))THEN
+  BEGIN
+    SELECT sum(tab_amount) INTO tax_exempt_total FROM tbl_takeaway_billdetails
+    WHERE tab_billno = billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+    IF(discount ='Y')THEN
+
+    BEGIN
+      IF(discount_mode = 'P')THEN
+      BEGIN                            
+          SET discount_tax_exempt = REPLACE(FORMAT(((discountof * tax_exempt_total)/100),decimal1), ',', '');
+          SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      ELSEIF(discount_mode = 'V')THEN
+      BEGIN
+        SET discount_tax_exempt = REPLACE(FORMAT(((discountvalue_P * tax_exempt_total)/100),decimal1), ',', '');
+        SET tax_exempt_total = (tax_exempt_total - discount_tax_exempt);
+      END;
+      END IF;
+    END;
+    END IF;
+    SET taxable_amount = subtotal - tax_exempt_total;
+    SET subtotal = taxable_amount;
+    UPDATE tbl_takeaway_billdetails SET tab_symbol_for_tax = NULL WHERE  tab_billno = billno;
+    UPDATE tbl_takeaway_billdetails SET tab_symbol_for_tax = '*' WHERE  tab_billno = billno AND tab_menuid IN(SELECT mr_menuid  FROM  tbl_menumaster WHERE mr_excempt_tax ='Y');
+    SET bill_custom_message = concat('* TAX EXEMPTED AMOUNT - ',tax_exempt_total,'/b TAXABLE AMOUNT - ',taxable_amount);
+  END;
+  ELSE
+  BEGIN
+    SET taxable_amount = subtotal;
+    SET tax_exempt_total = 0;
+    UPDATE tbl_takeaway_billdetails SET tab_symbol_for_tax = NULL WHERE  tab_billno = billno;
+  END;
+  END IF;
+  UPDATE tbl_takeaway_billmaster SET  tab_tax_exempt = tax_exempt_total,tab_taxable_amount = taxable_amount WHERE tab_billno = billno;
+  IF(taxable_amount > 0 ) THEN
+  BEGIN
+    DELETE FROM `tbl_takeaway_bill_extra_tax_master` WHERE `tbe_billno` = billno;
+    DELETE FROM  tbl_takeaway_bill_extra_tax_details WHERE `tbet_billno` = billno;
+    CALL proc_tax(billno,bmode,FLOOR_ID);
+  END;
+  END IF;
+  
+   IF(taxable_amount = 0 ) THEN
+  BEGIN
+    DELETE FROM `tbl_takeaway_bill_extra_tax_master` WHERE `tbe_billno` = billno;
+    DELETE FROM  tbl_takeaway_bill_extra_tax_details WHERE `tbet_billno` = billno;
+    CALL proc_tax(billno,bmode,FLOOR_ID);
+  END;
+  END IF;
+  
+   if exists( select * FROM  tbl_takeaway_bill_extra_tax_master WHERE tbe_billno = billno)then
+  begin
+    SELECT REPLACE(FORMAT(SUM(tbe_total_value),decimal1), ',', '')INTO tax_total FROM tbl_takeaway_bill_extra_tax_master WHERE tbe_billno = billno;
+  END;
+  ELSE 
+    SET tax_total = 0;
+  END IF;
+  SET finaltotal = taxable_amount + tax_exempt_total + tax_total;
+  IF((finaltotal != 0)OR (finaltotal > 0))THEN
+  BEGIN
+    IF(nearest_round_off =0) THEN
+    BEGIN
+      SET after_roundoff = finaltotal;
+      SET roundoff_value = 0.00;
+    END;
+    ELSE
+    BEGIN
+      SET after_roundoff = (nearest_round_off *ROUND(finaltotal/ nearest_round_off));
+       SET roundoff_value =  (after_roundoff - finaltotal);
+    END;
+    END IF;
+    IF((bmode = 'TA')OR(bmode = 'CS')OR(bmode = 'HD'))THEN
+    BEGIN
+      if(finaltotal=0)then
+      begin
+        set status_tobe = 'Cancelled';
+      end;
+      end if;
+      IF(bmode = 'HD') then
+      begin
+        if(delivery_charge>0) then
+        begin
+            set after_roundoff = after_roundoff + delivery_charge;
+        end;
+        end if;
+      end;
+      else
+        set delivery_charge = 0;
+      end if;      
+      UPDATE tbl_takeaway_billmaster SET tab_total= finaltotal,tab_netamt = after_roundoff,
+      tab_status = status_tobe,tab_roundoff_value = roundoff_value,tab_comments =  bill_custom_message, 
+      tab_tax_exempt = tax_exempt_total,tab_taxable_amount = taxable_amount,tab_cancelledreason=cancel_msg,tab_delivery_charge = delivery_charge
+      WHERE tab_billno = billno;
+    END;
+    END IF;
+  END;
+  END IF;
+  set MESSAGE = finaltotal;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_temptakeaway` (IN `temp_billno` VARCHAR(15), IN `menuid` VARCHAR(30), IN `rate_type` VARCHAR(30), IN `portion` INT, IN `unit_type` VARCHAR(50), IN `unit_weight` DECIMAL(15,5), IN `unit_id` INT, IN `base_unit_id` INT, IN `qty` INT, IN `preferencetext` VARCHAR(300), IN `rate` DECIMAL(15,3), IN `branchid` BIGINT, IN `mode` VARCHAR(10), IN `order_from` VARCHAR(2), IN `slno` INT, IN `dish_type` VARCHAR(15), IN `food` INT)  MODIFIES SQL DATA
+proc_temptakeaway:BEGIN
+  DECLARE dailystock,dailystock_in_number,is_instock,discmenu char(1); 
+  DECLARE ratio DECIMAL(3,2);
+  DECLARE numberinstock DECIMAL(15,2);
+  DECLARE messsage,preference_old,addon_slno varchar(100);
+  DECLARE menuid_addon,oldqty,qt_withratio,qtystock_withratio,NEWqty,menu_stock_id,disc_slno,SLNO_OLD,diff_time,check1,check2 int;
+  DECLARE flag,FLAG_STATUS varchar(20);
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE item_base_rate,org_rate,new_rate DECIMAL(15,3);
+   DECLARE entrytime time;
+   SELECT GET_LOCK('tableorderentry', 4) INTO check1;
+   
+  IF(unit_type ='')THEN
+   SET unit_type = NULL;
+  END IF;
+  IF(unit_weight ='')THEN
+   SET unit_weight = 0;
+  END IF; 
+   IF(unit_id =0)THEN
+   SET unit_id = NULL;
+  END IF;
+  IF(base_unit_id = 0)THEN
+   SET base_unit_id = NULL;
+  END IF;
+   IF(portion = 0)THEN
+   SET portion = NULL;
+  END IF;
+  IF(dish_type ='')THEN
+   SET dish_type = NULL;
+  END IF;
+  SET org_rate = rate;
+  IF((rate!= 0 and dish_type IS NULL) OR(dish_type='COMBO'))THEN
+  BEGIN
+    SELECT mr_excempt_disc,mr_dailystock,mr_dailystock_in_number INTO discmenu,dailystock,dailystock_in_number
+    FROM tbl_menumaster WHERE mr_menuid = trim(menuid); 
+    SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+    
+    IF(mode = 'Add') THEN
+    BEGIN
+      IF(dailystock ='Y')then
+      begin
+        if(dailystock_in_number = 'Y')then
+        begin
+          if(rate_type = 'Portion')then
+          begin
+            select mk_stock_number into numberinstock from tbl_menustock where mk_menuid = menuid AND mk_portion=portion ;
+            SELECT mk_id INTO menu_stock_id FROM  tbl_menustock ms WHERE ms.mk_menuid = menuid AND  ms.mk_portion =  portion;
+          end;
+          elseif(rate_type= 'Unit') then
+          begin
+            if(unit_type = 'Packet')then
+            begin 
+              select m.mk_stock_number into numberinstock from tbl_menustock m where m.mk_menuid = menuid AND m.mk_unit_type = unit_type and m.mk_unit_weight = unit_weight and m.mk_unit_id = unit_id; 
+              SELECT mk_id INTO menu_stock_id FROM tbl_menustock ms 
+              WHERE ms.mk_menuid = menuid AND ms.mk_unit_type =  unit_type  AND ms.mk_unit_weight = unit_weight    AND  ms.mk_unit_id = unit_id;
+            end;
+            elseif(unit_type = 'Loose')then
+            begin  
+              select m.mk_stock_number into numberinstock from tbl_menustock m where m.mk_menuid = menuid AND m.mk_unit_type = unit_type and m.mk_base_unit_id = base_unit_id; 
+            end;
+            end if;
+          end;
+          end if;
+          if(numberinstock = 0.00) then
+          begin
+            SET messsage = 'Ordered Item is Stock Out';
+            LEAVE proc_temptakeaway;
+          end;
+          else
+          begin
+            if(qty > numberinstock)then
+            begin
+              SET messsage = 'Quantity ordered is less than in Stock';
+              LEAVE proc_temptakeaway;
+            end;
+            else 
+              set flag = 'Qty_Reduce';
+            end if;
+          end;
+          end if;
+        end;
+        else
+        begin
+          if(rate_type = 'Portion')then
+          begin
+            select mk_stock into is_instock from tbl_menustock where mk_menuid = menuid AND mk_portion = portion and mk_date = DAYCLOSEDATE;
+          end;
+          elseif(rate_type= 'Unit') then
+          begin
+            if(unit_type = 'Packet')then
+            begin 
+              select mk_stock into is_instock from tbl_menustock  where mk_menuid = menuid AND mk_unit_type = unit_type and mk_unit_weight = unit_weight and mk_unit_id = unit_id; 
+            end;
+            elseif(unit_type = 'Loose')then
+            begin  
+              select mk_stock into is_instock from tbl_menustock where mk_menuid = menuid AND mk_unit_type = unit_type and mk_base_unit_id = base_unit_id; 
+            end;
+            end if;
+          end;
+          end if; 
+          if(is_instock = 'N')then
+          begin
+            SET messsage = 'Ordered Item not in Stock';
+            LEAVE proc_temptakeaway;
+          end;
+          end if;
+        end;
+        end if;  
+      end;
+      end if;
+      IF(order_from = 'TA')then
+        SELECT mta_rate INTO item_base_rate FROM tbl_menuratetakeaway WHERE mta_menuid = trim(menuid) AND mta_unit_type = unit_type and mta_base_unit_id = base_unit_id and mta_food_partner = food;      
+      elseif(order_from = 'CS')then
+        SELECT mrc_rate  INTO item_base_rate FROM tbl_menurate_counter WHERE mrc_menuid = trim(menuid) AND mrc_unit_type = unit_type and mrc_base_unit_id = base_unit_id;   
+      end if;
+      IF NOT EXISTS(SELECT (1) FROM tbl_takeaway_billmaster WHERE tab_billno = temp_billno AND tab_branchid = branchid) THEN
+      BEGIN
+        INSERT INTO `tbl_takeaway_billmaster`(`tab_billno`, `tab_date`, `tab_time`, `tab_branchid`,`tab_status`,tab_mode) VALUES (temp_billno,current_date(),current_time(),branchid,'Generated',order_from);
+      END;
+      END IF;
+      if(rate_type = 'Portion')then
+      begin
+       IF(dish_type IS NULL) THEN
+        BEGIN
+            IF((slno is not NULL)and(slno != 0))THEN
+            BEGIN
+               IF EXISTS(SELECT (1) FROM tbl_takeaway_billdetails WHERE  tab_billno = temp_billno AND tab_menuid = menuid 
+                AND tab_portion =  portion AND tab_rate_type = rate_type and tab_rate = rate and tab_bill_addon_slno =slno and tab_regen_status_menu = 'N'  )THEN
+                BEGIN
+               
+               
+                  UPDATE tbl_takeaway_billdetails SET tab_qty = tab_qty + qty,  tab_preferencetext = CONCAT(preference_old,',',preferencetext)
+                  WHERE  tab_billno = temp_billno AND tab_menuid = menuid  
+                  AND tab_portion =  portion AND tab_rate_type = rate_type and tab_rate = rate and tab_bill_addon_slno =slno;
+                END;
+                ELSE
+                BEGIN
+               
+                  INSERT INTO `tbl_takeaway_billdetails`(`tab_billno`, `tab_slno`,tab_bill_addon_slno, `tab_menuid`,tab_rate_type,tab_unit_type ,`tab_portion`,tab_unit_weight,tab_unit_id,tab_base_unit_id,tab_base_rate, `tab_qty`, `tab_preferencetext`, `tab_rate`,`tab_status`,tab_org_rate,tab_exempt_disc) 
+                  VALUES (temp_billno,0,slno,menuid,rate_type,unit_type,portion,unit_weight,unit_id,base_unit_id,item_base_rate,qty,preferencetext,rate,'Generated',org_rate,discmenu);
+                END;
+                END IF;
+            END;
+          ELSE
+            BEGIN
+           
+                IF EXISTS(SELECT (1) FROM tbl_takeaway_billdetails WHERE  tab_billno = temp_billno AND tab_menuid = menuid 
+                AND tab_portion =  portion AND tab_rate_type = rate_type and tab_rate = rate and tab_bill_addon_slno is null and tab_regen_status_menu = 'N'   )THEN
+                BEGIN
+              
+                  SET FLAG_STATUS ='UPDATE';
+                  select tab_preferencetext into preference_old FROM tbl_takeaway_billdetails WHERE  tab_billno = temp_billno AND tab_menuid = menuid 
+                  AND tab_portion =  portion AND tab_rate_type = rate_type and tab_rate = rate AND tab_bill_addon_slno is null;
+                 
+                
+                 UPDATE tbl_takeaway_billdetails SET tab_qty = tab_qty + qty,  tab_preferencetext = CONCAT(preference_old,',',preferencetext)
+                  WHERE  tab_billno = temp_billno AND tab_menuid = menuid  AND tab_bill_addon_slno is null
+                  AND tab_portion =  portion;
+                END;
+                ELSE
+                BEGIN
+                 
+               
+                  SET FLAG_STATUS ='INSERT';
+                  INSERT INTO `tbl_takeaway_billdetails`(`tab_billno`, `tab_slno`, `tab_menuid`,tab_rate_type,tab_unit_type ,`tab_portion`,tab_unit_weight,tab_unit_id,tab_base_unit_id,tab_base_rate, `tab_qty`, `tab_preferencetext`, `tab_rate`,`tab_status`,tab_org_rate,tab_exempt_disc) 
+                  VALUES (temp_billno,0,menuid,rate_type,unit_type,portion,unit_weight,unit_id,base_unit_id,item_base_rate,qty,preferencetext,rate,'Generated',org_rate,discmenu);
+                END;
+                END IF;
+              end;
+        end if;
+      end;
+      ELSE
+        BEGIN
+        
+        
+          INSERT INTO `tbl_takeaway_billdetails`(`tab_billno`, `tab_slno`, `tab_menuid`,tab_rate_type,tab_unit_type ,`tab_portion`,tab_unit_weight,tab_unit_id,tab_base_unit_id,tab_base_rate, `tab_qty`, `tab_preferencetext`, `tab_rate`,`tab_status`,tab_org_rate,tab_exempt_disc) 
+          VALUES (temp_billno,0,menuid,rate_type,unit_type,portion,unit_weight,unit_id,base_unit_id,item_base_rate,qty,preferencetext,rate,'Generated',org_rate,discmenu);
+        
+        END;
+      END IF;
+      END;
+      ELSE
+      BEGIN
+        IF(unit_type = 'Packet')then
+        begin
+          IF EXISTS(SELECT (1) FROM tbl_takeaway_billdetails WHERE  tab_billno = temp_billno AND tab_menuid = menuid and tab_unit_type = unit_type and tab_unit_weight = unit_weight  AND tab_unit_id = unit_id and tab_rate = rate and tab_regen_status_menu = 'N'  ) THEN
+          BEGIN
+            SET FLAG_STATUS ='UPDATE';
+            select tab_preferencetext  into preference_old FROM tbl_takeaway_billdetails WHERE  tab_billno = temp_billno AND tab_menuid = menuid and tab_unit_type = unit_type and tab_unit_weight = unit_weight  AND tab_unit_id = unit_id and tab_rate = rate;
+            UPDATE tbl_takeaway_billdetails SET tab_qty = tab_qty + qty,  tab_preferencetext = CONCAT(preference_old,',',preferencetext)
+            WHERE  tab_billno = temp_billno AND tab_menuid = menuid 
+            and tab_unit_type = unit_type and tab_unit_weight = unit_weight AND tab_unit_id = unit_id;
+          END;
+          ELSE
+          BEGIN
+             SET FLAG_STATUS ='INSERT';
+            INSERT INTO `tbl_takeaway_billdetails`(`tab_billno`, `tab_slno`, `tab_menuid`,tab_rate_type,tab_unit_type ,`tab_portion`,tab_unit_weight,tab_unit_id,tab_base_unit_id,tab_base_rate, `tab_qty`, `tab_preferencetext`, `tab_rate`,`tab_status`,tab_org_rate,tab_exempt_disc) 
+             VALUES (temp_billno,0,menuid,rate_type,unit_type,portion,unit_weight,unit_id,base_unit_id,item_base_rate,qty,preferencetext,rate,'Generated',org_rate,discmenu);
+          END;
+          END IF;
+        END;
+        ELSE
+        BEGIN
+          IF EXISTS(SELECT (1) FROM tbl_takeaway_billdetails WHERE  tab_billno = temp_billno AND tab_menuid = menuid and tab_unit_type = unit_type and tab_unit_weight = unit_weight and tab_base_unit_id = base_unit_id and tab_rate = rate and tab_regen_status_menu = 'N' ) THEN
+          BEGIN
+            SET FLAG_STATUS ='UPDATE';
+            select tab_preferencetext  into preference_old FROM tbl_takeaway_billdetails WHERE  tab_billno = temp_billno AND tab_menuid = menuid and tab_unit_type = unit_type and tab_unit_weight = unit_weight and tab_base_unit_id = base_unit_id and tab_rate = rate;
+            UPDATE tbl_takeaway_billdetails SET tab_qty = tab_qty + qty,  tab_preferencetext = CONCAT(preference_old,',',preferencetext)
+            WHERE  tab_billno = temp_billno AND tab_menuid = menuid 
+            and tab_unit_type = unit_type and tab_unit_weight = unit_weight and tab_base_unit_id = base_unit_id ;
+          END;
+          ELSE
+          BEGIN
+            SET FLAG_STATUS ='INSERT';
+            INSERT INTO `tbl_takeaway_billdetails`(`tab_billno`, `tab_slno`, `tab_menuid`,tab_rate_type,tab_unit_type ,`tab_portion`,tab_unit_weight,tab_unit_id,tab_base_unit_id,tab_base_rate, `tab_qty`, `tab_preferencetext`, `tab_rate`,`tab_status`,tab_org_rate,tab_exempt_disc) 
+            VALUES (temp_billno,0,menuid,rate_type,unit_type,portion,unit_weight,unit_id,base_unit_id,item_base_rate,qty,preferencetext,rate,'Generated',org_rate,discmenu);
+          END;
+          END IF;
+        END;
+        END IF;  
+      END;
+      END IF;
+      SELECT MAX(tab_slno) into disc_slno  FROM tbl_takeaway_billdetails  where tab_billno = temp_billno;
+      CALL proc_itemorder_discount(trim(menuid),'TA',temp_billno,disc_slno,@message_discount);
+      IF(FLAG_STATUS ='INSERT')THEN
+      BEGIN
+        IF(disc_slno != 1)then
+        begin
+          select tab_rate into new_rate from tbl_takeaway_billdetails where tab_billno = temp_billno and tab_slno = disc_slno;
+          IF EXISTS(SELECT * FROM tbl_takeaway_billdetails WHERE tab_billno = temp_billno and tab_menuid = menuid and tab_rate_type = rate_type AND tab_rate = new_rate AND tab_status= 'Generated' AND tab_cancelled = 'N' AND tab_slno != disc_slno and tab_bill_addon_slno is null)THEN
+          BEGIN 
+            
+            
+            
+            
+            
+            
+            SELECT tab_slno,tab_entrytime INTO SLNO_OLD,entrytime  FROM tbl_takeaway_billdetails WHERE tab_billno = temp_billno and  tab_menuid = menuid and tab_rate_type = rate_type AND tab_rate = new_rate AND tab_status= 'Generated' AND tab_cancelled = 'N' AND tab_slno != disc_slno and tab_bill_addon_slno is null LIMIT 1 ;
+            SELECT timediff(time(now()),entrytime) INTO diff_time;
+            IF(diff_time >2)THEN
+            begin
+            
+           
+              UPDATE tbl_takeaway_billdetails SET  tab_qty = qty +tab_qty,tab_entrytime = time(now()) WHERE tab_billno = temp_billno and tab_slno = SLNO_OLD and tab_bill_addon_slno is null;
+              UPDATE tbl_takeaway_billdetails SET tab_amount = tab_qty*tab_rate WHERE  tab_billno = temp_billno and tab_slno = SLNO_OLD and tab_bill_addon_slno is null;
+              DELETE FROM tbl_takeaway_billdetails WHERE tab_billno = temp_billno and tab_slno = disc_slno and tab_bill_addon_slno is null;
+            END;
+            ELSE
+              DELETE FROM tbl_takeaway_billdetails WHERE tab_billno = temp_billno and tab_slno = disc_slno and tab_bill_addon_slno is null;
+            END IF;
+            
+            
+            
+            
+            
+          END;
+          END IF;
+        END;
+        END IF;
+      END;
+      END IF;
+    END;
+    ELSEIF(mode = 'Edit') THEN
+    BEGIN
+       IF EXISTS(SELECT * FROM tbl_takeaway_billdetails  WHERE tab_billno = temp_billno AND tab_slno = slno AND tab_menuid = menuid  and tab_bill_addon_slno is null )THEN
+      BEGIN
+        SELECT tab_qty INTO oldqty FROM tbl_takeaway_billdetails  WHERE tab_billno = temp_billno AND tab_slno = slno;
+        IF(dailystock ='Y')then
+        begin
+        if(dailystock_in_number = 'Y')then
+        begin
+          if(rate_type = 'Portion')then
+          begin
+            select mk_stock_number into numberinstock from tbl_menustock where mk_menuid = menuid AND mk_portion=portion ;
+            SELECT mk_id INTO menu_stock_id FROM  tbl_menustock ms WHERE ms.mk_menuid = menuid AND  ms.mk_portion =  portion;
+          end;
+          elseif(rate_type= 'Unit') then
+          begin
+            if(unit_type = 'Packet')then
+            begin 
+              select m.mk_stock_number into numberinstock from tbl_menustock m where m.mk_menuid = menuid AND m.mk_unit_type = unit_type and m.mk_unit_weight = unit_weight and m.mk_unit_id = unit_id; 
+              SELECT mk_id INTO menu_stock_id FROM tbl_menustock ms 
+              WHERE ms.mk_menuid = menuid AND ms.mk_unit_type =  unit_type  AND ms.mk_unit_weight = unit_weight    AND  ms.mk_unit_id = unit_id;
+            end;
+            elseif(unit_type = 'Loose')then
+            begin  
+              select m.mk_stock_number into numberinstock from tbl_menustock m where m.mk_menuid = menuid AND m.mk_unit_type = unit_type and m.mk_base_unit_id = base_unit_id; 
+            end;
+            end if;
+          end;
+          end if;
+          IF(qty>oldqty) THEN
+          BEGIN
+            select mk_stock_number into numberinstock from tbl_menustock where mk_menuid = menuid AND mk_portion=portion ;
+            if(numberinstock = 0.00) then
+            begin
+              SET messsage = 'Ordered Item is Stock Out';
+              LEAVE proc_temptakeaway;
+            end;
+            else
+            begin
+              if(numberinstock < qty)then
+              begin
+                SET messsage = 'Quantity ordered is less than in Stock';
+                LEAVE proc_temptakeaway;
+              end;
+              else 
+                set flag = 'Qty_Reduce';
+              end if;
+            end;
+            end if;
+          END;
+          ELSE 
+          BEGIN
+            SET NEWqty = oldqty - qty;
+            set qt_withratio = (NEWqty);
+            set flag = 'Qty_increase';
+          END;
+          END IF;
+        end;
+        else
+        begin
+          select mk_stock into is_instock from tbl_menustock where mk_menuid = menuid AND mk_portion = portion and mk_date = DAYCLOSEDATE;
+          if(is_instock = 'N')then
+          begin
+            SET messsage = 'Ordered Item not in Stock';
+            LEAVE proc_temptakeaway;
+          end;
+          end if;
+        end;
+        end if;  
+      end;
+      end if;
+      UPDATE tbl_takeaway_billdetails SET tab_qty = qty,  tab_preferencetext = preferencetext,tab_rate = rate,tab_unit_weight=unit_weight WHERE tab_billno = temp_billno AND tab_slno = slno and tab_regen_status_menu='N';
+       CALL proc_itemorder_discount(trim(menuid),'TA',temp_billno,slno,@message_discount);
+      END;
+      ELSE
+      BEGIN
+           IF EXISTS(SELECT (1) FROM tbl_takeaway_billdetails WHERE  tab_billno = temp_billno AND tab_slno = slno  and tab_bill_addon_slno is not null and tab_regen_status_menu='N' )THEN
+            BEGIN
+              UPDATE tbl_takeaway_billdetails SET tab_qty =  qty,  tab_preferencetext = CONCAT(preference_old,',',preferencetext)
+              WHERE  tab_billno = temp_billno AND tab_slno = slno;
+            END;
+            ELSE
+            BEGIN
+              INSERT INTO `tbl_takeaway_billdetails`(`tab_billno`, `tab_slno`,tab_bill_addon_slno, `tab_menuid`,tab_rate_type,tab_unit_type ,`tab_portion`,tab_unit_weight,tab_unit_id,tab_base_unit_id,tab_base_rate, `tab_qty`, `tab_preferencetext`, `tab_rate`,`tab_status`,tab_org_rate,tab_exempt_disc) 
+              VALUES (temp_billno,0,slno,menuid,rate_type,unit_type,portion,unit_weight,unit_id,base_unit_id,item_base_rate,qty,preferencetext,rate,'Generated',org_rate,discmenu);
+                 END;
+            END IF;
+      END;
+      END IF;
+    END;
+    END IF;
+    if(trim(flag)= 'Qty_Reduce') then
+    begin
+      if(dailystock_in_number = 'Y')then
+      begin
+        if(mode = 'Edit') THEN
+        BEGIN
+         SET qty = qty-oldqty;
+        END;
+        END IF;
+        if(rate_type = 'Portion')then
+        begin
+          UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number -qty) WHERE mk_id =menu_stock_id ;
+        end;
+        elseif(rate_type= 'Unit') then
+        begin
+          if(unit_type = 'Packet')then
+          begin 
+            UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number-qty) WHERE mk_id =menu_stock_id; 
+          end;
+          elseif(unit_type = 'Loose')then
+          begin  
+            UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number-qty) WHERE mk_menuid = menuid AND mk_unit_type = unit_type and mk_base_unit_id = base_unit_id; 
+          end;
+          end if;
+        end;
+        end if;
+      end;
+      END IF; 
+    end;
+    elseif(trim(flag)= 'Qty_increase') then
+    begin
+      if(dailystock_in_number = 'Y')then
+      begin
+        if(mode = 'Edit') THEN
+        BEGIN
+         SET qty = oldqty-qty;
+        END;
+        END IF;
+        if(rate_type = 'Portion')then
+        begin
+          UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number +qty) WHERE mk_id =menu_stock_id;
+        end;
+        elseif(rate_type= 'Unit') then
+        begin
+          if(unit_type = 'Packet')then
+          begin 
+            UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number+qty) WHERE mk_id =menu_stock_id; 
+          end;
+          elseif(unit_type = 'Loose')then
+          begin  
+            UPDATE tbl_menustock SET mk_stock_number = (mk_stock_number+qty) WHERE mk_menuid = menuid AND mk_unit_type = unit_type and mk_base_unit_id = base_unit_id; 
+          end;
+          end if;
+        end;
+        end if;
+      end;
+      END IF; 
+    end;
+    END IF;
+  END;
+  END IF;
+   
+SELECT RELEASE_LOCK('tableorderentry') INTO check2;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_temp_split_delete` (IN `temp_billno` VARCHAR(30))  NO SQL
+BEGIN
+
+    IF NOT EXISTS(SELECT * FROM tbl_temp_tablebilldetails WHERE bd_temp_billno = temp_billno)THEN
+    DELETE FROM tbl_temp_tablebillmaster WHERE bm_temp_billno = temp_billno;
+    end if;
+
+ 
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_temp_split_details` (IN `temp_billno` VARCHAR(30), IN `menuid` VARCHAR(30), IN `portion` INT, IN `rate` FLOAT, IN `qty` INT, IN `amount` DECIMAL(15,2), IN `type` VARCHAR(50), OUT `message` VARCHAR(200))  NO SQL
+BEGIN
+DECLARE quantity INT;
+  DECLARE EBILLSLNO,EQTY INT;
+  
+    set message  = 'Error';
+   
+    
+    
+   SET quantity = 0; 
+    
+    IF EXISTS(SELECT (1) FROM tbl_temp_tablebilldetails WHERE bd_temp_billno = temp_billno AND bd_menuid= menuid AND bd_portion=portion and bd_rate = rate and bd_type = type ) THEN
+  BEGIN
+    SELECT bd_billslno,bd_qty INTO EBILLSLNO,EQTY FROM tbl_temp_tablebilldetails 
+    WHERE bd_temp_billno = temp_billno AND bd_menuid= menuid AND bd_portion=portion and bd_rate = rate and bd_type = type;
+    SET quantity = EQTY+qty;
+    UPDATE  tbl_temp_tablebilldetails SET bd_qty = quantity,bd_amount = (rate*quantity) 
+    WHERE bd_temp_billno = temp_billno AND bd_menuid= menuid AND bd_portion=portion and bd_rate = rate and bd_type = type;
+  END;
+  ELSE
+  BEGIN
+      INSERT INTO `tbl_temp_tablebilldetails`(`bd_temp_billno`, `bd_billslno`, `bd_menuid`, `bd_portion`, `bd_rate`, `bd_qty`, `bd_amount`, `bd_type`) 
+    VALUES(temp_billno,0,menuid,portion,rate,qty,amount,type);
+  END;
+  END IF;
+   set message  = 'Temp split bill details is generated';
+  
+ 
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_temp_split_master` (IN `temp_billno` VARCHAR(30), IN `Original_billno` VARCHAR(30), OUT `message` VARCHAR(200))  NO SQL
+BEGIN
+  
+    set message  = 'Error';
+    INSERT INTO `tbl_temp_tablebillmaster`(`bm_temp_billno`, `bm_main_billno`, `bm_branchid`, `bm_floorid`, `bm_subtotal`,  `bm_dayclosedate`, `bm_tableno`) 
+    select temp_billno, bm_billno,`bm_branchid`,`bm_floorid`,bm_subtotal,bm_dayclosedate, bm_tableno 
+    from tbl_tablebillmaster where bm_billno = Original_billno;
+    set message  = 'Temp split bill master is generated';
+ 
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_total_turnover` (IN `fromdate` VARCHAR(15), IN `todate` VARCHAR(15), OUT `gross_turnover` DECIMAL(22,2), OUT `total_ser_tax` DECIMAL(22,2), OUT `total_vat` DECIMAL(22,2), OUT `total_extra_vat` DECIMAL(22,2), OUT `total_tax` DECIMAL(22,2), OUT `net_turnover` DECIMAL(22,2), OUT `tot_pax` INT)  NO SQL
+BEGIN
+  DECLARE SUBTOTAL_DINEIN,SUBTOTAL_TAKEAWAY,CANCEL_DINEIN,CANCEL_TAKEAWAY,SUBTOTAL,CANCELTOTAL  DECIMAL(15,2);
+  DECLARE FINAL_TOTAL_DINEIN,FINAL_TOTAL_TAKEAWAY DECIMAL(15,2);
+  DECLARE TOTAL_VAT_DINEIN,TOTAL_SER_TAX_DINEIN,TOTAL_VAT_TA,TOTAL_SER_TAX_TA,TAKEAWAY_PARCEL_CHARGE,TOTAL_PAX DECIMAL(15,2);
+  DECLARE FROM_DATE, TO_DATE DATE;
+
+
+  SET  SUBTOTAL_DINEIN =0;
+  SET SUBTOTAL_TAKEAWAY =0;
+  SET CANCEL_DINEIN  =0;
+  SET CANCEL_TAKEAWAY  =0;
+  SET FINAL_TOTAL_DINEIN  =0;
+  SET FINAL_TOTAL_TAKEAWAY  =0;
+
+  SET TOTAL_VAT_DINEIN  =0;
+  SET TOTAL_SER_TAX_DINEIN  =0;
+  SET TOTAL_VAT_TA =0;
+  SET TOTAL_SER_TAX_TA =0;
+  SET TAKEAWAY_PARCEL_CHARGE  =0;
+  SET SUBTOTAL = 0;
+  SET CANCELTOTAL = 0;
+  SET TOTAL_PAX = 0;
+  SET gross_turnover = 0;
+  SET total_ser_tax =0;
+  SET total_vat = 0;
+  SET total_tax =  0;
+  SET net_turnover = 0;
+  SET tot_pax = 0;
+
+
+  SET FROM_DATE = str_to_date(fromdate,'%d-%m-%Y');
+  SET TO_DATE = str_to_date(todate,'%d-%m-%Y');
+
+
+
+  SELECT sum(bm_subtotal),sum(bm_cancelamount),sum(bm_total),sum(bm_vat),sum(bm_servicetax),sum(bm_totalpax)
+ INTO SUBTOTAL_DINEIN,CANCEL_DINEIN,FINAL_TOTAL_DINEIN,TOTAL_VAT_DINEIN,TOTAL_SER_TAX_DINEIN,TOTAL_PAX
+ FROM tbl_tablebillmaster
+ WHERE (bm_status = 'Closed') AND (bm_complimentary != 'Y') AND  bm_dayclosedate BETWEEN FROM_DATE AND TO_DATE;
+
+
+  select sum(b.bem_total_value) into total_extra_vat
+  from tbl_tablebill_extra_tax_master b
+  left join tbl_tablebillmaster tb ON tb.bm_billno = b.bem_billno
+  WHERE (tb.bm_status = 'Closed') AND (tb.bm_complimentary != 'Y') AND tb.bm_dayclosedate BETWEEN FROM_DATE AND TO_DATE;
+
+  SET SUBTOTAL = (SUBTOTAL_DINEIN + SUBTOTAL_TAKEAWAY +TAKEAWAY_PARCEL_CHARGE);
+  SET CANCELTOTAL = (CANCEL_DINEIN + CANCEL_TAKEAWAY);
+
+  SET gross_turnover  = SUBTOTAL - CANCELTOTAL;
+  SET total_ser_tax = TOTAL_SER_TAX_DINEIN;
+  SET total_vat = TOTAL_VAT_DINEIN + TOTAL_VAT_TA  ;
+  SET total_tax =  total_ser_tax +   total_vat;
+  SET net_turnover = gross_turnover + total_tax + total_extra_vat ;
+  SET tot_pax = tot_pax + TOTAL_PAX;
+
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_track_bill` (IN `fromdate` DATE, IN `todate` DATE, IN `final_sale` DECIMAL(15,3), OUT `message` VARCHAR(100))  NO SQL
+begin
+
+
+
+end$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_track_genotp` (IN `username` VARCHAR(30), OUT `otp_key` INT)  MODIFIES SQL DATA
+BEGIN
+   
+  SET otp_key = FLOOR( 1000 + ( RAND( ) *8999 ));
+
+ UPDATE `tbl_track_l` SET `l_current_otp` = otp_key where l_username =  username;
+ 
+
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `proc_track_r` (IN `fromdate` DATE, IN `todate` DATE, IN `MODE` CHAR(1), OUT `Max_Value` INT)  NO SQL
+proc_track_r_bill:begin
+ 
+  DECLARE CASH_AMOUNT_DINE_IN_Total,CASH_AMOUNT_TA_Total,REDUCE_AMT,CASH_TOTAL,CASH_AMOUNT_DINE_IN_Max_reduce,CASH_AMOUNT_TA_Max_reduce,SUBTOTAL,SUBTOTAL_bd,amount_bd DECIMAL(15,3);
+  DECLARE BILL,ordernumber,BILL_FROM VARCHAR(20);
+  DECLARE TA_MODE CHAR(2);
+  DECLARE bill_item_count,max_slno,max_t_value,PORTION,i,commacount int;
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE MENUID VARCHAR(30);
+  DECLARE RATE DECIMAL(15,3);
+  DECLARE ORDER_NO VARCHAR(250);
+  DECLARE  cur1 CURSOR FOR SELECT `bm_billno`,'DI' AS MODE_1 FROM tbl_tablebillmaster WHERE bm_dayclosedate between fromdate and todate and bm_status = 'Closed' and ((trim(bm_gst)  = '') or (trim(bm_gst)is NULL)) 
+    and bm_complimentary != 'Y' and bm_paymode ='1' UNION ALL SELECT `tab_billno`,'THC' AS MODE_1 FROM tbl_takeaway_billmaster WHERE tab_dayclosedate between fromdate and todate and tab_status = 'Closed' and ((trim(tab_gst)  = '') or (trim(tab_gst)is NULL))
+    and tab_complimentary != 'Y' and tab_paymode ='1';
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+  set CASH_AMOUNT_DINE_IN_Max_reduce = 0;
+  set CASH_AMOUNT_TA_Max_reduce = 0;
+  set Max_Value = 0;
+  /*select be_t_max_value into max_t_value from tbl_branchmaster;*/
+  SET max_t_value = 80 ;
+  IF(MODE='M')THEN
+  BEGIN
+    OPEN cur1;
+    
+    read_loop: LOOP
+    FETCH cur1 INTO BILL,BILL_FROM;
+   
+
+    IF done THEN
+
+    LEAVE read_loop;
+    END IF;
+   
+
+    IF(BILL_FROM ='DI')then
+    begin
+      SELECT COUNT(*) into bill_item_count FROM tbl_tablebilldetails where trim(bd_billno) = trim(BILL);
+       
+   
+      IF(bill_item_count>1)THEN
+      BEGIN
+      
+        SELECT bm_subtotal INTO SUBTOTAL_bd FROM tbl_tablebillmaster WHERE bm_billno =   trim(BILL);
+        IF(SUBTOTAL_bd >(max_t_value))then
+        begin
+          set CASH_AMOUNT_DINE_IN_Max_reduce = CASH_AMOUNT_DINE_IN_Max_reduce +  SUBTOTAL_bd;
+        end;
+        end if;
+      END;
+      END IF;
+    end;
+    elseif(BILL_FROM ='THC')then
+    begin
+    SELECT COUNT(*) into bill_item_count FROM tbl_takeaway_billdetails where trim(tab_billno) = trim(BILL);
+
+      IF(bill_item_count>1)THEN
+      BEGIN
+        SELECT tab_subtotal INTO SUBTOTAL FROM tbl_takeaway_billmaster WHERE tab_billno =   trim(BILL);
+        
+        IF(SUBTOTAL >(max_t_value))then
+        begin
+         set CASH_AMOUNT_TA_Max_reduce = CASH_AMOUNT_TA_Max_reduce + SUBTOTAL;
+        end;
+        end if;
+        
+      END;
+      END IF;
+    end;
+    end if;  
+    
+    END LOOP;
+    CLOSE cur1;
+    
+    SET Max_Value = CASH_AMOUNT_DINE_IN_Max_reduce +CASH_AMOUNT_TA_Max_reduce;
+  END;
+  ELSEIF(MODE='T')THEN
+  BEGIN
+  
+   SELECT (sum(bm_amountpaid)-sum(bm_amountbalace)) INTO CASH_AMOUNT_DINE_IN_Total
+    FROM tbl_tablebillmaster WHERE bm_dayclosedate between fromdate and todate and bm_status = 'Closed' and bm_complimentary != 'Y' AND bm_paymode ='1';
+    
+    SELECT (sum(tab_amountpaid)-sum(tab_amountbalace))INTO CASH_AMOUNT_TA_Total
+    FROM tbl_takeaway_billmaster WHERE tab_dayclosedate between fromdate and todate and tab_status = 'Closed' and tab_complimentary != 'Y' AND tab_paymode ='1';
+    
+    
+    if(CASH_AMOUNT_DINE_IN_Total is NULL)THEN
+    SET CASH_AMOUNT_DINE_IN_Total = 0 ;
+    END IF;
+     
+    if(CASH_AMOUNT_TA_Total is NULL)THEN
+    SET CASH_AMOUNT_TA_Total = 0 ;
+    END IF;
+    
+    
+    SET Max_Value = CASH_AMOUNT_DINE_IN_Total+CASH_AMOUNT_TA_Total;
+  END;
+  END IF;
+  
+
+end$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_track_r_bill` (IN `fromdate` DATE, IN `todate` DATE, IN `r_amount` INT, IN `mode` CHAR(1), OUT `Total_value` DECIMAL(15,3), OUT `Max_Value` INT, OUT `message` VARCHAR(500))  NO SQL
+proc_track_r_bill:begin
+ 
+  DECLARE CASH_AMOUNT_DINE_IN_Total,CASH_AMOUNT_TA_Total,REDUCE_AMT,CASH_TOTAL,CASH_AMOUNT_DINE_IN_Max_reduce,CASH_AMOUNT_TA_Max_reduce,SUBTOTAL,SUBTOTAL_bd,amount_bd DECIMAL(15,3);
+  DECLARE BILL,ordernumber,BILL_FROM VARCHAR(20);
+  DECLARE TA_MODE CHAR(2);
+  DECLARE bill_item_count,max_slno,max_t_value,PORTION,i,commacount,VALUE_NOW,cash_sale int;
+  DECLARE done INT DEFAULT FALSE;
+  DECLARE MENUID VARCHAR(30);
+  DECLARE RATE,DIFF_VALUE DECIMAL(15,3);
+  DECLARE ORDER_NO VARCHAR(250);
+  declare cloud_status char(1);
+
+  DECLARE  cur1 CURSOR FOR SELECT `bm_billno`,'DI' AS MODE_1 FROM tbl_tablebillmaster WHERE bm_dayclosedate between fromdate and todate and bm_status = 'Closed' and ((trim(bm_gst)  = '') or (trim(bm_gst)is NULL)) 
+    and bm_complimentary != 'Y' and bm_paymode ='1' UNION ALL SELECT `tab_billno`,'THC' AS MODE_1 FROM tbl_takeaway_billmaster WHERE tab_dayclosedate between fromdate and todate and tab_status = 'Closed' and ((trim(tab_gst)  = '') or (trim(tab_gst)is NULL))
+    and tab_complimentary != 'Y' and tab_paymode ='1';
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+  
+  set CASH_AMOUNT_DINE_IN_Total = 0;
+  set CASH_AMOUNT_TA_Total = 0;
+  set CASH_AMOUNT_DINE_IN_Max_reduce = 0;
+  set CASH_AMOUNT_TA_Max_reduce = 0;
+  set Total_value = 0;
+  set Max_Value = 0; 
+  
+  
+  select be_cloud_sync into cloud_status from tbl_branch_settings_cloud;
+  
+  /*select be_t_max_value into max_t_value from tbl_branchmaster;*/
+  SET max_t_value = 80 ;
+  
+  if(mode= 'T')then
+  begin
+   
+   if(cloud_status ='Y') THEN
+   BEGIN
+    if exists(select * FROM tbl_tablebillmaster WHERE bm_dayclosedate between fromdate and todate and bm_status = 'Closed' and bm_complimentary != 'Y' and  cloud_sync = 'N')then
+    begin
+      set message = 'Sync Not Processed';
+      SET Total_value = 0;
+      SET Max_Value = 0;
+      leave proc_track_r_bill;
+    end;   
+    end if;
+   END;
+   END IF;
+  
+   if(cloud_status ='Y') THEN
+   BEGIN   
+      if exists(select * FROM tbl_takeaway_billmaster WHERE tab_dayclosedate between fromdate and todate and tab_status = 'Closed' and tab_complimentary != 'Y'  and  cloud_sync = 'N')then
+      begin
+        set message = 'Sync Not Processed';
+        SET Total_value = 0;
+        SET Max_Value = 0;
+        leave proc_track_r_bill;
+      end;   
+      end if;
+   END;
+   END IF;
+   
+    call proc_track_r(fromdate,todate,'T',@Value1);
+    select @Value1 into Total_value;
+   
+    
+    call proc_track_r(fromdate,todate,'M',@Value);
+    select @Value into Max_Value;
+    
+    
+    set message = '';
+  
+  end;
+  elseif(mode= 'R')then
+  begin
+  
+
+    if(cloud_status ='Y') THEN
+    BEGIN    
+      if exists(select * FROM tbl_tablebillmaster WHERE bm_dayclosedate between fromdate and todate and bm_status = 'Closed' and bm_complimentary != 'Y' and bm_paymode ='1' and  cloud_sync = 'N')then
+      begin
+        set message = 'Sync Not Processed';
+        SET Total_value = 0;
+        SET Max_Value = 0;
+        leave proc_track_r_bill;
+      end;   
+      end if;
+    END;
+    END IF;
+    
+    if(cloud_status ='Y') THEN
+    BEGIN   
+      if exists(select * FROM tbl_takeaway_billmaster WHERE tab_dayclosedate between fromdate and todate and tab_status = 'Closed' and tab_complimentary != 'Y' and tab_paymode ='1' and  cloud_sync = 'N')then
+      begin
+        set message = 'Sync Not Processed';
+        SET Total_value = 0;
+        SET Max_Value = 0;
+        leave proc_track_r_bill;
+      end;   
+      end if;
+    END;
+    END IF;
+    
+    call proc_track_r(fromdate,todate,'T',@Value1);
+    select @Value1 into cash_sale;
+    
+     
+    
+    OPEN cur1;
+    
+    read_loop: LOOP
+    FETCH cur1 INTO BILL,BILL_FROM;
+     
+     
+  
+
+    IF done THEN
+
+    LEAVE read_loop;
+    END IF;
+   
+       
+    if(cash_sale <=r_amount)then
+    begin
+      set message = concat('M1 - Bills are already sucessfully adjusted to  -',r_amount);
+      INSERT INTO `tbl_track_l_details`(`from_date`, `to_date`, `l_datetime`, `l_amount`,`l_msg_no`) VALUES (fromdate,todate,now(),r_amount,1);
+      leave proc_track_r_bill;
+    end;
+    else
+    begin
+      IF(BILL_FROM ='DI')then
+      begin
+       
+        
+      
+        SELECT COUNT(*) into bill_item_count FROM tbl_tablebilldetails where trim(bd_billno) = trim(BILL);
+  
+        
+        itemloop: WHILE (bill_item_count>1)DO
+        SELECT MIN(bd_amount),bd_billslno ,bd_menuid,bd_portion,bd_rate into amount_bd,max_slno,MENUID,PORTION,RATE
+        from tbl_tablebilldetails where trim(bd_billno) = trim(BILL);
+        
+        SELECT bm_subtotal,bm_orderno INTO SUBTOTAL_bd,ORDER_NO FROM tbl_tablebillmaster WHERE bm_billno =   trim(BILL);
+        
+         
+         
+        IF((SUBTOTAL_bd-amount_bd) <(max_t_value))then
+          leave itemloop;
+          
+    
+        end if;
+     
+        DELETE FROM tbl_tablebilldetails where trim(bd_billno) = trim(BILL) AND bd_billslno = max_slno; 
+         
+        
+    
+        SELECT LENGTH(TRIM(ORDER_NO)) - LENGTH(REPLACE(TRIM(ORDER_NO), ',', ''))   INTO commacount;
+        SET i=1;
+        ORDER_LOOP: WHILE (i <= commacount+1) DO
+          SELECT split_str(ORDER_NO,',',i) INTO ordernumber;
+          DELETE FROM tbl_tableorder WHERE ter_orderno = ordernumber AND ter_menuid = MENUID AND ter_portion =  PORTION AND ter_rate = RATE;
+          SET i= i+1;
+        END WHILE;
+       
+        
+        CALL proc_bill_r(trim(BILL),@MESSAGE_O);
+        /*UPDATE tbl_tablebillmaster SET bm_amountpaid = bm_finaltotal, bm_amountbalace = 0 WHERE bm_billno = trim(BILL);*/
+        
+        SET cash_sale = 0;
+        call proc_track_r(fromdate,todate,'T',@Value2);
+        select @Value2 into cash_sale;
+        
+          
+    
+        if(cash_sale <=r_amount)then
+        begin
+          set message = concat('M2 - Bills are sucessfully adjusted and Reducing the amount to  -',r_amount);
+          INSERT INTO `tbl_track_l_details`(`from_date`, `to_date`, `l_datetime`, `l_amount`,`l_msg_no`) VALUES (fromdate,todate,now(),r_amount,2);
+          leave proc_track_r_bill;
+        end;
+        end if;
+      
+    
+        SELECT COUNT(*) into bill_item_count FROM tbl_tablebilldetails where trim(bd_billno) = trim(BILL);
+        END WHILE;
+      end;
+      elseif(BILL_FROM ='THC')then
+      begin
+
+        SELECT COUNT(*) into bill_item_count FROM tbl_takeaway_billdetails where trim(tab_billno) = trim(BILL);
+
+        itemloop1: WHILE (bill_item_count>1)DO
+
+        SELECT MIN(tab_amount),tab_slno into amount_bd,max_slno from tbl_takeaway_billdetails where trim(tab_billno) = trim(BILL);
+   
+        SELECT tab_subtotal,tab_mode INTO SUBTOTAL,TA_MODE FROM tbl_takeaway_billmaster WHERE tab_billno =   trim(BILL);
+
+        IF((SUBTOTAL-amount_bd) <(max_t_value))then
+          leave itemloop1;
+        end if;
+
+        DELETE FROM tbl_takeaway_billdetails where trim(tab_billno) = trim(BILL) AND tab_slno = max_slno; 
+        SET VALUE_NOW = VALUE_NOW + amount_bd; 
+        CALL proc_ta_kot_cancel(trim(BILL),1,TA_MODE,@MESSAGE_O);
+        UPDATE tbl_takeaway_billmaster SET tab_amountpaid = tab_netamt, tab_amountbalace = 0 WHERE trim(tab_billno) = trim(BILL);
+        
+  SET cash_sale = 0;
+        call proc_track_r(fromdate,todate,'T',@Value3);
+        select @Value3 into cash_sale;
+       
+        if(cash_sale <=r_amount)then
+        begin
+          set message = concat('M4 - Bills are sucessfully adjusted and Reducing the amount to  -',r_amount);
+          INSERT INTO `tbl_track_l_details`(`from_date`, `to_date`, `l_datetime`, `l_amount`,`l_msg_no`) VALUES (fromdate,todate,now(),r_amount,4);
+          leave proc_track_r_bill;
+        end;
+        end if;
+        
+        
+      
+        SELECT COUNT(*) into bill_item_count FROM tbl_takeaway_billdetails where trim(tab_billno) = trim(BILL);
+        END WHILE;
+      end;
+      end if;  
+    end;
+    end if;
+    END LOOP;
+    CLOSE cur1;
+  
+    set message = concat('M5 - Bills are sucessfully adjusted and Reducing the amount to  max possible');
+    INSERT INTO `tbl_track_l_details`(`from_date`, `to_date`, `l_datetime`, `l_amount`,`l_msg_no`) VALUES (fromdate,todate,now(),r_amount,5);
+
+  end;
+  end if;
+
+  
+
+
+
+
+end$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `proc_track_total_sale` (IN `fromdate` DATE, IN `todate` DATE, IN `mode` VARCHAR(10), OUT `total_sale` DECIMAL(15,3))  NO SQL
+begin
+    
+  DECLARE CASH_AMOUNT_DINE_IN,CASH_AMOUNT_TA,CARD_AMOUNT_DINE_IN,CARD_AMOUNT_TA DECIMAL(15,3);
+DECLARE CHEQUE_AMOUNT_DINE_IN,CHEQUE_AMOUNT_TA DECIMAL(15,3);
+
+
+  
+  set  CASH_AMOUNT_DINE_IN = 0;
+  set  CASH_AMOUNT_TA = 0;
+  set  CARD_AMOUNT_DINE_IN = 0;
+  set  CARD_AMOUNT_TA = 0;
+  set  CHEQUE_AMOUNT_DINE_IN = 0;
+  set  CHEQUE_AMOUNT_TA = 0;
+  
+  
+  SELECT (sum(bm_amountpaid) + sum(bm_amountbalace)) INTO CASH_AMOUNT_DINE_IN
+  FROM tbl_tablebillmaster 
+  WHERE bm_dayclosedate between fromdate and todate and bm_status = 'Closed' and bm_complimentary != 'Y';
+  
+  SELECT (sum(tab_amountpaid) + sum(tab_amountbalace)) INTO CASH_AMOUNT_TA
+  FROM tbl_takeaway_billmaster 
+  WHERE tab_dayclosedate between  fromdate and todate and tab_status = 'Closed' and tab_complimentary != 'Y';
+  
+  
+   SELECT (sum(bm_transactionamount)) INTO CARD_AMOUNT_DINE_IN
+  FROM tbl_tablebillmaster 
+  WHERE bm_dayclosedate between fromdate and todate and bm_status = 'Closed' and bm_complimentary != 'Y';
+  
+  SELECT (sum(tab_transactionamount)) INTO CARD_AMOUNT_TA
+  FROM tbl_takeaway_billmaster 
+  WHERE tab_dayclosedate between  fromdate and todate and tab_status = 'Closed' and tab_complimentary != 'Y';
+   
+  
+  SELECT (sum(bm_chequebankamount)) INTO CHEQUE_AMOUNT_DINE_IN
+  FROM tbl_tablebillmaster 
+  WHERE bm_dayclosedate between fromdate and todate and bm_status = 'Closed'and bm_complimentary != 'Y';
+  
+  SELECT (sum(tab_chequebankamount)) INTO CHEQUE_AMOUNT_TA
+  FROM tbl_takeaway_billmaster 
+  WHERE tab_dayclosedate between  fromdate and todate and tab_status = 'Closed'and tab_complimentary != 'Y';
+  
+  
+  
+  
+  if((CASH_AMOUNT_DINE_IN IS NULL) OR (CASH_AMOUNT_DINE_IN = ''))THEN
+  SET CASH_AMOUNT_DINE_IN = 0;
+  END IF;
+  if((CASH_AMOUNT_TA IS NULL) OR (CASH_AMOUNT_TA = ''))THEN
+  SET CASH_AMOUNT_TA = 0;
+  END IF;
+  if((CARD_AMOUNT_DINE_IN IS NULL) OR (CARD_AMOUNT_DINE_IN = ''))THEN
+  SET CARD_AMOUNT_DINE_IN = 0;
+  END IF;
+  if((CARD_AMOUNT_TA IS NULL) OR (CARD_AMOUNT_TA = ''))THEN
+  SET CARD_AMOUNT_TA = 0;
+  END IF;
+   if((CHEQUE_AMOUNT_DINE_IN IS NULL) OR (CHEQUE_AMOUNT_DINE_IN = ''))THEN
+  SET CHEQUE_AMOUNT_DINE_IN = 0;
+  END IF;
+  if((CHEQUE_AMOUNT_TA IS NULL) OR (CHEQUE_AMOUNT_TA = ''))THEN
+  SET CHEQUE_AMOUNT_TA = 0;
+  END IF;
+  
+
+  if(mode = 'ALL')then
+    set total_sale = CASH_AMOUNT_DINE_IN + CASH_AMOUNT_TA+ CARD_AMOUNT_DINE_IN+ CARD_AMOUNT_TA+CHEQUE_AMOUNT_DINE_IN+CHEQUE_AMOUNT_TA; 
+  elseif(mode = 'CASH')then
+    
+    set total_sale = CASH_AMOUNT_DINE_IN; 
+  elseif(mode = 'CARD')then
+    set total_sale = CARD_AMOUNT_DINE_IN+ CARD_AMOUNT_TA; 
+  elseif(mode = 'CHEQUE')then
+    set total_sale = CHEQUE_AMOUNT_DINE_IN+CHEQUE_AMOUNT_TA;
+  END IF;
+
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ratereentry` ()  NO SQL
+begin
+    DECLARE menu varchar(30);
+    DECLARE floor varchar(10);
+    DECLARE portion int; 
+    DECLARE rate float;
+    DECLARE default1 char(1);
+
+    DECLARE done INT DEFAULT FALSE;
+      DECLARE cur1 CURSOR FOR SELECT m.mr_menuid, r.floorid, r.portion, r.rate, r.default FROM deleterate r,tbl_menumaster m where trim(r.menuname) =  trim(m.mr_menuname);
+          
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+  OPEN cur1;
+
+    read_loop: LOOP
+
+  
+
+  
+  FETCH cur1 INTO menu,floor,portion,rate,default1;
+  
+
+    IF done THEN
+    
+      LEAVE read_loop;
+    END IF;
+
+INSERT INTO `tbl_menuratemaster`(`mmr_menuid`, `mmr_floorid`, `mmr_portion`, `mmr_rate`, `mmr_default`) VALUES (menu,floor,portion,rate,default1);
+
+    END LOOP;
+ 
+  CLOSE cur1;
+
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `report_user` (IN `username` VARCHAR(15))  NO SQL
+begin
+    DECLARE reportid int;
+
+    DECLARE done INT DEFAULT FALSE;
+      DECLARE cur1 CURSOR FOR SELECT `rm_id` from tbl_reportmaster;
+          
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+  OPEN cur1;
+
+    read_loop: LOOP
+  
+  
+  FETCH cur1 INTO reportid;
+  
+    IF done THEN
+    
+      LEAVE read_loop;
+
+    END IF;
+
+INSERT INTO `tbl_user_reports`(`ur_userid`, `ur_reportid`, `ur_access`) VALUES (username, reportid, 'N');
+
+    END LOOP;
+ 
+  CLOSE cur1;
+
+end$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `table_miss` ()  begin
+
+    DECLARE billnumber varchar(15);
+
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE cur1 CURSOR FOR SELECT ts_billnumber FROM tbl_tabledetails where ts_billnumber IS NOT NULL;
+          
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+     
+   
+    OPEN cur1;
+    read_loop: LOOP
+  
+  
+   FETCH cur1 INTO billnumber;
+  
+    IF done THEN
+    
+      LEAVE read_loop;
+
+    END IF;
+
+    IF NOT EXISTS(SELECT * FROM tbl_tablebillmaster WHERE bm_billno = billnumber) then
+    begin
+     UPDATE tbl_tableorder SET ter_status = 'Served'  WHERE ter_billnumber = billnumber;
+    UPDATE tbl_tabledetails SET ts_status = 'Occupied',ts_completed_order = 'Y'  WHERE ts_billnumber = billnumber;
+    end;
+    end if;
+
+    END LOOP;
+ 
+  CLOSE cur1;
+
+end$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `table_total_amount` (IN `orderno` VARCHAR(15))  MODIFIES SQL DATA
+begin
+  DECLARE total,rate,single_total,combo_total,combo_single_total decimal(15,3);
+  DECLARE qty,combo_count INT;
+  DECLARE done,combo_done INT DEFAULT FALSE;
+  DECLARE cur1 CURSOR FOR SELECT (ter_rate*ter_qty) FROM tbl_tableorder where ter_orderno = TRIM(orderno) and ter_count_combo_ordering IS NULL; 
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+  
+  
+  
+  SET total = 0;
+  
+  OPEN cur1;
+  read_loop: LOOP
+
+  FETCH cur1 INTO single_total;
+  
+  IF done THEN
+    
+  LEAVE read_loop;
+  END IF;
+    
+      set total = total + single_total;
+  END LOOP;
+  UPDATE  tbl_tabledetails SET ts_totalamount = total WHERE ts_orderno = TRIM(orderno);
+  CLOSE cur1;
+  CALL `proc_combo_amount_total`(orderno);
+end$$
+
+--
+-- Functions
+--
+CREATE DEFINER=`root`@`localhost` FUNCTION `ASCIITOCHAR` (`X` INT) RETURNS CHAR(1) CHARSET utf8 BEGIN
+DECLARE CONVERTCHAR CHAR(1);
+
+IF(X=65)THEN SET CONVERTCHAR ='A';
+ELSEIF(X=66)THEN SET CONVERTCHAR ='B';
+ELSEIF(X=67)THEN SET CONVERTCHAR ='C';
+ELSEIF(X=68)THEN SET CONVERTCHAR ='D';
+ELSEIF(X=69)THEN SET CONVERTCHAR ='E';
+ELSEIF(X=70)THEN SET CONVERTCHAR ='F';
+
+ELSEIF(X=71)THEN SET CONVERTCHAR ='G';
+ELSEIF(X=72)THEN SET CONVERTCHAR ='H';
+ELSEIF(X=73)THEN SET CONVERTCHAR ='I';
+ELSEIF(X=74)THEN SET CONVERTCHAR ='J';
+ELSEIF(X=75)THEN SET CONVERTCHAR ='K';
+ELSEIF(X=76)THEN SET CONVERTCHAR ='L';
+ELSEIF(X=77)THEN SET CONVERTCHAR ='M';
+ELSEIF(X=78)THEN SET CONVERTCHAR ='N';
+ELSEIF(X=79)THEN SET CONVERTCHAR ='O';
+ELSEIF(X=80)THEN SET CONVERTCHAR ='P';
+ELSEIF(X=81)THEN SET CONVERTCHAR ='Q';
+ELSEIF(X=82)THEN SET CONVERTCHAR ='R';
+ELSEIF(X=83)THEN SET CONVERTCHAR ='S';
+ELSEIF(X=84)THEN SET CONVERTCHAR ='T';
+ELSEIF(X=85)THEN SET CONVERTCHAR ='U';
+ELSEIF(X=86)THEN SET CONVERTCHAR ='V';
+ELSEIF(X=87)THEN SET CONVERTCHAR ='W';
+ELSEIF(X=88)THEN SET CONVERTCHAR ='X';
+ELSEIF(X=89)THEN SET CONVERTCHAR ='Y';
+ELSEIF(X=90)THEN SET CONVERTCHAR ='Z';
+END IF;
+
+RETURN CONVERTCHAR;
+END$$
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `CHARTOASCII` (`X` CHAR(1)) RETURNS INT(11) BEGIN
+DECLARE CONVERTASCII INT;
+
+IF(X='A')THEN SET CONVERTASCII = 65;
+ELSEIF(X='B')THEN SET CONVERTASCII = 66;
+ELSEIF(X='C')THEN SET CONVERTASCII = 67;
+ELSEIF(X='D')THEN SET CONVERTASCII = 68;
+ELSEIF(X='E')THEN SET CONVERTASCII = 69;
+ELSEIF(X='F')THEN SET CONVERTASCII = 70;
+ELSEIF(X='G')THEN SET CONVERTASCII = 71;
+ELSEIF(X='H')THEN SET CONVERTASCII = 72;
+ELSEIF(X='I')THEN SET CONVERTASCII = 73;
+ELSEIF(X='J')THEN SET CONVERTASCII = 74;
+ELSEIF(X='K')THEN SET CONVERTASCII = 75;
+ELSEIF(X='L')THEN SET CONVERTASCII = 76;
+ELSEIF(X='M')THEN SET CONVERTASCII = 77;
+ELSEIF(X='N')THEN SET CONVERTASCII = 78;
+ELSEIF(X='O')THEN SET CONVERTASCII = 79;
+ELSEIF(X='P')THEN SET CONVERTASCII = 80;
+ELSEIF(X='Q')THEN SET CONVERTASCII = 81;
+ELSEIF(X='R')THEN SET CONVERTASCII = 82;
+ELSEIF(X='S')THEN SET CONVERTASCII = 83;
+ELSEIF(X='T')THEN SET CONVERTASCII = 84;
+ELSEIF(X='U')THEN SET CONVERTASCII = 85;
+ELSEIF(X='V')THEN SET CONVERTASCII = 86;
+ELSEIF(X='W')THEN SET CONVERTASCII = 87;
+ELSEIF(X='X')THEN SET CONVERTASCII = 88;
+ELSEIF(X='Y')THEN SET CONVERTASCII = 89;
+ELSEIF(X='Z')THEN SET CONVERTASCII = 90;
+END IF;
+
+RETURN CONVERTASCII;
+END$$
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `Report_Dt_Gen` (`Date_typeid` INT) RETURNS DATE NO SQL
+BEGIN
+
+ DECLARE DATE_LIMIT INT;
+ DECLARE FROM_DATE DATE;
+
+ SELECT rbd_date_limit INTO DATE_LIMIT FROM tbl_report_bydate WHERE rbd_id = Date_typeid;
+
+ IF((Date_typeid >=1) AND (Date_typeid <=7))THEN
+ BEGIN
+
+  SET FROM_DATE = DATE_SUB(CURDATE(),INTERVAL DATE_LIMIT DAY);
+
+ END;
+ ELSEIF ((Date_typeid >=8) AND (Date_typeid <=11))THEN
+ BEGIN
+  SET FROM_DATE = DATE_SUB(CURDATE(),INTERVAL DATE_LIMIT MONTH);
+
+ END;
+ ELSEIF ((Date_typeid >=12) AND (Date_typeid <=17))THEN
+ BEGIN
+
+ SET FROM_DATE = DATE_SUB(CURDATE(),INTERVAL DATE_LIMIT YEAR);
+
+
+ END;
+ END IF;
+  RETURN FROM_DATE;
+END$$
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `SPLIT_STR` (`x` VARCHAR(255), `delim` VARCHAR(12), `pos` INT) RETURNS VARCHAR(255) CHARSET utf8 RETURN REPLACE(SUBSTRING(SUBSTRING_INDEX(x, delim, pos),
+       LENGTH(SUBSTRING_INDEX(x, delim, pos -1)) + 1),
+
+       delim, '')$$
+
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_accounthead`
+--
+
+CREATE TABLE `tbl_accounthead` (
+  `ac_accountid` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `ac_accountname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `ac_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_accounthead`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_accounthead` BEFORE UPDATE ON `tbl_accounthead` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_account_settings`
+--
+
+CREATE TABLE `tbl_account_settings` (
+  `tas_profit` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tas_loss` decimal(15,3) NOT NULL DEFAULT '0.000'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_account_stock`
+--
+
+CREATE TABLE `tbl_account_stock` (
+  `tas_id` int(11) NOT NULL,
+  `tas_date` date NOT NULL,
+  `tas_open_stock_value` decimal(15,3) DEFAULT '0.000',
+  `tas_close_stock_value` decimal(15,3) DEFAULT '0.000',
+  `tas_login` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_advance_day_detail`
+--
+
+CREATE TABLE `tbl_advance_day_detail` (
+  `tdd_id` int(11) NOT NULL,
+  `tdd_ref_id` int(11) DEFAULT NULL,
+  `tdd_advance_amount` decimal(15,3) DEFAULT NULL,
+  `tdd_dayclose_date` date DEFAULT NULL,
+  `tdd_login` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tdd_pay_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tdd_bank` int(11) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_advance_payment`
+--
+
+CREATE TABLE `tbl_advance_payment` (
+  `tp_id` int(11) NOT NULL,
+  `tp_amount` decimal(15,3) DEFAULT NULL,
+  `tp_delivery_date` date DEFAULT NULL,
+  `tp_delivery_note` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_customer` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_number` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_mode` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_dayclose` date DEFAULT NULL,
+  `tp_delivery_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tp_status` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_cancel_date` datetime DEFAULT NULL,
+  `tp_cancel_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_subtotal` decimal(15,3) DEFAULT '0.000',
+  `tp_tax` decimal(15,3) DEFAULT '0.000',
+  `tp_final` decimal(15,3) DEFAULT '0.000',
+  `tp_delivery_charge` decimal(15,3) DEFAULT NULL,
+  `tp_mail` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_bank` int(11) DEFAULT NULL,
+  `tp_cs_bill` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_advance_payment`
+--
+DELIMITER $$
+CREATE TRIGGER `delete_related_items` AFTER DELETE ON `tbl_advance_payment` FOR EACH ROW BEGIN
+
+DELETE FROM tbl_advance_pay_menu_details WHERE tbl_advance_pay_menu_details.tmd_ref_id = OLD.tp_id;
+
+
+DELETE FROM tbl_advance_day_detail WHERE tbl_advance_day_detail.tdd_ref_id = OLD.tp_id;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_advance_pay_menu_details`
+--
+
+CREATE TABLE `tbl_advance_pay_menu_details` (
+  `tmd_id` int(11) NOT NULL,
+  `tmd_ref_id` int(11) DEFAULT NULL,
+  `tmd_menu` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmd_qty` float DEFAULT NULL,
+  `tmd_type` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmd_rate` decimal(15,3) DEFAULT NULL,
+  `tmd_total` decimal(15,3) DEFAULT NULL,
+  `tmd_description` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmd_weight` decimal(15,3) DEFAULT NULL,
+  `tmd_total_weight` decimal(15,3) DEFAULT NULL,
+  `tmd_menuid` int(11) DEFAULT NULL,
+  `tmd_billed` char(1) COLLATE utf8_unicode_ci DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_amc_setup`
+--
+
+CREATE TABLE `tbl_amc_setup` (
+  `tmc_id` int(11) NOT NULL,
+  `tm_from` date DEFAULT NULL,
+  `tm_to` date DEFAULT NULL,
+  `tm_add_by` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tm_entry_time` datetime DEFAULT NULL,
+  `tm_pay_type` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_added` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tm_ref_id_client` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tm_install_on` date DEFAULT NULL,
+  `tm_cloud_active` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tm_cloud_expiry` date DEFAULT NULL,
+  `tm_amc_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tm_cloud_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tmc_tax` decimal(15,3) NOT NULL DEFAULT '0.000'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_appmachinedetails`
+--
+
+CREATE TABLE `tbl_appmachinedetails` (
+  `as_appmachineid` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
+  `as_appmachiesych` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_appmachiesychid` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `as_status` varchar(20) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Active',
+  `as_lastupdated` datetime DEFAULT NULL,
+  `as_cur_ver` int(11) DEFAULT NULL,
+  `as_new_ver` int(11) DEFAULT NULL,
+  `as_update_found` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_em_lastupdated` datetime DEFAULT NULL,
+  `as_em_cur_ver` int(11) DEFAULT NULL,
+  `as_em_new_ver` int(11) DEFAULT NULL,
+  `as_em_update_found` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_enable_cash_drawer` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_cash_drawer_ip` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `as_cash_drawer_port` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `as_cash_drawer_usb` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_floormaster` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_kotcounter` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_prefemaster` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_menumaincat` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_menusubcat` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_portionmas` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_menumaster` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_menuprefemaster` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_menuratemaster` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_counterrate` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_menustock` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_menuimage` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_menucombination` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_nutrition` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `as_sync_ingredient` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_appmachinedetails`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_appmachinedetails` BEFORE INSERT ON `tbl_appmachinedetails` FOR EACH ROW begin
+
+
+
+    declare apk_ver_code int;
+    declare apk_e_ver_code int;
+
+
+
+SELECT pv_apk_ver_code INTO apk_ver_code FROM tbl_version;
+
+
+
+SET new.as_new_ver = apk_ver_code;
+
+
+
+IF((NEW.as_cur_ver = NEW.as_new_ver)OR(NEW.as_new_ver < NEW.as_cur_ver )) THEN
+
+SET NEW.as_update_found = 'N';
+
+END IF;
+
+
+
+SET new.as_lastupdated = now();
+
+
+
+SELECT pve_apk_ver_code INTO apk_e_ver_code FROM tbl_version;
+
+
+
+SET new.as_em_new_ver = apk_e_ver_code;
+
+
+
+IF((NEW.as_em_cur_ver = NEW.as_em_new_ver)OR(NEW.as_em_new_ver < NEW.as_em_cur_ver )) THEN
+
+SET NEW.as_em_update_found = 'N';
+
+END IF;
+
+
+
+SET new.as_em_lastupdated = now();
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_appmachinedetails` BEFORE UPDATE ON `tbl_appmachinedetails` FOR EACH ROW BEGIN
+
+
+
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+
+
+IF((NEW.as_cur_ver = NEW.as_new_ver)OR(NEW.as_new_ver < NEW.as_cur_ver ))THEN
+
+set new.as_update_found = 'N';
+
+END IF;
+
+IF((NEW.as_em_cur_ver = NEW.as_em_new_ver)OR(NEW.as_em_new_ver < NEW.as_em_cur_ver ))THEN
+
+set new.as_em_update_found = 'N';
+
+END IF;
+
+
+IF EXISTS(SELECT * FROM tbl_appmachinedetails WHERE ((NEW.as_sync_floormaster='Y') OR ( NEW.as_sync_kotcounter='Y') OR (NEW.as_sync_prefemaster='Y') OR (NEW.as_sync_menumaincat='Y') OR (NEW.as_sync_menusubcat='Y') OR (NEW.as_sync_portionmas='Y') OR (NEW.as_sync_menumaster='Y') OR (NEW.as_sync_menuprefemaster='Y') OR ( NEW.as_sync_menuratemaster='Y') OR (NEW.as_sync_counterrate='Y') OR (NEW.as_sync_menustock='Y') OR (NEW.as_sync_menuimage='Y') OR (NEW.as_sync_menucombination='Y') OR (NEW.as_sync_nutrition='Y') OR (NEW.as_sync_ingredient='Y')) AND as_appmachineid = NEW.as_appmachineid) THEN
+
+         BEGIN
+          SET  NEW.as_appmachiesych='Y';
+          END;
+
+          ELSE
+          BEGIN
+          SET  NEW.as_appmachiesych='N';
+
+          END;
+        END IF;
+
+
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_app_permissions`
+--
+
+CREATE TABLE `tbl_app_permissions` (
+  `tap_id` int(11) NOT NULL,
+  `tap_staffname` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tap_staff_id` int(11) NOT NULL,
+  `tap_app_login` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_dinein_module` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_tahd_module` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_cs_module` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_item_cancel` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_bill_cancel` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_table_change` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_bill_reprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_settle_dinein` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_settle_ta_hd` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_settle_cs` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_shift` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tap_discount` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_regenerate` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_complimentary` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_tip` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_hold` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_enable_type` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tap_all_settle` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_archive_settings`
+--
+
+CREATE TABLE `tbl_archive_settings` (
+  `id` int(11) NOT NULL,
+  `clear_tables` text COLLATE utf8_unicode_ci,
+  `archive_db` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `archive_enabled` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `all_time_sync_tables` text COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_archive_settings_log`
+--
+
+CREATE TABLE `tbl_archive_settings_log` (
+  `id` int(11) NOT NULL,
+  `log` text COLLATE utf8_unicode_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_asset_category`
+--
+
+CREATE TABLE `tbl_asset_category` (
+  `tsc_id` int(11) NOT NULL,
+  `tsc_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tsc_order` int(11) DEFAULT NULL,
+  `tsc_status` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_asset_invoice_tax_details`
+--
+
+CREATE TABLE `tbl_asset_invoice_tax_details` (
+  `txd_id` int(11) NOT NULL,
+  `txd_tax_name` int(11) DEFAULT NULL,
+  `txd_value` decimal(15,3) DEFAULT NULL,
+  `txd_inclusive` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `txd_status` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `txd_invoice` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `txd_vendor` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `txd_date` date DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_asset_master`
+--
+
+CREATE TABLE `tbl_asset_master` (
+  `tam_id` int(11) NOT NULL,
+  `tam_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tam_asset_category` int(11) DEFAULT NULL,
+  `tam_status` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tam_depriciation` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_asset_purchase`
+--
+
+CREATE TABLE `tbl_asset_purchase` (
+  `tap_id` int(11) NOT NULL,
+  `tap_vendor_id` int(11) DEFAULT NULL,
+  `tap_date` date DEFAULT NULL,
+  `tap_invoice_no` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tap_asset_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tap_qty` int(11) DEFAULT NULL,
+  `tap_unit_rate` decimal(15,3) DEFAULT NULL,
+  `tap_total` decimal(15,3) DEFAULT NULL,
+  `tap_status` char(1) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_asset_purchase_invoice_detail`
+--
+
+CREATE TABLE `tbl_asset_purchase_invoice_detail` (
+  `tpd_id` int(11) NOT NULL,
+  `tpd_invoice` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpd_vendor` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpd_date` date DEFAULT NULL,
+  `tpd_subtotal` decimal(15,3) DEFAULT NULL,
+  `tpd_tax_total` decimal(15,3) DEFAULT NULL,
+  `tpd_netamount` decimal(15,3) DEFAULT NULL,
+  `tpd_from_acc` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpd_paid_amount` decimal(15,3) DEFAULT NULL,
+  `tpd_credit_amount` decimal(15,3) DEFAULT NULL,
+  `tpd_trn_detail` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpd_remarks` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpd_entry_date` date DEFAULT NULL,
+  `tpd_type_pay` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpd_discount` decimal(15,3) DEFAULT NULL,
+  `tpd_to_acc` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_attendance`
+--
+
+CREATE TABLE `tbl_attendance` (
+  `id` int(11) NOT NULL,
+  `staff_id` int(11) DEFAULT NULL,
+  `att_date` date DEFAULT NULL,
+  `status` enum('P','A') COLLATE utf8_unicode_ci DEFAULT 'A',
+  `month_id` int(11) DEFAULT NULL,
+  `year_id` int(11) DEFAULT NULL,
+  `edit_count` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_bankmaster`
+--
+
+CREATE TABLE `tbl_bankmaster` (
+  `bm_id` int(11) NOT NULL,
+  `bm_name` varchar(2500) COLLATE utf8_unicode_ci NOT NULL,
+  `bm_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bm_account` int(11) DEFAULT NULL,
+  `bm_lukado` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_bankmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_bankmaster` BEFORE UPDATE ON `tbl_bankmaster` FOR EACH ROW BEGIN
+
+
+IF(new.cloud_sync = old.cloud_sync)THEN
+BEGIN
+	SET new.cloud_sync = 'N';
+END;
+END IF;
+
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_base_unit_master`
+--
+
+CREATE TABLE `tbl_base_unit_master` (
+  `bu_id` int(11) NOT NULL,
+  `bu_name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bu_is_central` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_base_unit_master`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_baseunitmaster` BEFORE UPDATE ON `tbl_base_unit_master` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_batch_stock`
+--
+
+CREATE TABLE `tbl_batch_stock` (
+  `tbs_id` int(11) NOT NULL,
+  `tbs_menu` int(11) DEFAULT NULL,
+  `tbs_added` decimal(15,3) DEFAULT NULL,
+  `tbs_stock_set` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tbs_batch_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tbs_date` date DEFAULT NULL,
+  `tbs_ip` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_billcancel_log`
+--
+
+CREATE TABLE `tbl_billcancel_log` (
+  `bc_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `bc_date` date NOT NULL,
+  `bc_details` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `bc_datetime` datetime NOT NULL,
+  `bc_sms_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bc_email_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bc_sms_time` datetime DEFAULT NULL,
+  `bc_email_time` datetime DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_billcancel_log`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_billcancel_log` BEFORE UPDATE ON `tbl_billcancel_log` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_bill_card_payments`
+--
+
+CREATE TABLE `tbl_bill_card_payments` (
+  `mc_id` int(11) NOT NULL,
+  `mc_billno` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `mc_slno` smallint(6) NOT NULL,
+  `mc_cardtype` int(11) DEFAULT NULL,
+  `mc_cardamount` decimal(15,3) NOT NULL,
+  `mc_carnumber` char(4) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mc_to_bank` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_bill_card_payments`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_bill_card_payments` BEFORE INSERT ON `tbl_bill_card_payments` FOR EACH ROW BEGIN
+
+	DECLARE SLNO int;
+
+ 	
+
+    SELECT MAX(mc_slno) INTO SLNO FROM tbl_bill_card_payments 
+
+    WHERE mc_billno = NEW.mc_billno ;
+
+    
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+	
+
+    SET new.mc_slno = SLNO+1;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_bill_card_payments` BEFORE UPDATE ON `tbl_bill_card_payments` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_branchmaster`
+--
+
+CREATE TABLE `tbl_branchmaster` (
+  `be_branchid` bigint(20) NOT NULL,
+  `be_branchname` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `be_branchprefix` varchar(3) COLLATE utf8_unicode_ci NOT NULL,
+  `be_address` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_email` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_others1` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_others2` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_others3` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_others4` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_footer1` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_footer2` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_footer3` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_footer4` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_floorcount` tinyint(4) NOT NULL DEFAULT '1',
+  `be_kotcount` tinyint(4) NOT NULL DEFAULT '1',
+  `be_credit_count` int(11) NOT NULL DEFAULT '1',
+  `be_crd_guestcount` int(11) NOT NULL DEFAULT '1',
+  `be_tablecount` int(11) NOT NULL DEFAULT '1',
+  `be_departmentcount` int(11) NOT NULL DEFAULT '1',
+  `be_designationcount` int(11) NOT NULL DEFAULT '1',
+  `be_staffidcount` int(11) NOT NULL DEFAULT '1',
+  `be_menumaincatcount` int(11) NOT NULL DEFAULT '1',
+  `be_menusubcatcount` int(11) DEFAULT '1',
+  `be_menucount` int(11) NOT NULL DEFAULT '1',
+  `be_loyalityreg_count` int(11) NOT NULL DEFAULT '1',
+  `be_discountcount` int(11) NOT NULL DEFAULT '1',
+  `be_vouchercount` int(11) NOT NULL DEFAULT '1',
+  `be_corporatecount` int(11) NOT NULL DEFAULT '1',
+  `be_printercount` int(11) NOT NULL DEFAULT '1',
+  `be_feedbackcount` int(11) NOT NULL DEFAULT '1',
+  `be_phone` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_takeawaycustcount` int(11) NOT NULL DEFAULT '1',
+  `be_voucherhead_count` int(11) DEFAULT '1',
+  `be_appstring` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_kotstatuschange` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_listimage` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_fin_year_start` char(4) COLLATE utf8_unicode_ci DEFAULT '0104',
+  `be_fin_year_end` char(4) COLLATE utf8_unicode_ci DEFAULT '0331',
+  `be_printall` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_personscount` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_inventorylink` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_userpermissionadd` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_ta_kotbypass` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_ta_combkotbill_print` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_tableprefix_split` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_printwithdiscount` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_app_printwithdiscount` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_printwithloyality` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_app_printwithloyality` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_androidpasscode` varchar(5) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_logoinbill` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_billwithportion` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_ratein_kotprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_total_itemcountin_kotprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_staffin_kotprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_slnoin_kotprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_floor_in_kotprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_orderconfirm_bktotablesel` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_androdilogin` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_andr_default_login` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_qtychange_authorise` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_email_on_dayclose` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_bilregen_with_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_compl_manage_auth` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_reportemail_list` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_auth_paymentchange` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_print_on_dayclose` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_sms_on_dayclose` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_sms_list` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_sound_notification` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `be_loyality_reg_msg` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_kod_takeaway` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_kod_dinein` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_consolidated_print` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_voucher_pay_approve_default` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_nearest_roundoff_value` decimal(5,4) NOT NULL DEFAULT '1.0000',
+  `be_cash_drawer` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_cash_drawer_settle_btn` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cash_drawer_settle_ta_hd` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cash_drawer_settle_cs` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_roundoff_visible` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_regenerate_enable` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_bill_reprint_enable` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_billref_in_bill` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_emenu_cart_authorization` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_kotwaiter_name_dis` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_dbbackuplocation` varchar(250) COLLATE utf8_unicode_ci DEFAULT 'C:\\\\Expodine_backup',
+  `be_kot_cancellation_print` char(2) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_staff_selection` varchar(20) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Drop_Down',
+  `be_authorise_with_code` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_dayclose_authorise` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_reprint_authorise` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_bill_split_authorise` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_login_mode` varchar(20) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Normal',
+  `be_change_with_autherise` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_deno_pop_up` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_kod_image` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_eat_in` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_settle_billprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_decimal` tinyint(4) NOT NULL DEFAULT '2',
+  `be_menuimage_in_android` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_count_on` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_kod_screen` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Option_1',
+  `be_android_staffwise_occupied` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_time_zone` varchar(100) COLLATE utf8_unicode_ci DEFAULT 'Asia/Kolkata',
+  `be_base_currency` int(11) DEFAULT NULL,
+  `be_show_currency` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_bill_cancel_auth` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_app_login_code` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_app_auth_code` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_email_void` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_sms_void` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_kod_sound` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_multicard` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_gameurl` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_game_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_search_focus` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'search',
+  `be_gst_info` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_expolitelink` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_android_kotprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_android_kot_consolidated` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_pole_display` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_order_split` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_order_split_authorise` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_loyalty_settle` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_min_redeem_point` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_loyalty_greetings_bday` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_loyalty_greetings_anvy` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_timely_sms` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_comport` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_pole_message` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_combo_enable` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_db_archive_api` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_print_with_preference` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_search_focus_counter` varchar(100) COLLATE utf8_unicode_ci DEFAULT 'search',
+  `be_banquet_gst` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_inventory_staff_add` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_online_company_default` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_onscreen_keyboard` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_floor_table_change` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_cs_kot_before_settle` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_cs_kot_after_settle` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_phone_order` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_phone_order_enable` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_pax_kot_show` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_single_shift` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_shift_mail` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_data_save` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_uae_tax_concept` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_uae_tax_value` decimal(15,3) DEFAULT '0.000',
+  `be_ta_settle_auth` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_cs_settle_auth` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_billprint_option` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `be_bill_print_on` char(1) COLLATE utf8_unicode_ci DEFAULT 'Y',
+  `be_inventory_db_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_daily_stock_update` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_sms_bill` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_store_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT '0',
+  `be_store_db` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_qrcode_db` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_online_order_enable` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `be_cloud_menu_change` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `be_inv_stock_api` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_urban_api_key` varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_urban_api_url` varchar(250) COLLATE utf8_unicode_ci DEFAULT 'https://api.urbanpiper.com',
+  `be_barcode_location` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_menu_list_theme` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Theme_2',
+  `be_common_alerts` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_incl_bill_format` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_kot_generate_tahd` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_single_click_add` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_accounts_start_date` date DEFAULT '2030-07-01',
+  `be_barcode_printer_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT 'TSC',
+  `be_rate_on_button` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_kot_miss_check` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_saudi_format` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_arabic_address` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_di_settle_auth` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_central_kitchen` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_disc_after` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_lukado_on` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_lukado_api` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_lukado_store_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_lukado_key` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_multistore_staff` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `be_inv_sales_stock_reduce` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_bill_print_on_ta` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_bill_print_on_di` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `be_kot_miss_check_ta` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `be_kot_cons_miss_ta` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_kot_cons_miss_di` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_branchmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_branchmaster` AFTER INSERT ON `tbl_branchmaster` FOR EACH ROW begin
+
+INSERT INTO `tbl_branch_settings_printer`(`bp_branchid`) VALUES (new.be_branchid);
+
+
+INSERT INTO `tbl_branch_settings_counter`(`bsc_branchid`) VALUES (new.be_branchid);
+
+
+INSERT INTO `tbl_branch_settings_ta_hd`(`bsth_branchid`) VALUES (new.be_branchid);
+
+
+
+
+
+INSERT INTO `tbl_branch_settings_cloud` (`bsc_branchid`) VALUES
+(1);
+
+INSERT INTO `tbl_branchsettings_android`(`an_id`) VALUES ('1');
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_branchmaster` BEFORE UPDATE ON `tbl_branchmaster` FOR EACH ROW begin
+
+
+
+
+ if(new.be_footer4 != old.be_footer4) then
+
+  set new.be_footer4 = old.be_footer4;
+
+  END IF;
+
+
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_branchsettings_android`
+--
+
+CREATE TABLE `tbl_branchsettings_android` (
+  `an_id` int(11) NOT NULL,
+  `an_login_mode` varchar(100) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Normal',
+  `an_reprint_auth` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_branch_settings_cloud`
+--
+
+CREATE TABLE `tbl_branch_settings_cloud` (
+  `bsc_branchid` int(11) NOT NULL,
+  `bsc_cloud_group_id` int(11) NOT NULL DEFAULT '0',
+  `bsc_cloud_branchid` int(11) NOT NULL DEFAULT '0',
+  `be_cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `sync_pswd` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `avoid_tables` text COLLATE utf8_unicode_ci,
+  `last_sync_time` datetime DEFAULT NULL,
+  `current_table` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `start_sync_time` datetime DEFAULT NULL,
+  `cloud_url` varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `online_ordering_url` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bsc_firebase_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_update_data` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `sync_start_date` date DEFAULT NULL,
+  `sync_status` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_branch_settings_counter`
+--
+
+CREATE TABLE `tbl_branch_settings_counter` (
+  `bsc_branchid` bigint(20) NOT NULL,
+  `bsc_nearest_roundoff` decimal(5,4) NOT NULL DEFAULT '1.0000',
+  `bsc_kotbypass` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bsc_kotprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bsc_discount_popup` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bsc_bill_before_settle` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bsc_default_settle_touchpad` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bsc_enable_generate` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bsc_enable_hold` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bsc_roundoff_visible` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bsc_settle_billprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bsc_bill_series` int(11) NOT NULL DEFAULT '1',
+  `bsc_cs_bill_extra_copy` int(11) NOT NULL DEFAULT '1',
+  `bsc_bill_in_hand_device` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bsc_kot_in_hand_device` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bsc_bill_print` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_branch_settings_loyality`
+--
+
+CREATE TABLE `tbl_branch_settings_loyality` (
+  `bl_branchid` int(11) NOT NULL,
+  `bl_loyality_point` int(11) NOT NULL,
+  `bl_loyality_cash` decimal(15,3) NOT NULL,
+  `bl_redemption_min_point` int(11) NOT NULL,
+  `bl_redemption_cash_value` decimal(15,3) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_branch_settings_printer`
+--
+
+CREATE TABLE `tbl_branch_settings_printer` (
+  `bp_branchid` bigint(20) NOT NULL,
+  `bp_bill_set_ip` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bp_lineseperation_kotprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bp_item_other_lang` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `bp_item_other_lang_kot` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bp_show_steward` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bp_print_proceed_btn` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bp_space_after_item_bill` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bp_long_menu` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `bp_consolidate_kot_iplock` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bp_kot_iplock` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bp_footer` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bp_kot_size` varchar(10) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'NORMAL',
+  `bp_bill_size` varchar(10) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'NORMAL'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_branch_settings_ta_hd`
+--
+
+CREATE TABLE `tbl_branch_settings_ta_hd` (
+  `bsth_branchid` bigint(20) NOT NULL,
+  `bsth_nearest_roundoff` decimal(5,4) NOT NULL DEFAULT '1.0000',
+  `bsth_kotbypass` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bsth_kotprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bsth_discount_popup` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bsth_roundoff_visible` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bsth_enable_hold` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bsth_settle_billprint` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bsth_bill_series` int(11) NOT NULL DEFAULT '1',
+  `bsth_hd_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bsth_hd_bill_extra_copy` int(11) NOT NULL DEFAULT '1',
+  `bsth_ta_bill_extra_copy` int(11) NOT NULL DEFAULT '1',
+  `bsth_delivery_charge` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bsth_staff_assign_bypass` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bsth_bill_print` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bsth_bill_before_tahd` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `bsth_kot_before_tahd` char(1) COLLATE utf8_unicode_ci DEFAULT 'Y',
+  `bsth_kot_after_tahd` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_br_cloud_tables`
+--
+
+CREATE TABLE `tbl_br_cloud_tables` (
+  `id` int(11) NOT NULL,
+  `table_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `status` char(1) COLLATE utf8_unicode_ci DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_cancellation_reasons`
+--
+
+CREATE TABLE `tbl_cancellation_reasons` (
+  `cr_id` int(11) NOT NULL DEFAULT '1',
+  `cr_reason` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `cr_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_cancellation_reasons`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_cancellationreason` BEFORE INSERT ON `tbl_cancellation_reasons` FOR EACH ROW BEGIN
+
+	DECLARE SLNO int;
+
+ 	SELECT MAX(cr_id) INTO SLNO FROM tbl_cancellation_reasons;
+    
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+    END IF;
+
+	SET new.cr_id = SLNO+1;
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_cancellation_reason` BEFORE UPDATE ON `tbl_cancellation_reasons` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_cardmaster`
+--
+
+CREATE TABLE `tbl_cardmaster` (
+  `crd_id` int(15) NOT NULL,
+  `crd_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `crd_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `crd_imageurl` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_cardmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_card_master` BEFORE UPDATE ON `tbl_cardmaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_cash_drawer_log`
+--
+
+CREATE TABLE `tbl_cash_drawer_log` (
+  `cdl_id` int(11) NOT NULL,
+  `cdl_date` date DEFAULT NULL,
+  `cdl_time` time DEFAULT NULL,
+  `cdl_login` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `cdl_interface` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'W',
+  `cdl_machineid` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cdl_app_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_cash_drawer_log`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_cash_drawer_log` BEFORE INSERT ON `tbl_cash_drawer_log` FOR EACH ROW BEGIN
+
+ SET new.cdl_date = CURRENT_DATE();
+ SET new.cdl_time = CURRENT_TIME();
+
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_central_kitchen_transfer`
+--
+
+CREATE TABLE `tbl_central_kitchen_transfer` (
+  `tct_id` int(11) NOT NULL,
+  `tct_central_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_product` int(11) DEFAULT NULL,
+  `tct_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_unit_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_qty` decimal(15,3) DEFAULT NULL,
+  `tct_weight` decimal(15,3) DEFAULT NULL,
+  `tct_rate` decimal(15,3) DEFAULT NULL,
+  `tct_total` decimal(15,3) DEFAULT NULL,
+  `tct_tax` decimal(15,3) DEFAULT '0.000',
+  `tct_total_tax` decimal(15,3) DEFAULT '0.000',
+  `tct_final_total` decimal(15,3) DEFAULT NULL,
+  `tct_date` datetime DEFAULT NULL,
+  `tct_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_local_branch` int(11) DEFAULT NULL,
+  `tct_local_store` int(11) DEFAULT NULL,
+  `tct_to_branch` int(11) DEFAULT NULL,
+  `tct_to_store` int(11) DEFAULT NULL,
+  `tct_set` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Z',
+  `tct_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_brand` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_current_stock` decimal(15,3) DEFAULT NULL,
+  `tct_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_mode` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_received` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tct_receive_time` datetime DEFAULT NULL,
+  `tct_receive_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_status_live` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_cancel_time` datetime DEFAULT NULL,
+  `tc_cancel_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tc_receieved_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_central_menu_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_reject_update` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_reject_reason` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_edit_value` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tct_edited_by` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_edited_stage` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_edited_time` datetime DEFAULT NULL,
+  `tct_from_store_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_to_store_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_from_branch_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_to_branch_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_live_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tct_live_or_local` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Local',
+  `tct_option` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_city`
+--
+
+CREATE TABLE `tbl_city` (
+  `cy_cityid` bigint(20) NOT NULL,
+  `cy_cityname` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
+  `cy_stateid` bigint(20) NOT NULL,
+  `cy_countryid` smallint(6) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_city`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_cityid` BEFORE INSERT ON `tbl_city` FOR EACH ROW BEGIN
+
+	DECLARE NEWSLNO bigint;
+
+	DECLARE SLNO bigint;
+
+ 	SELECT MAX(cy_cityid) INTO SLNO FROM tbl_city;
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+
+
+	SET NEWSLNO = SLNO+1;
+
+
+
+	SET new.cy_cityid = NEWSLNO;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_cloud_backup_history`
+--
+
+CREATE TABLE `tbl_cloud_backup_history` (
+  `cbh_date` date NOT NULL,
+  `cbh_slno` int(11) NOT NULL,
+  `cbh_time` datetime DEFAULT NULL,
+  `cbh_syched` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_cloud_backup_history`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_cloud_backup_history` BEFORE INSERT ON `tbl_cloud_backup_history` FOR EACH ROW BEGIN
+
+	DECLARE SLNO int;
+
+ 	SELECT MAX(cbh_slno) INTO SLNO FROM bl_cloud_backup_history WHERE cbh_date = NEW.cbh_date ;
+
+    
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+	
+
+    SET new.cbh_slno = SLNO+1;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_cloudback_history` BEFORE UPDATE ON `tbl_cloud_backup_history` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_combo_bill_details`
+--
+
+CREATE TABLE `tbl_combo_bill_details` (
+  `cbd_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `cbd_billslno` int(11) NOT NULL,
+  `cbd_count_combo_ordering` int(11) DEFAULT NULL,
+  `cbd_combo_id` int(11) DEFAULT NULL,
+  `cbd_combo_pack_id` int(11) DEFAULT NULL,
+  `cbd_combo_qty` int(11) DEFAULT NULL,
+  `cbd_combo_pack_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cbd_combo_total_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cbd_menu_id` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cbd_menu_qty` int(11) DEFAULT NULL,
+  `cbd_entry_date` datetime DEFAULT NULL,
+  `cbd_dayclosedate` date DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_combo_bill_details`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_combo_bill_details` BEFORE INSERT ON `tbl_combo_bill_details` FOR EACH ROW BEGIN
+              DECLARE SLNO   int;
+
+
+
+SELECT MAX(cbd_billslno)
+INTO SLNO
+FROM tbl_combo_bill_details
+WHERE cbd_billno = NEW.cbd_billno;
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+
+
+SET new.cbd_billslno = SLNO + 1;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_combo_bill_details` BEFORE UPDATE ON `tbl_combo_bill_details` FOR EACH ROW begin
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+end
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_combo_bill_details_ta`
+--
+
+CREATE TABLE `tbl_combo_bill_details_ta` (
+  `cbd_id` int(11) NOT NULL,
+  `cbd_count_combo_ordering` int(11) DEFAULT NULL,
+  `cbd_billno` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cbd_combo_id` int(11) DEFAULT NULL,
+  `cbd_combo_pack_id` int(11) DEFAULT NULL,
+  `cbd_slno` int(11) NOT NULL DEFAULT '1',
+  `cbd_combo_qty` int(11) DEFAULT NULL,
+  `cbd_combo_pack_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cbd_combo_total_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cbd_menu_id` int(11) DEFAULT NULL,
+  `cbd_menu_qty` int(11) DEFAULT NULL,
+  `cbd_combo_preference` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cbd_entry_date` datetime DEFAULT NULL,
+  `cbd_dayclosedate` date DEFAULT NULL,
+  `cbd_order_status` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cbd_kot_no` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cbd_cancel` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cbd_regen_status` char(1) COLLATE utf8_unicode_ci DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_combo_bill_details_ta`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_combo_bill_details_ta` BEFORE INSERT ON `tbl_combo_bill_details_ta` FOR EACH ROW BEGIN
+              DECLARE SLNO   int;
+
+
+
+SELECT MAX(cbd_slno)
+INTO SLNO
+FROM tbl_combo_bill_details_ta
+WHERE cbd_count_combo_ordering = NEW.cbd_count_combo_ordering;
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+
+
+SET new.cbd_slno = SLNO + 1;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_combo_bill_details_ta` BEFORE UPDATE ON `tbl_combo_bill_details_ta` FOR EACH ROW begin 
+ 
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+end
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_combo_menu_labels`
+--
+
+CREATE TABLE `tbl_combo_menu_labels` (
+  `cml_id` int(11) NOT NULL,
+  `cml_label` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cml_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_combo_name`
+--
+
+CREATE TABLE `tbl_combo_name` (
+  `cn_id` int(11) NOT NULL,
+  `cn_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cn_type` int(11) NOT NULL,
+  `cn_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cn_stock_check` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_combo_ordering_details`
+--
+
+CREATE TABLE `tbl_combo_ordering_details` (
+  `cod_id` int(11) NOT NULL,
+  `cod_count_combo_ordering` int(11) DEFAULT NULL,
+  `cod_orderno` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cod_combo_id` int(11) DEFAULT NULL,
+  `cod_combo_pack_id` int(11) DEFAULT NULL,
+  `cod_slno` int(11) NOT NULL DEFAULT '1',
+  `cod_combo_qty` int(11) DEFAULT NULL,
+  `cod_combo_pack_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cod_combo_total_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cod_menu_id` int(11) DEFAULT NULL,
+  `cod_menu_qty` int(11) DEFAULT NULL,
+  `cod_combo_preference` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cod_entry_date` datetime DEFAULT NULL,
+  `cod_dayclosedate` date DEFAULT NULL,
+  `cod_order_status` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cod_kot_no` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cod_cancel` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_combo_ordering_details`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_combo_ordering_details` BEFORE INSERT ON `tbl_combo_ordering_details` FOR EACH ROW BEGIN
+              DECLARE SLNO   int;
+
+
+
+SELECT MAX(cod_slno)
+INTO SLNO
+FROM tbl_combo_ordering_details
+WHERE cod_count_combo_ordering = NEW.cod_count_combo_ordering;
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+
+
+SET new.cod_slno = SLNO + 1;
+
+
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_combo_packs`
+--
+
+CREATE TABLE `tbl_combo_packs` (
+  `cp_id` int(11) NOT NULL,
+  `cp_pack_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cp_combo` int(11) DEFAULT NULL,
+  `cp_pack_qty` int(11) DEFAULT '0',
+  `cp_pack_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_combo_pack_menus`
+--
+
+CREATE TABLE `tbl_combo_pack_menus` (
+  `cpm_id` int(11) NOT NULL,
+  `cpm_menu_id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `cpm_combo_pack_id` int(11) NOT NULL,
+  `cpm_combo_id` int(11) NOT NULL,
+  `cpm_menu_sale_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cpm_menu_type_label_id` int(11) DEFAULT NULL,
+  `cpm_menu_qty` int(11) DEFAULT NULL,
+  `cpm_menu_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_combo_pack_rates`
+--
+
+CREATE TABLE `tbl_combo_pack_rates` (
+  `cpr_id` int(11) NOT NULL,
+  `cpr_combo_pack_id` int(11) NOT NULL,
+  `cpr_combo_id` int(11) NOT NULL,
+  `cpr_floor_id` int(11) DEFAULT NULL,
+  `cpr_mode` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cpr_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cpr_online_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_combo_stock`
+--
+
+CREATE TABLE `tbl_combo_stock` (
+  `cs_id` int(11) NOT NULL,
+  `cs_pack_id` int(11) DEFAULT NULL,
+  `cs_combo_id` int(11) DEFAULT NULL,
+  `cs_stock_number` int(11) NOT NULL DEFAULT '0',
+  `cs_stock_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cs_stock_date` date DEFAULT NULL,
+  `cs_last_updated` datetime DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_combo_stock`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_combo_stock` BEFORE UPDATE ON `tbl_combo_stock` FOR EACH ROW begin
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+end
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_combo_type`
+--
+
+CREATE TABLE `tbl_combo_type` (
+  `ct_id` int(11) NOT NULL,
+  `ct_type` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_common_logs_all`
+--
+
+CREATE TABLE `tbl_common_logs_all` (
+  `tcl_id` int(11) NOT NULL,
+  `tcl_date` date DEFAULT NULL,
+  `tcl_data` varchar(2500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tcl_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_complementory_reasons`
+--
+
+CREATE TABLE `tbl_complementory_reasons` (
+  `id` int(11) NOT NULL,
+  `cor_reason` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `cor_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_complementory_reasons`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_complementory_reason` BEFORE UPDATE ON `tbl_complementory_reasons` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_consumption`
+--
+
+CREATE TABLE `tbl_consumption` (
+  `tc_id` int(11) NOT NULL,
+  `tc_con_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tc_product` int(11) DEFAULT NULL,
+  `tc_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tc_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tc_qty` int(11) DEFAULT NULL,
+  `tc_weight` decimal(15,3) DEFAULT NULL,
+  `tc_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tc_unit_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tc_rate` decimal(15,3) DEFAULT NULL,
+  `tc_total` decimal(15,3) DEFAULT NULL,
+  `tc_set` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tc_date` date DEFAULT NULL,
+  `tc_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tc_store` int(11) DEFAULT NULL,
+  `tc_brand` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tc_current_stock` decimal(15,3) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tc_balance` decimal(15,3) DEFAULT '0.000'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_consumption`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_consumption` BEFORE UPDATE ON `tbl_consumption` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_contra_voucher`
+--
+
+CREATE TABLE `tbl_contra_voucher` (
+  `cv_id` int(11) NOT NULL,
+  `cv_date` date DEFAULT NULL,
+  `cv_from_acc` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cv_to_acc` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cv_amount` decimal(15,3) DEFAULT NULL,
+  `cv_transaction_data` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cv_remarks` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cv_entry_date` date DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cv_cloud_added` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cv_cloud_edited` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_corporatemaster`
+--
+
+CREATE TABLE `tbl_corporatemaster` (
+  `ct_corporatecode` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `ct_corporatename` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `ct_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ct_online_id` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_corporatemaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_corporatediscount` BEFORE INSERT ON `tbl_corporatemaster` FOR EACH ROW BEGIN
+
+
+
+    DECLARE prefx varchar(3);
+
+ DECLARE corporateno TINYINT;
+
+
+
+SELECT be_branchprefix, be_corporatecount
+  INTO prefx, corporateno
+  FROM tbl_branchmaster;
+
+
+
+SET new.ct_corporatecode = CONCAT('C', corporateno);
+
+
+
+UPDATE tbl_branchmaster
+   SET be_corporatecount = be_corporatecount + 1;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_corporate_master` BEFORE UPDATE ON `tbl_corporatemaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_country`
+--
+
+CREATE TABLE `tbl_country` (
+  `cy_countyid` smallint(11) NOT NULL,
+  `cy_countryname` varchar(100) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_country`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_countryid` BEFORE INSERT ON `tbl_country` FOR EACH ROW BEGIN
+
+	DECLARE NEWSLNO smallint;
+
+	DECLARE SLNO smallint;
+
+ 	SELECT MAX(cy_countyid) INTO SLNO FROM tbl_country;
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+
+
+	SET NEWSLNO = SLNO+1;
+
+
+
+	SET new.cy_countyid = NEWSLNO;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_couponcompany`
+--
+
+CREATE TABLE `tbl_couponcompany` (
+  `cy_coupid` int(11) NOT NULL,
+  `cy_companyname` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `cy_active` char(3) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Yes',
+  `cy_startdate` date NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_couponcompany`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_coupon_company` BEFORE UPDATE ON `tbl_couponcompany` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_credit_details`
+--
+
+CREATE TABLE `tbl_credit_details` (
+  `cd_slno` int(11) NOT NULL,
+  `cd_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `cd_modeofentry` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cd_masterid` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `cd_amount` decimal(15,2) NOT NULL,
+  `cd_dateofentry` datetime NOT NULL,
+  `cd_settled` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cd_dateofsettle` datetime DEFAULT NULL,
+  `cd_dayclosedate` date DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_credit_details`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_creditdetails` AFTER INSERT ON `tbl_credit_details` FOR EACH ROW begin
+
+
+
+
+  DECLARE roomid int;
+
+  
+
+  set roomid = 0;
+
+
+
+UPDATE tbl_credit_master
+
+   SET crd_totalamount = (crd_totalamount + new.cd_amount)
+
+ WHERE crd_id = trim(new.cd_masterid);
+
+
+
+SELECT `crd_roomid`
+
+  INTO roomid
+
+  FROM `tbl_credit_master`
+
+ WHERE `crd_id` = trim(new.cd_masterid);
+
+
+
+ IF(roomid != 0) THEN
+
+    BEGIN
+
+    
+
+      CALL proc_credittoroom(trim(NEW.cd_masterid),NEW.cd_billno,roomid,new.cd_amount);
+
+      
+
+      END;
+
+    END IF;
+
+    
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trau_creditdetails` AFTER UPDATE ON `tbl_credit_details` FOR EACH ROW begin
+
+
+
+  if(new.cd_settled = 'Y')then
+
+  begin
+
+     update tbl_credit_master set crd_totalamount = (crd_totalamount - new.cd_amount) where crd_id = trim(new.cd_masterid);
+
+
+
+
+
+  END;
+
+  END IF;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_creditdetails` BEFORE INSERT ON `tbl_credit_details` FOR EACH ROW begin
+
+ 
+
+    set  new.cd_dateofentry = now();
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_credit_details` BEFORE UPDATE ON `tbl_credit_details` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_credit_details_payment`
+--
+
+CREATE TABLE `tbl_credit_details_payment` (
+  `cdp_master_id` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `cdp_dayclosedate` date NOT NULL,
+  `cdp_slno` int(11) NOT NULL,
+  `cdp_paid_cash` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cdp_transaction_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cdp_balance` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cdp_entry_time` datetime DEFAULT NULL,
+  `cdp_login_id` int(11) DEFAULT NULL,
+  `cdp_bank` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_credit_details_payment`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_credit_details_payment` BEFORE INSERT ON `tbl_credit_details_payment` FOR EACH ROW BEGIN
+
+DECLARE SLNO int;
+
+ 	
+
+    SELECT MAX(cdp_slno) INTO SLNO FROM tbl_credit_details_payment 
+
+    WHERE 	cdp_master_id = NEW.cdp_master_id ;
+
+    
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+	
+
+    SET new.cdp_slno = SLNO+1;
+      SET new.cdp_entry_time = NOW();
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_credit_details_payment` BEFORE UPDATE ON `tbl_credit_details_payment` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_credit_master`
+--
+
+CREATE TABLE `tbl_credit_master` (
+  `crd_id` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `crd_type` int(11) NOT NULL,
+  `crd_branchid` bigint(20) NOT NULL,
+  `crd_totalamount` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `crd_staffid` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `crd_roomid` int(11) DEFAULT NULL,
+  `crd_corporateid` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `crd_guestid` int(11) DEFAULT NULL,
+  `crd_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_credit_master`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_creditmaster` BEFORE INSERT ON `tbl_credit_master` FOR EACH ROW BEGIN
+
+	
+
+    DECLARE creditno int;
+
+    DECLARE prefix varchar(3);
+
+   
+
+    SELECT be_branchprefix,be_credit_count into prefix,creditno FROM  
+
+    tbl_branchmaster where be_branchid = new.crd_branchid;
+
+        
+
+	SET new.crd_id = creditno;
+
+    
+
+    UPDATE tbl_branchmaster SET be_credit_count = be_credit_count +1 
+
+    WHERE be_branchid = new.crd_branchid;
+
+    
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_credit_master` BEFORE UPDATE ON `tbl_credit_master` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_credit_partial_bill`
+--
+
+CREATE TABLE `tbl_credit_partial_bill` (
+  `tcp_id` int(11) NOT NULL,
+  `tcp_billno` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tcp_mode` int(11) DEFAULT NULL,
+  `tcp_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tcp_date` datetime DEFAULT NULL,
+  `tcp_login` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_credit_types`
+--
+
+CREATE TABLE `tbl_credit_types` (
+  `ct_creditid` int(11) NOT NULL,
+  `ct_credit_type` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `ct_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `ct_labels` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_credit_types`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_credittypes` BEFORE INSERT ON `tbl_credit_types` FOR EACH ROW BEGIN
+
+	DECLARE SLNO bigint;
+
+ 	SELECT MAX(ct_creditid) INTO SLNO FROM tbl_credit_types;
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+	SET new.ct_creditid = SLNO +1;
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_credit_type` BEFORE UPDATE ON `tbl_credit_types` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_currency_conv_rate`
+--
+
+CREATE TABLE `tbl_currency_conv_rate` (
+  `cc_base_currency` int(11) NOT NULL,
+  `cc_currency` int(11) NOT NULL,
+  `cc_conversion_rate` decimal(15,6) NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_currency_conv_rate`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_currency_conv_rate` BEFORE UPDATE ON `tbl_currency_conv_rate` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_currency_master`
+--
+
+CREATE TABLE `tbl_currency_master` (
+  `c_id` int(11) NOT NULL,
+  `c_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `c_short_code` char(10) COLLATE utf8_unicode_ci NOT NULL,
+  `c_status` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Active',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_currency_master`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_currencymaster` AFTER INSERT ON `tbl_currency_master` FOR EACH ROW begin
+
+ INSERT INTO `tbl_currency_conv_rate`(`cc_base_currency`, `cc_currency`, `cc_conversion_rate`) VALUES (new.c_id,new.c_id,1);
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_currency_master` BEFORE UPDATE ON `tbl_currency_master` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_customer_ebill_details`
+--
+
+CREATE TABLE `tbl_customer_ebill_details` (
+  `branchid` int(11) DEFAULT NULL,
+  `tc_review` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tc_billno` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_daily_stock_detail`
+--
+
+CREATE TABLE `tbl_daily_stock_detail` (
+  `ts_id` int(11) NOT NULL,
+  `ts_dayclose` date DEFAULT NULL,
+  `ts_menuid` int(11) DEFAULT NULL,
+  `ts_portion` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ts_unit_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ts_unit_weight` decimal(15,3) DEFAULT '0.000',
+  `ts_unit_id` int(11) DEFAULT NULL,
+  `ts_base_unit_id` int(11) DEFAULT NULL,
+  `ts_open_stock` int(11) DEFAULT NULL,
+  `ts_added_stock` int(11) DEFAULT NULL,
+  `ts_balance_stock` int(11) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_databank`
+--
+
+CREATE TABLE `tbl_databank` (
+  `db_id` int(11) NOT NULL,
+  `db_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `db_mailtext` text COLLATE utf8_unicode_ci,
+  `db_messgaetext` text COLLATE utf8_unicode_ci,
+  `db_tomail` text COLLATE utf8_unicode_ci,
+  `db_tomessage` text COLLATE utf8_unicode_ci,
+  `db_attachment` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `db_sendto` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `db_closedate` date NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_databank`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_databank` BEFORE UPDATE ON `tbl_databank` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_datesettings`
+--
+
+CREATE TABLE `tbl_datesettings` (
+  `ds_branchid` bigint(20) NOT NULL,
+  `ds_date` date NOT NULL,
+  `ds_ordercount` int(11) NOT NULL DEFAULT '1',
+  `ds_kotno` int(11) NOT NULL DEFAULT '1',
+  `ds_takeawaybillcount` int(11) NOT NULL DEFAULT '1',
+  `ds_voucherpay_count` int(11) NOT NULL DEFAULT '1',
+  `ds_hold_no` int(11) NOT NULL DEFAULT '1',
+  `ds_kot_cancellation_id` int(11) NOT NULL DEFAULT '1',
+  `ds_bill_ref_dine_in` int(11) NOT NULL DEFAULT '1',
+  `ds_bill_ref_counter` int(11) NOT NULL DEFAULT '1',
+  `ds_bill_ref_ta` int(11) NOT NULL DEFAULT '1',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_datesettings`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_datesettings` BEFORE UPDATE ON `tbl_datesettings` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_dayclose`
+--
+
+CREATE TABLE `tbl_dayclose` (
+  `dc_day` date NOT NULL,
+  `dc_id` bigint(20) NOT NULL,
+  `dc_dateopen` date NOT NULL,
+  `dc_timeopen` time NOT NULL,
+  `dc_dateclose` date DEFAULT NULL,
+  `dc_timeclose` time DEFAULT NULL,
+  `dc_open_total_deno` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `dc_close_total_deno` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `dc_dayclose_sms_success` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `dc_dayclose_email_success` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `dc_last_sms_time` datetime DEFAULT NULL,
+  `dc_last_email_time` datetime DEFAULT NULL,
+  `dc_dayclose_sms_attempts` int(1) NOT NULL DEFAULT '0',
+  `dc_dayclose_email_attempts` int(1) NOT NULL DEFAULT '0',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `dc_profit` decimal(15,3) DEFAULT '0.000',
+  `dc_loss` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `dc_asset` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `dc_liab` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `dc_income` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `dc_expense` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `dc_closing_user` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `dc_closing_pc` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `dc_continue_sale` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `dc_monthy_send` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_dayclose`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_daycloseid` BEFORE INSERT ON `tbl_dayclose` FOR EACH ROW BEGIN
+
+	DECLARE SLNO smallint;
+
+ 	SELECT MAX(dc_id) INTO SLNO FROM tbl_dayclose;
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+
+
+	SET new.dc_id = SLNO +1;
+
+    
+
+  END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_dayclose` BEFORE UPDATE ON `tbl_dayclose` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_dayclose_revert_log`
+--
+
+CREATE TABLE `tbl_dayclose_revert_log` (
+  `td_id` int(11) NOT NULL,
+  `td_reverted_by` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `td_date_time` datetime DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_dbsize_detail`
+--
+
+CREATE TABLE `tbl_dbsize_detail` (
+  `tbs_id` int(11) NOT NULL,
+  `tbs_month` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tbs_size` decimal(15,3) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_delivery_status`
+--
+
+CREATE TABLE `tbl_delivery_status` (
+  `ds_id` int(11) NOT NULL,
+  `ds_name` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `ds_short_code` varchar(3) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_delivery_status`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_delivery_status` BEFORE UPDATE ON `tbl_delivery_status` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_denomination_master`
+--
+
+CREATE TABLE `tbl_denomination_master` (
+  `dm_id` int(11) NOT NULL,
+  `dm_denomination` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `dm_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `dm_display_order` int(11) NOT NULL DEFAULT '1',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_denomination_master`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_denomination_master` BEFORE UPDATE ON `tbl_denomination_master` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_departmentmaster`
+--
+
+CREATE TABLE `tbl_departmentmaster` (
+  `der_departmentid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `der_departmentname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `der_branch` bigint(20) NOT NULL DEFAULT '1',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_departmentmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_departmentid` BEFORE INSERT ON `tbl_departmentmaster` FOR EACH ROW begin 
+
+DECLARE departmentnno INT;
+
+
+
+SELECT be_departmentcount INTO departmentnno FROM tbl_branchmaster WHERE be_branchid = new.der_branch;
+
+SET new.der_departmentid = departmentnno;
+
+UPDATE tbl_branchmaster SET be_departmentcount = be_departmentcount + 1 WHERE be_branchid = new.der_branch;
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_department_master` BEFORE UPDATE ON `tbl_departmentmaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_designationmaster`
+--
+
+CREATE TABLE `tbl_designationmaster` (
+  `dr_designationid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `dr_designationname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dr_branch` bigint(20) NOT NULL DEFAULT '1',
+  `dr_login` varchar(3) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Yes',
+  `dr_takeorder` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `dr_authorisation_code` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_designationmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `stewardnochange` BEFORE UPDATE ON `tbl_designationmaster` FOR EACH ROW begin
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+
+  if(old.dr_designationname = 'Steward') then
+
+set new.dr_designationname = 'Steward';
+
+end if;
+
+
+
+if(old.dr_designationname = 'Delivery Boy') then
+
+set new.dr_designationname = 'Delivery Boy';
+
+end if;
+
+
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_designationid` BEFORE INSERT ON `tbl_designationmaster` FOR EACH ROW begin 
+
+DECLARE designationno INT;
+
+
+
+SELECT be_designationcount INTO designationno FROM tbl_branchmaster WHERE be_branchid = new.dr_branch;
+
+SET new.dr_designationid = designationno;
+
+UPDATE tbl_branchmaster SET be_designationcount = be_designationcount + 1 WHERE be_branchid = new.dr_branch;
+
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_discountmaster`
+--
+
+CREATE TABLE `tbl_discountmaster` (
+  `ds_discountid` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `ds_discountname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `ds_item_discount` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ds_branchid` bigint(20) NOT NULL,
+  `ds_status` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Active',
+  `ds_discountof` decimal(8,3) NOT NULL,
+  `ds_mode` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'P',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ds_cloud_added` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ds_cloud_edit` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_discountmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_discountmaster` BEFORE INSERT ON `tbl_discountmaster` FOR EACH ROW BEGIN
+
+
+	
+
+    DECLARE prefx varchar(3);
+
+	DECLARE discountno tinyint;
+
+
+    
+
+    SELECT be_branchprefix,be_discountcount into prefx, discountno FROM  
+
+    tbl_branchmaster where be_branchid = new.ds_branchid;
+
+        
+
+	SET new.ds_discountid = discountno;
+
+    
+
+    UPDATE tbl_branchmaster SET be_discountcount = be_discountcount +1 WHERE be_branchid
+
+    = new.ds_branchid;
+
+    
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_discount_master` BEFORE UPDATE ON `tbl_discountmaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_employee_master`
+--
+
+CREATE TABLE `tbl_employee_master` (
+  `emp_id` int(11) NOT NULL,
+  `emp_first_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_last_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_employee_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_vendor` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_department` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_designation` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_status` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_mail` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_number` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_salary` decimal(15,3) DEFAULT NULL,
+  `emp_mode` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_alternate_no` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_dob` date DEFAULT NULL,
+  `emp_join_date` date DEFAULT NULL,
+  `emp_id_no` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_id_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_address` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `emp_remarks` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_employee_salary`
+--
+
+CREATE TABLE `tbl_employee_salary` (
+  `tes_id` int(11) NOT NULL,
+  `tes_month` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tes_year` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tes_emp_id` int(11) DEFAULT NULL,
+  `tes_workdays` int(11) DEFAULT NULL,
+  `tes_lopdays` int(11) DEFAULT NULL,
+  `tes_extradays` int(11) DEFAULT NULL,
+  `tes_deduction` decimal(15,3) DEFAULT NULL,
+  `tes_extrapay` decimal(15,3) DEFAULT NULL,
+  `tes_netsalary` decimal(15,3) DEFAULT NULL,
+  `tes_entrydate` datetime DEFAULT NULL,
+  `tes_advance` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tes_paid` decimal(15,3) NOT NULL DEFAULT '0.000'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_employee_voucher`
+--
+
+CREATE TABLE `tbl_employee_voucher` (
+  `ev_id` int(11) NOT NULL,
+  `ev_employee_id` int(11) DEFAULT NULL,
+  `ev_department` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_pay_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_date` date DEFAULT NULL,
+  `ev_amount` decimal(15,3) DEFAULT NULL,
+  `ev_from` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_approved_by` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_trans` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_remarks` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_entry_date` date DEFAULT NULL,
+  `ev_entry_login` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_month` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_year` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_pay_type_acc` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_net_salary_new` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ev_entry_time` datetime DEFAULT NULL,
+  `ev_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_cloud_added` varchar(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_cloud_edited` varchar(1) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_employee_voucher`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_employee` BEFORE UPDATE ON `tbl_employee_voucher` FOR EACH ROW BEGIN
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_expense_voucher`
+--
+
+CREATE TABLE `tbl_expense_voucher` (
+  `ev_id` int(11) NOT NULL,
+  `ev_date` date DEFAULT NULL,
+  `ev_acc_type` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_from_acc` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_to_acc` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_amount` decimal(15,3) DEFAULT NULL,
+  `ev_transaction_data` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_remarks` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_entry_date` date DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ev_entry_time` datetime DEFAULT NULL,
+  `ev_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ev_cloud_added` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ev_cloud_edited` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_expense_voucher`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_expense` BEFORE UPDATE ON `tbl_expense_voucher` FOR EACH ROW BEGIN
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_expodine_machines`
+--
+
+CREATE TABLE `tbl_expodine_machines` (
+  `cm_id` int(11) NOT NULL,
+  `cm_ip_address` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `cm_ip_port` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cm_ip_folder` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `cm_is_server` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cm_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cm_lastupdated_time` datetime DEFAULT NULL,
+  `cm_xml_update_found` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cm_xml_update_from_link` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cm_xml_update_found_time` datetime DEFAULT NULL,
+  `cm_ip_remarks` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cm_enable_cash_drawer` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cm_cash_drawer_ip` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cm_cash_drawer_port` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cm_cash_drawer_usb` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cm_machine_type` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_expodine_machines`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_expodine_machines` BEFORE UPDATE ON `tbl_expodine_machines` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_extra_tax_master`
+--
+
+CREATE TABLE `tbl_extra_tax_master` (
+  `amc_id` int(11) NOT NULL,
+  `amc_name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `amc_value` decimal(5,2) NOT NULL DEFAULT '0.00',
+  `amc_unit` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'P',
+  `amc_label` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `amc_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `amc_symbol` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `amc_entrydate` datetime DEFAULT NULL,
+  `amc_modified_date` datetime DEFAULT NULL,
+  `amc_item_tax` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `amc_enable_cs` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `amc_enable_ta` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `amc_enable_hd` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_extra_tax_master`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_extrataxmaster` BEFORE INSERT ON `tbl_extra_tax_master` FOR EACH ROW set new.amc_entrydate = now()
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_extrataxmaster` BEFORE UPDATE ON `tbl_extra_tax_master` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+set new.amc_modified_date = now();
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_feedbackmaster`
+--
+
+CREATE TABLE `tbl_feedbackmaster` (
+  `fbm_id` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `fbm_question` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `fbm_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `fbm_branchid` bigint(20) DEFAULT NULL,
+  `fbm_avgrating` decimal(2,1) NOT NULL DEFAULT '0.0',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_feedbackmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_feedbackmaster` BEFORE INSERT ON `tbl_feedbackmaster` FOR EACH ROW BEGIN
+
+	
+
+    DECLARE prefx varchar(3);
+
+	DECLARE feedbackcount int;
+
+    DECLARE branchid bigint;
+
+
+
+    SELECT be_branchprefix,	be_feedbackcount , be_branchid  into prefx, feedbackcount, branchid from tbl_branchmaster ;
+
+        
+
+	SET new.fbm_id = feedbackcount;
+
+    SET new.fbm_branchid = 	branchid;
+
+    
+
+    UPDATE tbl_branchmaster SET be_feedbackcount = be_feedbackcount +1 ;
+
+
+
+    
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_feedback_master` BEFORE UPDATE ON `tbl_feedbackmaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_feedbackrating`
+--
+
+CREATE TABLE `tbl_feedbackrating` (
+  `fbr_id` int(11) NOT NULL,
+  `fbr_fbm_id` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `fbr_rate` decimal(2,1) DEFAULT NULL,
+  `fbr_table` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `fbr_entrytime` datetime DEFAULT NULL,
+  `fbr_orderid` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_feedbackrating`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_feedbackrating` AFTER INSERT ON `tbl_feedbackrating` FOR EACH ROW begin
+
+  	DECLARE noofcount INT;
+
+    DECLARE rating_sum FLOAT;
+
+
+
+   select count(*), SUM(fbr_rate) into noofcount,rating_sum  from tbl_feedbackrating where fbr_fbm_id = new.fbr_fbm_id;
+
+   
+
+   update tbl_feedbackmaster set fbm_avgrating = (rating_sum/noofcount) where 
+
+   fbm_id = new.fbr_fbm_id;
+
+   
+
+   
+
+
+
+
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_feedbackrating` BEFORE INSERT ON `tbl_feedbackrating` FOR EACH ROW begin
+
+
+
+ set new.fbr_entrytime = now();
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_feedback_rating` BEFORE UPDATE ON `tbl_feedbackrating` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_feedbackratingcount`
+--
+
+CREATE TABLE `tbl_feedbackratingcount` (
+  `frc_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `frc_5star` int(11) NOT NULL DEFAULT '0',
+  `frc_4star` int(11) NOT NULL DEFAULT '0',
+  `frc_3star` int(11) NOT NULL DEFAULT '0',
+  `frc_2star` int(11) NOT NULL DEFAULT '0',
+  `frc_1star` int(11) NOT NULL DEFAULT '0',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_feedbackratingcount`
+--
+DELIMITER $$
+CREATE TRIGGER `trau_feedbackratingcount` AFTER UPDATE ON `tbl_feedbackratingcount` FOR EACH ROW begin
+DECLARE RATING INT;
+ 
+ SET RATING = new.frc_5star+ new.frc_4star  +new.frc_3star+new.frc_2star+new.frc_1star;
+ 
+ IF (RATING>0) THEN
+ 
+ BEGIN
+ 
+   UPDATE tbl_menumaster set  mr_rating = (((5*new.frc_5star)+(4*new.frc_4star)+(3*new.frc_3star)+(2*new.frc_2star)+(1*new.frc_1star)) /RATING) where mr_menuid = new.frc_menuid;
+
+  END;
+  
+  END IF;
+
+
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_feedback_rating_count` BEFORE UPDATE ON `tbl_feedbackratingcount` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_feedback_remark_entry`
+--
+
+CREATE TABLE `tbl_feedback_remark_entry` (
+  `tfb_id` int(11) NOT NULL,
+  `tfb_customer` int(11) DEFAULT NULL,
+  `tfb_remarks` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tfb_datetime` datetime DEFAULT NULL,
+  `tfb_billno` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tfb_mobile` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_firebase_notification_report`
+--
+
+CREATE TABLE `tbl_firebase_notification_report` (
+  `tf_id` int(11) NOT NULL,
+  `tf_report_head` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tf_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_floormaster`
+--
+
+CREATE TABLE `tbl_floormaster` (
+  `fr_floorid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `fr_branchid` bigint(20) NOT NULL,
+  `fr_floorname` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `fr_status` varchar(10) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Active',
+  `fr_vbill_discount` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `fr_enable_extra_tax` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `fr_extra_prefix` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `fr_bill_series` int(11) NOT NULL DEFAULT '1',
+  `fr_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `fr_order_display` int(11) DEFAULT NULL,
+  `fr_qr_order` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bu_is_central` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_floormaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_appmachinedetails` AFTER INSERT ON `tbl_floormaster` FOR EACH ROW begin
+
+update tbl_appmachinedetails set as_sync_floormaster='Y';
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_floorid` BEFORE INSERT ON `tbl_floormaster` FOR EACH ROW BEGIN
+
+	
+	DECLARE floorno tinyint;
+
+    SELECT be_floorcount into  floorno FROM  
+    tbl_branchmaster where be_branchid = new.fr_branchid;
+
+        
+	SET new.fr_floorid = floorno;
+
+    UPDATE tbl_branchmaster SET be_floorcount = be_floorcount +1 
+    WHERE be_branchid = new.fr_branchid;
+
+    
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_floormaster` BEFORE UPDATE ON `tbl_floormaster` FOR EACH ROW BEGIN
+   DECLARE SYNCH CHAR(1);
+     
+     IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+
+    SET SYNCH ='Y'; 
+    IF(NEW.fr_android_sync != OLD.fr_android_sync) THEN
+    BEGIN 
+    	IF(NEW.fr_android_sync = 'N') THEN
+   		SET SYNCH ='N';
+        END IF;
+    END;
+    END IF;
+   
+   IF(SYNCH ='Y') THEN
+   BEGIN
+   SET NEW.fr_android_sync = 'Y';
+   update tbl_appmachinedetails set as_sync_floormaster='Y';
+   END;
+   ELSE
+   SET NEW.fr_android_sync = 'N';
+   END IF;
+   
+  
+    
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_floor_tax`
+--
+
+CREATE TABLE `tbl_floor_tax` (
+  `ft_floorid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `ft_tax_id` int(11) NOT NULL,
+  `ft_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `ft_entry_date` date DEFAULT NULL,
+  `ft_modified_date` date DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_floor_tax`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_floor_tax` BEFORE INSERT ON `tbl_floor_tax` FOR EACH ROW set new.ft_entry_date = now()
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_floor_tax` BEFORE UPDATE ON `tbl_floor_tax` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+set new.ft_modified_date = now();
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_food_cost`
+--
+
+CREATE TABLE `tbl_food_cost` (
+  `tfc_id` int(11) NOT NULL,
+  `tfc_menu` int(11) DEFAULT NULL,
+  `tfc_portion` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tfc_ing_menu` int(11) DEFAULT NULL,
+  `tfc_qty` decimal(15,3) DEFAULT NULL,
+  `tfc_weight` decimal(15,3) DEFAULT NULL,
+  `tfc_rate` decimal(15,3) DEFAULT NULL,
+  `tfc_total` decimal(15,3) DEFAULT NULL,
+  `tfc_date` datetime DEFAULT NULL,
+  `tfc_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tfc_di` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tfc_ta` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tfc_hd` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tfc_cs` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tfc_store` int(11) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tfc_yield` decimal(15,3) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_function_details`
+--
+
+CREATE TABLE `tbl_function_details` (
+  `fd_id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `fd_reg_type` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `fd_date` date NOT NULL,
+  `fd_time` time NOT NULL,
+  `fd_session` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `fd_function_type` int(11) NOT NULL,
+  `fd_venue` int(11) NOT NULL,
+  `fd_billing_type` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `fd_no_of_pax` int(11) NOT NULL,
+  `fd_per_head_cost` decimal(15,3) NOT NULL,
+  `fd_customer` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `fd_email` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `fd_mobile_1` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `fd_mobile_2` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `fd_landline` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `fd_contact_person` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `fd_address` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `fd_remarks` text COLLATE utf8_unicode_ci NOT NULL,
+  `fd_total_rate` float NOT NULL DEFAULT '0',
+  `fd_status` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Open',
+  `fd_advance_given` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `fd_reg_date` date NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `fd_dayclosedate` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_function_details`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_tbl_function_details` BEFORE INSERT ON `tbl_function_details` FOR EACH ROW BEGIN
+
+DECLARE reg_date VARCHAR(30);
+   
+   SET reg_date=(SELECT dc_day FROM tbl_dayclose Where dc_dateclose is  NULL       ORDER BY dc_day DESC LIMIT 1);
+
+  SET NEW.fd_dayclosedate= reg_date;
+  SET NEW.fd_reg_date= now();
+  
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_function_details` BEFORE UPDATE ON `tbl_function_details` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_function_details_menu`
+--
+
+CREATE TABLE `tbl_function_details_menu` (
+  `fdm_function_id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `fdm_slno` int(11) NOT NULL,
+  `fdm_menu` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `fdm_qty` decimal(15,3) NOT NULL DEFAULT '1.000',
+  `fdm_unit_rate` float NOT NULL DEFAULT '0',
+  `fdm_total_rate` float NOT NULL DEFAULT '0',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_function_details_menu`
+--
+DELIMITER $$
+CREATE TRIGGER `tr_bi_function_menu` BEFORE INSERT ON `tbl_function_details_menu` FOR EACH ROW BEGIN
+
+	DECLARE SLNO int;
+ 	
+
+    SELECT MAX(fdm_slno) INTO SLNO FROM tbl_function_details_menu 
+
+    WHERE fdm_function_id = NEW.fdm_function_id ;
+
+    
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+	
+
+    SET new.fdm_slno = SLNO+1;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_function_details_menu` BEFORE UPDATE ON `tbl_function_details_menu` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_function_extra_costs`
+--
+
+CREATE TABLE `tbl_function_extra_costs` (
+  `fec_id` int(11) NOT NULL,
+  `fec_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `fec_cost` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `fec_unit` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'V',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_function_extra_costs`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_function_extra_costs` BEFORE UPDATE ON `tbl_function_extra_costs` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_function_invoice`
+--
+
+CREATE TABLE `tbl_function_invoice` (
+  `fi_invoice_no` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `fi_function_id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `fi_total_cost` decimal(15,3) NOT NULL,
+  `fi_total_extra_cost` decimal(15,3) NOT NULL,
+  `fi_total_discount` decimal(15,3) NOT NULL,
+  `fi_total_final_rate` decimal(15,3) NOT NULL,
+  `fi_discount_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `fi_paid_by_mode` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `fi_balance_amt` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_function_invoice`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_function_invoice` BEFORE UPDATE ON `tbl_function_invoice` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_function_invoice_extras`
+--
+
+CREATE TABLE `tbl_function_invoice_extras` (
+  `fi_invoice_no` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `fi_slno` int(11) NOT NULL,
+  `fi_extra_id` int(11) NOT NULL,
+  `fi_extra_cost` decimal(15,3) NOT NULL,
+  `fi_extra_rate` decimal(15,3) NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_function_invoice_extras`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_function_invoice_extra` BEFORE INSERT ON `tbl_function_invoice_extras` FOR EACH ROW BEGIN
+
+	DECLARE SLNO int;
+
+ 	
+
+    SELECT MAX(fi_slno) INTO SLNO FROM  tbl_function_invoice_extras 
+
+    WHERE fi_invoice_no = NEW.fi_invoice_no ;
+
+    
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+	
+
+    SET new.fi_slno = SLNO+1;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_function_invoice_extra` BEFORE UPDATE ON `tbl_function_invoice_extras` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_function_type`
+--
+
+CREATE TABLE `tbl_function_type` (
+  `ft_id` int(11) NOT NULL,
+  `ft_name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `ft_status` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Active',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_function_type`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_function_type` BEFORE UPDATE ON `tbl_function_type` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_function_venue`
+--
+
+CREATE TABLE `tbl_function_venue` (
+  `fv_id` int(11) NOT NULL,
+  `fv_name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `fv_status` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_function_venue`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_function_venue` BEFORE UPDATE ON `tbl_function_venue` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_generalsettings`
+--
+
+CREATE TABLE `tbl_generalsettings` (
+  `be_id` int(11) NOT NULL,
+  `be_mail_server` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_mail_port` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_mail_emailid` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_mail_password` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_mail_secure` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_mail_from` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_sms_username` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_sms_apipassword` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_sms_senderid` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_sms_domainid` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_sms_priority` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_sms_method` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_merchant_id` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_collector_id` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_client_id` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_client_secret` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_merchant_username` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_merchant_password` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_upi_auth_token` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_client_hash_salt` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_upi_money_api` varchar(300) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `be_upi_status_api` varchar(300) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `be_sms_api_dynamic` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `dynamic_invoice_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `reset_otp` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `auto_dayclose_time` varchar(50) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `manual_pref_item` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `ebill_link` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `kot_detail_print` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `accounts_section` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `steward_app_menu_change` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `live_table_cloud` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `overdue_pay_check` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `bill_cancel_cloud` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `dayclose_shifts_name` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `otp_bill_cancel` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `otp_item_cancel` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `otp_mail` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `shortlink_api` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `shortlink_token` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `auto_accept_qr` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `amc_otp` varchar(25) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `payment_overdue_date` date DEFAULT '2050-01-01',
+  `overdue_crm` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `lock_crm` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `admin_logon_otp` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `admin_otp_validity` time DEFAULT NULL,
+  `admin_login_via_otp` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `search_popup_single` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_general_settings_log`
+--
+
+CREATE TABLE `tbl_general_settings_log` (
+  `tg_id` int(11) NOT NULL,
+  `tg_message` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_date_time` datetime DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_grn_order`
+--
+
+CREATE TABLE `tbl_grn_order` (
+  `tg_id` int(11) NOT NULL,
+  `tg_grn_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_dayclosedate` date DEFAULT NULL,
+  `tg_product` int(11) DEFAULT NULL,
+  `tg_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_unittype` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_weight` decimal(15,3) DEFAULT '0.000',
+  `tg_qty` int(11) DEFAULT NULL,
+  `tg_unit_rate` decimal(15,3) DEFAULT NULL,
+  `tg_total_rate` decimal(15,3) DEFAULT NULL,
+  `tg_tax_percent` decimal(15,3) DEFAULT NULL,
+  `tg_tax_rate` decimal(15,3) DEFAULT NULL,
+  `tg_final_rate` decimal(15,3) DEFAULT NULL,
+  `tg_expiry_date` date DEFAULT NULL,
+  `tg_brand` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_supplier` int(11) DEFAULT NULL,
+  `tg_store` int(11) DEFAULT NULL,
+  `tg_set` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tg_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_status_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_status_date` datetime DEFAULT NULL,
+  `tg_status` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_direct_transfer` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tg_ip` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_direct_accept` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tg_accept_direct_by` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_accept_direct_time` datetime DEFAULT NULL,
+  `tg_batch_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_grn_order`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_grn_order` BEFORE UPDATE ON `tbl_grn_order` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_grn_summary`
+--
+
+CREATE TABLE `tbl_grn_summary` (
+  `tgs_id` int(11) NOT NULL,
+  `tgs_grn_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tg_final_total` decimal(15,3) DEFAULT NULL,
+  `tg_tax` decimal(15,3) DEFAULT NULL,
+  `tg_tax_amount` decimal(15,3) DEFAULT NULL,
+  `tg_grand_total` decimal(15,3) DEFAULT NULL,
+  `tg_date` date DEFAULT NULL,
+  `tgs_invoice_no` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tgs_adjustment` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tgs_ip` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tgs_remarks` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tgs_edited_time` datetime DEFAULT NULL,
+  `tgs_edit_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_grn_summary`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_grn_summary` BEFORE UPDATE ON `tbl_grn_summary` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_hold_data`
+--
+
+CREATE TABLE `tbl_hold_data` (
+  `th_id` int(11) NOT NULL,
+  `th_hold_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `th_date` date DEFAULT NULL,
+  `th_mode` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_indent_partial`
+--
+
+CREATE TABLE `tbl_indent_partial` (
+  `tip_id` int(11) NOT NULL,
+  `tip_req_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tip_transfer_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tip_qty_weight` decimal(15,3) DEFAULT NULL,
+  `tip_date` datetime DEFAULT NULL,
+  `tip_menuid` int(11) DEFAULT NULL,
+  `tip_done` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_ingredientmaster`
+--
+
+CREATE TABLE `tbl_ingredientmaster` (
+  `ir_ingredientid` bigint(20) NOT NULL,
+  `ir_ingredientname` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
+  `ir_headofficeid` bigint(20) NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_ingredientmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_ingredientmaster` BEFORE INSERT ON `tbl_ingredientmaster` FOR EACH ROW BEGIN
+
+	DECLARE NEWSLNO bigint;
+
+	DECLARE SLNO bigint;
+
+ 	SELECT MAX(ir_ingredientid) INTO SLNO FROM tbl_ingredientmaster;
+
+    IF SLNO is NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+
+
+	SET NEWSLNO = SLNO+1;
+
+
+
+	SET new.ir_ingredientid = NEWSLNO;
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_ingrident_master` BEFORE UPDATE ON `tbl_ingredientmaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_inv_daily_store_stock`
+--
+
+CREATE TABLE `tbl_inv_daily_store_stock` (
+  `tis_id` int(11) NOT NULL,
+  `tis_date` date DEFAULT NULL,
+  `tis_product` int(11) DEFAULT NULL,
+  `tis_weight` decimal(15,3) DEFAULT NULL,
+  `tis_qty` decimal(15,3) DEFAULT NULL,
+  `tis_rate` decimal(15,3) DEFAULT NULL,
+  `tis_tax` decimal(15,3) DEFAULT NULL,
+  `tis_total` decimal(15,3) DEFAULT NULL,
+  `tis_store` int(11) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_inv_kitchen`
+--
+
+CREATE TABLE `tbl_inv_kitchen` (
+  `ti_id` int(11) NOT NULL,
+  `ti_name` varchar(250) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `ti_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `ti_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `central_created` varchar(5) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `updated_in_local` varchar(5) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `central_edited` varchar(5) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `id` int(11) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_inv_kitchen`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_inv_kitchen` BEFORE UPDATE ON `tbl_inv_kitchen` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_inv_settings`
+--
+
+CREATE TABLE `tbl_inv_settings` (
+  `ti_id` int(11) NOT NULL,
+  `ti_requistion_id` int(11) DEFAULT '1',
+  `ti_purchase_id` int(11) DEFAULT '1',
+  `ti_grn_id` int(11) DEFAULT '1',
+  `ti_transfer_id` int(11) NOT NULL DEFAULT '1',
+  `ti_physical_id` int(11) NOT NULL DEFAULT '1',
+  `ti_return_id` int(11) DEFAULT '1',
+  `ti_consumption_id` int(11) DEFAULT '1',
+  `ti_wastage_id` int(11) DEFAULT '1',
+  `ti_production_id` int(11) NOT NULL DEFAULT '1',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ti_central_id` int(11) DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_inv_settings`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_inv_settings` BEFORE UPDATE ON `tbl_inv_settings` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_kotcountermaster`
+--
+
+CREATE TABLE `tbl_kotcountermaster` (
+  `kr_kotcode` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `kr_branchid` bigint(20) NOT NULL,
+  `kr_kotname` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `kr_printerid` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `kr_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `new_from_cloud` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `central_edited` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `central_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_kotcountermaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_kotcountermaster` AFTER INSERT ON `tbl_kotcountermaster` FOR EACH ROW update tbl_appmachinedetails set as_sync_kotcounter='Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_kotcounterid` BEFORE INSERT ON `tbl_kotcountermaster` FOR EACH ROW BEGIN
+
+
+
+    DECLARE prefx varchar(3);
+
+ DECLARE kotno TINYINT;
+
+    DECLARE kotcode VARCHAR(10);
+
+
+
+SELECT be_branchprefix, be_kotcount
+
+  INTO prefx, kotno
+
+  FROM tbl_branchmaster
+
+ WHERE be_branchid = new.kr_branchid;
+
+
+
+SET new.kr_kotcode =   kotno;
+
+
+
+UPDATE tbl_branchmaster
+
+   SET be_kotcount = be_kotcount + 1
+
+ WHERE be_branchid = new.kr_branchid;
+
+
+
+SET new.kr_kotname = upper(new.kr_kotname);
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_kotcountermaster` BEFORE UPDATE ON `tbl_kotcountermaster` FOR EACH ROW BEGIN
+   DECLARE SYNCH CHAR(1);
+     
+     IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+    SET SYNCH ='Y'; 
+    IF(NEW.kr_android_sync != OLD.kr_android_sync) THEN
+    BEGIN 
+    	IF(NEW.kr_android_sync = 'N') THEN
+   		SET SYNCH ='N';
+        END IF;
+    END;
+    END IF;
+   
+   IF(SYNCH ='Y') THEN
+   BEGIN
+   SET NEW.kr_android_sync = 'Y';
+   update tbl_appmachinedetails set as_sync_kotcounter='Y';
+   END;
+   ELSE
+   SET NEW.kr_android_sync = 'N';
+   END IF;
+   
+  
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_kotmaster`
+--
+
+CREATE TABLE `tbl_kotmaster` (
+  `kr_date` date NOT NULL,
+  `kr_kotno` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `kr_print` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `kr_firstprint` datetime DEFAULT NULL,
+  `kr_lastprint` datetime DEFAULT NULL,
+  `kr_time` time DEFAULT NULL,
+  `kr_mode_of_order` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `kr_order_confirming_staff` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_kotmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_kotmaster` BEFORE UPDATE ON `tbl_kotmaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_kot_cancellation`
+--
+
+CREATE TABLE `tbl_kot_cancellation` (
+  `kc_cancellation_id` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `kc_date` date NOT NULL,
+  `kc_time` time NOT NULL,
+  `kc_table` varchar(500) COLLATE utf8_unicode_ci NOT NULL,
+  `kc_login` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_kot_cancellation`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_kot_cancellation` BEFORE UPDATE ON `tbl_kot_cancellation` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_languages`
+--
+
+CREATE TABLE `tbl_languages` (
+  `ls_id` int(11) NOT NULL,
+  `ls_language` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `ls_shortcode` char(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ls_status` char(1) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_language_feedback`
+--
+
+CREATE TABLE `tbl_language_feedback` (
+  `fe_lang_id` int(11) NOT NULL,
+  `fe_feedback_id` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `fe_feedback_name` varchar(200) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_language_floor`
+--
+
+CREATE TABLE `tbl_language_floor` (
+  `f_lang_id` int(11) NOT NULL,
+  `f_floor_id` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `f_floor_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_language_menu_main`
+--
+
+CREATE TABLE `tbl_language_menu_main` (
+  `mm_lang_id` int(11) NOT NULL,
+  `mm_categoryid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `mm_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_language_menu_master`
+--
+
+CREATE TABLE `tbl_language_menu_master` (
+  `lm_language_id` int(11) NOT NULL,
+  `lm_menu_id` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `lm_menu_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `lm_menu_print` varchar(45) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `lm_menu_description` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `lm_menu_diet` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `lm_menu_prepmode` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_language_menu_sub`
+--
+
+CREATE TABLE `tbl_language_menu_sub` (
+  `mm_lang_id` int(11) NOT NULL,
+  `mm_sub_category_id` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `mm_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_language_portion`
+--
+
+CREATE TABLE `tbl_language_portion` (
+  `lm_language_id` int(11) NOT NULL,
+  `lm_portion_id` int(11) NOT NULL,
+  `lm_portion_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_language_preference`
+--
+
+CREATE TABLE `tbl_language_preference` (
+  `l_lang_id` int(11) NOT NULL,
+  `l_pref_id` int(11) NOT NULL,
+  `l_pref_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_language_staff`
+--
+
+CREATE TABLE `tbl_language_staff` (
+  `s_lang_id` int(11) NOT NULL,
+  `s_staff_id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `s_staff_first_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `s_staff_last_name` varchar(50) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_language_table_master`
+--
+
+CREATE TABLE `tbl_language_table_master` (
+  `t_lang_id` int(11) NOT NULL,
+  `t_table_id` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `t_table_name` varchar(50) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_ledger_group`
+--
+
+CREATE TABLE `tbl_ledger_group` (
+  `tlg_id` int(11) NOT NULL,
+  `tlg_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tlg_status` char(1) COLLATE utf8_unicode_ci DEFAULT 'Y',
+  `tlg_group_type` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tlg_exp_inc_type` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_edited` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_edited_by` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_ledger_master`
+--
+
+CREATE TABLE `tbl_ledger_master` (
+  `tlm_id` int(11) NOT NULL,
+  `tlm_ledger_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tlm_group` int(11) NOT NULL,
+  `tlm_open_bal` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tlm_type` varchar(100) COLLATE utf8_unicode_ci DEFAULT 'Normal',
+  `tlm_vendor_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tlm_staff_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tlm_guest_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tlm_company_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tlm_close_bal` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tlm_capital_cb` int(11) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tlm_cloud_add` char(2) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tlm_cloud_add_by` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tlm_cloud_edit` char(2) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tlm_cloud_edit_by` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_ledger_master`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_ledger` BEFORE UPDATE ON `tbl_ledger_master` FOR EACH ROW BEGIN
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_ledger_openbal_log`
+--
+
+CREATE TABLE `tbl_ledger_openbal_log` (
+  `top_id` int(11) NOT NULL,
+  `top_ledger` int(11) DEFAULT NULL,
+  `top_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `top_date` datetime DEFAULT NULL,
+  `top_amount_now` decimal(15,3) NOT NULL DEFAULT '0.000'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_ledger_setting`
+--
+
+CREATE TABLE `tbl_ledger_setting` (
+  `tps_id` int(11) NOT NULL,
+  `tps_ledger_id` int(11) DEFAULT NULL,
+  `tps_ledger_open_bal` decimal(15,3) DEFAULT NULL,
+  `tps_closing_balance` decimal(15,3) DEFAULT NULL,
+  `tps_dayclosedate` date DEFAULT NULL,
+  `tps_open_bal_updated` varchar(5) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_ledger_setting`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_ledger_op_cl` BEFORE UPDATE ON `tbl_ledger_setting` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loan_advance`
+--
+
+CREATE TABLE `tbl_loan_advance` (
+  `tla_id` int(11) NOT NULL,
+  `tla_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tla_acc_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tla_date` date DEFAULT NULL,
+  `tla_from` int(11) DEFAULT NULL,
+  `tla_to` int(11) DEFAULT NULL,
+  `tla_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tla_paid` decimal(15,3) DEFAULT NULL,
+  `tla_transaction` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tla_particulars` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tla_receive` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tla_entry_date` datetime DEFAULT NULL,
+  `tla_pay_entry` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tla_voucher_no` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tla_main_acc` int(11) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_logindetails`
+--
+
+CREATE TABLE `tbl_logindetails` (
+  `ls_username` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `ls_password` varchar(35) COLLATE utf8_unicode_ci NOT NULL,
+  `ls_branchid` bigint(20) DEFAULT NULL,
+  `ls_applogin` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ls_staffid` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ls_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `ls_restrict_login` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ls_login_status` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ls_login_time` datetime DEFAULT NULL,
+  `ls_logout_time` datetime DEFAULT NULL,
+  `ls_login_machineip` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_logindetails`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_logindetails` BEFORE UPDATE ON `tbl_logindetails` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_login_restrict_logs`
+--
+
+CREATE TABLE `tbl_login_restrict_logs` (
+  `r_id` int(11) NOT NULL,
+  `r_date` datetime NOT NULL,
+  `r_message` varchar(1000) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_login_restrict_logs`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_login_restrict` BEFORE INSERT ON `tbl_login_restrict_logs` FOR EACH ROW begin
+
+ set new.r_date  = now();
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_login_restrict_logs` BEFORE UPDATE ON `tbl_login_restrict_logs` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_campaign`
+--
+
+CREATE TABLE `tbl_loyalty_campaign` (
+  `lc_id` int(11) NOT NULL,
+  `lc_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `lc_from` date NOT NULL,
+  `lc_to` date NOT NULL,
+  `lc_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `lc_condent` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_loyalty_campaign`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_loyality_campaign` BEFORE UPDATE ON `tbl_loyalty_campaign` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_campaign_group`
+--
+
+CREATE TABLE `tbl_loyalty_campaign_group` (
+  `gp_id` int(11) NOT NULL,
+  `gp_groupname` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `gp_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `gp_value` decimal(6,3) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_discount`
+--
+
+CREATE TABLE `tbl_loyalty_discount` (
+  `ld_visitcount` int(11) NOT NULL,
+  `ld_discount` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `ld_type` varchar(5) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_loyalty_discount`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_loyality_discount` BEFORE UPDATE ON `tbl_loyalty_discount` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_group_details`
+--
+
+CREATE TABLE `tbl_loyalty_group_details` (
+  `tgp_groupid` int(11) NOT NULL,
+  `tgp_customerid` int(11) NOT NULL,
+  `tgp_groupcode` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tgp_datetime` datetime DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tgp_code_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `tgp_campaign_id` int(11) NOT NULL,
+  `tgp_id` int(11) NOT NULL,
+  `tgp_bill_amount` decimal(15,3) DEFAULT NULL,
+  `tgp_coupon_amount` decimal(15,3) DEFAULT NULL,
+  `tgp_bill_date_time` datetime DEFAULT NULL,
+  `tgp_billno` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_levels`
+--
+
+CREATE TABLE `tbl_loyalty_levels` (
+  `ll_id` int(11) NOT NULL,
+  `ll_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `ll_description` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ll_condition_value` int(11) DEFAULT NULL,
+  `ll_reward_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ll_reward_code` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ll_reward_value` int(11) DEFAULT NULL,
+  `ll_minorder_value` int(11) DEFAULT NULL,
+  `ll_customers` int(11) DEFAULT NULL,
+  `ll_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `ll_special_rewards` int(11) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_loyalty_levels`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_loyality_levels` BEFORE UPDATE ON `tbl_loyalty_levels` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_pointadd_bill`
+--
+
+CREATE TABLE `tbl_loyalty_pointadd_bill` (
+  `lob_id` int(11) NOT NULL,
+  `lob_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `lob_bill_amount` decimal(15,3) DEFAULT NULL,
+  `lob_point_add` decimal(15,2) DEFAULT NULL,
+  `lob_point_redeem` decimal(15,2) DEFAULT NULL,
+  `lob_redeem_amount` decimal(15,3) DEFAULT NULL,
+  `lob_date` datetime DEFAULT NULL,
+  `lob_loyalty_customer` int(11) DEFAULT NULL,
+  `lob_mode` varchar(11) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_loyalty_pointadd_bill`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_loyality_point_add_bill` BEFORE UPDATE ON `tbl_loyalty_pointadd_bill` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_pointrule`
+--
+
+CREATE TABLE `tbl_loyalty_pointrule` (
+  `lyp_id` int(11) NOT NULL,
+  `lyp_point` decimal(15,2) DEFAULT NULL,
+  `lyp_amount` decimal(15,3) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_loyalty_pointrule`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_loyality_pointrule` BEFORE UPDATE ON `tbl_loyalty_pointrule` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_point_transfers`
+--
+
+CREATE TABLE `tbl_loyalty_point_transfers` (
+  `lpt_id` int(11) NOT NULL,
+  `lpt_from_id` int(11) NOT NULL,
+  `lpt_to_id` int(11) NOT NULL,
+  `lpt_points` int(11) NOT NULL,
+  `lpt_reason` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `lpt_secret_key` int(11) DEFAULT NULL,
+  `lpt_date` datetime NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_loyalty_point_transfers`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_loyality_point_transfer` BEFORE UPDATE ON `tbl_loyalty_point_transfers` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_redeem_rule`
+--
+
+CREATE TABLE `tbl_loyalty_redeem_rule` (
+  `lyr_id` int(11) NOT NULL,
+  `lyr_point` decimal(15,2) DEFAULT NULL,
+  `lyr_amount` decimal(15,3) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_loyalty_redeem_rule`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_loyalty_redeem_rule` BEFORE UPDATE ON `tbl_loyalty_redeem_rule` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_reg`
+--
+
+CREATE TABLE `tbl_loyalty_reg` (
+  `ly_id` int(11) NOT NULL,
+  `ly_firstname` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `ly_lastname` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_gender` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_mobileno` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_emailid` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_birthdaydate` date DEFAULT NULL,
+  `ly_maritalstatus` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_anniversarydate` date DEFAULT NULL,
+  `ly_profession` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_totalvisit` int(11) NOT NULL DEFAULT '0',
+  `ly_mailreceive` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ly_smsreceive` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ly_entrydatetime` datetime DEFAULT NULL,
+  `ly_branchid` int(11) DEFAULT '1',
+  `ly_status` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Active',
+  `ly_entry_from` varchar(100) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Credit',
+  `ly_points` decimal(15,2) DEFAULT '0.00',
+  `ly_voucher_count` int(11) NOT NULL DEFAULT '1',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ly_loy_dayclose` date DEFAULT NULL,
+  `ly_loy_login` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_gst` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_default` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_module` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_customer_table` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_customer_floor` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_otp` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_discount` decimal(15,3) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_loyalty_reg`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_loyaltyreg` BEFORE INSERT ON `tbl_loyalty_reg` FOR EACH ROW BEGIN
+
+
+
+    DECLARE prefx varchar(3);
+
+ DECLARE regid INT;
+
+
+
+SELECT be_branchprefix, be_loyalityreg_count
+  INTO prefx, regid
+  FROM tbl_branchmaster
+ WHERE be_branchid = new.ly_branchid;
+
+
+
+SET new.ly_id = regid;
+
+
+
+UPDATE tbl_branchmaster
+   SET be_loyalityreg_count = be_loyalityreg_count + 1
+ WHERE be_branchid = new.ly_branchid;
+
+
+
+SET new.ly_entrydatetime = now();
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_loyalty_reg` BEFORE UPDATE ON `tbl_loyalty_reg` FOR EACH ROW Begin 
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+if(new.ly_birthdaydate='1001-01-01')THEN
+
+set new.ly_birthdaydate=NULL;
+
+End if;
+
+if(new.ly_anniversarydate='1001-01-01')THEN
+
+set new.ly_anniversarydate=NULL;
+
+End if;
+
+End
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_rules`
+--
+
+CREATE TABLE `tbl_loyalty_rules` (
+  `lr_id` int(11) NOT NULL,
+  `lr_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `lr_description` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `lr_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `lr_start_at` date NOT NULL,
+  `lr_end_at` date NOT NULL,
+  `lr_type` int(11) NOT NULL,
+  `lr_bill_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `lr_redemption_min_point` int(11) NOT NULL DEFAULT '0',
+  `lr_redemption_cash_value` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_loyalty_rules`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_loyality_rules` BEFORE UPDATE ON `tbl_loyalty_rules` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_rules_type`
+--
+
+CREATE TABLE `tbl_loyalty_rules_type` (
+  `lrt_id` int(11) NOT NULL,
+  `lrt_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `lrt_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_loyalty_rules_type`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_loyality_rules_type` BEFORE UPDATE ON `tbl_loyalty_rules_type` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_sendto`
+--
+
+CREATE TABLE `tbl_loyalty_sendto` (
+  `ls_id` int(11) NOT NULL,
+  `ls_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ls_query` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ls_selected` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_loyalty_sendto`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_loyality_send_to` BEFORE UPDATE ON `tbl_loyalty_sendto` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_sms_source`
+--
+
+CREATE TABLE `tbl_loyalty_sms_source` (
+  `ls_id` int(11) NOT NULL,
+  `ls_sms_data` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ls_date_sendon` datetime DEFAULT NULL,
+  `ls_login_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_loyalty_sms_source`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_loyality_sms_source` BEFORE UPDATE ON `tbl_loyalty_sms_source` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loyalty_voucher`
+--
+
+CREATE TABLE `tbl_loyalty_voucher` (
+  `vr_voucherid` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `vr_vouchername` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `vr_voucherfrom` date NOT NULL,
+  `vr_voucherexpiry` date NOT NULL,
+  `vr_vouchercost` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `vr_vouchercost_unit` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'V',
+  `vr_voucherholder` int(11) NOT NULL,
+  `vr_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_loyalty_voucher`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_loyality_voucher` BEFORE UPDATE ON `tbl_loyalty_voucher` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_loy_coupon`
+--
+
+CREATE TABLE `tbl_loy_coupon` (
+  `tlc_id` int(11) NOT NULL,
+  `tlc_coupon_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tlc_coupon_from` date DEFAULT NULL,
+  `tlc_to` date DEFAULT NULL,
+  `tlc_code` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tlc_customer` int(11) DEFAULT NULL,
+  `tlc_status` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tlc_date` date DEFAULT NULL,
+  `tlc_value` decimal(15,3) NOT NULL DEFAULT '0.000'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menucombination`
+--
+
+CREATE TABLE `tbl_menucombination` (
+  `mn_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mn_menucombid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mn_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_menucombination`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_menucombination` AFTER INSERT ON `tbl_menucombination` FOR EACH ROW UPDATE `tbl_appmachinedetails` SET `as_sync_menucombination` = 'Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menucombination` BEFORE UPDATE ON `tbl_menucombination` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menuimages`
+--
+
+CREATE TABLE `tbl_menuimages` (
+  `mes_imagename` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `mes_imagethumb` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `mes_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mes_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_menuimages`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_menuimage` AFTER INSERT ON `tbl_menuimages` FOR EACH ROW UPDATE `tbl_appmachinedetails` SET `as_sync_menuimage`= 'Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menuimages` BEFORE UPDATE ON `tbl_menuimages` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menuimage_delete_log`
+--
+
+CREATE TABLE `tbl_menuimage_delete_log` (
+  `tmi_id` int(11) NOT NULL,
+  `tmi_thumb_location` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmi_menuid` int(11) DEFAULT NULL,
+  `tmi_date_time` datetime DEFAULT NULL,
+  `tmi_cloud_branch_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmi_cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menuingredients`
+--
+
+CREATE TABLE `tbl_menuingredients` (
+  `ms_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `ms_ingridentid` bigint(20) NOT NULL,
+  `ms_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_menuingredients`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_menuingredients` AFTER INSERT ON `tbl_menuingredients` FOR EACH ROW UPDATE `tbl_appmachinedetails` SET `as_sync_ingredient` = 'Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menu_ingredient` BEFORE UPDATE ON `tbl_menuingredients` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menumaincategory`
+--
+
+CREATE TABLE `tbl_menumaincategory` (
+  `mmy_maincategoryid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `mmy_maincategoryname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `mmy_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `mmy_branchid` bigint(20) NOT NULL,
+  `mmy_displayorder` int(11) DEFAULT '1',
+  `mmy_imagename` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mmy_orderof_print` int(11) NOT NULL DEFAULT '1',
+  `mmy_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mmy_qr_image` varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mmy_inventory` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `mmy_is_central` varchar(10) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mmy_new_cate` varchar(10) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mmy_accepted_outlets` longtext COLLATE utf8_unicode_ci,
+  `new_from_cloud` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `central_edited` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `central_id` int(11) DEFAULT NULL,
+  `pref_ids` varchar(2500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `addons_id` varchar(2500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `last_printer_kitchen` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mmy_delete_mode` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `from_time` time DEFAULT NULL,
+  `to_time` time DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_menumaincategory`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_menumaincategory` AFTER INSERT ON `tbl_menumaincategory` FOR EACH ROW update tbl_appmachinedetails set as_sync_menumaincat='Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_maincatid` BEFORE INSERT ON `tbl_menumaincategory` FOR EACH ROW BEGIN
+
+    DECLARE prefx varchar(3);
+    DECLARE maincatid,DISPLAY_ORDER INT;
+
+  SELECT be_branchprefix, be_menumaincatcount INTO prefx, maincatid
+ FROM tbl_branchmaster WHERE be_branchid = new.mmy_branchid;
+
+SET new.mmy_maincategoryid =  maincatid;
+UPDATE tbl_branchmaster SET be_menumaincatcount = be_menumaincatcount + 1
+WHERE be_branchid = new.mmy_branchid;
+	SELECT MAX(mmy_displayorder) INTO DISPLAY_ORDER FROM  tbl_menumaincategory ;
+ IF DISPLAY_ORDER IS NULL THEN SET DISPLAY_ORDER = 0;
+    END IF;
+ SET new.mmy_displayorder = DISPLAY_ORDER+1;
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menumaincategory` BEFORE UPDATE ON `tbl_menumaincategory` FOR EACH ROW BEGIN 
+
+DECLARE SYNCH CHAR(1); 
+
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+SET SYNCH ='Y'; 
+
+IF(NEW.mmy_android_sync != OLD.mmy_android_sync) THEN 
+BEGIN 
+	IF(NEW.mmy_android_sync = 'N') THEN 
+		SET SYNCH ='N'; 
+	END IF; 
+END;
+END IF; 
+
+IF(SYNCH ='Y') THEN
+BEGIN
+	SET NEW.mmy_android_sync = 'Y'; 
+ 	update tbl_appmachinedetails set as_sync_menumaincat='Y';
+END;
+ELSE 
+	SET NEW.mmy_android_sync = 'N'; 
+END IF; 
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menumaster`
+--
+
+CREATE TABLE `tbl_menumaster` (
+  `mr_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_menuname` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_maincatid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_subcatid` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_description` varchar(5000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_diet` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_time_min` tinyint(4) NOT NULL,
+  `mr_active` char(1) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_kotcounter` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_modifieddate` datetime NOT NULL,
+  `mr_modifieduser` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_rating` tinyint(4) DEFAULT '0',
+  `mr_prepmode` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_branchid` bigint(20) NOT NULL,
+  `mr_itemshortcode` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_dailystock` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_manualrateentry` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_itemcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_dailystock_in_number` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `mr_show_in_kod` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `mr_excempt_tax` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_rate_type` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Portion',
+  `mr_unit_type` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_base_unit` int(11) DEFAULT NULL,
+  `mr_add_on` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_show_in_kot_print` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `manual_barcode` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_ingredient` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_replacer` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_product_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT 'Menu',
+  `inv_pdt_id` varchar(11) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_inventory_kitchen` int(11) DEFAULT NULL,
+  `mr_pkd_date` date DEFAULT NULL,
+  `mr_exp_date` date DEFAULT NULL,
+  `mr_plu` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_reorder_level` decimal(15,3) DEFAULT '0.000',
+  `mr_purchase_price` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mr_raw_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_qr_set` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `mr_delete_mode` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_central_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_excempt_disc` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_central_menu` varchar(25) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_new_menu` varchar(5) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_copy_from` int(11) DEFAULT NULL,
+  `mr_added_branches` longtext COLLATE utf8_unicode_ci,
+  `mr_accepted_outlets` longtext COLLATE utf8_unicode_ci,
+  `mr_stock_inventory` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `mr_hsn` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_stock_in_out` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_menumaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trad_menumaster` AFTER DELETE ON `tbl_menumaster` FOR EACH ROW UPDATE `tbl_appmachinedetails` SET `as_appmachiesych`= 'Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trai_menumaster` AFTER INSERT ON `tbl_menumaster` FOR EACH ROW begin
+
+
+
+UPDATE `tbl_appmachinedetails` SET `as_sync_menumaster` = 'Y';
+
+ 
+
+INSERT INTO `tbl_feedbackratingcount`(`frc_menuid`) VALUES(new.mr_menuid);
+
+
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_menuid` BEFORE INSERT ON `tbl_menumaster` FOR EACH ROW BEGIN 
+
+DECLARE prefx varchar(3); 
+
+DECLARE menuno INT; 
+
+SELECT be_branchprefix, be_menucount INTO prefx, menuno FROM tbl_branchmaster; 
+
+SET new.mr_menuid = menuno; 
+
+UPDATE tbl_branchmaster SET be_menucount = be_menucount + 1; 
+
+SET new.mr_modifieddate = now(); 
+
+SET NEW.mr_menuname = UPPER(NEW.mr_menuname); 
+
+SET NEW.mr_itemshortcode = UPPER(NEW.mr_itemshortcode); 
+
+set NEW.mr_itemcode = UPPER(NEW.mr_itemcode);
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menumaster` BEFORE UPDATE ON `tbl_menumaster` FOR EACH ROW BEGIN 
+DECLARE SYNCH CHAR(1); 
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+SET SYNCH ='Y';
+SET NEW.mr_menuname = UPPER(NEW.mr_menuname); 
+
+SET NEW.mr_itemshortcode = UPPER(NEW.mr_itemshortcode); 
+
+
+SET new.mr_modifieddate = now(); 
+
+set NEW.mr_itemcode = UPPER(NEW.mr_itemcode);
+
+
+IF(NEW.mr_android_sync != OLD.mr_android_sync) 
+THEN BEGIN IF(NEW.mr_android_sync = 'N') 
+THEN SET SYNCH ='N'; END IF; END; END IF; 
+IF(SYNCH ='Y') THEN 
+
+BEGIN
+SET NEW.mr_android_sync = 'Y'; 
+update tbl_appmachinedetails set as_sync_menumaster='Y';
+END;
+ELSE SET NEW.mr_android_sync = 'N'; END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menunutitionfacts`
+--
+
+CREATE TABLE `tbl_menunutitionfacts` (
+  `mnf_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mnf_nutrition` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `mnf_value` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mnf_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_menunutitionfacts`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_menunutitionfacts` AFTER INSERT ON `tbl_menunutitionfacts` FOR EACH ROW UPDATE `tbl_appmachinedetails` SET `as_sync_nutrition` = 'Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menunutitionfacts` BEFORE UPDATE ON `tbl_menunutitionfacts` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menuprefmaster`
+--
+
+CREATE TABLE `tbl_menuprefmaster` (
+  `mpr_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mpr_prefeernce` int(11) NOT NULL,
+  `mpr_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_menuprefmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_menupreference_master` AFTER INSERT ON `tbl_menuprefmaster` FOR EACH ROW update tbl_appmachinedetails set as_sync_menuprefemaster='Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menuprefmaster` BEFORE UPDATE ON `tbl_menuprefmaster` FOR EACH ROW BEGIN 
+
+DECLARE SYNCH CHAR(1); 
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+
+SET SYNCH ='Y';
+
+IF(NEW.mpr_android_sync != OLD.mpr_android_sync) THEN 
+BEGIN 
+	IF(NEW.mpr_android_sync = 'N') THEN 
+	SET SYNCH ='N';
+	END IF; 
+END;
+END IF; 
+
+IF(SYNCH ='Y') THEN 
+BEGIN 
+	SET NEW.mpr_android_sync = 'Y'; 
+	update tbl_appmachinedetails set as_sync_menuprefemaster='Y';
+END;
+ELSE 
+SET NEW.mpr_android_sync = 'N'; 
+END IF; 
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menuratemaster`
+--
+
+CREATE TABLE `tbl_menuratemaster` (
+  `mmr_id` int(11) NOT NULL,
+  `mmr_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mmr_floorid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `mmr_rate_type` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Portion',
+  `mmr_portion` int(11) DEFAULT NULL,
+  `mmr_unit_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mmr_unit_weight` decimal(15,5) NOT NULL DEFAULT '0.00000',
+  `mmr_unit_id` int(11) DEFAULT NULL,
+  `mmr_base_unit_id` int(11) DEFAULT NULL,
+  `mmr_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mmr_default` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mmr_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mmr_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mmr_menu_tax_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mmr_menu_final_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mmr_menu_tax_value` decimal(15,3) NOT NULL DEFAULT '0.000'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_menuratemaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trad_menuratemaster` AFTER DELETE ON `tbl_menuratemaster` FOR EACH ROW UPDATE `tbl_appmachinedetails` SET `as_appmachiesych`= 'Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trai_menuratemaster` AFTER INSERT ON `tbl_menuratemaster` FOR EACH ROW BEGIN 
+	DECLARE DAILYSTOCK CHAR(1);
+	DECLARE DAYCLOSEDATE date;
+
+ 
+	SELECT mr_dailystock into DAILYSTOCK FROM tbl_menumaster  WHERE mr_menuid = new.mmr_menuid;
+
+	IF(DAILYSTOCK = 'Y') THEN
+	begin 
+      call proc_menustock_entry(new.mmr_menuid,new.mmr_rate_type,new.mmr_portion,new.mmr_unit_type,new.mmr_unit_weight,new.mmr_unit_id,new.mmr_base_unit_id);
+      
+	end;
+
+  	END IF;
+    
+    
+    	if(new.mmr_android_sync='Y') THEN 
+	BEGIN 
+
+		update tbl_appmachinedetails set as_sync_menuratemaster='Y'; 
+
+	END; 
+	end IF; 
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menuratemaster` BEFORE UPDATE ON `tbl_menuratemaster` FOR EACH ROW BEGIN DECLARE SYNCH CHAR(1); 
+
+SET SYNCH ='Y'; 
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+IF(NEW.mmr_android_sync != OLD.mmr_android_sync) THEN 
+BEGIN 
+	IF(NEW.mmr_android_sync = 'N') THEN 
+	SET SYNCH ='N'; 
+    END IF; 
+END; 
+END IF; 
+
+IF(SYNCH ='Y') THEN
+BEGIN 
+	SET NEW.mmr_android_sync = 'Y'; 
+ 	update tbl_appmachinedetails set as_sync_menuratemaster='Y';
+END;
+ELSE 
+SET NEW.mmr_android_sync = 'N';
+END IF; 
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menuratetakeaway`
+--
+
+CREATE TABLE `tbl_menuratetakeaway` (
+  `mta_id` int(11) NOT NULL,
+  `mta_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mta_rate_type` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Portion',
+  `mta_portion` int(11) DEFAULT NULL,
+  `mta_unit_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mta_unit_weight` decimal(15,5) NOT NULL DEFAULT '0.00000',
+  `mta_unit_id` int(11) DEFAULT NULL,
+  `mta_base_unit_id` int(11) DEFAULT NULL,
+  `mta_branchid` bigint(20) NOT NULL,
+  `mta_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mta_default` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mta_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mta_food_partner` int(11) DEFAULT NULL,
+  `mta_menu_tax_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mta_menu_final_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mta_menu_tax_value` decimal(15,3) NOT NULL DEFAULT '0.000'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_menuratetakeaway`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_menuratetakeaway` AFTER INSERT ON `tbl_menuratetakeaway` FOR EACH ROW BEGIN 
+	DECLARE DAILYSTOCK CHAR(1);
+
+ 
+	SELECT mr_dailystock into DAILYSTOCK FROM tbl_menumaster  WHERE mr_menuid = new.mta_menuid;
+
+	IF(DAILYSTOCK = 'Y') THEN
+	begin 
+      
+		 call proc_menustock_entry(new.mta_menuid,new.mta_rate_type,new.mta_portion,new.mta_unit_type,new.mta_unit_weight,new.mta_unit_id,new.mta_base_unit_id);
+         
+         
+	end;
+
+  	END IF;
+    
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menuratetakeaway` BEFORE UPDATE ON `tbl_menuratetakeaway` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menurate_counter`
+--
+
+CREATE TABLE `tbl_menurate_counter` (
+  `mrc_id` int(11) NOT NULL,
+  `mrc_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mrc_rate_type` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Portion',
+  `mrc_portion` int(11) DEFAULT NULL,
+  `mrc_unit_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mrc_unit_weight` decimal(15,5) NOT NULL DEFAULT '0.00000',
+  `mrc_unit_id` int(11) DEFAULT NULL,
+  `mrc_base_unit_id` int(11) DEFAULT NULL,
+  `mrc_branchid` bigint(20) NOT NULL,
+  `mrc_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mrc_default` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mrc_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `mrc_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mrc_menu_tax_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mrc_menu_final_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mrc_menu_tax_value` decimal(15,3) NOT NULL DEFAULT '0.000'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_menurate_counter`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_menurate_counter` AFTER INSERT ON `tbl_menurate_counter` FOR EACH ROW BEGIN 
+	DECLARE DAILYSTOCK CHAR(1);
+
+ 
+	SELECT mr_dailystock into DAILYSTOCK FROM tbl_menumaster  WHERE mr_menuid = new.mrc_menuid;
+
+	IF(DAILYSTOCK = 'Y') THEN
+	begin 
+      
+			call proc_menustock_entry(new.mrc_menuid,new.mrc_rate_type,new.mrc_portion,new.mrc_unit_type,new.mrc_unit_weight,new.mrc_unit_id,new.mrc_base_unit_id);
+	end;
+
+  	END IF;
+    
+    
+    	if(new.mrc_android_sync='Y') THEN 
+	BEGIN 
+
+		update tbl_appmachinedetails set as_sync_counterrate='Y'; 
+
+	END; 
+	end IF; 
+
+
+   
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menurate_counter` BEFORE UPDATE ON `tbl_menurate_counter` FOR EACH ROW BEGIN DECLARE SYNCH CHAR(1); 
+
+SET SYNCH ='Y'; 
+
+IF(NEW.mrc_android_sync != OLD.mrc_android_sync) THEN 
+BEGIN 
+
+    IF(NEW.mrc_android_sync = 'N') 
+    THEN SET SYNCH ='N'; 
+    END IF; 
+END; 
+END IF; 
+
+IF(SYNCH ='Y') THEN 
+BEGIN 
+	SET NEW.mrc_android_sync = 'Y'; 
+	update tbl_appmachinedetails set as_sync_counterrate='Y';
+END;
+ELSE 
+	SET NEW.mrc_android_sync = 'N'; 
+END IF; 
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menurate_delete_log`
+--
+
+CREATE TABLE `tbl_menurate_delete_log` (
+  `tmd_id` int(11) NOT NULL,
+  `tmd_menuid` int(11) DEFAULT NULL,
+  `tmd_mmr_id` int(11) DEFAULT NULL,
+  `tmd_mode` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmd_date_time` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmd_cloud_sync` char(1) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menurate_roomservice`
+--
+
+CREATE TABLE `tbl_menurate_roomservice` (
+  `mrs_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mrs_portion` int(11) NOT NULL,
+  `mrs_branchid` bigint(20) NOT NULL,
+  `mrs_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_menurate_roomservice`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_menurate_roomservice` BEFORE UPDATE ON `tbl_menurate_roomservice` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menusearchtype`
+--
+
+CREATE TABLE `tbl_menusearchtype` (
+  `me_id` int(11) NOT NULL,
+  `me_type` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `me_description` text COLLATE utf8_unicode_ci NOT NULL,
+  `me_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_menusearchtype`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_menusearchtype` BEFORE UPDATE ON `tbl_menusearchtype` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menustock`
+--
+
+CREATE TABLE `tbl_menustock` (
+  `mk_id` int(11) NOT NULL,
+  `mk_date` date NOT NULL,
+  `mk_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mk_portion` int(11) DEFAULT NULL,
+  `mk_unit_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mk_unit_weight` decimal(15,5) DEFAULT '0.00000',
+  `mk_unit_id` int(11) DEFAULT NULL,
+  `mk_base_unit_id` int(11) DEFAULT NULL,
+  `mk_stock` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `mk_stocktime` datetime DEFAULT NULL,
+  `mk_stock_number` decimal(10,2) DEFAULT '0.00',
+  `mk_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mk_opening_stock` int(11) DEFAULT '0',
+  `mk_open_stock_date` date DEFAULT NULL,
+  `mk_added_stock_total` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_menustock`
+--
+DELIMITER $$
+CREATE TRIGGER `trad_menustock` AFTER DELETE ON `tbl_menustock` FOR EACH ROW UPDATE `tbl_appmachinedetails` SET `as_appmachiesych`= 'Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trai_menustock` AFTER INSERT ON `tbl_menustock` FOR EACH ROW UPDATE `tbl_appmachinedetails` SET `as_sync_menustock`= 'Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trau_menustock` AFTER UPDATE ON `tbl_menustock` FOR EACH ROW begin
+
+
+ 
+   if(new.mk_android_sync='Y') THEN BEGIN  END; end IF; 
+
+
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_menustock` BEFORE INSERT ON `tbl_menustock` FOR EACH ROW BEGIN 
+
+  DECLARE DAILY_STOCK, DAILY_STOCKIN_NO CHAR(1); 
+
+  select mr_dailystock,mr_dailystock_in_number INTO DAILY_STOCK,DAILY_STOCKIN_NO 
+
+  from tbl_menumaster where mr_menuid = new.mk_menuid; 
+
+  IF(DAILY_STOCK = 'Y' AND DAILY_STOCKIN_NO = 'Y')THEN 
+
+  BEGIN 
+
+    if(new.mk_stock_number = 0.00)THEN set new.mk_stock= 'N'; 
+
+    elseif(new.mk_stock_number > 0.00)THEN set new.mk_stock= 'Y'; 
+
+    end if; 
+
+  END; 
+
+  end if; 
+
+  set new.mk_stocktime = (now()-1);
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menustock` BEFORE UPDATE ON `tbl_menustock` FOR EACH ROW begin
+DECLARE SYNCH CHAR(1);
+  DECLARE DAILY_STOCK, DAILY_STOCKIN_NO CHAR(1); 
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+
+ SET SYNCH ='Y';
+
+  select mr_dailystock,mr_dailystock_in_number INTO DAILY_STOCK,DAILY_STOCKIN_NO from tbl_menumaster where mr_menuid  = new.mk_menuid;
+  IF((TRIM(DAILY_STOCK) = 'Y') AND (TRIM(DAILY_STOCKIN_NO) = 'Y'))THEN
+
+  BEGIN
+
+      if(new.mk_stock_number = 0.00)THEN
+
+      set new.mk_stock= 'N';
+
+      elseif(new.mk_stock_number > 0.00)THEN
+
+      set new.mk_stock= 'Y';
+
+      end if;
+
+  END;
+
+  end if;
+  set  new.mk_stocktime = now();
+  
+  IF(NEW.mk_android_sync != OLD.mk_android_sync) 
+THEN BEGIN IF(NEW.mk_android_sync = 'N') 
+THEN SET SYNCH ='N'; END IF; END; END IF; 
+IF(SYNCH ='Y') THEN 
+BEGIN 
+SET NEW.mk_android_sync = 'Y'; 
+update tbl_appmachinedetails set as_sync_menustock='Y';
+END;
+ELSE SET NEW.mk_android_sync = 'N'; END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menusubcategory`
+--
+
+CREATE TABLE `tbl_menusubcategory` (
+  `msy_subcategoryid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `msy_branchid` bigint(20) NOT NULL,
+  `msy_subcategoryname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `msy_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `msy_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `msy_sub_displayorder` int(11) NOT NULL DEFAULT '1',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `msy_is_central` varchar(10) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `msy_accepted_outlets` longtext COLLATE utf8_unicode_ci,
+  `msy_new_subcat` varchar(10) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `new_from_cloud` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `central_edited` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `central_id` int(11) DEFAULT NULL,
+  `msy_delete_mode` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_menusubcategory`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_menusubcategory` AFTER INSERT ON `tbl_menusubcategory` FOR EACH ROW update tbl_appmachinedetails set as_sync_menusubcat='Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_subcatid` BEFORE INSERT ON `tbl_menusubcategory` FOR EACH ROW begin
+
+    DECLARE prefx varchar(3);
+
+ DECLARE subcatid INT;
+
+
+
+
+
+SELECT be_branchprefix, be_menusubcatcount
+
+  INTO prefx, subcatid
+
+  FROM tbl_branchmaster
+
+ WHERE be_branchid = new.msy_branchid;
+
+
+
+
+
+SET new.msy_subcategoryid = subcatid;
+
+
+
+UPDATE tbl_branchmaster
+
+   SET be_menusubcatcount = be_menusubcatcount + 1
+
+ WHERE be_branchid = new.msy_branchid;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menusubcategory` BEFORE UPDATE ON `tbl_menusubcategory` FOR EACH ROW BEGIN
+
+DECLARE SYNCH CHAR(1);
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+
+SET SYNCH ='Y'; 
+IF(NEW.msy_android_sync != OLD.msy_android_sync) THEN 
+BEGIN 
+    IF(NEW.msy_android_sync = 'N') THEN 
+    SET SYNCH ='N'; 
+    END IF; 
+END; 
+END IF;
+
+IF(SYNCH ='Y') THEN
+BEGIN 
+    SET NEW.msy_android_sync = 'Y';
+    update tbl_appmachinedetails set as_sync_menusubcat='Y';
+    END;
+    ELSE 
+    SET NEW.msy_android_sync = 'N'; 
+END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menu_addons`
+--
+
+CREATE TABLE `tbl_menu_addons` (
+  `ma_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `ma_addon_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `ma_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_menu_addons`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_menu_addons` BEFORE UPDATE ON `tbl_menu_addons` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menu_discount`
+--
+
+CREATE TABLE `tbl_menu_discount` (
+  `md_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `md_slno` int(11) NOT NULL,
+  `md_discount` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `md_date_limit` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `md_time_limit` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `md_day_limit` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `md_day` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `md_from_date` date DEFAULT NULL,
+  `md_to_date` date DEFAULT NULL,
+  `md_di_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `md_cs_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `md_ta_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `md_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `md_from_time` time DEFAULT NULL,
+  `md_to_time` time DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `md_cloud_added` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `md_cloud_edited` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_menu_discount`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_menudiscount` BEFORE INSERT ON `tbl_menu_discount` FOR EACH ROW BEGIN
+
+	DECLARE SLNO int;
+
+ 	
+
+    SELECT MAX(md_slno) INTO SLNO FROM tbl_menu_discount 
+
+    WHERE md_menuid = NEW.md_menuid ;
+
+    
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+	
+
+    SET new.md_slno = SLNO+1;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menu_discount` BEFORE UPDATE ON `tbl_menu_discount` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menu_import`
+--
+
+CREATE TABLE `tbl_menu_import` (
+  `ID` int(11) NOT NULL,
+  `CATEGORY` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `SUB_CATEGORY` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `MENU_NAME` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `MENU_CODE` varchar(5) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `KOT_KITCHEN` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `DIET` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `DESCRIPTION` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `TYPE` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `UNIT` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `WEIGHT` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `RATE_1` float NOT NULL DEFAULT '0',
+  `RATE_2` float NOT NULL DEFAULT '0',
+  `RATE_3` float NOT NULL DEFAULT '0',
+  `RATE_4` float NOT NULL DEFAULT '0',
+  `RATE_5` float NOT NULL DEFAULT '0',
+  `RATE_6` float NOT NULL DEFAULT '0',
+  `DYNAMIC_RATE` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `DAILY_STOCK` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `STOCK_IN_NUMBERS` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ESTIMATED_TIME` tinyint(4) NOT NULL DEFAULT '10',
+  `PREPARATION_MODE` varchar(10) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'General',
+  `CATEGORY_ID` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `SUB_CATEGORY_ID` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `KOT_COUNTER_ID` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `MENU_ID` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `UNIT_ID` int(11) DEFAULT NULL,
+  `FLOOR_ID_1` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `FLOOR_ID_2` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `FLOOR_ID_3` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `FLOOR_ID_4` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `FLOOR_ID_5` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ITEM_SHORTCODE` varchar(17) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_menu_import`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_menu_import` BEFORE UPDATE ON `tbl_menu_import` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menu_ingredient_detail`
+--
+
+CREATE TABLE `tbl_menu_ingredient_detail` (
+  `tmi_id` int(11) NOT NULL,
+  `tmi_menuid` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmi_ing_menuid` int(11) DEFAULT NULL,
+  `tmi_ing_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmi_ing_qty` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmi_ing_unit` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmi_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmi_ing_rate` decimal(15,3) DEFAULT NULL,
+  `tmi_ing_total` decimal(15,3) DEFAULT NULL,
+  `tmi_ing_dayclosedate` datetime DEFAULT NULL,
+  `tmi_weight` decimal(15,3) DEFAULT NULL,
+  `tmi_wastage_qty` decimal(15,3) DEFAULT NULL,
+  `tmi_wastage_rate` decimal(15,3) DEFAULT NULL,
+  `tmi_di` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `tmi_ta` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `tmi_hd` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `tmi_cs` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `tmi_store` int(11) DEFAULT NULL,
+  `tmi_yield` decimal(15,3) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tmi_portion` int(11) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_menu_ingredient_detail`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_menu_ing` BEFORE UPDATE ON `tbl_menu_ingredient_detail` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menu_log`
+--
+
+CREATE TABLE `tbl_menu_log` (
+  `tml_id` int(11) NOT NULL,
+  `tml_date` datetime DEFAULT NULL,
+  `tml_menu` int(11) DEFAULT NULL,
+  `tml_data` varchar(2500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tml_staff` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tml_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tml_mode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menu_preference_kot`
+--
+
+CREATE TABLE `tbl_menu_preference_kot` (
+  `tmp_id` int(11) NOT NULL,
+  `tmp_orderno_bill` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmp_qty` int(11) DEFAULT NULL,
+  `tmp_mode` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tmp_menu` int(11) DEFAULT NULL,
+  `tmp_pref_id` int(11) DEFAULT NULL,
+  `tmp_pref_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menu_rate_cs_upload`
+--
+
+CREATE TABLE `tbl_menu_rate_cs_upload` (
+  `mrc_id` int(11) NOT NULL,
+  `mrc_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mrc_rate_type` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Portion',
+  `mrc_portion` int(11) DEFAULT NULL,
+  `mrc_unit_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mrc_unit_weight` decimal(15,5) NOT NULL DEFAULT '0.00000',
+  `mrc_unit_id` int(11) DEFAULT NULL,
+  `mrc_base_unit_id` int(11) DEFAULT NULL,
+  `mrc_branchid` bigint(20) NOT NULL,
+  `mrc_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mrc_default` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mrc_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `mrc_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menu_rate_di_upload`
+--
+
+CREATE TABLE `tbl_menu_rate_di_upload` (
+  `mmr_id` int(11) NOT NULL,
+  `mmr_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mmr_floorid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `mmr_rate_type` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Portion',
+  `mmr_portion` int(11) DEFAULT NULL,
+  `mmr_unit_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mmr_unit_weight` decimal(15,5) NOT NULL DEFAULT '0.00000',
+  `mmr_unit_id` int(11) DEFAULT NULL,
+  `mmr_base_unit_id` int(11) DEFAULT NULL,
+  `mmr_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mmr_default` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mmr_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mmr_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menu_rate_ta_upload`
+--
+
+CREATE TABLE `tbl_menu_rate_ta_upload` (
+  `mta_id` int(11) NOT NULL,
+  `mta_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mta_rate_type` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Portion',
+  `mta_portion` int(11) DEFAULT NULL,
+  `mta_unit_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mta_unit_weight` decimal(15,5) NOT NULL DEFAULT '0.00000',
+  `mta_unit_id` int(11) DEFAULT NULL,
+  `mta_base_unit_id` int(11) DEFAULT NULL,
+  `mta_branchid` bigint(20) NOT NULL,
+  `mta_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `mta_default` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mta_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mta_food_partner` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menu_tax_master`
+--
+
+CREATE TABLE `tbl_menu_tax_master` (
+  `mtm_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `mtm_slno` tinyint(4) NOT NULL,
+  `mtm_tax_id` int(11) NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_menu_tax_master`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_menu_tax_master` BEFORE INSERT ON `tbl_menu_tax_master` FOR EACH ROW BEGIN
+
+	DECLARE SLNO int;
+
+	SELECT MAX(mtm_slno) INTO SLNO FROM tbl_menu_tax_master 
+    WHERE mtm_menuid = NEW.mtm_menuid ;
+   
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+    END IF;
+
+    SET new.mtm_slno = SLNO+1;
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_menu_tax_master` BEFORE UPDATE ON `tbl_menu_tax_master` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_menu_upload`
+--
+
+CREATE TABLE `tbl_menu_upload` (
+  `mr_menuid` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_menuname` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_maincatid` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_subcatid` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_description` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_diet` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_time_min` tinyint(4) NOT NULL,
+  `mr_active` char(1) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_kotcounter` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_modifieddate` datetime NOT NULL,
+  `mr_modifieduser` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_rating` tinyint(4) DEFAULT '0',
+  `mr_prepmode` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_branchid` bigint(20) NOT NULL,
+  `mr_itemshortcode` varchar(17) COLLATE utf8_unicode_ci NOT NULL,
+  `mr_dailystock` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_manualrateentry` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_itemcode` varchar(5) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_dailystock_in_number` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `mr_show_in_kod` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `mr_excempt_tax` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `mr_maincatid_org` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_subcatid_org` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mr_kotcounter_org` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_menu_upload`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_menu_upload` BEFORE UPDATE ON `tbl_menu_upload` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_modulemaster`
+--
+
+CREATE TABLE `tbl_modulemaster` (
+  `mer_moduleid` int(11) NOT NULL,
+  `mer_modulename` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `mer_modulelink` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_modulemaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_modulemaster` BEFORE UPDATE ON `tbl_modulemaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_modulesubmaster`
+--
+
+CREATE TABLE `tbl_modulesubmaster` (
+  `mser_submoduleid` int(11) NOT NULL,
+  `mser_moduleid` int(11) NOT NULL,
+  `mser_subname` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `mser_submodulelink` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_modulesubmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_modulesubmaster` BEFORE UPDATE ON `tbl_modulesubmaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_monthly_inventory_stock`
+--
+
+CREATE TABLE `tbl_monthly_inventory_stock` (
+  `tms_id` int(11) NOT NULL,
+  `tms_date` date DEFAULT NULL,
+  `tms_store` int(11) DEFAULT NULL,
+  `tms_product` int(11) DEFAULT NULL,
+  `tms_qty` decimal(15,3) DEFAULT NULL,
+  `tms_weight` decimal(15,3) DEFAULT NULL,
+  `tms_unit` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tms_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tms_rate` decimal(15,3) DEFAULT NULL,
+  `tms_total` decimal(15,3) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_notifications`
+--
+
+CREATE TABLE `tbl_notifications` (
+  `tbl_notificationid` int(11) NOT NULL,
+  `tbl_notificationtype` int(11) NOT NULL,
+  `tbl_tableid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `tbl_message` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
+  `tbl_read` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tbl_readby` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tbl_insertdate` date DEFAULT NULL,
+  `tbl_inserttime` time DEFAULT NULL,
+  `tbl_readdate` date DEFAULT NULL,
+  `tbl_readtime` time DEFAULT NULL,
+  `tbl_billno` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_notifications`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_notifications` BEFORE INSERT ON `tbl_notifications` FOR EACH ROW Begin
+
+
+
+set new.tbl_insertdate=current_date();
+
+SET new.tbl_inserttime = current_time();
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_notifications` BEFORE UPDATE ON `tbl_notifications` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_online_billdetails`
+--
+
+CREATE TABLE `tbl_online_billdetails` (
+  `tab_billno` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `tab_slno` int(11) NOT NULL,
+  `tab_menu` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_portion` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_qty` int(11) NOT NULL DEFAULT '1',
+  `tab_preferencetext` varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_status` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_entrytime` datetime DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_online_billdetails`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_online_billdetails` BEFORE UPDATE ON `tbl_online_billdetails` FOR EACH ROW begin
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+end
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_online_billmaster`
+--
+
+CREATE TABLE `tbl_online_billmaster` (
+  `on_billno` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `on_billdatetime` date NOT NULL,
+  `on_orderno` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_kotno` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_customer_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_customer_name` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_customer_phone` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_total_items` int(11) DEFAULT NULL,
+  `on_order_type` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_delivery_charge` decimal(15,3) DEFAULT NULL,
+  `on_delivery_street` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_delivery_building` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_delivery_floor` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_delivery_apartment` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_delivery_state` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_delivery_zip_code` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_subtotal` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `on_subtotal_final` decimal(15,3) DEFAULT '0.000',
+  `on_discountvalue` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `on_taxable_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `on_total` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `on_roundoff_value` decimal(15,3) DEFAULT '0.000',
+  `on_finaltotal` decimal(15,3) DEFAULT '0.000',
+  `on_paymode` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `remarks` text COLLATE utf8_unicode_ci NOT NULL,
+  `on_billprinted` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `on_lastprintime` datetime DEFAULT NULL,
+  `on_status` varchar(100) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Billed',
+  `on_discountlabel` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `on_bill_ref` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_online_billmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_online_billmaster` BEFORE UPDATE ON `tbl_online_billmaster` FOR EACH ROW begin
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+end
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_online_order`
+--
+
+CREATE TABLE `tbl_online_order` (
+  `tol_id` int(11) NOT NULL,
+  `tol_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tol_discount` decimal(15,3) DEFAULT '0.000',
+  `tol_tax` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `tol_tax_value` decimal(15,3) DEFAULT '0.000',
+  `tol_credit_settle` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tol_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `tol_order_status` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tol_logo_url` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tol_urban_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tol_local_order` char(1) COLLATE utf8_unicode_ci DEFAULT 'Y',
+  `tol_qr_order` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bu_is_central` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_online_order`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_online_order` BEFORE UPDATE ON `tbl_online_order` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_online_order_counters`
+--
+
+CREATE TABLE `tbl_online_order_counters` (
+  `toc_id` int(11) NOT NULL,
+  `toc_partner` int(11) DEFAULT NULL,
+  `toc_ip` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `toc_status` char(1) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_online_tax`
+--
+
+CREATE TABLE `tbl_online_tax` (
+  `tox_id` int(11) NOT NULL,
+  `tox_partner` int(11) DEFAULT NULL,
+  `tox_tax_id` int(11) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_order_addon`
+--
+
+CREATE TABLE `tbl_order_addon` (
+  `ad_orderno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `ad_order_slno` int(11) NOT NULL,
+  `ad_addon_menu` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `ad_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `ad_qty` int(11) DEFAULT NULL,
+  `ad_total_rate` decimal(15,3) DEFAULT '0.000',
+  `ad_dayclosedate` date NOT NULL,
+  `ad_entrydate` datetime DEFAULT NULL,
+  `ad_kotno` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ad_cancelled` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_order_addon`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_order_addon` BEFORE UPDATE ON `tbl_order_addon` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_order_addon_changes`
+--
+
+CREATE TABLE `tbl_order_addon_changes` (
+  `adc_cancel_id` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `adc_cancel_orderno` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `adc_cancel_order_slno` int(11) NOT NULL,
+  `adc_cancel_menu` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `adc_cancelled_qty` int(11) NOT NULL,
+  `adc_cancelledreason` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `adc_cancelledlogin` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `adc_cancelledby_careof` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `adc_cancelled_date` datetime DEFAULT NULL,
+  `adc_dayclosedate` date DEFAULT NULL,
+  `adc_kotno` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_order_addon_changes`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_order_addon_changes` BEFORE UPDATE ON `tbl_order_addon_changes` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_paymentmode`
+--
+
+CREATE TABLE `tbl_paymentmode` (
+  `pym_id` int(11) NOT NULL,
+  `pym_code` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `pym_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `pym_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `pym_credit_view` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `pym_changesettled_view` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `pym_takeaway_view` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `pym_counter_view` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_paymentmode`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_paymentmode` BEFORE INSERT ON `tbl_paymentmode` FOR EACH ROW BEGIN
+
+	DECLARE SLNO bigint;
+
+ 	SELECT MAX(pym_id) INTO SLNO FROM tbl_paymentmode;
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+	SET new.pym_id = SLNO +1;
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_paymentmode` BEFORE UPDATE ON `tbl_paymentmode` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_payment_auth_log`
+--
+
+CREATE TABLE `tbl_payment_auth_log` (
+  `tp_id` int(11) NOT NULL,
+  `tp_datetime` datetime DEFAULT NULL,
+  `tp_login` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_auth_staff` int(11) DEFAULT NULL,
+  `tp_pay_type` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_billno` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_physical_default`
+--
+
+CREATE TABLE `tbl_physical_default` (
+  `tpf_id` int(11) NOT NULL,
+  `tpf_product` int(11) DEFAULT NULL,
+  `tpf_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpf_brand` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpf_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpf_qty` decimal(15,3) DEFAULT NULL,
+  `tpf_weight` decimal(15,3) DEFAULT NULL,
+  `tpf_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpf_unit_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpf_store` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_physical_stock`
+--
+
+CREATE TABLE `tbl_physical_stock` (
+  `tps_id` int(11) NOT NULL,
+  `tps_phy_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tps_product` int(11) DEFAULT NULL,
+  `tps_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tps_brand` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tps_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tps_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tps_unittype` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tps_qty` int(11) NOT NULL DEFAULT '0',
+  `tps_weight` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tps_store_qty` int(11) DEFAULT NULL,
+  `tps_store_weight` decimal(15,3) DEFAULT NULL,
+  `tps_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tps_date` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tps_set` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tps_store` int(11) DEFAULT NULL,
+  `tps_rate` decimal(15,3) DEFAULT NULL,
+  `tps_total` decimal(15,3) DEFAULT NULL,
+  `tps_approve_date` date DEFAULT NULL,
+  `tps_approved_by` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tps_reason` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tps_aprroving_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_physical_stock`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_physical_stock` BEFORE UPDATE ON `tbl_physical_stock` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_pinmode_log`
+--
+
+CREATE TABLE `tbl_pinmode_log` (
+  `tpn_id` int(11) NOT NULL,
+  `tpn_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpn_staff` int(11) DEFAULT NULL,
+  `tpn_date_time` datetime DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_portionmaster`
+--
+
+CREATE TABLE `tbl_portionmaster` (
+  `pm_id` int(11) NOT NULL,
+  `pm_portionname` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `pm_portionshortcode` char(1) COLLATE utf8_unicode_ci NOT NULL,
+  `pm_viewinbill` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `pm_viewinkot` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `pm_ratio` decimal(3,2) DEFAULT '1.00',
+  `pm_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `display_order` int(11) NOT NULL DEFAULT '1',
+  `pm_is_central` varchar(10) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_portionmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_portionmaster` AFTER INSERT ON `tbl_portionmaster` FOR EACH ROW update tbl_appmachinedetails set as_sync_portionmas='Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_portionmaster` BEFORE UPDATE ON `tbl_portionmaster` FOR EACH ROW BEGIN 
+
+DECLARE SYNCH CHAR(1);
+
+SET SYNCH ='Y'; 
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+
+IF(NEW.pm_android_sync != OLD.pm_android_sync) THEN 
+BEGIN 
+    IF(NEW.pm_android_sync = 'N') THEN 
+    SET SYNCH ='N'; END IF; END; END IF; 
+    IF(SYNCH ='Y') THEN 
+        BEGIN
+        SET NEW.pm_android_sync = 'Y'; 
+        update tbl_appmachinedetails set as_sync_portionmas='Y';
+        END;
+    ELSE 
+    SET NEW.pm_android_sync = 'N'; 
+END IF;
+
+IF(OLD.pm_portionname!= NEW.pm_portionname) THEN
+	SET NEW.pm_portionname = OLD.pm_portionname;
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_preferencemaster`
+--
+
+CREATE TABLE `tbl_preferencemaster` (
+  `pmr_id` int(11) NOT NULL,
+  `pmr_name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `pmr_android_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_preferencemaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_preferencemaster` AFTER INSERT ON `tbl_preferencemaster` FOR EACH ROW update tbl_appmachinedetails set as_sync_prefemaster='Y'
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_preferencemaster` BEFORE UPDATE ON `tbl_preferencemaster` FOR EACH ROW BEGIN 
+
+DECLARE SYNCH CHAR(1); 
+
+SET SYNCH ='Y'; 
+
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+
+
+IF(NEW.pmr_android_sync != OLD.pmr_android_sync) THEN 
+BEGIN 
+    IF(NEW.pmr_android_sync = 'N') THEN 
+    SET SYNCH ='N'; END IF; END; END IF; 
+    IF(SYNCH ='Y') THEN
+    BEGIN 
+        SET NEW.pmr_android_sync = 'Y'; 
+        update tbl_appmachinedetails set as_sync_prefemaster='Y';
+    END;
+    ELSE 
+    SET NEW.pmr_android_sync = 'N'; 
+    END IF; 
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_printersettings`
+--
+
+CREATE TABLE `tbl_printersettings` (
+  `pr_id` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `pr_printername` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `pr_printerip` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `pr_printerport` int(11) DEFAULT NULL,
+  `pr_branchid` bigint(20) NOT NULL,
+  `pr_printertype` int(11) NOT NULL,
+  `pr_floorid` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `pr_kotcode` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `pr_usbprinterip` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `pr_usbprinter` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `pr_defaultusb` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `pr_enable` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `pr_printcount` int(11) NOT NULL DEFAULT '1',
+  `pr_style` int(11) NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_printersettings`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_printersettings` BEFORE INSERT ON `tbl_printersettings` FOR EACH ROW BEGIN
+
+	
+
+    DECLARE prefx varchar(3);
+
+    DECLARE printerno int;
+
+      
+
+    SELECT be_branchprefix,be_printercount into prefx, printerno FROM  
+
+    tbl_branchmaster where be_branchid = new.pr_branchid;
+
+        
+
+	SET new.pr_id = printerno;
+
+    
+
+    UPDATE tbl_branchmaster SET be_printercount = be_printercount +1 WHERE be_branchid
+
+    = new.pr_branchid;
+
+    
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_printersettings` BEFORE UPDATE ON `tbl_printersettings` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_printersettings_ip`
+--
+
+CREATE TABLE `tbl_printersettings_ip` (
+  `pr_id` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `pr_slno` int(11) NOT NULL DEFAULT '1',
+  `pr_machine_ip` varchar(15) COLLATE utf8_unicode_ci NOT NULL DEFAULT '127.0.0.1',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_printersettings_ip`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_printersettings_ip` BEFORE UPDATE ON `tbl_printersettings_ip` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_printersettings_log`
+--
+
+CREATE TABLE `tbl_printersettings_log` (
+  `l_id` int(11) NOT NULL,
+  `l_log` varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `l_date_time` datetime DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_printersettings_log`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_printersettings_log` BEFORE UPDATE ON `tbl_printersettings_log` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_printertype`
+--
+
+CREATE TABLE `tbl_printertype` (
+  `pt_id` int(11) NOT NULL,
+  `pt_typename` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `pt_kotstatus` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `pt_floorvisible` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_printertype`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_printertype` BEFORE UPDATE ON `tbl_printertype` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_printer_function_log`
+--
+
+CREATE TABLE `tbl_printer_function_log` (
+  `tpf_id` int(11) NOT NULL,
+  `tpf_log_data` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpf_date_time` datetime DEFAULT NULL,
+  `tpf_print_status` char(1) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_printer_styles`
+--
+
+CREATE TABLE `tbl_printer_styles` (
+  `ps_id` int(11) NOT NULL,
+  `ps_name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `ps_description` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_printer_styles`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_printer_styles` BEFORE UPDATE ON `tbl_printer_styles` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_production`
+--
+
+CREATE TABLE `tbl_production` (
+  `tp_id` int(11) NOT NULL,
+  `tp_production_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_product` int(11) DEFAULT NULL,
+  `tp_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_unit_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_qty` decimal(15,3) DEFAULT NULL,
+  `tp_weight` decimal(15,3) DEFAULT NULL,
+  `tp_date` date DEFAULT NULL,
+  `tp_set` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tp_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_store` int(11) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tp_portion` int(11) DEFAULT NULL,
+  `tp_prod_central_id` int(11) DEFAULT NULL,
+  `tp_cloud_added` char(1) COLLATE utf8_unicode_ci DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_production`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_production` BEFORE UPDATE ON `tbl_production` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_product_conversion`
+--
+
+CREATE TABLE `tbl_product_conversion` (
+  `tpc_id` int(11) NOT NULL,
+  `tpc_from_product` int(11) DEFAULT NULL,
+  `tpc_to_product` int(11) DEFAULT NULL,
+  `tpc_from_store` int(11) DEFAULT NULL,
+  `tpc_to_store` int(11) DEFAULT NULL,
+  `tpc_date` date DEFAULT NULL,
+  `tpc_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpc_qty` decimal(15,3) DEFAULT NULL,
+  `tpc_weight` decimal(15,3) DEFAULT NULL,
+  `tpc_from_weight` decimal(15,3) DEFAULT NULL,
+  `tpc_from_qty` decimal(15,3) DEFAULT NULL,
+  `tpc_set` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tpc_from_cloud` char(1) COLLATE utf8_unicode_ci DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_product_conversion`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_product_conversion` BEFORE UPDATE ON `tbl_product_conversion` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_profession_master`
+--
+
+CREATE TABLE `tbl_profession_master` (
+  `pr_id` int(11) NOT NULL,
+  `pr_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_purchase_order`
+--
+
+CREATE TABLE `tbl_purchase_order` (
+  `tp_id` int(11) NOT NULL,
+  `tp_purchase_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_dayclosedate` date DEFAULT NULL,
+  `tp_product` int(11) DEFAULT NULL,
+  `tp_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_unittype` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_weight` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tp_qty` int(11) DEFAULT NULL,
+  `tp_brand` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_supplier` int(11) DEFAULT NULL,
+  `tp_store` int(11) DEFAULT NULL,
+  `tp_set` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tp_login` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `tp_status_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tp_status_date` datetime DEFAULT NULL,
+  `tp_status` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tp_ip` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_purchase_order`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_purchase_order` BEFORE UPDATE ON `tbl_purchase_order` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_purchase_return`
+--
+
+CREATE TABLE `tbl_purchase_return` (
+  `tpr_id` int(11) NOT NULL,
+  `tpr_return_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpr_store` int(11) DEFAULT NULL,
+  `tpr_menu` int(11) DEFAULT NULL,
+  `tpr_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpr_unit_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpr_qty` int(11) DEFAULT NULL,
+  `tpr_weight` decimal(15,3) DEFAULT NULL,
+  `tpr_rate` decimal(15,3) DEFAULT NULL,
+  `tpr_total` decimal(15,3) DEFAULT NULL,
+  `tp_tax` decimal(15,3) DEFAULT NULL,
+  `tpp_tax_rate` decimal(15,3) DEFAULT NULL,
+  `tpr_final` decimal(15,3) DEFAULT NULL,
+  `tpr_date` date DEFAULT NULL,
+  `tpr_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpr_grn` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpr_remarks` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tpr_set` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tpr_batch` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_purchase_return`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_purchase order` BEFORE UPDATE ON `tbl_purchase_return` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_receipts`
+--
+
+CREATE TABLE `tbl_receipts` (
+  `tr_id` int(11) NOT NULL,
+  `tr_date` date DEFAULT NULL,
+  `tr_acc_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_from` int(11) DEFAULT NULL,
+  `tr_to` int(11) DEFAULT NULL,
+  `tr_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tr_transaction` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_received` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_particulars` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_entry_date` datetime DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_regenerate_reasons`
+--
+
+CREATE TABLE `tbl_regenerate_reasons` (
+  `rr_id` int(11) NOT NULL,
+  `rr_reason` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `rr_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_regenerate_reasons`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_regenerate_reasons` BEFORE UPDATE ON `tbl_regenerate_reasons` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_regenrate_log`
+--
+
+CREATE TABLE `tbl_regenrate_log` (
+  `re_id` int(11) NOT NULL,
+  `re_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `re_datetime` datetime DEFAULT NULL,
+  `re_staffid` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `re_reason` text COLLATE utf8_unicode_ci,
+  `re_loginid` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `re_secretkey` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `re_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `re_order_no` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `re_new_bill_no` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_regenrate_log`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_regenratelog` BEFORE INSERT ON `tbl_regenrate_log` FOR EACH ROW set new.re_datetime = now()
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_regenrate_log` BEFORE UPDATE ON `tbl_regenrate_log` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_reportmaster`
+--
+
+CREATE TABLE `tbl_reportmaster` (
+  `rm_id` int(11) NOT NULL,
+  `rm_reportid` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `rm_reportname` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `rm_reportview` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `rm_printa4` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `rm_posprintofanother` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `rm_daycloseprint` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `rm_dayclosemail` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `rm_reporttype` char(2) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'DI',
+  `rm_dayclose_print_order` int(11) NOT NULL DEFAULT '0',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_reportmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_reportmaster` BEFORE UPDATE ON `tbl_reportmaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_report_bydate`
+--
+
+CREATE TABLE `tbl_report_bydate` (
+  `rbd_id` int(11) NOT NULL,
+  `rbd_typename` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `rbd_date_limit` int(11) NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_report_bydate`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_report_bydate` BEFORE UPDATE ON `tbl_report_bydate` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_reprint_details`
+--
+
+CREATE TABLE `tbl_reprint_details` (
+  `tr_id` int(11) NOT NULL,
+  `tr_bill` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_kot` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_login` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_date` datetime DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_requisition`
+--
+
+CREATE TABLE `tbl_requisition` (
+  `tr_id` int(11) NOT NULL,
+  `tr_req_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_dayclosedate` date DEFAULT NULL,
+  `tr_product` int(11) DEFAULT NULL,
+  `tr_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_unittype` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_weight` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tr_qty` int(11) NOT NULL DEFAULT '0',
+  `tr_brand` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_set` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tr_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_status_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_status` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_status_date` datetime DEFAULT NULL,
+  `tr_store` int(11) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tr_branchid` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_central` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tr_central_accept` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tr_indent` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tr_indent_done` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tr_indent_accepted` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tr_ip` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_central_menu_id` int(11) DEFAULT NULL,
+  `tr_central_partial` varchar(2) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tr_partial_option` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_cancel_updated` varchar(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tr_cancel_updated_on` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_requisition`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_requisition` BEFORE UPDATE ON `tbl_requisition` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_reset_bill_log`
+--
+
+CREATE TABLE `tbl_reset_bill_log` (
+  `rs_id` int(11) NOT NULL,
+  `rs_login` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `rs_date_time` datetime DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_return_payment`
+--
+
+CREATE TABLE `tbl_return_payment` (
+  `tr_id` int(11) NOT NULL,
+  `tr_vendor` int(11) DEFAULT NULL,
+  `tr_to_acc` int(11) DEFAULT NULL,
+  `tr_return_amount` decimal(15,3) DEFAULT '0.000',
+  `tr_date` datetime DEFAULT NULL,
+  `tr_particulars` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_invoice` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tr_sv_id` int(11) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_roommaster`
+--
+
+CREATE TABLE `tbl_roommaster` (
+  `rm_roomid` int(11) NOT NULL,
+  `rm_roomno` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `rm_status` char(1) COLLATE utf8_unicode_ci DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_roommaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_roommaster` BEFORE UPDATE ON `tbl_roommaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_secretkeymaster`
+--
+
+CREATE TABLE `tbl_secretkeymaster` (
+  `sr_id` int(11) NOT NULL,
+  `sr_staffid` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `sr_key` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sr_password` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sr_generatedtime` datetime NOT NULL,
+  `sr_expiredtime` datetime DEFAULT NULL,
+  `sr_defaultkey` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_secretkeymaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_secretkeymaster` BEFORE UPDATE ON `tbl_secretkeymaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_shift_card_detail_close`
+--
+
+CREATE TABLE `tbl_shift_card_detail_close` (
+  `sb_shiftdate_close` date NOT NULL,
+  `sb_shiftid_close` smallint(6) NOT NULL,
+  `sb_bankid_close` int(11) NOT NULL,
+  `sb_card_amount_close` decimal(15,3) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_shift_card_detail_open`
+--
+
+CREATE TABLE `tbl_shift_card_detail_open` (
+  `sb_shiftdate` date NOT NULL,
+  `sb_shiftid` smallint(6) NOT NULL,
+  `sb_bankid` int(11) NOT NULL,
+  `sb_card_amount` decimal(15,3) NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_shift_close_denomination`
+--
+
+CREATE TABLE `tbl_shift_close_denomination` (
+  `dod_day` date NOT NULL,
+  `dod_shidt_slno` smallint(6) NOT NULL,
+  `dod_deno_id` int(11) NOT NULL,
+  `dod_count` int(11) NOT NULL DEFAULT '0',
+  `dod_value` decimal(15,4) NOT NULL DEFAULT '0.0000',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_shift_close_denomination`
+--
+DELIMITER $$
+CREATE TRIGGER `traf_shiftclose_deno` AFTER INSERT ON `tbl_shift_close_denomination` FOR EACH ROW begin
+
+update tbl_shift_details set sd_total_deno_value_close = sd_total_deno_value_close + new.dod_value where 	sd_day = new.dod_day and sd_id = new.dod_shidt_slno;
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_shift_close_denomination` BEFORE UPDATE ON `tbl_shift_close_denomination` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_shift_details`
+--
+
+CREATE TABLE `tbl_shift_details` (
+  `sd_day` date NOT NULL,
+  `sd_id` smallint(6) NOT NULL,
+  `sd_open` datetime NOT NULL,
+  `sd_open_staff` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `sd_open_balance` decimal(15,4) NOT NULL DEFAULT '0.0000',
+  `sd_open_petty` decimal(15,4) NOT NULL DEFAULT '0.0000',
+  `sd_total_value` decimal(15,4) NOT NULL DEFAULT '0.0000',
+  `sd_total_deno_value` decimal(15,4) NOT NULL DEFAULT '0.0000',
+  `sd_open_machineid` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sd_close` datetime DEFAULT NULL,
+  `sd_close_balance` decimal(15,4) NOT NULL DEFAULT '0.0000',
+  `sd_close_petty` decimal(15,4) NOT NULL DEFAULT '0.0000',
+  `sd_total_value_close` decimal(15,4) NOT NULL DEFAULT '0.0000',
+  `sd_total_deno_value_close` decimal(15,4) NOT NULL DEFAULT '0.0000',
+  `sd_close_machineid` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `sd_changein_open` decimal(15,4) DEFAULT NULL,
+  `sd_changein_close` decimal(15,4) DEFAULT NULL,
+  `sd_open_method` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_shift_details`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_shift_details` BEFORE INSERT ON `tbl_shift_details` FOR EACH ROW BEGIN
+
+	DECLARE SLNO int;
+
+ 	
+
+    SELECT MAX(sd_id) INTO SLNO FROM tbl_shift_details 
+    WHERE sd_day = NEW.sd_day ;
+
+    
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+	
+
+    SET new.sd_id = SLNO+1;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_shift_details` BEFORE UPDATE ON `tbl_shift_details` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_shift_open_denomination`
+--
+
+CREATE TABLE `tbl_shift_open_denomination` (
+  `dod_day` date NOT NULL,
+  `dod_shidt_slno` smallint(6) NOT NULL,
+  `dod_deno_id` int(11) NOT NULL,
+  `dod_count` int(11) NOT NULL DEFAULT '0',
+  `dod_value` decimal(15,4) NOT NULL DEFAULT '0.0000',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_shift_open_denomination`
+--
+DELIMITER $$
+CREATE TRIGGER `traf_shiftopen_deno` AFTER INSERT ON `tbl_shift_open_denomination` FOR EACH ROW begin
+
+update tbl_shift_details set sd_total_deno_value = sd_total_deno_value + new.dod_value where 	sd_day = new.dod_day and sd_id = new.dod_shidt_slno;
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_shift_open_denomination` BEFORE UPDATE ON `tbl_shift_open_denomination` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_sms_report_settings`
+--
+
+CREATE TABLE `tbl_sms_report_settings` (
+  `ss_id` int(11) NOT NULL,
+  `ss_label` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ss_show` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `ss_timely_report_show` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `ss_last_updated` datetime DEFAULT NULL,
+  `ss_updated_login` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ss_last_updated_timely` datetime DEFAULT NULL,
+  `ss_timely_update_login` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_sms_report_slab`
+--
+
+CREATE TABLE `tbl_sms_report_slab` (
+  `sr_id` int(11) NOT NULL,
+  `sr_salevalue` decimal(15,2) NOT NULL,
+  `sms_text` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `sr_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_sms_report_slab`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_ssm_slno` BEFORE INSERT ON `tbl_sms_report_slab` FOR EACH ROW BEGIN
+
+	DECLARE SLNO bigint;
+
+ 	
+
+    SELECT MAX(sr_id) INTO SLNO FROM tbl_sms_report_slab;
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+
+
+	SET new.sr_id = SLNO+1;
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_sms_report_slab` BEFORE UPDATE ON `tbl_sms_report_slab` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_sms_time_settings`
+--
+
+CREATE TABLE `tbl_sms_time_settings` (
+  `tsr_id` int(11) NOT NULL,
+  `tsr_time` time DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_staffmaster`
+--
+
+CREATE TABLE `tbl_staffmaster` (
+  `ser_staffid` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `ser_firstname` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `ser_lastname` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_gender` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `ser_designation` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_department` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_dob` date DEFAULT NULL,
+  `ser_address1` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_address2` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_dateofjoin` date DEFAULT NULL,
+  `ser_mobileno` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_alternateno` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_email` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_employeestatus` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_remarks` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_idtype` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_idno` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_branchofficeid` bigint(20) DEFAULT NULL,
+  `ser_cancelpermission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_cancelwithkey` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `ser_defaultfloor` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_mode` char(1) COLLATE utf8_unicode_ci DEFAULT 'B',
+  `ser_discountpermission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_compl_mgmt` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_stockchng_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_discount_manual` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_counter_enable_generate` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_counter_enable_hold` char(1) COLLATE utf8_unicode_ci DEFAULT 'Y',
+  `ser_permit_cash_drawer_open` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_kot_cancel_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_confirm_code` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_authorisation_code` char(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_bill_cancel_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_rate_edit` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_dayclose_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_shift_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_release_login` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_bill_regen_per` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_bill_reprint_per` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_kot_reprint_per` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_bill_settle_change_per` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_order_split_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_tip_edit_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_dayclose_revert_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_bill_reset` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_salary` decimal(15,3) DEFAULT NULL,
+  `ser_credit_view` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_comp_view` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_credit_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_comp_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_bill_print_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_bill_settle_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_bill_edit_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_change_table_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_advance_pay_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_counter_settle_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_reset_accounts` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `ser_last_inherit_staff` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_online_order` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_inv_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_physical_stock_permission` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_wastage_entry` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_stock_entry` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_req` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_po` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_rps` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_store_transfer` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_return_history` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_inventory_reports` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_purchase_return` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_consumption` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_store_stock` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_dashboard` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_recipe` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_production` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_central_kitchen` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_central_accept` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_com_item` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_inv_check_all` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_force_close` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_discount_after` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_all_shift_closer` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_item_discount_manual` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_indent` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_delete_menu` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_menu_unit_edit` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_store_inv` int(11) DEFAULT '1',
+  `ser_stores` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_approve_cancel_inv` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_direct_transfer` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_indent_accept` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `ser_normal_transfer_accept` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_direct_transfer_accept` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_created_by` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_created_time` datetime DEFAULT NULL,
+  `ser_last_update` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_cloud_added` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_cloud_edit` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_perm_edited_cloud` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_delete_mode` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_last_inherit_permision` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_last_inherit_user_permision` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_last_inherit_app_permision` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ser_app_change` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ser_enable_type` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_staffmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trau_staffmaster` AFTER UPDATE ON `tbl_staffmaster` FOR EACH ROW begin
+
+
+
+    update tbl_secretkeymaster set sr_defaultkey = new.ser_cancelwithkey where sr_staffid = new.ser_staffid and (sr_expiredtime is null);
+
+
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_staffid` BEFORE INSERT ON `tbl_staffmaster` FOR EACH ROW BEGIN DECLARE staffno int; SELECT be_staffidcount into staffno FROM tbl_branchmaster where be_branchid = new.ser_branchofficeid; SET new.ser_staffid = staffno; UPDATE tbl_branchmaster SET be_staffidcount = be_staffidcount +1 WHERE be_branchid = new.ser_branchofficeid; END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_staffmaster` BEFORE UPDATE ON `tbl_staffmaster` FOR EACH ROW begin
+ 
+ if(old.ser_authorisation_code != new.ser_authorisation_code)THEN
+BEGIN
+
+INSERT INTO `tbl_staffmaster_logs` (`message`, `date_time`)
+VALUES((CONCAT_WS("-",'Authorization code is changed for the staff ',new.ser_firstname,' ',new.ser_lastname)), now());
+
+
+
+END;
+END IF;
+
+
+  
+  
+  
+  
+  IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+
+   if((trim(new.ser_defaultfloor)) = '')then
+
+   set new.ser_defaultfloor = NULL;
+
+   end if;
+
+    if(trim(new.ser_employeestatus)!= 'Active') THEN
+   set new.ser_employeestatus = 'Inactive';
+   end if;
+
+
+   
+
+   
+
+end
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_staffmaster_logs`
+--
+
+CREATE TABLE `tbl_staffmaster_logs` (
+  `id` int(11) NOT NULL,
+  `message` varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `date_time` datetime DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_staff_salary_detail`
+--
+
+CREATE TABLE `tbl_staff_salary_detail` (
+  `ts_id` int(11) NOT NULL,
+  `ts_staff_id` int(11) DEFAULT NULL,
+  `ts_date_time` datetime DEFAULT NULL,
+  `ts_amount` decimal(15,3) DEFAULT NULL,
+  `ts_type` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_state`
+--
+
+CREATE TABLE `tbl_state` (
+  `se_stateid` bigint(20) NOT NULL,
+  `se_statename` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `se_countryid` smallint(6) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_state`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_stateid` BEFORE INSERT ON `tbl_state` FOR EACH ROW BEGIN
+
+ DECLARE NEWSLNO bigint;
+
+ DECLARE SLNO BIGINT;
+
+
+
+SELECT MAX(se_stateid) INTO SLNO FROM tbl_state;
+
+
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+
+
+SET NEWSLNO = SLNO + 1;
+
+
+
+SET new.se_stateid = NEWSLNO;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_stock_details`
+--
+
+CREATE TABLE `tbl_stock_details` (
+  `sd_id` int(11) NOT NULL,
+  `sd_date` date DEFAULT NULL,
+  `sd_opening_stock` decimal(15,3) DEFAULT NULL,
+  `sd_stock_value` decimal(15,3) DEFAULT NULL,
+  `sd_stock_transfer` decimal(15,3) DEFAULT NULL,
+  `sd_stock_purchase` decimal(15,3) DEFAULT NULL,
+  `sd_closing_stock` decimal(15,3) DEFAULT NULL,
+  `sd_store_id` int(11) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_stock_details`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_stock_details` BEFORE UPDATE ON `tbl_stock_details` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_store_stock`
+--
+
+CREATE TABLE `tbl_store_stock` (
+  `ts_id` int(11) NOT NULL,
+  `ts_store` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ts_product` int(11) DEFAULT NULL,
+  `ts_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ts_qty` decimal(15,3) DEFAULT NULL,
+  `ts_weight` decimal(15,3) DEFAULT NULL,
+  `ts_unit` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ts_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ts_average` decimal(15,3) DEFAULT NULL,
+  `ts_unit_price` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `ts_total` decimal(15,3) DEFAULT NULL,
+  `ts_reorder` decimal(15,3) DEFAULT NULL,
+  `ts_expiry` date DEFAULT NULL,
+  `ts_last_grn` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ts_stock_update_date` date DEFAULT NULL,
+  `ts_updating` char(1) COLLATE utf8_unicode_ci DEFAULT 'Y',
+  `ts_tax` decimal(15,3) DEFAULT NULL,
+  `ts_tx_amount` decimal(15,3) DEFAULT NULL,
+  `ts_last_qty_on_1st` decimal(15,3) DEFAULT '0.000',
+  `ts_last_weight_on_1st` decimal(15,3) DEFAULT '0.000',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_store_stock`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_store_stock` BEFORE UPDATE ON `tbl_store_stock` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_store_transfer`
+--
+
+CREATE TABLE `tbl_store_transfer` (
+  `tt_id` int(11) NOT NULL,
+  `tt_trn_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_product` int(11) DEFAULT NULL,
+  `tt_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_qty` int(11) DEFAULT NULL,
+  `tt_weight` decimal(15,3) DEFAULT '0.000',
+  `tt_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tt_brand` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_unit_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_total` decimal(15,3) DEFAULT '0.000',
+  `tt_reorder` decimal(15,3) DEFAULT '0.000',
+  `tt_current_stock` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tt_from_store` int(11) DEFAULT NULL,
+  `tt_to_store` int(11) DEFAULT NULL,
+  `tt_transfer_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_transfer_date` datetime DEFAULT NULL,
+  `tt_dayclosedate` date DEFAULT NULL,
+  `tt_set` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tt_tax` decimal(15,3) DEFAULT NULL,
+  `tt_tax_value` decimal(15,3) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tt_indent` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_transfer_from_central` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tt_indent_accepted` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tt_indent_accepted_time` datetime DEFAULT NULL,
+  `tt_indent_accepted_login` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_direct_grn` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_ip` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_normal` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tt_normal_accept` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tt_normal_accept_login` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_normal_accept_time` datetime DEFAULT NULL,
+  `tt_direct_accept` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tt_direct_accept_by` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tt_batch_id` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_store_transfer`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_store_transfer` BEFORE UPDATE ON `tbl_store_transfer` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_supplier_voucher`
+--
+
+CREATE TABLE `tbl_supplier_voucher` (
+  `sv_id` int(11) NOT NULL,
+  `sv_vendor_id` int(11) NOT NULL,
+  `sv_date` date DEFAULT NULL,
+  `sv_address` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sv_invoice_no` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sv_invoice_amount` decimal(15,3) DEFAULT NULL,
+  `sv_from` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sv_paid_amount` decimal(15,3) DEFAULT NULL,
+  `sv_credit_amount` decimal(15,3) DEFAULT NULL,
+  `sv_entry_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sv_trn_detail` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sv_remarks` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sv_entry_date` date DEFAULT NULL,
+  `sv_type_pay` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sv_discount` decimal(15,3) DEFAULT NULL,
+  `sv_pr_return` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `sv_purchase_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sv_return_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `sv_paid_fully` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sv_tax` decimal(15,3) DEFAULT '0.000',
+  `sv_subtotal` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `sv_entry_time` datetime DEFAULT NULL,
+  `sv_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sv_from_inventory` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `sv_cloud_added` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `sv_cloud_edited` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_supplier_voucher`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_supplier` BEFORE UPDATE ON `tbl_supplier_voucher` FOR EACH ROW BEGIN
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_sync_log`
+--
+
+CREATE TABLE `tbl_sync_log` (
+  `id` int(11) NOT NULL,
+  `sync_datetime` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sync_remarks` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tablebilldetails`
+--
+
+CREATE TABLE `tbl_tablebilldetails` (
+  `bd_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `bd_billslno` smallint(6) NOT NULL,
+  `bd_bill_addon_slno` int(11) DEFAULT NULL,
+  `bd_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `bd_rate_type` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Portion',
+  `bd_unit_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bd_portion` int(11) DEFAULT NULL,
+  `bd_unit_weight` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bd_unit_id` int(11) DEFAULT NULL,
+  `bd_base_unit_id` int(11) DEFAULT NULL,
+  `bd_base_rate` decimal(15,3) DEFAULT '0.000',
+  `bd_org_rate` decimal(15,3) DEFAULT '0.000',
+  `bd_discount` decimal(15,3) DEFAULT '0.000',
+  `bd_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bd_qty` int(11) NOT NULL,
+  `bd_amount` decimal(15,3) DEFAULT '0.000',
+  `bd_tax_total` decimal(15,3) DEFAULT '0.000',
+  `bd_taxable_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bd_type` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `bd_printbill` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bd_cancelled` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bd_cancelledby_careof` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bd_cancelledreason` text COLLATE utf8_unicode_ci,
+  `bd_cancelledtime` datetime DEFAULT NULL,
+  `bd_cancelledsecret` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bd_cancelledlogin` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bd_complementary_staff` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bd_symbol_for_tax` char(3) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bd_count_combo_ordering` int(11) DEFAULT NULL,
+  `bd_new_rate_incl` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bd_exempt_disc` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bd_cost` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bd_staff_store` int(11) DEFAULT NULL,
+  `bd_dayclose_in` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_tablebilldetails`
+--
+DELIMITER $$
+CREATE TRIGGER `trad_tablebilldetails` AFTER DELETE ON `tbl_tablebilldetails` FOR EACH ROW BEGIN
+
+DELETE FROM tbl_tablebill_item_discount WHERE bd_billno = old.bd_billno and bd_billslno = old.bd_billslno;
+
+
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trai_tablebilldetails` AFTER INSERT ON `tbl_tablebilldetails` FOR EACH ROW begin
+
+
+
+ update  tbl_tablebillmaster set bm_subtotal = bm_subtotal + new.bd_amount
+
+ WHERE bm_billno =new.bd_billno;
+
+ 
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trau_tablebilldetails` AFTER UPDATE ON `tbl_tablebilldetails` FOR EACH ROW begin
+
+
+
+  If(new.bd_amount != old.bd_amount)then
+
+  begin
+
+     If(new.bd_amount > old.bd_amount)then
+
+     begin
+
+         update  tbl_tablebillmaster set bm_subtotal = bm_subtotal + (new.bd_amount-old.bd_amount) WHERE bm_billno =new.bd_billno;
+
+     
+
+     end;
+
+     elseif(new.bd_amount < old.bd_amount)then
+
+     begin
+
+        update  tbl_tablebillmaster set bm_subtotal = bm_subtotal - (old.bd_amount - new.bd_amount) WHERE bm_billno =new.bd_billno;
+
+     end;
+
+     end if;		
+
+  end;
+
+  end if;
+
+  
+
+
+
+ 
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_tablebilldetail` BEFORE INSERT ON `tbl_tablebilldetails` FOR EACH ROW BEGIN
+
+	DECLARE SLNO int;
+
+ 	
+
+    SELECT MAX(bd_billslno) INTO SLNO FROM tbl_tablebilldetails 
+
+    WHERE bd_billno = NEW.bd_billno ;
+
+    
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+	
+
+    SET new.bd_billslno = SLNO+1;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_tablebilldetails` BEFORE UPDATE ON `tbl_tablebilldetails` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z' )THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tablebillmaster`
+--
+
+CREATE TABLE `tbl_tablebillmaster` (
+  `bm_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `bm_billdate` date NOT NULL,
+  `bm_billtime` time NOT NULL,
+  `bm_branchid` bigint(20) NOT NULL,
+  `bm_orderno` varchar(500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_totalpax` int(11) DEFAULT NULL,
+  `bm_floorid` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_subtotal` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bm_subtotal_final` decimal(15,3) DEFAULT '0.000',
+  `bm_discountid` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_discountvalue` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bm_tax_exempt` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bm_taxable_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bm_total` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bm_roundoff_value` decimal(15,3) DEFAULT '0.000',
+  `bm_redeem_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bm_finaltotal` decimal(15,3) DEFAULT '0.000',
+  `bm_corporatecode` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_paymode` int(11) DEFAULT NULL,
+  `bm_credit` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bm_room_credit` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bm_creditmasterid` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_complimentary` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bm_complimentaryremark` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_amountbalace` decimal(15,3) DEFAULT '0.000',
+  `bm_transactionamount` decimal(15,3) DEFAULT '0.000',
+  `bm_amountpaid` decimal(15,3) DEFAULT '0.000',
+  `bm_upi_amount` decimal(15,3) DEFAULT '0.000',
+  `bm_upi_txn_id` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_transcbank` int(11) DEFAULT NULL,
+  `bm_voucherid` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_couponcompany` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_couponamt` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bm_chequeno` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_chequebankname` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_chequebankamount` decimal(15,3) DEFAULT '0.000',
+  `bm_dayclosedate` date NOT NULL,
+  `bm_billprinted` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bm_lastprintime` datetime DEFAULT NULL,
+  `bm_status` varchar(100) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Billed',
+  `bm_tableno` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_discountlabel` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_bill_is_split` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `bm_bill_no_of_split` int(11) NOT NULL DEFAULT '0',
+  `bm_compl_mgmt_staff` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_can_regenerate` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `ter_cancelledby_careof` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_cancelledreason` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_cancelledsecretkey` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_cancelledlogin` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_cancelled_date_time` datetime DEFAULT NULL,
+  `bm_bill_ref` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_settlement_login` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_comments` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_steward` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_creditremark` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_cname` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_cnumber` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_gst` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_upi_requestid` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_qrcode_mode` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_settlement_time` datetime DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bm_bill_printed_by` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_tips_given` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `bm_tips_mode` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'C',
+  `bm_feedback_customer` int(11) DEFAULT NULL,
+  `bm_loy_id` int(11) DEFAULT NULL,
+  `bm_lukado_response` varchar(2500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_lukado_pay_response` varchar(2500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_qr_orderno` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_customer_display_status` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_login` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_tablebillmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trau_tablebillmaster` AFTER UPDATE ON `tbl_tablebillmaster` FOR EACH ROW begin
+
+
+
+if(new.bm_status = 'Cancelled') then
+
+begin
+
+
+
+UPDATE tbl_tableorder SET ter_status = 'Closed' WHERE ter_billnumber = NEW.bm_billno;
+
+
+
+DELETE FROM  tbl_tabledetails WHERE ts_billnumber= NEW.bm_billno; 
+
+
+
+END;
+
+END IF;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_tablebillmaster` BEFORE INSERT ON `tbl_tablebillmaster` FOR EACH ROW begin
+
+	DECLARE DAYCLOSEDATE DATE;
+
+  
+
+  SET NEW.bm_billdate = CURRENT_DATE();
+
+  SET NEW.bm_billtime = CURRENT_TIME();
+
+  
+
+  
+
+  
+
+   SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+
+    SET NEW.bm_dayclosedate = DAYCLOSEDATE;
+
+    
+
+  
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_tablebillmaster` BEFORE UPDATE ON `tbl_tablebillmaster` FOR EACH ROW begin
+
+if(new.bm_status = 'Cancelled') then
+
+begin
+	set new.bm_cancelled_date_time = now();
+END;
+
+END IF;
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tablebill_extra_tax_details`
+--
+
+CREATE TABLE `tbl_tablebill_extra_tax_details` (
+  `bet_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `bet_billslno` smallint(6) NOT NULL,
+  `bet_tax_id` int(11) NOT NULL,
+  `bet_menuid` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bet_tax_value` decimal(8,3) NOT NULL DEFAULT '0.000',
+  `bet_tax_amount` decimal(15,3) DEFAULT '0.000',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bet_dayclose` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_tablebill_extra_tax_details`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_tbill_ex_tx_details` AFTER INSERT ON `tbl_tablebill_extra_tax_details` FOR EACH ROW BEGIN
+
+ DECLARE symbol char(1);
+ DECLARE symbol_billdetails char(3);
+
+SELECT amc_symbol into symbol FROM tbl_extra_tax_master where amc_id = new.bet_tax_id AND amc_item_tax = 'Y';
+
+IF(symbol IS NOT NULL)THEN
+BEGIN
+	SELECT bd_symbol_for_tax into symbol_billdetails FROM 	tbl_tablebilldetails where bd_billno = new.bet_billno and bd_billslno = new.bet_billslno;
+
+if(symbol_billdetails IS NULL)THEN
+
+update tbl_tablebilldetails set  bd_symbol_for_tax = symbol where bd_billno = new.bet_billno and bd_billslno = new.bet_billslno;
+
+ELSE
+
+update tbl_tablebilldetails set  bd_symbol_for_tax = concat(bd_symbol_for_tax,symbol) where bd_billno = new.bet_billno and bd_billslno = new.bet_billslno;
+
+END IF;
+
+END;
+END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_tablebill_extra_tax_details` BEFORE UPDATE ON `tbl_tablebill_extra_tax_details` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tablebill_extra_tax_master`
+--
+
+CREATE TABLE `tbl_tablebill_extra_tax_master` (
+  `bem_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `bem_taxid` int(11) NOT NULL,
+  `bem_total_value` decimal(15,2) NOT NULL,
+  `bem_label` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `bem_dayclose` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_tablebill_extra_tax_master`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_tablebill_extra_tax_master` BEFORE UPDATE ON `tbl_tablebill_extra_tax_master` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tablebill_item_discount`
+--
+
+CREATE TABLE `tbl_tablebill_item_discount` (
+  `bd_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `bd_billslno` smallint(6) NOT NULL,
+  `bd_discount_id` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `bd_menuid` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bd_discount_of` decimal(8,3) NOT NULL,
+  `bd_mode` char(1) COLLATE utf8_unicode_ci NOT NULL,
+  `bd_discount_remarks` varchar(60) COLLATE utf8_unicode_ci NOT NULL,
+  `bd_discount` decimal(15,3) NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_tablebill_item_discount`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_tablebill_item_discount` BEFORE UPDATE ON `tbl_tablebill_item_discount` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tablebill_paymentchange`
+--
+
+CREATE TABLE `tbl_tablebill_paymentchange` (
+  `bcp_old_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `bcp_old_branchid` bigint(20) NOT NULL DEFAULT '0',
+  `bcp_old_billno_slno` int(11) NOT NULL DEFAULT '0',
+  `bcp_old_paymode` int(11) DEFAULT NULL,
+  `bcp_old_credit` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bcp_old_creditmasterid` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bcp_old_complimentary` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bcp_old_complimentaryremark` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bcp_old_amountbalace` decimal(15,2) DEFAULT NULL,
+  `bcp_old_transactionamount` decimal(15,2) DEFAULT NULL,
+  `bcp_old_amountpaid` decimal(15,2) DEFAULT NULL,
+  `bcp_old_transcbank` int(11) DEFAULT NULL,
+  `bcp_old_voucherid` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bcp_old_couponcompany` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bcp_old_couponamt` decimal(15,2) DEFAULT NULL,
+  `bcp_old_chequeno` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bcp_old_chequebankname` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bcp_old_chequebankamount` decimal(15,2) DEFAULT NULL,
+  `bcp_cancelledby_careof` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bcp_cancelledreason` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bcp_cancelledsecret` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bcp_entrydate` datetime DEFAULT NULL,
+  `bcp_cancelledlogin` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_tablebill_paymentchange`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_billpaymeny_change` BEFORE INSERT ON `tbl_tablebill_paymentchange` FOR EACH ROW BEGIN
+
+ DECLARE SLNO int;
+
+
+
+SELECT MAX(bcp_old_billno_slno)
+
+  INTO SLNO
+
+  FROM tbl_tablebill_paymentchange
+
+ WHERE bcp_old_billno = NEW.bcp_old_billno and bcp_old_branchid = new.bcp_old_branchid;
+
+
+
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+
+
+SET new.bcp_old_billno_slno = SLNO + 1;
+
+
+
+    set new.bcp_entrydate = now();
+
+ 
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_tablebill_paymentchange` BEFORE UPDATE ON `tbl_tablebill_paymentchange` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tablebill_split`
+--
+
+CREATE TABLE `tbl_tablebill_split` (
+  `tbs_orderno` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `tbs_newbillno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `tbs_billtotal` decimal(15,3) NOT NULL,
+  `tbs_modifieddate` datetime NOT NULL,
+  `tbs_billstatus` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_tablebill_split`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_tablebill_split` BEFORE INSERT ON `tbl_tablebill_split` FOR EACH ROW BEGIN
+
+  
+
+   set new.tbs_modifieddate = now();
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_tablebill_split` BEFORE UPDATE ON `tbl_tablebill_split` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tabledetails`
+--
+
+CREATE TABLE `tbl_tabledetails` (
+  `ts_tableid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `ts_tableidprefix` char(1) COLLATE utf8_unicode_ci NOT NULL,
+  `ts_status` varchar(20) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Vacant',
+  `ts_dineintime` time DEFAULT NULL,
+  `ts_noofpersons` tinyint(4) DEFAULT NULL,
+  `ts_orderno` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ts_floorid` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ts_orderstaff` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ts_reservetime` time DEFAULT NULL,
+  `ts_totalamount` float NOT NULL DEFAULT '0',
+  `ts_entrydate` datetime NOT NULL,
+  `ts_interface` char(1) COLLATE utf8_unicode_ci NOT NULL,
+  `ts_billnumber` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ts_paxcount` int(11) DEFAULT NULL,
+  `ts_username` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ts_in_access` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `ts_completed_order` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ts_machineid` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_tabledetails`
+--
+DELIMITER $$
+CREATE TRIGGER `trad_tabledetails_count` AFTER DELETE ON `tbl_tabledetails` FOR EACH ROW begin
+
+
+
+	declare personcount int;
+
+    declare	maxcount int;
+
+	declare	oldvacant int;
+
+    declare	newvacant int;
+
+	
+
+    SELECT tr_maxchaircount,tr_vaccantcount INTO maxcount,oldvacant FROM tbl_tablemaster where tr_tableid = old.ts_tableid;
+
+    
+
+    set newvacant = oldvacant + old.ts_noofpersons;
+
+    
+
+    if(maxcount <= (newvacant))then
+
+        UPDATE tbl_tablemaster 
+
+    	set tr_vaccantcount =  maxcount where tr_tableid = old.ts_tableid;
+
+    
+
+    	else
+
+       	UPDATE tbl_tablemaster 
+
+        set tr_vaccantcount =  newvacant where tr_tableid = old.ts_tableid;
+
+
+
+	end if;
+
+ CALL proc_next_ascii(OLD.ts_tableid);
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trai_personcount` AFTER INSERT ON `tbl_tabledetails` FOR EACH ROW begin
+
+
+
+  declare	personcount,vacant,next_ascii,max_ascii int;
+
+
+
+	
+
+    SELECT tr_vaccantcount,tr_nextprefix_ascii,tr_max_ascii INTO vacant,next_ascii,max_ascii FROM tbl_tablemaster where tr_tableid = new.ts_tableid;
+
+    
+
+    set personcount = vacant - new.ts_noofpersons;
+
+    
+
+    if(personcount < 0) then
+
+    	set personcount = 0;
+
+    end if;
+
+    
+
+     UPDATE tbl_tablemaster set tr_vaccantcount = personcount where tr_tableid = new.ts_tableid;
+
+     
+
+     CALL proc_next_ascii(NEW.ts_tableid);
+
+    
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_tabledetails` BEFORE INSERT ON `tbl_tabledetails` FOR EACH ROW begin
+
+  	if(NEW.ts_status != 'Reserved') then
+
+ 	set new.ts_dineintime = current_time();
+
+    end if;
+
+    
+
+    set new.ts_entrydate = now();
+
+ end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_tabledetails` BEFORE UPDATE ON `tbl_tabledetails` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tableinsertion`
+--
+
+CREATE TABLE `tbl_tableinsertion` (
+  `ts_id` int(11) NOT NULL,
+  `ts_tableid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `ts_tableidprefix` char(1) COLLATE utf8_unicode_ci NOT NULL,
+  `ts_noofpersons` tinyint(4) NOT NULL,
+  `ts_orderno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_tableinsertion`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_tableinsertion` BEFORE UPDATE ON `tbl_tableinsertion` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tablemaster`
+--
+
+CREATE TABLE `tbl_tablemaster` (
+  `tr_tableid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `tr_branchid` bigint(20) NOT NULL,
+  `tr_floorid` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
+  `tr_tableno` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `tr_status` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Active',
+  `tr_maxchaircount` int(11) NOT NULL,
+  `tr_vaccantcount` int(11) NOT NULL DEFAULT '0',
+  `tr_nextprefix_ascii` int(11) NOT NULL DEFAULT '65',
+  `tr_displayorder` int(11) NOT NULL,
+  `tr_max_ascii` int(11) NOT NULL,
+  `tr_timealloted` int(3) DEFAULT '0',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_tablemaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_tableid` BEFORE INSERT ON `tbl_tablemaster` FOR EACH ROW BEGIN
+
+
+
+    DECLARE prefx varchar(3);
+
+ DECLARE tableno TINYINT;
+
+    DECLARE tableid VARCHAR(10);
+
+
+
+SELECT be_branchprefix, be_tablecount
+
+  INTO prefx, tableno
+
+  FROM tbl_branchmaster
+
+ WHERE be_branchid = new.tr_branchid;
+
+
+
+SET new.tr_tableid = tableno;
+
+
+
+UPDATE tbl_branchmaster
+
+   SET be_tablecount = be_tablecount + 1
+
+ WHERE be_branchid = new.tr_branchid;
+
+
+
+SET NEW.tr_vaccantcount = new.tr_maxchaircount;
+
+set new.tr_max_ascii = 65+NEW.tr_maxchaircount;
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_maxchaircount` BEFORE UPDATE ON `tbl_tablemaster` FOR EACH ROW begin
+
+ declare vacantcount int;
+
+ 
+
+   if(new.tr_maxchaircount != old.tr_maxchaircount) then
+
+	
+
+      SET new.tr_vaccantcount = old.tr_vaccantcount + (new.tr_maxchaircount -old.tr_maxchaircount) ;
+
+
+
+      end if;
+
+      
+
+  if(new.tr_maxchaircount != old.tr_maxchaircount) then
+
+	set new.tr_max_ascii = 65+NEW.tr_maxchaircount;
+
+  end if;
+
+      IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+end
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tableorder`
+--
+
+CREATE TABLE `tbl_tableorder` (
+  `ter_orderno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `ter_slno` int(11) NOT NULL,
+  `ter_branchid` bigint(20) NOT NULL,
+  `ter_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `ter_rate_type` varchar(30) COLLATE utf8_unicode_ci DEFAULT 'Portion',
+  `ter_unit_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_portion` int(11) DEFAULT NULL,
+  `ter_unit_weight` decimal(15,5) DEFAULT '0.00000',
+  `ter_unit_id` int(11) DEFAULT NULL,
+  `ter_base_unit_id` int(11) DEFAULT NULL,
+  `ter_base_rate` decimal(15,3) DEFAULT NULL,
+  `ter_org_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `ter_discount` decimal(15,3) DEFAULT '0.000',
+  `ter_rate` decimal(15,3) DEFAULT '0.000',
+  `ter_qty` int(11) NOT NULL,
+  `ter_total_rate` decimal(15,3) DEFAULT '0.000',
+  `ter_status` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `ter_preference` int(11) DEFAULT NULL,
+  `ter_preferencetext` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_orderfrom` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `ter_entrydate` date NOT NULL,
+  `ter_entrytime` time NOT NULL,
+  `ter_entryuser` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `ter_esttime` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_staff` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `ter_type` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `ter_kotno` varchar(20) COLLATE utf8_unicode_ci DEFAULT '0',
+  `ter_billnumber` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_feedbackrating` decimal(2,1) NOT NULL DEFAULT '0.0',
+  `ter_feedbackremarks` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_feedbackenter` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ter_dayclosedate` date NOT NULL,
+  `ter_floorid` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_cancel` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `ter_cancelledby_careof` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_cancelledreason` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_cancelledsecretkey` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_cancelledlogin` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_orderno_temp` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_waiter_id` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_kot_canceltime` datetime DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ter_combo_entry_id` int(11) DEFAULT NULL,
+  `ter_count_combo_ordering` int(11) DEFAULT NULL,
+  `ter_addon_slno` int(11) DEFAULT NULL,
+  `ter_new_rate_incl` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `ter_kot_printed` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ter_cons_printed` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ter_rate_before_comp` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `ter_item_disc_manual` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `ter_disc_type` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_disc_before` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `ter_qr_order` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ter_dynamic_rate` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_tableorder`
+--
+DELIMITER $$
+CREATE TRIGGER `trad_tableorder` AFTER DELETE ON `tbl_tableorder` FOR EACH ROW begin
+
+  DECLARE DAYCLOSEDATE DATE;
+  DECLARE dailystock,dailystock_in_number char(1); 
+  DECLARE old_qty int;
+  DECLARE rate_type,unit_type varchar(50);
+
+  DECLARE qt_withratio,qtystock_withratio int;
+
+
+  CALL proc_table_status(old.ter_orderno);    
+  CALL `table_total_amount`(old.ter_orderno);
+  DELETE FROM tbl_tableorder_discount WHERE d_orderno = old.ter_orderno and d_slno = old.ter_slno;
+
+
+  
+  SELECT mr_dailystock,mr_dailystock_in_number,mr_rate_type,mr_unit_type INTO dailystock,dailystock_in_number,rate_type,unit_type
+  from tbl_menumaster where mr_menuid = OLD.ter_menuid;
+  
+  
+  END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trai_tableorder` AFTER INSERT ON `tbl_tableorder` FOR EACH ROW begin
+
+  DECLARE dailystock,dailystock_in_number char(1); 
+  
+  DECLARE rate_type,unit_type varchar(50);
+
+  CALL `table_total_amount`(new.ter_orderno);
+
+  CALL proc_table_status(NEW.ter_orderno);    
+    
+
+   
+
+
+
+
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trau_tableorder` AFTER UPDATE ON `tbl_tableorder` FOR EACH ROW BEGIN
+              DECLARE tableid   varchar(10);
+
+    DECLARE prefix CHAR( 1);
+
+
+    DECLARE qtychanged INT;
+
+    DECLARE MODE VARCHAR( 15);
+
+    DECLARE DAYCLOSEDATE DATE;
+
+
+
+CALL proc_table_status(NEW.ter_orderno);
+CALL `table_total_amount`(NEW.ter_orderno);
+
+if( new.ter_feedbackrating != old.ter_feedbackrating) then
+
+    begin
+
+
+
+       if((new.ter_feedbackrating >= 1) and (new.ter_feedbackrating <2))then
+
+         update tbl_feedbackratingcount set frc_1star = frc_1star + 1  where frc_menuid = new.ter_menuid;
+
+
+
+         END IF;
+
+       if((new.ter_feedbackrating >= 2) and ( new.ter_feedbackrating <3))then
+
+       update tbl_feedbackratingcount set frc_2star = frc_2star + 1  where frc_menuid = new.ter_menuid;
+
+
+
+       END IF;
+
+       if((new.ter_feedbackrating >= 3) and ( new.ter_feedbackrating <4))then
+
+       update tbl_feedbackratingcount set frc_3star = frc_3star + 1  where frc_menuid = new.ter_menuid;
+
+
+
+       END IF;
+
+       if((new.ter_feedbackrating >= 4) and ( new.ter_feedbackrating <5))then
+
+ update tbl_feedbackratingcount set frc_4star = frc_4star + 1  where frc_menuid = new.ter_menuid;
+
+
+
+ END IF;
+
+       if( new.ter_feedbackrating = 5)then
+
+  update tbl_feedbackratingcount set frc_5star = frc_5star + 1  where frc_menuid = new.ter_menuid;
+
+
+
+  END IF;
+
+
+
+    END;
+
+    END IF;
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_tableorderslno` BEFORE INSERT ON `tbl_tableorder` FOR EACH ROW BEGIN
+
+	DECLARE SLNO int;
+
+    DECLARE DAYCLOSEDATE DATE;
+
+ 	
+
+    SELECT MAX(ter_slno) INTO SLNO FROM tbl_tableorder 
+
+    WHERE ter_orderno = NEW.ter_orderno ;
+
+    
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+	
+
+    SET new.ter_slno = SLNO+1;
+
+    
+
+    set NEW.ter_entrydate = CURRENT_DATE();
+
+    set NEW.ter_entrytime = CURRENT_TIME();
+
+    
+
+    SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+
+    SET NEW.ter_dayclosedate = DAYCLOSEDATE;
+
+    
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_tableorder_stock` BEFORE UPDATE ON `tbl_tableorder` FOR EACH ROW begin
+   DECLARE stock CHAR(1);
+   DECLARE DAYCLOSEDATE DATE;
+   
+   
+   SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+
+     IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+  select mk_stock into stock from  tbl_menustock where mk_menuid =new.ter_menuid and mk_portion = NEW.ter_portion AND mk_date= DAYCLOSEDATE;
+
+
+
+  if(stock = 'N')then
+  begin
+  	if(new.ter_qty > old.ter_qty) then 
+      set new.ter_status = 'NotInStock';
+  	end if;
+  end;
+  end if;
+    
+
+  if(new.ter_qty != old.ter_qty) then
+  begin
+    if(new.ter_qty = 0)THEN
+        set new.ter_status = 'Served';
+    end if;
+  end;
+  end if;
+
+end
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tableorder_changes`
+--
+
+CREATE TABLE `tbl_tableorder_changes` (
+  `ch_kot_cancel_id` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `ch_orderno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `ch_orderslno` int(11) NOT NULL,
+  `ch_slno` int(11) NOT NULL,
+  `ch_cancelled_qty` int(11) NOT NULL,
+  `ch_cancelledby_careof` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ch_entrydate` datetime NOT NULL,
+  `ch_kotno` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `ch_cancelledreason` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ch_cancelledsecret` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `ch_cancelledlogin` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `ch_dayclosedate` date DEFAULT NULL,
+  `sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ch_sms` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ch_email` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `ch_sms_time` datetime DEFAULT NULL,
+  `ch_email_time` datetime DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ch_combo_pack_cancelled_qty` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_tableorder_changes`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_tableorder_changes` BEFORE INSERT ON `tbl_tableorder_changes` FOR EACH ROW BEGIN
+
+ DECLARE SLNO int;
+
+    DECLARE DAYCLOSEDATE DATE;
+
+
+
+SELECT MAX(ch_slno)
+
+  INTO SLNO
+
+  FROM tbl_tableorder_changes
+
+ WHERE ch_orderno = NEW.ch_orderno AND ch_orderslno = new.ch_orderslno;
+
+
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+
+    END IF;
+
+
+
+SET new.ch_slno = SLNO + 1;
+
+
+
+SET NEW.ch_entrydate = now();
+
+
+
+SELECT dc_day
+
+  INTO DAYCLOSEDATE
+
+  FROM tbl_dayclose
+
+ WHERE dc_dateclose IS NULL;
+
+
+
+SET NEW.ch_dayclosedate = DAYCLOSEDATE;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_tableorder_changes` BEFORE UPDATE ON `tbl_tableorder_changes` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_tableorder_discount`
+--
+
+CREATE TABLE `tbl_tableorder_discount` (
+  `d_orderno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `d_slno` int(11) NOT NULL,
+  `d_discount_id` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `d_discount_of` decimal(8,3) DEFAULT NULL,
+  `d_mode` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `d_discount_remarks` varchar(60) COLLATE utf8_unicode_ci NOT NULL,
+  `d_discount` decimal(15,3) NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_tableorder_discount`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_tableorder_discount` BEFORE UPDATE ON `tbl_tableorder_discount` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_table_cloud`
+--
+
+CREATE TABLE `tbl_table_cloud` (
+  `id` int(11) NOT NULL,
+  `table_name` text COLLATE utf8_unicode_ci NOT NULL,
+  `columns` text COLLATE utf8_unicode_ci,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_takeaway_billdetails`
+--
+
+CREATE TABLE `tbl_takeaway_billdetails` (
+  `tab_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `tab_slno` int(11) NOT NULL,
+  `tab_bill_addon_slno` int(11) DEFAULT NULL,
+  `tab_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `tab_rate_type` varchar(30) COLLATE utf8_unicode_ci DEFAULT 'Portion',
+  `tab_unit_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_portion` int(11) DEFAULT NULL,
+  `tab_unit_weight` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_unit_id` int(11) DEFAULT NULL,
+  `tab_base_unit_id` int(11) DEFAULT NULL,
+  `tab_base_rate` decimal(15,3) DEFAULT '0.000',
+  `tab_qty` int(11) NOT NULL,
+  `tab_preferencetext` varchar(300) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_org_rate` decimal(15,3) DEFAULT '0.000',
+  `tab_discount` decimal(15,3) DEFAULT '0.000',
+  `tab_rate` decimal(15,3) NOT NULL,
+  `tab_amount` decimal(15,3) NOT NULL,
+  `tab_status` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_modifieduser` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_packedtime` datetime DEFAULT NULL,
+  `tab_cancelled` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_cancelledtime` datetime DEFAULT NULL,
+  `tab_cancelledby_careof` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_cancelledreason` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_cancelledsecretkey` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_cancelledlogin` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_entrytime` datetime DEFAULT NULL,
+  `tab_symbol_for_tax` char(3) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_count_combo_ordering` int(11) DEFAULT NULL,
+  `tab_food_partner_id` int(11) DEFAULT NULL,
+  `tab_regen_status_menu` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_kotno_new` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_urban_order_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_qr_order_id` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_new_rate_incl` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_kot_printed` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_cons_printed` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_rate_before_comp` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_dayclose_in` date DEFAULT NULL,
+  `tab_exempt_disc` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_cost` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_item_disc_manual` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_disc_type` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_disc_before` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_staff_store` int(11) DEFAULT NULL,
+  `tab_addon_in` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_dynamic_rate` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_takeaway_billdetails`
+--
+DELIMITER $$
+CREATE TRIGGER `bu_takeaway_billdetails` BEFORE UPDATE ON `tbl_takeaway_billdetails` FOR EACH ROW BEGIN
+
+	SET NEW.tab_amount = (NEW.tab_rate * NEW.tab_qty);
+
+    if(old.tab_status = 'Packed')then
+    set NEW.tab_status = 'Packed';
+    END IF;
+
+ 	IF(NEW.tab_status = 'Packed')then
+
+   	 set new.tab_packedtime = now();
+
+     
+
+    end if;
+       
+       
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trad_takeaway_billdetails` AFTER DELETE ON `tbl_takeaway_billdetails` FOR EACH ROW begin
+ 
+ 
+DELETE FROM `tbl_takeaway_item_discount` WHERE tbd_billno = old.tab_billno and tbd_slno = old.tab_slno;
+
+
+
+
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trai_takeaway_billdetails` AFTER INSERT ON `tbl_takeaway_billdetails` FOR EACH ROW begin
+
+
+
+
+
+ update tbl_takeaway_billmaster set tab_subtotal = tab_subtotal +new.tab_amount  where tab_billno = new.tab_billno;
+
+
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trau_takeaway_billdetails` AFTER UPDATE ON `tbl_takeaway_billdetails` FOR EACH ROW begin
+
+ DECLARE status_item varchar(100);
+    DECLARE tabmode CHAR(2);
+ DECLARE status_of_master VARCHAR(100);
+    DECLARE bill_settled VARCHAR(100);
+
+SET status_item = '';
+
+IF ((NEW.tab_qty != OLD.tab_qty)OR(NEW.tab_rate != OLD.tab_rate))THEN
+
+BEGIN
+
+  UPDATE tbl_takeaway_billmaster SET tab_subtotal = tab_subtotal + (NEW.tab_amount - OLD.tab_amount) WHERE tab_billno = NEW.tab_billno;
+
+ END;
+
+END IF;
+
+
+
+SELECT tab_mode, tab_payment_settled
+  INTO tabmode, bill_settled
+  FROM tbl_takeaway_billmaster
+ WHERE tab_billno = new.tab_billno;
+
+IF NOT EXISTS(SELECT * FROM tbl_takeaway_billdetails WHERE tab_status != 'Packed' AND tab_billno = NEW.tab_billno )THEN
+BEGIN
+  IF(tabmode ='CS')THEN
+  BEGIN
+  SET status_of_master = 'Closed';
+
+  END;
+  ELSEIF(tabmode ='HD')THEN
+  BEGIN
+  IF(bill_settled = 'N') THEN
+   SET status_of_master = 'Billed';
+  ELSEIF(bill_settled = 'Y') THEN
+   SET status_of_master = 'Settled';
+  END IF;
+  END;
+  ELSE
+   SET status_of_master = 'Packed';
+ END IF;
+
+UPDATE tbl_takeaway_billmaster
+   SET tab_status = status_of_master
+ WHERE tab_billno = new.tab_billno;
+
+END;
+END IF;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_takeaway_billdetails` BEFORE INSERT ON `tbl_takeaway_billdetails` FOR EACH ROW BEGIN 
+
+	DECLARE SLNO bigint; 
+
+	SELECT MAX(tab_slno) INTO SLNO FROM tbl_takeaway_billdetails where 		tab_billno = new.tab_billno; 
+
+	IF SLNO is NULL THEN
+
+    	SET SLNO = 0; 
+
+	END IF; 
+
+	SET new.tab_slno = SLNO +1; 
+
+	SET NEW.tab_amount = (NEW.tab_rate * NEW.tab_qty); 
+
+	SET NEW.tab_entrytime = NOW();
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_takeaway_billmaster`
+--
+
+CREATE TABLE `tbl_takeaway_billmaster` (
+  `tab_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `tab_date` date NOT NULL,
+  `tab_time` time NOT NULL,
+  `tab_branchid` int(11) NOT NULL,
+  `tab_mode_of_entry` char(3) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_subtotal` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_subtotal_final` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_tax_exempt` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_taxable_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_total` decimal(15,3) DEFAULT '0.000',
+  `tab_roundoff_value` decimal(10,3) NOT NULL DEFAULT '0.000',
+  `tab_redeem_amount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_netamt` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_payment_settled` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_kotno` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_loginid` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_hd` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tab_hdcustomerid` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_status` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_assignedto` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_delivery_status` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_esttime` datetime DEFAULT NULL,
+  `tab_assignedtime` datetime DEFAULT NULL,
+  `tab_paymode` int(11) DEFAULT NULL,
+  `tab_cancelamount` decimal(15,3) DEFAULT '0.000',
+  `tab_discountid` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_discount_mode` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_discount_of` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_corporatecode` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_discountvalue` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_discount_label` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_complimentary` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tab_complimentaryremark` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_amountpaid` decimal(15,3) DEFAULT '0.000',
+  `tab_upi_amount` decimal(15,3) DEFAULT '0.000',
+  `tab_upi_txn_id` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_amountbalace` decimal(15,3) DEFAULT '0.000',
+  `tab_transcbank` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_transactionamount` decimal(15,3) DEFAULT '0.000',
+  `tab_voucherid` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_couponcompany` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_couponamt` decimal(15,3) DEFAULT '0.000',
+  `tab_chequeno` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_chequebankname` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_chequebankamount` decimal(15,3) DEFAULT '0.000',
+  `tab_dayclosedate` date NOT NULL,
+  `tbl_takeaway_printed` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tbl_takeaway_print_time` datetime DEFAULT NULL,
+  `tab_mode` char(2) COLLATE utf8_unicode_ci NOT NULL,
+  `tab_credit` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_room_credit` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_creditmasterid` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_cancelledby_careof` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_cancelledreason` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_cancelledsecretkey` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_cancelledlogin` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_cancelled` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_cancelledtime` datetime DEFAULT NULL,
+  `tab_on_hold` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_bill_ref` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_msg_customerstatus` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_msg_staffstatus` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_bill_gen_login` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_settlement_login` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_comments` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_sms_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_email_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_sms_time` datetime DEFAULT NULL,
+  `tab_email_time` datetime DEFAULT NULL,
+  `tab_creditremark` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_name` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_phone` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_gst` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_upi_requestid` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_qrcode_mode` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_settlement_time` datetime DEFAULT NULL,
+  `tab_bill_print` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_bill_reorder` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_table_no` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_no_pax` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_c_name` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_c_no` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_c_veh_no` varchar(150) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_bill_printed_by` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_tips_given` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_tips_mode` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'C',
+  `tab_delivery_charge` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_food_partner` int(11) DEFAULT NULL,
+  `tab_food_partner_discount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_food_partner_total` decimal(15,3) DEFAULT '0.000',
+  `tab_regen_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_urban_order_id` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_urban_partner` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_urban_partner_order_no` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_qr_order_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_qr_order_time` datetime DEFAULT NULL,
+  `tab_qr_delivery_charge` decimal(15,3) DEFAULT NULL,
+  `tab_loy_id` int(11) DEFAULT NULL,
+  `tab_lukado_response` varchar(2500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_lukado_pay_response` varchar(2500) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_system_ip` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_ref_no_new` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_customer_display_status` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_phone_order` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_adv_orderno` varchar(25) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_takeaway_billmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `tr_takeaway_billmaster` BEFORE INSERT ON `tbl_takeaway_billmaster` FOR EACH ROW begin
+
+   declare DAYCLOSEDATE date; 
+
+ SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+
+    SET NEW.tab_dayclosedate = DAYCLOSEDATE;
+
+ end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trau_takeaway_billmaster` BEFORE UPDATE ON `tbl_takeaway_billmaster` FOR EACH ROW begin
+  DECLARE manage_kot CHAR(1);
+
+SELECT bsth_kotbypass INTO manage_kot FROM tbl_branch_settings_ta_hd;
+
+
+
+  IF(OLD.tab_status = 'Closed' AND NEW.tab_status != 'Cancelled')THEN
+    SET NEW.tab_status ='Closed';
+  END IF;
+
+  IF((NEW.tab_mode = 'HD')OR(NEW.tab_mode = 'TA')) THEN
+  BEGIN
+   IF((NEW.tab_bill_print = 'N') AND (NEW.tab_status != 'Cancelled') )THEN
+    BEGIN
+      IF(manage_kot = 'Y') THEN
+      BEGIN
+        SET NEW.tab_status = 'Processing';
+      END;
+      ELSEIF(manage_kot = 'N') THEN
+        SET NEW.tab_status = 'Kot_Generated';
+      END IF;
+    END;
+   END IF;
+    IF((NEW.tab_bill_print = 'Y') AND (NEW.tab_status != 'Cancelled') )THEN
+    BEGIN
+      IF(manage_kot = 'Y') THEN
+      BEGIN
+        IF EXISTS(SELECT * FROM tbl_takeaway_billdetails WHERE tab_status NOT IN('Packed','Cancelled') AND tab_billno = NEW.tab_billno )THEN
+        BEGIN
+           SET NEW.tab_status = 'Processing';
+        END;
+        ELSE
+        BEGIN
+             SET NEW.tab_status = 'Billed';
+        END;
+        END IF;
+      END;
+      ELSEIF(manage_kot = 'N') THEN
+       SET NEW.tab_status = 'Billed';
+      END IF;
+    END;
+   END IF;
+
+    IF((NEW.tab_bill_print = 'Y') AND (NEW.tab_status != 'Cancelled')AND (NEW.tab_payment_settled =  'Y'))THEN
+    BEGIN
+      IF(manage_kot = 'Y') THEN
+      BEGIN
+        IF EXISTS(SELECT * FROM tbl_takeaway_billdetails WHERE tab_status NOT IN('Packed','Cancelled') AND tab_billno = NEW.tab_billno )THEN
+        BEGIN
+           SET NEW.tab_status = 'Processing';
+        END;
+        ELSE
+        BEGIN
+          IF(NEW.tab_mode = 'HD') THEN
+          BEGIN
+            SET NEW.tab_status = 'Settled';
+          END;
+          ELSEIF(NEW.tab_mode = 'TA') THEN
+          BEGIN
+            SET NEW.tab_status = 'Closed';
+          END;
+          END IF;
+        END;
+        END IF;
+      END;
+      ELSEIF(manage_kot = 'N') THEN
+      BEGIN
+        IF(NEW.tab_mode = 'HD') THEN
+        BEGIN
+          SET NEW.tab_status = 'Settled';
+        END;
+        ELSEIF(NEW.tab_mode = 'TA') THEN
+        BEGIN
+          SET NEW.tab_status = 'Closed';
+        END;
+        END IF;
+      END;
+      END IF;
+    END;
+   END IF;
+    IF(NEW.tab_mode = 'HD') THEN
+    BEGIN
+      IF((NEW.tab_delivery_status = 'D') AND (NEW.tab_payment_settled =  'Y')AND (NEW.tab_status != 'Cancelled') )THEN
+      BEGIN
+          SET NEW.tab_status = 'Closed';
+      END;
+     END IF;
+    END;
+    END IF;
+  END;
+  END IF;
+  IF(NEW.tab_status ='Assigned')THEN
+    SET NEW.tab_assignedtime = NOW();
+  END IF;
+  IF(NEW.tab_subtotal <= 0)THEN
+  BEGIN
+   SET NEW.tab_status = 'Cancelled';
+SET new.tab_taxable_amount = 0;
+SET new.tab_netamt = 0;
+SET new.tab_total = 0;
+  END;
+  END IF;
+  IF(OLD.cloud_sync != 'N' AND OLD.cloud_sync != 'Z')THEN
+    SET NEW.cloud_sync = 'N';
+  END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_takeaway_bill_extra_tax_details`
+--
+
+CREATE TABLE `tbl_takeaway_bill_extra_tax_details` (
+  `tbet_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `tbet_slno` int(11) NOT NULL,
+  `tbet_tax_id` int(11) NOT NULL,
+  `tbet_menuid` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tbet_tax_value` decimal(5,2) NOT NULL DEFAULT '0.00',
+  `tbet_tax_amount` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tbet_daycolse` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_takeaway_bill_extra_tax_details`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_tabill_ex_tx_details` AFTER INSERT ON `tbl_takeaway_bill_extra_tax_details` FOR EACH ROW BEGIN
+
+ DECLARE symbol char(1);
+ DECLARE symbol_billdetails char(3);
+
+SELECT amc_symbol into symbol FROM tbl_extra_tax_master where amc_id = new.tbet_tax_id;
+
+SELECT tab_symbol_for_tax into symbol_billdetails FROM tbl_takeaway_billdetails where tab_billno = new.tbet_billno and tab_slno = new.tbet_slno;
+
+if(symbol_billdetails IS NULL)THEN
+
+update tbl_takeaway_billdetails set  tab_symbol_for_tax = symbol where  tab_billno = new.tbet_billno and tab_slno = new.tbet_slno;
+
+ELSE
+
+update tbl_takeaway_billdetails set  tab_symbol_for_tax = concat(tab_symbol_for_tax,symbol) where  tab_billno = new.tbet_billno and tab_slno = new.tbet_slno;
+
+END IF;
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_takeaway_bill_extra_tax_details` BEFORE UPDATE ON `tbl_takeaway_bill_extra_tax_details` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_takeaway_bill_extra_tax_master`
+--
+
+CREATE TABLE `tbl_takeaway_bill_extra_tax_master` (
+  `tbe_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `tbe_taxid` int(11) NOT NULL,
+  `tbe_total_value` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `tbe_label` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tbe_dayclose` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_takeaway_bill_extra_tax_master`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_takeaway_bill_extra_tax_master` BEFORE UPDATE ON `tbl_takeaway_bill_extra_tax_master` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_takeaway_cancel_items`
+--
+
+CREATE TABLE `tbl_takeaway_cancel_items` (
+  `tc_cancel_id` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `tc_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `tc_bill_slno` int(11) NOT NULL,
+  `tc_slno` int(11) NOT NULL,
+  `tc_cancel_qty` int(11) DEFAULT NULL,
+  `tc_cancelled_by` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tc_cancelled_login` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tc_cancelled_time` datetime DEFAULT NULL,
+  `tc_reason` int(11) DEFAULT NULL,
+  `tc_cancel_kotno` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tc_dayclosedate` date DEFAULT NULL,
+  `tc_mode` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tc_combo_pack_cancelled_qty` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_takeaway_cancel_items`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_ta_cancel_items` BEFORE INSERT ON `tbl_takeaway_cancel_items` FOR EACH ROW BEGIN
+
+ DECLARE SLNO int;
+
+    DECLARE DAYCLOSEDATE DATE;
+
+
+
+SELECT MAX(tc_slno) INTO SLNO FROM  tbl_takeaway_cancel_items WHERE tc_billno = NEW.tc_billno AND tc_bill_slno = new.tc_bill_slno;
+
+   IF SLNO IS NULL THEN SET  SLNO = 0;
+    END IF;
+
+
+
+SET new.tc_slno = SLNO + 1;
+
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_takeaway_cancel_items` BEFORE UPDATE ON `tbl_takeaway_cancel_items` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N' AND old.cloud_sync != 'Z')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_takeaway_customer`
+--
+
+CREATE TABLE `tbl_takeaway_customer` (
+  `tac_customerid` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `tac_customername` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tac_contactno` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tac_address` varchar(300) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tac_landmark` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tac_area` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tac_remarks` varchar(1000) COLLATE utf8_unicode_ci NOT NULL,
+  `tac_branchid` bigint(20) DEFAULT NULL,
+  `tac_per_address` varchar(300) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tac_takeaway_count` int(11) NOT NULL DEFAULT '1',
+  `tac_homedelivery_count` int(11) NOT NULL DEFAULT '1',
+  `tac_entrydate` datetime NOT NULL,
+  `tac_gst` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tac_def` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tac_del_boy` int(11) DEFAULT NULL,
+  `tac_ref_data` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tac_phone_order` char(1) COLLATE utf8_unicode_ci DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_takeaway_customer`
+--
+DELIMITER $$
+CREATE TRIGGER `traf_takeway_customer` AFTER INSERT ON `tbl_takeaway_customer` FOR EACH ROW BEGIN
+ 
+ IF NOT EXISTS(SELECT * FROM tbl_loyalty_reg WHERE ly_mobileno = new.tac_contactno)THEN
+                           BEGIN
+                              if(new.tac_customername != '') and (new.tac_customername is not null) then
+                             begin
+                              INSERT INTO `tbl_loyalty_reg`(`ly_firstname`,`ly_mobileno`,ly_totalvisit,ly_default,ly_module) VALUES (new.tac_customername,new.tac_contactno,'0','Y','TA');
+                             end;
+                             end if;
+                           END;
+                           END IF;
+                           
+                           
+                           end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbi_customer` BEFORE INSERT ON `tbl_takeaway_customer` FOR EACH ROW BEGIN
+declare custcount int;
+
+SELECT be_takeawaycustcount INTO custcount FROM tbl_branchmaster; 
+   SET new.tac_customerid = custcount; 
+UPDATE tbl_branchmaster SET be_takeawaycustcount = be_takeawaycustcount + 1; 
+
+end
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_takeaway_customer` BEFORE UPDATE ON `tbl_takeaway_customer` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_takeaway_item_discount`
+--
+
+CREATE TABLE `tbl_takeaway_item_discount` (
+  `tbd_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `tbd_slno` smallint(6) NOT NULL,
+  `tbd_discount_id` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `tbd_discount_of` decimal(8,3) NOT NULL,
+  `tbd_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `tbd_mode` char(1) COLLATE utf8_unicode_ci NOT NULL,
+  `tbd_discount_remarks` varchar(60) COLLATE utf8_unicode_ci NOT NULL,
+  `tbd_discount` decimal(15,3) NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_takeaway_item_discount`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_takeaway_item_discount` BEFORE UPDATE ON `tbl_takeaway_item_discount` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_temp_orderno_details`
+--
+
+CREATE TABLE `tbl_temp_orderno_details` (
+  `to_temp_id` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `to_temp_createdtime` datetime NOT NULL,
+  `to_orderno` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `to_orderno_createdtime` datetime DEFAULT NULL,
+  `to_created_interface` char(1) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_temp_orderno_details`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_temp_orderno` BEFORE INSERT ON `tbl_temp_orderno_details` FOR EACH ROW SET NEW.to_temp_createdtime = NOW()
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_temp_orderno_details` BEFORE UPDATE ON `tbl_temp_orderno_details` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_temp_regenerate`
+--
+
+CREATE TABLE `tbl_temp_regenerate` (
+  `bill_no` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `order_no` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_temp_regenerate`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_temp_regenerate` BEFORE UPDATE ON `tbl_temp_regenerate` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_temp_tablebilldetails`
+--
+
+CREATE TABLE `tbl_temp_tablebilldetails` (
+  `bd_temp_billno` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `bd_billslno` smallint(6) NOT NULL,
+  `bd_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `bd_portion` int(11) NOT NULL,
+  `bd_rate` float NOT NULL DEFAULT '0',
+  `bd_qty` int(11) NOT NULL,
+  `bd_amount` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `bd_type` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_temp_tablebilldetails`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_temp_tablebilldetail` BEFORE INSERT ON `tbl_temp_tablebilldetails` FOR EACH ROW BEGIN
+
+	DECLARE SLNO int;
+  DECLARE quantity,NEW_quantity INT;
+  DECLARE EBILLSLNO,EQTY INT;
+
+    SELECT MAX(bd_billslno) INTO SLNO FROM tbl_temp_tablebilldetails 
+    WHERE bd_temp_billno = NEW.bd_temp_billno ;
+
+    IF SLNO IS NULL THEN SET  SLNO = 0;
+    END IF;
+
+    SET new.bd_billslno = SLNO+1;
+    
+    
+    
+  
+  
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_temp_tablebilldetails` BEFORE UPDATE ON `tbl_temp_tablebilldetails` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_temp_tablebillmaster`
+--
+
+CREATE TABLE `tbl_temp_tablebillmaster` (
+  `bm_temp_billno` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `bm_main_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `bm_branchid` bigint(20) NOT NULL,
+  `bm_floorid` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `bm_subtotal` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `bm_dayclosedate` date NOT NULL,
+  `bm_tableno` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_temp_tablebillmaster`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_temp_tablebillmaster` BEFORE UPDATE ON `tbl_temp_tablebillmaster` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_timely_sms_entry`
+--
+
+CREATE TABLE `tbl_timely_sms_entry` (
+  `tml_id` int(11) NOT NULL,
+  `tml_time` time DEFAULT NULL,
+  `tml_hour` decimal(15,1) DEFAULT NULL,
+  `tml_dayclose` date DEFAULT NULL,
+  `tml_sms` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tml_email` char(1) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_track_l`
+--
+
+CREATE TABLE `tbl_track_l` (
+  `l_username` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `l_secure_code` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `l_logged_status` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_track_l_details`
+--
+
+CREATE TABLE `tbl_track_l_details` (
+  `slno` int(11) NOT NULL,
+  `from_date` date NOT NULL,
+  `to_date` date NOT NULL,
+  `l_datetime` datetime NOT NULL,
+  `l_amount` int(11) NOT NULL,
+  `l_msg_no` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_unit_master`
+--
+
+CREATE TABLE `tbl_unit_master` (
+  `u_id` int(11) NOT NULL,
+  `u_name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_unit_master`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_unit_master` BEFORE UPDATE ON `tbl_unit_master` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_unit_master_combination`
+--
+
+CREATE TABLE `tbl_unit_master_combination` (
+  `um_first_id` int(11) NOT NULL,
+  `um_second_id` int(11) NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_unit_master_combination`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_unit_master_combination` BEFORE UPDATE ON `tbl_unit_master_combination` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_urban_charge_tax`
+--
+
+CREATE TABLE `tbl_urban_charge_tax` (
+  `tcx_id` int(11) NOT NULL,
+  `txc_order_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tcx_title` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tcx_value` decimal(15,3) DEFAULT NULL,
+  `tcx_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tcx_date` datetime DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_urban_order_temp_bill`
+--
+
+CREATE TABLE `tbl_urban_order_temp_bill` (
+  `tab_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `tab_status` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_dayclose` date NOT NULL,
+  `tab_entry` datetime DEFAULT NULL,
+  `tab_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_phone` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_address` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_urban_order_temp_detail`
+--
+
+CREATE TABLE `tbl_urban_order_temp_detail` (
+  `tab_billno` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `tab_slno` int(11) NOT NULL,
+  `tab_menuid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `tab_rate_type` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Portion',
+  `tab_unit_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_portion` int(11) DEFAULT NULL,
+  `tab_unit_weight` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_unit_id` int(11) DEFAULT NULL,
+  `tab_base_unit_id` int(11) DEFAULT NULL,
+  `tab_base_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_qty` int(11) NOT NULL,
+  `tab_preferencetext` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_org_rate` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_discount` decimal(15,3) NOT NULL DEFAULT '0.000',
+  `tab_rate` decimal(15,3) NOT NULL,
+  `tab_amount` decimal(15,3) NOT NULL,
+  `tab_status` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_packedtime` datetime DEFAULT NULL,
+  `tab_cancelled` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tab_cancelledtime` datetime DEFAULT NULL,
+  `tab_cancelledreason` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_cancelledlogin` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_symbol_for_tax` char(3) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tab_count_combo_ordering` int(11) DEFAULT NULL,
+  `tab_food_partner_id` int(11) DEFAULT NULL,
+  `tab_dayclose` date DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_usermodules`
+--
+
+CREATE TABLE `tbl_usermodules` (
+  `um_username` varchar(15) COLLATE utf8_unicode_ci NOT NULL,
+  `um_moduleid` int(11) NOT NULL,
+  `um_submoduleid` int(11) NOT NULL DEFAULT '0',
+  `um_access` char(1) COLLATE utf8_unicode_ci DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_vendor_master`
+--
+
+CREATE TABLE `tbl_vendor_master` (
+  `v_id` int(11) NOT NULL,
+  `v_name` varchar(1000) COLLATE utf8_unicode_ci NOT NULL,
+  `v_branchid` bigint(20) NOT NULL,
+  `v_address` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_city` int(11) DEFAULT NULL,
+  `v_state` int(11) DEFAULT NULL,
+  `v_country` int(11) DEFAULT NULL,
+  `v_email` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_contact_no` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_open_bal` decimal(15,3) DEFAULT NULL,
+  `v_tin_no` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `gst` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_srvctax_reg_no` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_pan` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_bank_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_branch_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_acct_no` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_ifsc` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_mode_of_pay` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_credit_period` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_favour` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_conc_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_conc_desg` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_conc_contact` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_conc_email` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `v_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `v_entry_type` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `v_entry_date` date DEFAULT NULL,
+  `central_created` varchar(5) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `updated_in_local` varchar(5) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `central_edited` varchar(5) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `id` int(11) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_version`
+--
+
+CREATE TABLE `tbl_version` (
+  `pv_current_version` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `pv_date_of_change` date NOT NULL,
+  `pv_time_of_change` time NOT NULL,
+  `pv_expodine_staff_by` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `pv_apk_ver_name` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `pv_apk_ver_code` int(11) DEFAULT NULL,
+  `pve_apk_ver_name` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `pve_apk_ver_code` int(11) DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `payment_overdue` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_version`
+--
+DELIMITER $$
+CREATE TRIGGER `trau_version` BEFORE UPDATE ON `tbl_version` FOR EACH ROW begin
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+
+  if(old.pv_apk_ver_code != new.pv_apk_ver_code)then
+
+  begin
+
+
+
+   UPDATE `tbl_appmachinedetails` SET as_new_ver = new.pv_apk_ver_code, as_update_found = 'Y';
+
+
+
+   END;
+
+
+
+   END IF;
+
+
+  if(old.pve_apk_ver_code != new.pve_apk_ver_code)then
+
+  begin
+
+
+
+   UPDATE `tbl_appmachinedetails` SET as_em_new_ver = new.pve_apk_ver_code, as_em_update_found = 'Y';
+
+
+
+   END;
+
+
+
+   END IF;
+
+IF NOT EXISTS (SELECT vl_old_version FROM tbl_version_log WHERE vl_old_version =old.pv_current_version)
+THEN
+BEGIN
+INSERT INTO `tbl_version_log`(`vl_old_version`, `vl_old_date_of change`) VALUES(old.pv_current_version,old.pv_date_of_change);
+END;
+END IF;
+
+
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_version_log`
+--
+
+CREATE TABLE `tbl_version_log` (
+  `vl_old_version` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `vl_old_date_of change` date NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_version_log`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_version_log` BEFORE UPDATE ON `tbl_version_log` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_voucherhead`
+--
+
+CREATE TABLE `tbl_voucherhead` (
+  `vh_id` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `vh_vouchername` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
+  `vh_active` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `vh_branchid` bigint(20) NOT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_voucherhead`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_voucherhead` BEFORE INSERT ON `tbl_voucherhead` FOR EACH ROW begin
+
+    DECLARE prefx varchar(3);
+
+   DECLARE voucherno INT;
+
+
+
+SELECT be_branchprefix, be_voucherhead_count
+
+  INTO prefx,voucherno
+
+  FROM tbl_branchmaster
+
+ WHERE be_branchid = new.vh_branchid;
+
+
+
+
+
+SET new.vh_id = voucherno;
+
+
+
+UPDATE tbl_branchmaster
+
+   SET be_voucherhead_count = be_voucherhead_count + 1
+
+ WHERE be_branchid = new.vh_branchid;
+
+
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_voucherhead` BEFORE UPDATE ON `tbl_voucherhead` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_voucherpayment`
+--
+
+CREATE TABLE `tbl_voucherpayment` (
+  `vp_id` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `vp_vhid` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `vp_amount` decimal(15,2) NOT NULL DEFAULT '0.00',
+  `vp_date` datetime DEFAULT NULL,
+  `vp_paymentmode` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `vp_paidto` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `vp_chequebank` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `vp_chequebranch` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `vp_chequeleafno` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `vp_receivedby` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `vp_branchid` bigint(20) DEFAULT NULL,
+  `vp_status` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `vp_remarks` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `vp_approveddate` datetime DEFAULT NULL,
+  `vp_approvedby` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `vp_type` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Expense',
+  `vp_voucherno` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `vp_add_remark` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `vp_system_ip` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `vp_dayclose_date` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_voucherpayment`
+--
+DELIMITER $$
+CREATE TRIGGER `trbi_voucherpayment` BEFORE INSERT ON `tbl_voucherpayment` FOR EACH ROW BEGIN
+
+
+
+   DECLARE DAYCLOSEDATE DATE;
+
+   DECLARE vdate varchar(6);
+
+   DECLARE vouchercount INT;
+
+
+
+  SELECT dc_day INTO DAYCLOSEDATE FROM tbl_dayclose WHERE dc_dateclose IS NULL;
+
+  
+
+  SELECT DATE_FORMAT(DAYCLOSEDATE,'%d%m%y') INTO vdate;
+
+
+
+
+
+SELECT ds_voucherpay_count INTO vouchercount FROM tbl_datesettings
+
+      WHERE ds_branchid = new.vp_branchid AND ds_date = DAYCLOSEDATE;
+
+      
+
+       IF(vouchercount IS NULL) THEN
+
+      BEGIN
+
+        INSERT INTO tbl_datesettings(ds_branchid,ds_date) VALUES(new.vp_branchid, DAYCLOSEDATE);
+
+        SELECT ds_voucherpay_count INTO vouchercount FROM tbl_datesettings WHERE ds_branchid = new.vp_branchid AND ds_date = DAYCLOSEDATE;
+
+      END;
+
+      END IF;
+
+
+
+      set new.vp_id = concat(vdate,vouchercount);
+
+      
+
+      UPDATE tbl_datesettings SET ds_voucherpay_count = ds_voucherpay_count+1 WHERE ds_branchid = new.vp_branchid AND ds_date = DAYCLOSEDATE;
+
+
+
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_voucherpayment` BEFORE UPDATE ON `tbl_voucherpayment` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_voucher_delete_log`
+--
+
+CREATE TABLE `tbl_voucher_delete_log` (
+  `tvd_id` int(11) NOT NULL,
+  `tvd_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tvd_data` varchar(5000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tvd_date` datetime DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tv_cloud_id_deleted` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tv_deleted_local` varchar(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_wastage`
+--
+
+CREATE TABLE `tbl_wastage` (
+  `tw_id` int(11) NOT NULL,
+  `tw_wastage_id` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tw_product` int(11) DEFAULT NULL,
+  `tw_name` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tw_barcode` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tw_qty` decimal(15,3) DEFAULT NULL,
+  `tw_weight` decimal(15,3) DEFAULT NULL,
+  `tw_rate_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tw_unit_type` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tw_rate` decimal(15,3) DEFAULT NULL,
+  `tw_total` decimal(15,3) DEFAULT NULL,
+  `tw_set` char(1) COLLATE utf8_unicode_ci DEFAULT 'N',
+  `tw_date` date DEFAULT NULL,
+  `tw_login` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tw_store` int(11) DEFAULT NULL,
+  `tw_brand` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `tw_current_stock` decimal(15,3) DEFAULT NULL,
+  `tw_reason` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tw_central_return` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `tw_item_central_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Triggers `tbl_wastage`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_wastage` BEFORE UPDATE ON `tbl_wastage` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_yearsettings`
+--
+
+CREATE TABLE `tbl_yearsettings` (
+  `ys_fin_year` char(4) COLLATE utf8_unicode_ci NOT NULL,
+  `ys_fin_year_current` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Y',
+  `ys_fin_year_start` date NOT NULL,
+  `ys_fin_year_end` date NOT NULL,
+  `ys_function_count` int(11) NOT NULL DEFAULT '1',
+  `ys_function_invoice` int(11) NOT NULL DEFAULT '1',
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Triggers `tbl_yearsettings`
+--
+DELIMITER $$
+CREATE TRIGGER `trai_yersettings` AFTER INSERT ON `tbl_yearsettings` FOR EACH ROW begin IF EXISTS( SELECT * FROM tbl_year_bill_series) THEN BEGIN INSERT INTO `tbl_year_bill_series`(`b_fin_year`, `b_series`, `b_alpahabet`) SELECT NEW.ys_fin_year , `b_series`,`b_alpahabet` FROM `tbl_year_bill_series` GROUP BY b_series; END; ELSE BEGIN INSERT INTO `tbl_year_bill_series`(`b_fin_year`, b_series,`b_count`, `b_alpahabet`) VALUES(NEW.ys_fin_year,1,1,'A'); END; END IF; END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trbu_yearsettings` BEFORE UPDATE ON `tbl_yearsettings` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_year_bill_series`
+--
+
+CREATE TABLE `tbl_year_bill_series` (
+  `b_fin_year` char(4) COLLATE utf8_unicode_ci NOT NULL,
+  `b_series` int(11) NOT NULL,
+  `b_count` int(11) NOT NULL DEFAULT '1',
+  `b_alpahabet` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `cloud_sync` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC;
+
+--
+-- Triggers `tbl_year_bill_series`
+--
+DELIMITER $$
+CREATE TRIGGER `trbu_year_bill_series` BEFORE UPDATE ON `tbl_year_bill_series` FOR EACH ROW BEGIN
+
+IF(old.cloud_sync != 'N')THEN
+SET new.cloud_sync = 'N';
+END IF;
+
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `temp_loyalty_reg`
+--
+
+CREATE TABLE `temp_loyalty_reg` (
+  `ly_id` int(11) NOT NULL,
+  `ly_firstname` varchar(250) COLLATE utf8_unicode_ci NOT NULL,
+  `ly_lastname` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_gender` char(1) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_mobileno` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_emailid` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_birthdaydate` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_maritalstatus` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_anniversarydate` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_profession` varchar(250) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ly_totalvisit` int(11) NOT NULL DEFAULT '1',
+  `ly_mailreceive` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ly_smsreceive` char(1) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N',
+  `ly_entrydatetime` datetime DEFAULT NULL,
+  `ly_branchid` int(11) DEFAULT NULL,
+  `ly_status` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Active',
+  `ly_entry_from` varchar(100) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'Credit',
+  `ly_points` int(11) DEFAULT NULL,
+  `ly_voucher_count` int(11) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `tbl_accounthead`
+--
+ALTER TABLE `tbl_accounthead`
+  ADD PRIMARY KEY (`ac_accountid`);
+
+--
+-- Indexes for table `tbl_account_settings`
+--
+ALTER TABLE `tbl_account_settings`
+  ADD PRIMARY KEY (`tas_profit`,`tas_loss`);
+
+--
+-- Indexes for table `tbl_account_stock`
+--
+ALTER TABLE `tbl_account_stock`
+  ADD PRIMARY KEY (`tas_id`),
+  ADD UNIQUE KEY `tas_date` (`tas_date`);
+
+--
+-- Indexes for table `tbl_advance_day_detail`
+--
+ALTER TABLE `tbl_advance_day_detail`
+  ADD PRIMARY KEY (`tdd_id`);
+
+--
+-- Indexes for table `tbl_advance_payment`
+--
+ALTER TABLE `tbl_advance_payment`
+  ADD PRIMARY KEY (`tp_id`);
+
+--
+-- Indexes for table `tbl_advance_pay_menu_details`
+--
+ALTER TABLE `tbl_advance_pay_menu_details`
+  ADD PRIMARY KEY (`tmd_id`),
+  ADD UNIQUE KEY `tmd_ref_id` (`tmd_ref_id`,`tmd_menu`,`tmd_weight`);
+
+--
+-- Indexes for table `tbl_amc_setup`
+--
+ALTER TABLE `tbl_amc_setup`
+  ADD PRIMARY KEY (`tmc_id`),
+  ADD UNIQUE KEY `tm_to` (`tm_to`);
+
+--
+-- Indexes for table `tbl_appmachinedetails`
+--
+ALTER TABLE `tbl_appmachinedetails`
+  ADD PRIMARY KEY (`as_appmachineid`),
+  ADD UNIQUE KEY `as_appmachiesychid` (`as_appmachiesychid`);
+
+--
+-- Indexes for table `tbl_app_permissions`
+--
+ALTER TABLE `tbl_app_permissions`
+  ADD PRIMARY KEY (`tap_id`),
+  ADD UNIQUE KEY `tap_staff_id` (`tap_staff_id`),
+  ADD UNIQUE KEY `tap_staff_id_2` (`tap_staff_id`);
+
+--
+-- Indexes for table `tbl_archive_settings`
+--
+ALTER TABLE `tbl_archive_settings`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tbl_archive_settings_log`
+--
+ALTER TABLE `tbl_archive_settings_log`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tbl_asset_category`
+--
+ALTER TABLE `tbl_asset_category`
+  ADD PRIMARY KEY (`tsc_id`);
+
+--
+-- Indexes for table `tbl_asset_invoice_tax_details`
+--
+ALTER TABLE `tbl_asset_invoice_tax_details`
+  ADD PRIMARY KEY (`txd_id`);
+
+--
+-- Indexes for table `tbl_asset_master`
+--
+ALTER TABLE `tbl_asset_master`
+  ADD PRIMARY KEY (`tam_id`);
+
+--
+-- Indexes for table `tbl_asset_purchase`
+--
+ALTER TABLE `tbl_asset_purchase`
+  ADD PRIMARY KEY (`tap_id`);
+
+--
+-- Indexes for table `tbl_asset_purchase_invoice_detail`
+--
+ALTER TABLE `tbl_asset_purchase_invoice_detail`
+  ADD PRIMARY KEY (`tpd_id`);
+
+--
+-- Indexes for table `tbl_attendance`
+--
+ALTER TABLE `tbl_attendance`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_att` (`staff_id`,`att_date`);
+
+--
+-- Indexes for table `tbl_bankmaster`
+--
+ALTER TABLE `tbl_bankmaster`
+  ADD PRIMARY KEY (`bm_id`);
+
+--
+-- Indexes for table `tbl_base_unit_master`
+--
+ALTER TABLE `tbl_base_unit_master`
+  ADD PRIMARY KEY (`bu_id`);
+
+--
+-- Indexes for table `tbl_batch_stock`
+--
+ALTER TABLE `tbl_batch_stock`
+  ADD PRIMARY KEY (`tbs_id`);
+
+--
+-- Indexes for table `tbl_billcancel_log`
+--
+ALTER TABLE `tbl_billcancel_log`
+  ADD PRIMARY KEY (`bc_billno`);
+
+--
+-- Indexes for table `tbl_bill_card_payments`
+--
+ALTER TABLE `tbl_bill_card_payments`
+  ADD PRIMARY KEY (`mc_id`),
+  ADD UNIQUE KEY `mc_billno` (`mc_billno`,`mc_cardamount`,`mc_to_bank`);
+
+--
+-- Indexes for table `tbl_branchmaster`
+--
+ALTER TABLE `tbl_branchmaster`
+  ADD PRIMARY KEY (`be_branchid`),
+  ADD UNIQUE KEY `be_branchname` (`be_branchname`),
+  ADD UNIQUE KEY `be_branchprefix` (`be_branchprefix`),
+  ADD KEY `be_base_currency` (`be_base_currency`);
+
+--
+-- Indexes for table `tbl_branchsettings_android`
+--
+ALTER TABLE `tbl_branchsettings_android`
+  ADD PRIMARY KEY (`an_id`);
+
+--
+-- Indexes for table `tbl_branch_settings_cloud`
+--
+ALTER TABLE `tbl_branch_settings_cloud`
+  ADD PRIMARY KEY (`bsc_branchid`);
+
+--
+-- Indexes for table `tbl_branch_settings_counter`
+--
+ALTER TABLE `tbl_branch_settings_counter`
+  ADD PRIMARY KEY (`bsc_branchid`);
+
+--
+-- Indexes for table `tbl_branch_settings_loyality`
+--
+ALTER TABLE `tbl_branch_settings_loyality`
+  ADD PRIMARY KEY (`bl_branchid`);
+
+--
+-- Indexes for table `tbl_branch_settings_printer`
+--
+ALTER TABLE `tbl_branch_settings_printer`
+  ADD PRIMARY KEY (`bp_branchid`);
+
+--
+-- Indexes for table `tbl_branch_settings_ta_hd`
+--
+ALTER TABLE `tbl_branch_settings_ta_hd`
+  ADD PRIMARY KEY (`bsth_branchid`);
+
+--
+-- Indexes for table `tbl_br_cloud_tables`
+--
+ALTER TABLE `tbl_br_cloud_tables`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tbl_cancellation_reasons`
+--
+ALTER TABLE `tbl_cancellation_reasons`
+  ADD PRIMARY KEY (`cr_id`);
+
+--
+-- Indexes for table `tbl_cardmaster`
+--
+ALTER TABLE `tbl_cardmaster`
+  ADD PRIMARY KEY (`crd_id`),
+  ADD UNIQUE KEY `crd_name` (`crd_name`);
+
+--
+-- Indexes for table `tbl_cash_drawer_log`
+--
+ALTER TABLE `tbl_cash_drawer_log`
+  ADD PRIMARY KEY (`cdl_id`);
+
+--
+-- Indexes for table `tbl_central_kitchen_transfer`
+--
+ALTER TABLE `tbl_central_kitchen_transfer`
+  ADD PRIMARY KEY (`tct_id`);
+
+--
+-- Indexes for table `tbl_city`
+--
+ALTER TABLE `tbl_city`
+  ADD PRIMARY KEY (`cy_cityid`),
+  ADD UNIQUE KEY `cy_cityname` (`cy_cityname`),
+  ADD KEY `cy_stateid` (`cy_stateid`),
+  ADD KEY `cy_countryid` (`cy_countryid`);
+
+--
+-- Indexes for table `tbl_cloud_backup_history`
+--
+ALTER TABLE `tbl_cloud_backup_history`
+  ADD PRIMARY KEY (`cbh_date`,`cbh_slno`);
+
+--
+-- Indexes for table `tbl_combo_bill_details`
+--
+ALTER TABLE `tbl_combo_bill_details`
+  ADD PRIMARY KEY (`cbd_billno`,`cbd_billslno`);
+
+--
+-- Indexes for table `tbl_combo_bill_details_ta`
+--
+ALTER TABLE `tbl_combo_bill_details_ta`
+  ADD PRIMARY KEY (`cbd_id`),
+  ADD KEY `cbd_billno` (`cbd_billno`);
+
+--
+-- Indexes for table `tbl_combo_menu_labels`
+--
+ALTER TABLE `tbl_combo_menu_labels`
+  ADD PRIMARY KEY (`cml_id`);
+
+--
+-- Indexes for table `tbl_combo_name`
+--
+ALTER TABLE `tbl_combo_name`
+  ADD PRIMARY KEY (`cn_id`);
+
+--
+-- Indexes for table `tbl_combo_ordering_details`
+--
+ALTER TABLE `tbl_combo_ordering_details`
+  ADD PRIMARY KEY (`cod_id`);
+
+--
+-- Indexes for table `tbl_combo_packs`
+--
+ALTER TABLE `tbl_combo_packs`
+  ADD PRIMARY KEY (`cp_id`);
+
+--
+-- Indexes for table `tbl_combo_pack_menus`
+--
+ALTER TABLE `tbl_combo_pack_menus`
+  ADD PRIMARY KEY (`cpm_id`);
+
+--
+-- Indexes for table `tbl_combo_pack_rates`
+--
+ALTER TABLE `tbl_combo_pack_rates`
+  ADD PRIMARY KEY (`cpr_id`);
+
+--
+-- Indexes for table `tbl_combo_stock`
+--
+ALTER TABLE `tbl_combo_stock`
+  ADD PRIMARY KEY (`cs_id`);
+
+--
+-- Indexes for table `tbl_combo_type`
+--
+ALTER TABLE `tbl_combo_type`
+  ADD PRIMARY KEY (`ct_id`);
+
+--
+-- Indexes for table `tbl_common_logs_all`
+--
+ALTER TABLE `tbl_common_logs_all`
+  ADD PRIMARY KEY (`tcl_id`);
+
+--
+-- Indexes for table `tbl_complementory_reasons`
+--
+ALTER TABLE `tbl_complementory_reasons`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tbl_consumption`
+--
+ALTER TABLE `tbl_consumption`
+  ADD PRIMARY KEY (`tc_id`),
+  ADD UNIQUE KEY `tc_con_id` (`tc_con_id`,`tc_product`);
+
+--
+-- Indexes for table `tbl_contra_voucher`
+--
+ALTER TABLE `tbl_contra_voucher`
+  ADD PRIMARY KEY (`cv_id`);
+
+--
+-- Indexes for table `tbl_corporatemaster`
+--
+ALTER TABLE `tbl_corporatemaster`
+  ADD PRIMARY KEY (`ct_corporatecode`),
+  ADD UNIQUE KEY `ct_corporatename` (`ct_corporatename`);
+
+--
+-- Indexes for table `tbl_country`
+--
+ALTER TABLE `tbl_country`
+  ADD PRIMARY KEY (`cy_countyid`),
+  ADD UNIQUE KEY `cy_countryname` (`cy_countryname`);
+
+--
+-- Indexes for table `tbl_couponcompany`
+--
+ALTER TABLE `tbl_couponcompany`
+  ADD PRIMARY KEY (`cy_companyname`);
+
+--
+-- Indexes for table `tbl_credit_details`
+--
+ALTER TABLE `tbl_credit_details`
+  ADD PRIMARY KEY (`cd_slno`),
+  ADD UNIQUE KEY `cd_billno` (`cd_billno`),
+  ADD KEY `fk_creditdetails_creditmaster` (`cd_masterid`);
+
+--
+-- Indexes for table `tbl_credit_details_payment`
+--
+ALTER TABLE `tbl_credit_details_payment`
+  ADD PRIMARY KEY (`cdp_master_id`,`cdp_dayclosedate`,`cdp_slno`);
+
+--
+-- Indexes for table `tbl_credit_master`
+--
+ALTER TABLE `tbl_credit_master`
+  ADD PRIMARY KEY (`crd_id`),
+  ADD UNIQUE KEY `crd_corporateid` (`crd_corporateid`),
+  ADD UNIQUE KEY `crd_guestid_2` (`crd_guestid`),
+  ADD UNIQUE KEY `crd_staffid_2` (`crd_staffid`),
+  ADD KEY `crd_companyid` (`crd_corporateid`),
+  ADD KEY `crd_guestid` (`crd_guestid`),
+  ADD KEY `crd_roomid` (`crd_roomid`),
+  ADD KEY `crd_staffid` (`crd_staffid`),
+  ADD KEY `crd_type` (`crd_type`);
+
+--
+-- Indexes for table `tbl_credit_partial_bill`
+--
+ALTER TABLE `tbl_credit_partial_bill`
+  ADD PRIMARY KEY (`tcp_id`);
+
+--
+-- Indexes for table `tbl_credit_types`
+--
+ALTER TABLE `tbl_credit_types`
+  ADD PRIMARY KEY (`ct_creditid`),
+  ADD UNIQUE KEY `ct_credit_type` (`ct_credit_type`);
+
+--
+-- Indexes for table `tbl_currency_conv_rate`
+--
+ALTER TABLE `tbl_currency_conv_rate`
+  ADD PRIMARY KEY (`cc_base_currency`,`cc_currency`),
+  ADD KEY `fk_currency_conv_rate_curr` (`cc_currency`);
+
+--
+-- Indexes for table `tbl_currency_master`
+--
+ALTER TABLE `tbl_currency_master`
+  ADD PRIMARY KEY (`c_id`);
+
+--
+-- Indexes for table `tbl_customer_ebill_details`
+--
+ALTER TABLE `tbl_customer_ebill_details`
+  ADD UNIQUE KEY `branchid` (`branchid`,`tc_billno`);
+
+--
+-- Indexes for table `tbl_daily_stock_detail`
+--
+ALTER TABLE `tbl_daily_stock_detail`
+  ADD PRIMARY KEY (`ts_id`),
+  ADD UNIQUE KEY `ts_dayclose` (`ts_dayclose`,`ts_menuid`,`ts_portion`);
+
+--
+-- Indexes for table `tbl_databank`
+--
+ALTER TABLE `tbl_databank`
+  ADD PRIMARY KEY (`db_id`);
+
+--
+-- Indexes for table `tbl_datesettings`
+--
+ALTER TABLE `tbl_datesettings`
+  ADD PRIMARY KEY (`ds_branchid`,`ds_date`);
+
+--
+-- Indexes for table `tbl_dayclose`
+--
+ALTER TABLE `tbl_dayclose`
+  ADD PRIMARY KEY (`dc_day`),
+  ADD KEY `dayclose` (`dc_day`,`dc_dateopen`);
+
+--
+-- Indexes for table `tbl_dayclose_revert_log`
+--
+ALTER TABLE `tbl_dayclose_revert_log`
+  ADD PRIMARY KEY (`td_id`);
+
+--
+-- Indexes for table `tbl_dbsize_detail`
+--
+ALTER TABLE `tbl_dbsize_detail`
+  ADD PRIMARY KEY (`tbs_id`),
+  ADD UNIQUE KEY `tbs_month` (`tbs_month`),
+  ADD UNIQUE KEY `tbs_month_2` (`tbs_month`);
+
+--
+-- Indexes for table `tbl_delivery_status`
+--
+ALTER TABLE `tbl_delivery_status`
+  ADD PRIMARY KEY (`ds_id`);
+
+--
+-- Indexes for table `tbl_denomination_master`
+--
+ALTER TABLE `tbl_denomination_master`
+  ADD PRIMARY KEY (`dm_id`);
+
+--
+-- Indexes for table `tbl_departmentmaster`
+--
+ALTER TABLE `tbl_departmentmaster`
+  ADD PRIMARY KEY (`der_departmentid`),
+  ADD UNIQUE KEY `der_departmentname` (`der_departmentname`),
+  ADD KEY `fk_department_branch` (`der_branch`);
+
+--
+-- Indexes for table `tbl_designationmaster`
+--
+ALTER TABLE `tbl_designationmaster`
+  ADD PRIMARY KEY (`dr_designationid`),
+  ADD UNIQUE KEY `dr_designationname` (`dr_designationname`),
+  ADD KEY `fk_designation_branch` (`dr_branch`);
+
+--
+-- Indexes for table `tbl_discountmaster`
+--
+ALTER TABLE `tbl_discountmaster`
+  ADD PRIMARY KEY (`ds_discountid`),
+  ADD UNIQUE KEY `ds_discountname` (`ds_discountname`);
+
+--
+-- Indexes for table `tbl_employee_master`
+--
+ALTER TABLE `tbl_employee_master`
+  ADD PRIMARY KEY (`emp_id`);
+
+--
+-- Indexes for table `tbl_employee_salary`
+--
+ALTER TABLE `tbl_employee_salary`
+  ADD PRIMARY KEY (`tes_id`),
+  ADD UNIQUE KEY `tes_month` (`tes_month`,`tes_year`,`tes_emp_id`);
+
+--
+-- Indexes for table `tbl_employee_voucher`
+--
+ALTER TABLE `tbl_employee_voucher`
+  ADD PRIMARY KEY (`ev_id`);
+
+--
+-- Indexes for table `tbl_expense_voucher`
+--
+ALTER TABLE `tbl_expense_voucher`
+  ADD PRIMARY KEY (`ev_id`);
+
+--
+-- Indexes for table `tbl_expodine_machines`
+--
+ALTER TABLE `tbl_expodine_machines`
+  ADD PRIMARY KEY (`cm_id`),
+  ADD UNIQUE KEY `cm_ip_address` (`cm_ip_address`);
+
+--
+-- Indexes for table `tbl_extra_tax_master`
+--
+ALTER TABLE `tbl_extra_tax_master`
+  ADD PRIMARY KEY (`amc_id`);
+
+--
+-- Indexes for table `tbl_feedbackmaster`
+--
+ALTER TABLE `tbl_feedbackmaster`
+  ADD PRIMARY KEY (`fbm_id`),
+  ADD KEY `fbm_branchid` (`fbm_branchid`);
+
+--
+-- Indexes for table `tbl_feedbackrating`
+--
+ALTER TABLE `tbl_feedbackrating`
+  ADD PRIMARY KEY (`fbr_id`),
+  ADD KEY `fbr_fbm_id` (`fbr_fbm_id`),
+  ADD KEY `fbr_orderid` (`fbr_orderid`),
+  ADD KEY `fbr_table` (`fbr_table`);
+
+--
+-- Indexes for table `tbl_feedbackratingcount`
+--
+ALTER TABLE `tbl_feedbackratingcount`
+  ADD PRIMARY KEY (`frc_menuid`);
+
+--
+-- Indexes for table `tbl_feedback_remark_entry`
+--
+ALTER TABLE `tbl_feedback_remark_entry`
+  ADD PRIMARY KEY (`tfb_id`);
+
+--
+-- Indexes for table `tbl_firebase_notification_report`
+--
+ALTER TABLE `tbl_firebase_notification_report`
+  ADD PRIMARY KEY (`tf_id`);
+
+--
+-- Indexes for table `tbl_floormaster`
+--
+ALTER TABLE `tbl_floormaster`
+  ADD PRIMARY KEY (`fr_floorid`),
+  ADD KEY `fr_branchid` (`fr_branchid`);
+
+--
+-- Indexes for table `tbl_floor_tax`
+--
+ALTER TABLE `tbl_floor_tax`
+  ADD PRIMARY KEY (`ft_floorid`,`ft_tax_id`),
+  ADD KEY `fk_floortax_taxid` (`ft_tax_id`);
+
+--
+-- Indexes for table `tbl_food_cost`
+--
+ALTER TABLE `tbl_food_cost`
+  ADD PRIMARY KEY (`tfc_id`);
+
+--
+-- Indexes for table `tbl_function_details`
+--
+ALTER TABLE `tbl_function_details`
+  ADD PRIMARY KEY (`fd_id`),
+  ADD KEY `fd_function_type` (`fd_function_type`),
+  ADD KEY `fd_venue` (`fd_venue`);
+
+--
+-- Indexes for table `tbl_function_details_menu`
+--
+ALTER TABLE `tbl_function_details_menu`
+  ADD PRIMARY KEY (`fdm_function_id`,`fdm_slno`);
+
+--
+-- Indexes for table `tbl_function_extra_costs`
+--
+ALTER TABLE `tbl_function_extra_costs`
+  ADD PRIMARY KEY (`fec_id`);
+
+--
+-- Indexes for table `tbl_function_invoice`
+--
+ALTER TABLE `tbl_function_invoice`
+  ADD PRIMARY KEY (`fi_invoice_no`),
+  ADD UNIQUE KEY `fi_invoice_no` (`fi_invoice_no`,`fi_function_id`);
+
+--
+-- Indexes for table `tbl_function_invoice_extras`
+--
+ALTER TABLE `tbl_function_invoice_extras`
+  ADD PRIMARY KEY (`fi_invoice_no`,`fi_slno`),
+  ADD KEY `fi_extra_id` (`fi_extra_id`);
+
+--
+-- Indexes for table `tbl_function_type`
+--
+ALTER TABLE `tbl_function_type`
+  ADD PRIMARY KEY (`ft_id`);
+
+--
+-- Indexes for table `tbl_function_venue`
+--
+ALTER TABLE `tbl_function_venue`
+  ADD PRIMARY KEY (`fv_id`);
+
+--
+-- Indexes for table `tbl_generalsettings`
+--
+ALTER TABLE `tbl_generalsettings`
+  ADD PRIMARY KEY (`be_id`);
+
+--
+-- Indexes for table `tbl_general_settings_log`
+--
+ALTER TABLE `tbl_general_settings_log`
+  ADD PRIMARY KEY (`tg_id`);
+
+--
+-- Indexes for table `tbl_grn_order`
+--
+ALTER TABLE `tbl_grn_order`
+  ADD PRIMARY KEY (`tg_id`);
+
+--
+-- Indexes for table `tbl_grn_summary`
+--
+ALTER TABLE `tbl_grn_summary`
+  ADD PRIMARY KEY (`tgs_id`);
+
+--
+-- Indexes for table `tbl_hold_data`
+--
+ALTER TABLE `tbl_hold_data`
+  ADD PRIMARY KEY (`th_id`),
+  ADD UNIQUE KEY `th_hold_id` (`th_hold_id`,`th_date`);
+
+--
+-- Indexes for table `tbl_indent_partial`
+--
+ALTER TABLE `tbl_indent_partial`
+  ADD PRIMARY KEY (`tip_id`);
+
+--
+-- Indexes for table `tbl_ingredientmaster`
+--
+ALTER TABLE `tbl_ingredientmaster`
+  ADD PRIMARY KEY (`ir_ingredientid`),
+  ADD UNIQUE KEY `ir_ingredientname` (`ir_ingredientname`);
+
+--
+-- Indexes for table `tbl_inv_daily_store_stock`
+--
+ALTER TABLE `tbl_inv_daily_store_stock`
+  ADD PRIMARY KEY (`tis_id`),
+  ADD UNIQUE KEY `tis_date` (`tis_date`,`tis_product`,`tis_store`);
+
+--
+-- Indexes for table `tbl_inv_kitchen`
+--
+ALTER TABLE `tbl_inv_kitchen`
+  ADD PRIMARY KEY (`ti_id`),
+  ADD UNIQUE KEY `ti_name` (`ti_name`);
+
+--
+-- Indexes for table `tbl_inv_settings`
+--
+ALTER TABLE `tbl_inv_settings`
+  ADD PRIMARY KEY (`ti_id`);
+
+--
+-- Indexes for table `tbl_kotcountermaster`
+--
+ALTER TABLE `tbl_kotcountermaster`
+  ADD PRIMARY KEY (`kr_kotcode`),
+  ADD KEY `kr_branchid` (`kr_branchid`),
+  ADD KEY `kr_printerid` (`kr_printerid`);
+
+--
+-- Indexes for table `tbl_kotmaster`
+--
+ALTER TABLE `tbl_kotmaster`
+  ADD PRIMARY KEY (`kr_date`,`kr_kotno`);
+
+--
+-- Indexes for table `tbl_kot_cancellation`
+--
+ALTER TABLE `tbl_kot_cancellation`
+  ADD PRIMARY KEY (`kc_cancellation_id`);
+
+--
+-- Indexes for table `tbl_languages`
+--
+ALTER TABLE `tbl_languages`
+  ADD PRIMARY KEY (`ls_id`);
+
+--
+-- Indexes for table `tbl_language_feedback`
+--
+ALTER TABLE `tbl_language_feedback`
+  ADD PRIMARY KEY (`fe_lang_id`,`fe_feedback_id`);
+
+--
+-- Indexes for table `tbl_language_floor`
+--
+ALTER TABLE `tbl_language_floor`
+  ADD PRIMARY KEY (`f_lang_id`,`f_floor_id`),
+  ADD KEY `fk_language_floorid` (`f_floor_id`);
+
+--
+-- Indexes for table `tbl_language_menu_main`
+--
+ALTER TABLE `tbl_language_menu_main`
+  ADD PRIMARY KEY (`mm_lang_id`,`mm_categoryid`),
+  ADD KEY `fk_language_mmc` (`mm_categoryid`);
+
+--
+-- Indexes for table `tbl_language_menu_master`
+--
+ALTER TABLE `tbl_language_menu_master`
+  ADD PRIMARY KEY (`lm_language_id`,`lm_menu_id`),
+  ADD KEY `fk_language_menu` (`lm_menu_id`);
+
+--
+-- Indexes for table `tbl_language_menu_sub`
+--
+ALTER TABLE `tbl_language_menu_sub`
+  ADD PRIMARY KEY (`mm_lang_id`,`mm_sub_category_id`),
+  ADD KEY `fk_language_menu_sub_subid` (`mm_sub_category_id`);
+
+--
+-- Indexes for table `tbl_language_portion`
+--
+ALTER TABLE `tbl_language_portion`
+  ADD PRIMARY KEY (`lm_language_id`,`lm_portion_id`),
+  ADD KEY `fk_language_portion_name` (`lm_portion_id`);
+
+--
+-- Indexes for table `tbl_language_preference`
+--
+ALTER TABLE `tbl_language_preference`
+  ADD PRIMARY KEY (`l_lang_id`,`l_pref_id`),
+  ADD KEY `fk_language_preference_pref_id` (`l_pref_id`);
+
+--
+-- Indexes for table `tbl_language_staff`
+--
+ALTER TABLE `tbl_language_staff`
+  ADD PRIMARY KEY (`s_lang_id`,`s_staff_id`),
+  ADD KEY `fk_language_staff_staffid` (`s_staff_id`);
+
+--
+-- Indexes for table `tbl_language_table_master`
+--
+ALTER TABLE `tbl_language_table_master`
+  ADD PRIMARY KEY (`t_lang_id`,`t_table_id`),
+  ADD KEY `fk_language_table_tableid` (`t_table_id`);
+
+--
+-- Indexes for table `tbl_ledger_group`
+--
+ALTER TABLE `tbl_ledger_group`
+  ADD PRIMARY KEY (`tlg_id`);
+
+--
+-- Indexes for table `tbl_ledger_master`
+--
+ALTER TABLE `tbl_ledger_master`
+  ADD PRIMARY KEY (`tlm_id`),
+  ADD UNIQUE KEY `tlm_ledger_name` (`tlm_ledger_name`);
+
+--
+-- Indexes for table `tbl_ledger_openbal_log`
+--
+ALTER TABLE `tbl_ledger_openbal_log`
+  ADD PRIMARY KEY (`top_id`);
+
+--
+-- Indexes for table `tbl_ledger_setting`
+--
+ALTER TABLE `tbl_ledger_setting`
+  ADD PRIMARY KEY (`tps_id`),
+  ADD UNIQUE KEY `tps_ledger_id` (`tps_ledger_id`,`tps_dayclosedate`),
+  ADD UNIQUE KEY `tps_ledger_id_2` (`tps_ledger_id`,`tps_dayclosedate`);
+
+--
+-- Indexes for table `tbl_loan_advance`
+--
+ALTER TABLE `tbl_loan_advance`
+  ADD PRIMARY KEY (`tla_id`);
+
+--
+-- Indexes for table `tbl_logindetails`
+--
+ALTER TABLE `tbl_logindetails`
+  ADD PRIMARY KEY (`ls_username`),
+  ADD UNIQUE KEY `ls_branchid_2` (`ls_branchid`,`ls_staffid`),
+  ADD UNIQUE KEY `ls_headofficeid_2` (`ls_staffid`),
+  ADD UNIQUE KEY `ls_staffid_2` (`ls_staffid`),
+  ADD KEY `ls_branchid` (`ls_branchid`),
+  ADD KEY `ls_staffid` (`ls_staffid`);
+
+--
+-- Indexes for table `tbl_login_restrict_logs`
+--
+ALTER TABLE `tbl_login_restrict_logs`
+  ADD PRIMARY KEY (`r_id`);
+
+--
+-- Indexes for table `tbl_loyalty_campaign`
+--
+ALTER TABLE `tbl_loyalty_campaign`
+  ADD PRIMARY KEY (`lc_id`);
+
+--
+-- Indexes for table `tbl_loyalty_campaign_group`
+--
+ALTER TABLE `tbl_loyalty_campaign_group`
+  ADD PRIMARY KEY (`gp_id`);
+
+--
+-- Indexes for table `tbl_loyalty_discount`
+--
+ALTER TABLE `tbl_loyalty_discount`
+  ADD PRIMARY KEY (`ld_visitcount`);
+
+--
+-- Indexes for table `tbl_loyalty_group_details`
+--
+ALTER TABLE `tbl_loyalty_group_details`
+  ADD PRIMARY KEY (`tgp_id`),
+  ADD UNIQUE KEY `tgp_groupid` (`tgp_groupid`,`tgp_customerid`,`tgp_campaign_id`);
+
+--
+-- Indexes for table `tbl_loyalty_levels`
+--
+ALTER TABLE `tbl_loyalty_levels`
+  ADD PRIMARY KEY (`ll_id`);
+
+--
+-- Indexes for table `tbl_loyalty_pointadd_bill`
+--
+ALTER TABLE `tbl_loyalty_pointadd_bill`
+  ADD PRIMARY KEY (`lob_id`),
+  ADD UNIQUE KEY `lob_billno` (`lob_billno`);
+
+--
+-- Indexes for table `tbl_loyalty_pointrule`
+--
+ALTER TABLE `tbl_loyalty_pointrule`
+  ADD PRIMARY KEY (`lyp_id`);
+
+--
+-- Indexes for table `tbl_loyalty_point_transfers`
+--
+ALTER TABLE `tbl_loyalty_point_transfers`
+  ADD PRIMARY KEY (`lpt_id`);
+
+--
+-- Indexes for table `tbl_loyalty_redeem_rule`
+--
+ALTER TABLE `tbl_loyalty_redeem_rule`
+  ADD PRIMARY KEY (`lyr_id`);
+
+--
+-- Indexes for table `tbl_loyalty_reg`
+--
+ALTER TABLE `tbl_loyalty_reg`
+  ADD PRIMARY KEY (`ly_id`),
+  ADD UNIQUE KEY `ly_firstname` (`ly_firstname`,`ly_mobileno`),
+  ADD KEY `name_index` (`ly_firstname`);
+
+--
+-- Indexes for table `tbl_loyalty_rules`
+--
+ALTER TABLE `tbl_loyalty_rules`
+  ADD PRIMARY KEY (`lr_id`);
+
+--
+-- Indexes for table `tbl_loyalty_rules_type`
+--
+ALTER TABLE `tbl_loyalty_rules_type`
+  ADD PRIMARY KEY (`lrt_id`);
+
+--
+-- Indexes for table `tbl_loyalty_sendto`
+--
+ALTER TABLE `tbl_loyalty_sendto`
+  ADD PRIMARY KEY (`ls_id`);
+
+--
+-- Indexes for table `tbl_loyalty_sms_source`
+--
+ALTER TABLE `tbl_loyalty_sms_source`
+  ADD PRIMARY KEY (`ls_id`);
+
+--
+-- Indexes for table `tbl_loyalty_voucher`
+--
+ALTER TABLE `tbl_loyalty_voucher`
+  ADD PRIMARY KEY (`vr_voucherid`);
+
+--
+-- Indexes for table `tbl_loy_coupon`
+--
+ALTER TABLE `tbl_loy_coupon`
+  ADD PRIMARY KEY (`tlc_id`),
+  ADD UNIQUE KEY `tlc_coupon_name` (`tlc_coupon_name`,`tlc_code`,`tlc_customer`);
+
+--
+-- Indexes for table `tbl_menucombination`
+--
+ALTER TABLE `tbl_menucombination`
+  ADD PRIMARY KEY (`mn_menuid`,`mn_menucombid`),
+  ADD KEY `fk_menucomb_menucombid` (`mn_menucombid`);
+
+--
+-- Indexes for table `tbl_menuimages`
+--
+ALTER TABLE `tbl_menuimages`
+  ADD PRIMARY KEY (`mes_imagename`),
+  ADD KEY `mes_menuid` (`mes_menuid`);
+
+--
+-- Indexes for table `tbl_menuimage_delete_log`
+--
+ALTER TABLE `tbl_menuimage_delete_log`
+  ADD PRIMARY KEY (`tmi_id`);
+
+--
+-- Indexes for table `tbl_menuingredients`
+--
+ALTER TABLE `tbl_menuingredients`
+  ADD PRIMARY KEY (`ms_menuid`,`ms_ingridentid`),
+  ADD KEY `fk_menuingredient_ingredientid` (`ms_ingridentid`),
+  ADD KEY `ms_menu` (`ms_menuid`);
+
+--
+-- Indexes for table `tbl_menumaincategory`
+--
+ALTER TABLE `tbl_menumaincategory`
+  ADD PRIMARY KEY (`mmy_maincategoryid`),
+  ADD KEY `mmy_branchid` (`mmy_branchid`);
+
+--
+-- Indexes for table `tbl_menumaster`
+--
+ALTER TABLE `tbl_menumaster`
+  ADD PRIMARY KEY (`mr_menuid`),
+  ADD UNIQUE KEY `mr_menuname` (`mr_menuname`),
+  ADD UNIQUE KEY `mr_itemcode` (`mr_itemcode`),
+  ADD KEY `mr_base_unit` (`mr_base_unit`),
+  ADD KEY `mr_branchid` (`mr_branchid`),
+  ADD KEY `mr_kotcounter` (`mr_kotcounter`),
+  ADD KEY `mr_maincatid` (`mr_maincatid`),
+  ADD KEY `mr_modifieduser` (`mr_modifieduser`),
+  ADD KEY `mr_subcatid` (`mr_subcatid`);
+
+--
+-- Indexes for table `tbl_menunutitionfacts`
+--
+ALTER TABLE `tbl_menunutitionfacts`
+  ADD PRIMARY KEY (`mnf_menuid`,`mnf_nutrition`);
+
+--
+-- Indexes for table `tbl_menuprefmaster`
+--
+ALTER TABLE `tbl_menuprefmaster`
+  ADD PRIMARY KEY (`mpr_menuid`,`mpr_prefeernce`),
+  ADD KEY `fk_menurate_portionid` (`mpr_prefeernce`);
+
+--
+-- Indexes for table `tbl_menuratemaster`
+--
+ALTER TABLE `tbl_menuratemaster`
+  ADD PRIMARY KEY (`mmr_id`),
+  ADD KEY `fk_menurate_floorid` (`mmr_floorid`),
+  ADD KEY `fk_menurate_portionid` (`mmr_portion`),
+  ADD KEY `mmr_menuid` (`mmr_menuid`),
+  ADD KEY `mmr_unit_id` (`mmr_unit_id`);
+
+--
+-- Indexes for table `tbl_menuratetakeaway`
+--
+ALTER TABLE `tbl_menuratetakeaway`
+  ADD PRIMARY KEY (`mta_id`),
+  ADD KEY `fk_menutakeaway_branchid` (`mta_branchid`),
+  ADD KEY `fk_menutakeaway_portionid` (`mta_portion`),
+  ADD KEY `mta_menuid` (`mta_menuid`);
+
+--
+-- Indexes for table `tbl_menurate_counter`
+--
+ALTER TABLE `tbl_menurate_counter`
+  ADD PRIMARY KEY (`mrc_id`),
+  ADD KEY `fk_menuroom_ser_branchid` (`mrc_branchid`),
+  ADD KEY `fk_menuroom_ser_portion` (`mrc_portion`),
+  ADD KEY `mrc_menuid` (`mrc_menuid`);
+
+--
+-- Indexes for table `tbl_menurate_delete_log`
+--
+ALTER TABLE `tbl_menurate_delete_log`
+  ADD PRIMARY KEY (`tmd_id`);
+
+--
+-- Indexes for table `tbl_menurate_roomservice`
+--
+ALTER TABLE `tbl_menurate_roomservice`
+  ADD PRIMARY KEY (`mrs_menuid`,`mrs_portion`,`mrs_branchid`),
+  ADD KEY `fk_menuroom_ser_branchid` (`mrs_branchid`),
+  ADD KEY `fk_menuroom_ser_portion` (`mrs_portion`);
+
+--
+-- Indexes for table `tbl_menusearchtype`
+--
+ALTER TABLE `tbl_menusearchtype`
+  ADD PRIMARY KEY (`me_id`);
+
+--
+-- Indexes for table `tbl_menustock`
+--
+ALTER TABLE `tbl_menustock`
+  ADD PRIMARY KEY (`mk_id`),
+  ADD KEY `fk_menustock_menuid` (`mk_menuid`),
+  ADD KEY `fk_menustock_portion` (`mk_portion`);
+
+--
+-- Indexes for table `tbl_menusubcategory`
+--
+ALTER TABLE `tbl_menusubcategory`
+  ADD PRIMARY KEY (`msy_subcategoryid`),
+  ADD UNIQUE KEY `msy_subcategoryname` (`msy_subcategoryname`),
+  ADD KEY `msy_headofficeid` (`msy_branchid`);
+
+--
+-- Indexes for table `tbl_menu_addons`
+--
+ALTER TABLE `tbl_menu_addons`
+  ADD PRIMARY KEY (`ma_menuid`,`ma_addon_menuid`);
+
+--
+-- Indexes for table `tbl_menu_discount`
+--
+ALTER TABLE `tbl_menu_discount`
+  ADD PRIMARY KEY (`md_menuid`,`md_slno`),
+  ADD KEY `fk_menud_discount_id` (`md_discount`);
+
+--
+-- Indexes for table `tbl_menu_import`
+--
+ALTER TABLE `tbl_menu_import`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `tbl_menu_ingredient_detail`
+--
+ALTER TABLE `tbl_menu_ingredient_detail`
+  ADD PRIMARY KEY (`tmi_id`),
+  ADD UNIQUE KEY `tmi_menuid` (`tmi_menuid`,`tmi_ing_menuid`,`tmi_portion`);
+
+--
+-- Indexes for table `tbl_menu_log`
+--
+ALTER TABLE `tbl_menu_log`
+  ADD PRIMARY KEY (`tml_id`);
+
+--
+-- Indexes for table `tbl_menu_preference_kot`
+--
+ALTER TABLE `tbl_menu_preference_kot`
+  ADD PRIMARY KEY (`tmp_id`);
+
+--
+-- Indexes for table `tbl_menu_rate_cs_upload`
+--
+ALTER TABLE `tbl_menu_rate_cs_upload`
+  ADD PRIMARY KEY (`mrc_id`),
+  ADD KEY `fk_menuroom_ser_branchid` (`mrc_branchid`),
+  ADD KEY `fk_menuroom_ser_portion` (`mrc_portion`),
+  ADD KEY `mrc_menuid` (`mrc_menuid`);
+
+--
+-- Indexes for table `tbl_menu_rate_di_upload`
+--
+ALTER TABLE `tbl_menu_rate_di_upload`
+  ADD PRIMARY KEY (`mmr_id`),
+  ADD KEY `fk_menurate_floorid` (`mmr_floorid`),
+  ADD KEY `fk_menurate_portionid` (`mmr_portion`),
+  ADD KEY `mmr_menuid` (`mmr_menuid`),
+  ADD KEY `mmr_unit_id` (`mmr_unit_id`);
+
+--
+-- Indexes for table `tbl_menu_rate_ta_upload`
+--
+ALTER TABLE `tbl_menu_rate_ta_upload`
+  ADD PRIMARY KEY (`mta_id`),
+  ADD KEY `fk_menutakeaway_branchid` (`mta_branchid`),
+  ADD KEY `fk_menutakeaway_portionid` (`mta_portion`),
+  ADD KEY `mta_menuid` (`mta_menuid`);
+
+--
+-- Indexes for table `tbl_menu_tax_master`
+--
+ALTER TABLE `tbl_menu_tax_master`
+  ADD PRIMARY KEY (`mtm_menuid`,`mtm_slno`,`mtm_tax_id`),
+  ADD KEY `fk_menu_tax_master_taxid` (`mtm_tax_id`);
+
+--
+-- Indexes for table `tbl_modulemaster`
+--
+ALTER TABLE `tbl_modulemaster`
+  ADD PRIMARY KEY (`mer_moduleid`);
+
+--
+-- Indexes for table `tbl_modulesubmaster`
+--
+ALTER TABLE `tbl_modulesubmaster`
+  ADD PRIMARY KEY (`mser_submoduleid`),
+  ADD KEY `mser_moduleid` (`mser_moduleid`);
+
+--
+-- Indexes for table `tbl_monthly_inventory_stock`
+--
+ALTER TABLE `tbl_monthly_inventory_stock`
+  ADD PRIMARY KEY (`tms_id`),
+  ADD UNIQUE KEY `tms_date` (`tms_date`,`tms_store`,`tms_product`);
+
+--
+-- Indexes for table `tbl_notifications`
+--
+ALTER TABLE `tbl_notifications`
+  ADD PRIMARY KEY (`tbl_notificationid`),
+  ADD KEY `tbl_billno` (`tbl_billno`),
+  ADD KEY `tbl_notificationtype` (`tbl_notificationtype`),
+  ADD KEY `tbl_readby` (`tbl_readby`),
+  ADD KEY `tbl_tableid` (`tbl_tableid`);
+
+--
+-- Indexes for table `tbl_online_billdetails`
+--
+ALTER TABLE `tbl_online_billdetails`
+  ADD PRIMARY KEY (`tab_billno`,`tab_slno`);
+
+--
+-- Indexes for table `tbl_online_billmaster`
+--
+ALTER TABLE `tbl_online_billmaster`
+  ADD PRIMARY KEY (`on_billno`);
+
+--
+-- Indexes for table `tbl_online_order`
+--
+ALTER TABLE `tbl_online_order`
+  ADD PRIMARY KEY (`tol_id`);
+
+--
+-- Indexes for table `tbl_online_order_counters`
+--
+ALTER TABLE `tbl_online_order_counters`
+  ADD PRIMARY KEY (`toc_id`);
+
+--
+-- Indexes for table `tbl_online_tax`
+--
+ALTER TABLE `tbl_online_tax`
+  ADD PRIMARY KEY (`tox_id`),
+  ADD UNIQUE KEY `tox_partner` (`tox_partner`,`tox_tax_id`);
+
+--
+-- Indexes for table `tbl_order_addon`
+--
+ALTER TABLE `tbl_order_addon`
+  ADD PRIMARY KEY (`ad_orderno`,`ad_order_slno`,`ad_addon_menu`);
+
+--
+-- Indexes for table `tbl_order_addon_changes`
+--
+ALTER TABLE `tbl_order_addon_changes`
+  ADD PRIMARY KEY (`adc_cancel_id`,`adc_cancel_orderno`,`adc_cancel_order_slno`,`adc_cancel_menu`);
+
+--
+-- Indexes for table `tbl_paymentmode`
+--
+ALTER TABLE `tbl_paymentmode`
+  ADD PRIMARY KEY (`pym_id`),
+  ADD UNIQUE KEY `pym_code` (`pym_code`),
+  ADD UNIQUE KEY `pym_name` (`pym_name`);
+
+--
+-- Indexes for table `tbl_payment_auth_log`
+--
+ALTER TABLE `tbl_payment_auth_log`
+  ADD PRIMARY KEY (`tp_id`),
+  ADD UNIQUE KEY `tp_billno` (`tp_billno`);
+
+--
+-- Indexes for table `tbl_physical_default`
+--
+ALTER TABLE `tbl_physical_default`
+  ADD PRIMARY KEY (`tpf_id`),
+  ADD UNIQUE KEY `tpf_product` (`tpf_product`,`tpf_store`);
+
+--
+-- Indexes for table `tbl_physical_stock`
+--
+ALTER TABLE `tbl_physical_stock`
+  ADD PRIMARY KEY (`tps_id`),
+  ADD UNIQUE KEY `tps_phy_id` (`tps_phy_id`,`tps_product`);
+
+--
+-- Indexes for table `tbl_pinmode_log`
+--
+ALTER TABLE `tbl_pinmode_log`
+  ADD PRIMARY KEY (`tpn_id`);
+
+--
+-- Indexes for table `tbl_portionmaster`
+--
+ALTER TABLE `tbl_portionmaster`
+  ADD PRIMARY KEY (`pm_id`);
+
+--
+-- Indexes for table `tbl_preferencemaster`
+--
+ALTER TABLE `tbl_preferencemaster`
+  ADD PRIMARY KEY (`pmr_id`);
+
+--
+-- Indexes for table `tbl_printersettings`
+--
+ALTER TABLE `tbl_printersettings`
+  ADD PRIMARY KEY (`pr_id`),
+  ADD KEY `pr_branchid` (`pr_branchid`),
+  ADD KEY `pr_floorid` (`pr_floorid`),
+  ADD KEY `pr_kotcode` (`pr_kotcode`),
+  ADD KEY `pr_printertype` (`pr_printertype`),
+  ADD KEY `pr_style` (`pr_style`);
+
+--
+-- Indexes for table `tbl_printersettings_ip`
+--
+ALTER TABLE `tbl_printersettings_ip`
+  ADD PRIMARY KEY (`pr_id`,`pr_machine_ip`);
+
+--
+-- Indexes for table `tbl_printersettings_log`
+--
+ALTER TABLE `tbl_printersettings_log`
+  ADD PRIMARY KEY (`l_id`);
+
+--
+-- Indexes for table `tbl_printertype`
+--
+ALTER TABLE `tbl_printertype`
+  ADD PRIMARY KEY (`pt_id`);
+
+--
+-- Indexes for table `tbl_printer_function_log`
+--
+ALTER TABLE `tbl_printer_function_log`
+  ADD PRIMARY KEY (`tpf_id`);
+
+--
+-- Indexes for table `tbl_printer_styles`
+--
+ALTER TABLE `tbl_printer_styles`
+  ADD PRIMARY KEY (`ps_id`);
+
+--
+-- Indexes for table `tbl_production`
+--
+ALTER TABLE `tbl_production`
+  ADD PRIMARY KEY (`tp_id`),
+  ADD UNIQUE KEY `tp_production_id` (`tp_production_id`,`tp_product`,`tp_portion`);
+
+--
+-- Indexes for table `tbl_product_conversion`
+--
+ALTER TABLE `tbl_product_conversion`
+  ADD PRIMARY KEY (`tpc_id`);
+
+--
+-- Indexes for table `tbl_profession_master`
+--
+ALTER TABLE `tbl_profession_master`
+  ADD PRIMARY KEY (`pr_id`);
+
+--
+-- Indexes for table `tbl_purchase_order`
+--
+ALTER TABLE `tbl_purchase_order`
+  ADD PRIMARY KEY (`tp_id`),
+  ADD UNIQUE KEY `tp_purchase_id` (`tp_purchase_id`,`tp_dayclosedate`,`tp_product`);
+
+--
+-- Indexes for table `tbl_purchase_return`
+--
+ALTER TABLE `tbl_purchase_return`
+  ADD PRIMARY KEY (`tpr_id`);
+
+--
+-- Indexes for table `tbl_receipts`
+--
+ALTER TABLE `tbl_receipts`
+  ADD PRIMARY KEY (`tr_id`);
+
+--
+-- Indexes for table `tbl_regenerate_reasons`
+--
+ALTER TABLE `tbl_regenerate_reasons`
+  ADD PRIMARY KEY (`rr_id`);
+
+--
+-- Indexes for table `tbl_regenrate_log`
+--
+ALTER TABLE `tbl_regenrate_log`
+  ADD PRIMARY KEY (`re_id`),
+  ADD KEY `re_loginid` (`re_loginid`),
+  ADD KEY `re_staffid` (`re_staffid`);
+
+--
+-- Indexes for table `tbl_reportmaster`
+--
+ALTER TABLE `tbl_reportmaster`
+  ADD PRIMARY KEY (`rm_id`);
+
+--
+-- Indexes for table `tbl_report_bydate`
+--
+ALTER TABLE `tbl_report_bydate`
+  ADD PRIMARY KEY (`rbd_id`);
+
+--
+-- Indexes for table `tbl_reprint_details`
+--
+ALTER TABLE `tbl_reprint_details`
+  ADD PRIMARY KEY (`tr_id`);
+
+--
+-- Indexes for table `tbl_requisition`
+--
+ALTER TABLE `tbl_requisition`
+  ADD PRIMARY KEY (`tr_id`),
+  ADD UNIQUE KEY `tr_req_id` (`tr_req_id`,`tr_dayclosedate`,`tr_product`);
+
+--
+-- Indexes for table `tbl_reset_bill_log`
+--
+ALTER TABLE `tbl_reset_bill_log`
+  ADD PRIMARY KEY (`rs_id`);
+
+--
+-- Indexes for table `tbl_return_payment`
+--
+ALTER TABLE `tbl_return_payment`
+  ADD PRIMARY KEY (`tr_id`);
+
+--
+-- Indexes for table `tbl_roommaster`
+--
+ALTER TABLE `tbl_roommaster`
+  ADD PRIMARY KEY (`rm_roomid`);
+
+--
+-- Indexes for table `tbl_secretkeymaster`
+--
+ALTER TABLE `tbl_secretkeymaster`
+  ADD PRIMARY KEY (`sr_id`),
+  ADD KEY `sr_staffid` (`sr_staffid`);
+
+--
+-- Indexes for table `tbl_shift_card_detail_close`
+--
+ALTER TABLE `tbl_shift_card_detail_close`
+  ADD PRIMARY KEY (`sb_shiftdate_close`,`sb_shiftid_close`,`sb_bankid_close`);
+
+--
+-- Indexes for table `tbl_shift_card_detail_open`
+--
+ALTER TABLE `tbl_shift_card_detail_open`
+  ADD PRIMARY KEY (`sb_shiftdate`,`sb_shiftid`,`sb_bankid`);
+
+--
+-- Indexes for table `tbl_shift_close_denomination`
+--
+ALTER TABLE `tbl_shift_close_denomination`
+  ADD PRIMARY KEY (`dod_day`,`dod_shidt_slno`,`dod_deno_id`);
+
+--
+-- Indexes for table `tbl_shift_details`
+--
+ALTER TABLE `tbl_shift_details`
+  ADD PRIMARY KEY (`sd_day`,`sd_id`);
+
+--
+-- Indexes for table `tbl_shift_open_denomination`
+--
+ALTER TABLE `tbl_shift_open_denomination`
+  ADD PRIMARY KEY (`dod_day`,`dod_shidt_slno`,`dod_deno_id`);
+
+--
+-- Indexes for table `tbl_sms_report_settings`
+--
+ALTER TABLE `tbl_sms_report_settings`
+  ADD PRIMARY KEY (`ss_id`);
+
+--
+-- Indexes for table `tbl_sms_report_slab`
+--
+ALTER TABLE `tbl_sms_report_slab`
+  ADD PRIMARY KEY (`sr_id`);
+
+--
+-- Indexes for table `tbl_sms_time_settings`
+--
+ALTER TABLE `tbl_sms_time_settings`
+  ADD PRIMARY KEY (`tsr_id`);
+
+--
+-- Indexes for table `tbl_staffmaster`
+--
+ALTER TABLE `tbl_staffmaster`
+  ADD PRIMARY KEY (`ser_staffid`),
+  ADD UNIQUE KEY `ser_authorisation_code` (`ser_authorisation_code`),
+  ADD UNIQUE KEY `ser_confirm_code` (`ser_confirm_code`),
+  ADD KEY `ser_branchofficeid` (`ser_branchofficeid`),
+  ADD KEY `ser_defaultfloor` (`ser_defaultfloor`),
+  ADD KEY `ser_department` (`ser_department`),
+  ADD KEY `ser_designation` (`ser_designation`);
+
+--
+-- Indexes for table `tbl_staffmaster_logs`
+--
+ALTER TABLE `tbl_staffmaster_logs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tbl_staff_salary_detail`
+--
+ALTER TABLE `tbl_staff_salary_detail`
+  ADD PRIMARY KEY (`ts_id`);
+
+--
+-- Indexes for table `tbl_state`
+--
+ALTER TABLE `tbl_state`
+  ADD PRIMARY KEY (`se_stateid`),
+  ADD UNIQUE KEY `se_statename` (`se_statename`),
+  ADD KEY `se_countryid` (`se_countryid`),
+  ADD KEY `se_countryid_2` (`se_countryid`);
+
+--
+-- Indexes for table `tbl_stock_details`
+--
+ALTER TABLE `tbl_stock_details`
+  ADD PRIMARY KEY (`sd_id`);
+
+--
+-- Indexes for table `tbl_store_stock`
+--
+ALTER TABLE `tbl_store_stock`
+  ADD PRIMARY KEY (`ts_id`),
+  ADD UNIQUE KEY `ts_store` (`ts_store`,`ts_product`);
+
+--
+-- Indexes for table `tbl_store_transfer`
+--
+ALTER TABLE `tbl_store_transfer`
+  ADD PRIMARY KEY (`tt_id`);
+
+--
+-- Indexes for table `tbl_supplier_voucher`
+--
+ALTER TABLE `tbl_supplier_voucher`
+  ADD PRIMARY KEY (`sv_id`);
+
+--
+-- Indexes for table `tbl_sync_log`
+--
+ALTER TABLE `tbl_sync_log`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tbl_tablebilldetails`
+--
+ALTER TABLE `tbl_tablebilldetails`
+  ADD PRIMARY KEY (`bd_billno`,`bd_billslno`),
+  ADD KEY `bd_cancelledby_careof` (`bd_cancelledby_careof`),
+  ADD KEY `bd_cancelledlogin` (`bd_cancelledlogin`),
+  ADD KEY `bd_menuid` (`bd_menuid`),
+  ADD KEY `bd_portion` (`bd_portion`),
+  ADD KEY `bm_bill` (`bd_billno`);
+
+--
+-- Indexes for table `tbl_tablebillmaster`
+--
+ALTER TABLE `tbl_tablebillmaster`
+  ADD PRIMARY KEY (`bm_billno`),
+  ADD UNIQUE KEY `bm_corporatecode` (`bm_corporatecode`),
+  ADD UNIQUE KEY `bm_voucherid` (`bm_voucherid`),
+  ADD KEY `bm_branchid` (`bm_branchid`),
+  ADD KEY `bm_compl_mgmt_staff` (`bm_compl_mgmt_staff`),
+  ADD KEY `bm_creditmasterid` (`bm_creditmasterid`),
+  ADD KEY `bm_discountid` (`bm_discountid`),
+  ADD KEY `bm_floorid` (`bm_floorid`),
+  ADD KEY `bm_paymode` (`bm_paymode`),
+  ADD KEY `bm_voucherid_2` (`bm_voucherid`),
+  ADD KEY `ter_cancelledby_careof` (`ter_cancelledby_careof`),
+  ADD KEY `ter_cancelledlogin` (`ter_cancelledlogin`),
+  ADD KEY `bm_dayclosedate` (`bm_dayclosedate`);
+
+--
+-- Indexes for table `tbl_tablebill_extra_tax_details`
+--
+ALTER TABLE `tbl_tablebill_extra_tax_details`
+  ADD PRIMARY KEY (`bet_billno`,`bet_billslno`,`bet_tax_id`),
+  ADD KEY `fk_tbil_ex_tax_det_taxid` (`bet_tax_id`),
+  ADD KEY `bill` (`bet_billno`);
+
+--
+-- Indexes for table `tbl_tablebill_extra_tax_master`
+--
+ALTER TABLE `tbl_tablebill_extra_tax_master`
+  ADD PRIMARY KEY (`bem_billno`,`bem_taxid`),
+  ADD KEY `fk_tbil_ex_tax_master_taxid` (`bem_taxid`),
+  ADD KEY `bill` (`bem_billno`);
+
+--
+-- Indexes for table `tbl_tablebill_item_discount`
+--
+ALTER TABLE `tbl_tablebill_item_discount`
+  ADD PRIMARY KEY (`bd_billno`,`bd_billslno`,`bd_discount_id`);
+
+--
+-- Indexes for table `tbl_tablebill_paymentchange`
+--
+ALTER TABLE `tbl_tablebill_paymentchange`
+  ADD PRIMARY KEY (`bcp_old_billno`,`bcp_old_branchid`,`bcp_old_billno_slno`),
+  ADD KEY `bcp_cancelledby_careof` (`bcp_cancelledby_careof`),
+  ADD KEY `bcp_cancelledlogin` (`bcp_cancelledlogin`),
+  ADD KEY `bcp_old_couponcompany` (`bcp_old_couponcompany`),
+  ADD KEY `bcp_old_creditmasterid` (`bcp_old_creditmasterid`),
+  ADD KEY `bcp_old_paymode` (`bcp_old_paymode`),
+  ADD KEY `bcp_old_transcbank` (`bcp_old_transcbank`),
+  ADD KEY `bcp_old_voucherid` (`bcp_old_voucherid`),
+  ADD KEY `fk_paymentchange_branchid` (`bcp_old_branchid`);
+
+--
+-- Indexes for table `tbl_tablebill_split`
+--
+ALTER TABLE `tbl_tablebill_split`
+  ADD PRIMARY KEY (`tbs_orderno`,`tbs_newbillno`);
+
+--
+-- Indexes for table `tbl_tabledetails`
+--
+ALTER TABLE `tbl_tabledetails`
+  ADD PRIMARY KEY (`ts_tableid`,`ts_tableidprefix`),
+  ADD KEY `ts_floorid` (`ts_floorid`),
+  ADD KEY `ts_orderno` (`ts_orderno`),
+  ADD KEY `ts_orderstaff` (`ts_orderstaff`),
+  ADD KEY `ts_username` (`ts_username`);
+
+--
+-- Indexes for table `tbl_tableinsertion`
+--
+ALTER TABLE `tbl_tableinsertion`
+  ADD PRIMARY KEY (`ts_id`);
+
+--
+-- Indexes for table `tbl_tablemaster`
+--
+ALTER TABLE `tbl_tablemaster`
+  ADD PRIMARY KEY (`tr_tableid`),
+  ADD KEY `tr_branchid` (`tr_branchid`),
+  ADD KEY `tr_floor` (`tr_floorid`),
+  ADD KEY `tr_floorid` (`tr_floorid`);
+
+--
+-- Indexes for table `tbl_tableorder`
+--
+ALTER TABLE `tbl_tableorder`
+  ADD PRIMARY KEY (`ter_orderno`,`ter_slno`),
+  ADD KEY `fk_orderdetails_waitername` (`ter_waiter_id`),
+  ADD KEY `os_branchid` (`ter_branchid`),
+  ADD KEY `os_entryuser` (`ter_entryuser`),
+  ADD KEY `os_menuid` (`ter_menuid`),
+  ADD KEY `ter_preference` (`ter_preference`),
+  ADD KEY `ter_staff` (`ter_staff`),
+  ADD KEY `ter_dayclosedate` (`ter_dayclosedate`,`ter_orderno`) USING BTREE;
+
+--
+-- Indexes for table `tbl_tableorder_changes`
+--
+ALTER TABLE `tbl_tableorder_changes`
+  ADD PRIMARY KEY (`ch_kot_cancel_id`,`ch_orderno`,`ch_orderslno`,`ch_slno`),
+  ADD KEY `ch_cancelledby_careof` (`ch_cancelledby_careof`),
+  ADD KEY `ch_cancelledlogin` (`ch_cancelledlogin`);
+
+--
+-- Indexes for table `tbl_tableorder_discount`
+--
+ALTER TABLE `tbl_tableorder_discount`
+  ADD PRIMARY KEY (`d_orderno`,`d_slno`,`d_discount_id`);
+
+--
+-- Indexes for table `tbl_table_cloud`
+--
+ALTER TABLE `tbl_table_cloud`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `tbl_takeaway_billdetails`
+--
+ALTER TABLE `tbl_takeaway_billdetails`
+  ADD PRIMARY KEY (`tab_billno`,`tab_slno`),
+  ADD KEY `tab_menuid` (`tab_menuid`),
+  ADD KEY `tab_portion` (`tab_portion`),
+  ADD KEY `bill` (`tab_billno`);
+
+--
+-- Indexes for table `tbl_takeaway_billmaster`
+--
+ALTER TABLE `tbl_takeaway_billmaster`
+  ADD PRIMARY KEY (`tab_billno`),
+  ADD KEY `tab_assignedto` (`tab_assignedto`),
+  ADD KEY `tab_dayclosedate` (`tab_dayclosedate`);
+
+--
+-- Indexes for table `tbl_takeaway_bill_extra_tax_details`
+--
+ALTER TABLE `tbl_takeaway_bill_extra_tax_details`
+  ADD PRIMARY KEY (`tbet_billno`,`tbet_slno`,`tbet_tax_id`),
+  ADD KEY `fk_ta_bil_ex_tax_det_taxid` (`tbet_tax_id`),
+  ADD KEY `bill` (`tbet_billno`);
+
+--
+-- Indexes for table `tbl_takeaway_bill_extra_tax_master`
+--
+ALTER TABLE `tbl_takeaway_bill_extra_tax_master`
+  ADD PRIMARY KEY (`tbe_billno`,`tbe_taxid`),
+  ADD KEY `fk_ta_bil_ex_tax_master_taxid` (`tbe_taxid`),
+  ADD KEY `bill` (`tbe_billno`);
+
+--
+-- Indexes for table `tbl_takeaway_cancel_items`
+--
+ALTER TABLE `tbl_takeaway_cancel_items`
+  ADD PRIMARY KEY (`tc_cancel_id`,`tc_billno`,`tc_bill_slno`,`tc_slno`);
+
+--
+-- Indexes for table `tbl_takeaway_customer`
+--
+ALTER TABLE `tbl_takeaway_customer`
+  ADD PRIMARY KEY (`tac_customerid`),
+  ADD UNIQUE KEY `tac_contactno` (`tac_contactno`),
+  ADD KEY `tac_branchid` (`tac_branchid`);
+
+--
+-- Indexes for table `tbl_takeaway_item_discount`
+--
+ALTER TABLE `tbl_takeaway_item_discount`
+  ADD PRIMARY KEY (`tbd_billno`,`tbd_slno`,`tbd_discount_id`);
+
+--
+-- Indexes for table `tbl_temp_orderno_details`
+--
+ALTER TABLE `tbl_temp_orderno_details`
+  ADD PRIMARY KEY (`to_temp_id`);
+
+--
+-- Indexes for table `tbl_temp_regenerate`
+--
+ALTER TABLE `tbl_temp_regenerate`
+  ADD PRIMARY KEY (`bill_no`);
+
+--
+-- Indexes for table `tbl_temp_tablebilldetails`
+--
+ALTER TABLE `tbl_temp_tablebilldetails`
+  ADD PRIMARY KEY (`bd_temp_billno`,`bd_billslno`),
+  ADD KEY `bd_menuid` (`bd_menuid`),
+  ADD KEY `bd_portion` (`bd_portion`);
+
+--
+-- Indexes for table `tbl_temp_tablebillmaster`
+--
+ALTER TABLE `tbl_temp_tablebillmaster`
+  ADD PRIMARY KEY (`bm_temp_billno`),
+  ADD KEY `bm_branchid` (`bm_branchid`);
+
+--
+-- Indexes for table `tbl_timely_sms_entry`
+--
+ALTER TABLE `tbl_timely_sms_entry`
+  ADD PRIMARY KEY (`tml_id`);
+
+--
+-- Indexes for table `tbl_track_l`
+--
+ALTER TABLE `tbl_track_l`
+  ADD PRIMARY KEY (`l_username`);
+
+--
+-- Indexes for table `tbl_track_l_details`
+--
+ALTER TABLE `tbl_track_l_details`
+  ADD PRIMARY KEY (`slno`);
+
+--
+-- Indexes for table `tbl_unit_master`
+--
+ALTER TABLE `tbl_unit_master`
+  ADD PRIMARY KEY (`u_id`);
+
+--
+-- Indexes for table `tbl_unit_master_combination`
+--
+ALTER TABLE `tbl_unit_master_combination`
+  ADD PRIMARY KEY (`um_first_id`,`um_second_id`);
+
+--
+-- Indexes for table `tbl_urban_charge_tax`
+--
+ALTER TABLE `tbl_urban_charge_tax`
+  ADD PRIMARY KEY (`tcx_id`);
+
+--
+-- Indexes for table `tbl_urban_order_temp_bill`
+--
+ALTER TABLE `tbl_urban_order_temp_bill`
+  ADD PRIMARY KEY (`tab_billno`,`tab_dayclose`);
+
+--
+-- Indexes for table `tbl_urban_order_temp_detail`
+--
+ALTER TABLE `tbl_urban_order_temp_detail`
+  ADD UNIQUE KEY `tab_billno` (`tab_billno`,`tab_slno`,`tab_menuid`,`tab_portion`);
+
+--
+-- Indexes for table `tbl_usermodules`
+--
+ALTER TABLE `tbl_usermodules`
+  ADD PRIMARY KEY (`um_username`,`um_moduleid`,`um_submoduleid`),
+  ADD KEY `fk_usermodules_moduleid` (`um_moduleid`),
+  ADD KEY `fk_usermodules_submoduleid` (`um_submoduleid`);
+
+--
+-- Indexes for table `tbl_vendor_master`
+--
+ALTER TABLE `tbl_vendor_master`
+  ADD PRIMARY KEY (`v_id`);
+
+--
+-- Indexes for table `tbl_version`
+--
+ALTER TABLE `tbl_version`
+  ADD PRIMARY KEY (`pv_current_version`);
+
+--
+-- Indexes for table `tbl_version_log`
+--
+ALTER TABLE `tbl_version_log`
+  ADD PRIMARY KEY (`vl_old_version`);
+
+--
+-- Indexes for table `tbl_voucherhead`
+--
+ALTER TABLE `tbl_voucherhead`
+  ADD PRIMARY KEY (`vh_id`);
+
+--
+-- Indexes for table `tbl_voucherpayment`
+--
+ALTER TABLE `tbl_voucherpayment`
+  ADD PRIMARY KEY (`vp_id`),
+  ADD KEY `vp_approvedby` (`vp_approvedby`);
+
+--
+-- Indexes for table `tbl_voucher_delete_log`
+--
+ALTER TABLE `tbl_voucher_delete_log`
+  ADD PRIMARY KEY (`tvd_id`);
+
+--
+-- Indexes for table `tbl_wastage`
+--
+ALTER TABLE `tbl_wastage`
+  ADD PRIMARY KEY (`tw_id`),
+  ADD UNIQUE KEY `tw_wastage_id` (`tw_wastage_id`,`tw_product`);
+
+--
+-- Indexes for table `tbl_yearsettings`
+--
+ALTER TABLE `tbl_yearsettings`
+  ADD PRIMARY KEY (`ys_fin_year`);
+
+--
+-- Indexes for table `tbl_year_bill_series`
+--
+ALTER TABLE `tbl_year_bill_series`
+  ADD PRIMARY KEY (`b_fin_year`,`b_series`);
+
+--
+-- Indexes for table `temp_loyalty_reg`
+--
+ALTER TABLE `temp_loyalty_reg`
+  ADD PRIMARY KEY (`ly_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `tbl_account_stock`
+--
+ALTER TABLE `tbl_account_stock`
+  MODIFY `tas_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+
+--
+-- AUTO_INCREMENT for table `tbl_advance_day_detail`
+--
+ALTER TABLE `tbl_advance_day_detail`
+  MODIFY `tdd_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=230;
+
+--
+-- AUTO_INCREMENT for table `tbl_advance_payment`
+--
+ALTER TABLE `tbl_advance_payment`
+  MODIFY `tp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=317;
+
+--
+-- AUTO_INCREMENT for table `tbl_advance_pay_menu_details`
+--
+ALTER TABLE `tbl_advance_pay_menu_details`
+  MODIFY `tmd_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=377;
+
+--
+-- AUTO_INCREMENT for table `tbl_amc_setup`
+--
+ALTER TABLE `tbl_amc_setup`
+  MODIFY `tmc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+
+--
+-- AUTO_INCREMENT for table `tbl_app_permissions`
+--
+ALTER TABLE `tbl_app_permissions`
+  MODIFY `tap_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT for table `tbl_archive_settings`
+--
+ALTER TABLE `tbl_archive_settings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tbl_archive_settings_log`
+--
+ALTER TABLE `tbl_archive_settings_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_asset_category`
+--
+ALTER TABLE `tbl_asset_category`
+  MODIFY `tsc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `tbl_asset_invoice_tax_details`
+--
+ALTER TABLE `tbl_asset_invoice_tax_details`
+  MODIFY `txd_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT for table `tbl_asset_master`
+--
+ALTER TABLE `tbl_asset_master`
+  MODIFY `tam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `tbl_asset_purchase`
+--
+ALTER TABLE `tbl_asset_purchase`
+  MODIFY `tap_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=128;
+
+--
+-- AUTO_INCREMENT for table `tbl_asset_purchase_invoice_detail`
+--
+ALTER TABLE `tbl_asset_purchase_invoice_detail`
+  MODIFY `tpd_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+
+--
+-- AUTO_INCREMENT for table `tbl_attendance`
+--
+ALTER TABLE `tbl_attendance`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2763;
+
+--
+-- AUTO_INCREMENT for table `tbl_bankmaster`
+--
+ALTER TABLE `tbl_bankmaster`
+  MODIFY `bm_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `tbl_base_unit_master`
+--
+ALTER TABLE `tbl_base_unit_master`
+  MODIFY `bu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `tbl_batch_stock`
+--
+ALTER TABLE `tbl_batch_stock`
+  MODIFY `tbs_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_bill_card_payments`
+--
+ALTER TABLE `tbl_bill_card_payments`
+  MODIFY `mc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+
+--
+-- AUTO_INCREMENT for table `tbl_branchsettings_android`
+--
+ALTER TABLE `tbl_branchsettings_android`
+  MODIFY `an_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tbl_br_cloud_tables`
+--
+ALTER TABLE `tbl_br_cloud_tables`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=134;
+
+--
+-- AUTO_INCREMENT for table `tbl_cardmaster`
+--
+ALTER TABLE `tbl_cardmaster`
+  MODIFY `crd_id` int(15) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `tbl_cash_drawer_log`
+--
+ALTER TABLE `tbl_cash_drawer_log`
+  MODIFY `cdl_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_central_kitchen_transfer`
+--
+ALTER TABLE `tbl_central_kitchen_transfer`
+  MODIFY `tct_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `tbl_combo_bill_details_ta`
+--
+ALTER TABLE `tbl_combo_bill_details_ta`
+  MODIFY `cbd_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `tbl_combo_menu_labels`
+--
+ALTER TABLE `tbl_combo_menu_labels`
+  MODIFY `cml_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
+-- AUTO_INCREMENT for table `tbl_combo_name`
+--
+ALTER TABLE `tbl_combo_name`
+  MODIFY `cn_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+
+--
+-- AUTO_INCREMENT for table `tbl_combo_ordering_details`
+--
+ALTER TABLE `tbl_combo_ordering_details`
+  MODIFY `cod_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tbl_combo_packs`
+--
+ALTER TABLE `tbl_combo_packs`
+  MODIFY `cp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=140;
+
+--
+-- AUTO_INCREMENT for table `tbl_combo_pack_menus`
+--
+ALTER TABLE `tbl_combo_pack_menus`
+  MODIFY `cpm_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=307;
+
+--
+-- AUTO_INCREMENT for table `tbl_combo_pack_rates`
+--
+ALTER TABLE `tbl_combo_pack_rates`
+  MODIFY `cpr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
+
+--
+-- AUTO_INCREMENT for table `tbl_combo_stock`
+--
+ALTER TABLE `tbl_combo_stock`
+  MODIFY `cs_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `tbl_combo_type`
+--
+ALTER TABLE `tbl_combo_type`
+  MODIFY `ct_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `tbl_common_logs_all`
+--
+ALTER TABLE `tbl_common_logs_all`
+  MODIFY `tcl_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+
+--
+-- AUTO_INCREMENT for table `tbl_complementory_reasons`
+--
+ALTER TABLE `tbl_complementory_reasons`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tbl_consumption`
+--
+ALTER TABLE `tbl_consumption`
+  MODIFY `tc_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_contra_voucher`
+--
+ALTER TABLE `tbl_contra_voucher`
+  MODIFY `cv_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+
+--
+-- AUTO_INCREMENT for table `tbl_credit_details`
+--
+ALTER TABLE `tbl_credit_details`
+  MODIFY `cd_slno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+
+--
+-- AUTO_INCREMENT for table `tbl_credit_partial_bill`
+--
+ALTER TABLE `tbl_credit_partial_bill`
+  MODIFY `tcp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
+
+--
+-- AUTO_INCREMENT for table `tbl_currency_master`
+--
+ALTER TABLE `tbl_currency_master`
+  MODIFY `c_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `tbl_daily_stock_detail`
+--
+ALTER TABLE `tbl_daily_stock_detail`
+  MODIFY `ts_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+
+--
+-- AUTO_INCREMENT for table `tbl_databank`
+--
+ALTER TABLE `tbl_databank`
+  MODIFY `db_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_dayclose_revert_log`
+--
+ALTER TABLE `tbl_dayclose_revert_log`
+  MODIFY `td_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=224;
+
+--
+-- AUTO_INCREMENT for table `tbl_dbsize_detail`
+--
+ALTER TABLE `tbl_dbsize_detail`
+  MODIFY `tbs_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+
+--
+-- AUTO_INCREMENT for table `tbl_delivery_status`
+--
+ALTER TABLE `tbl_delivery_status`
+  MODIFY `ds_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tbl_denomination_master`
+--
+ALTER TABLE `tbl_denomination_master`
+  MODIFY `dm_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `tbl_employee_master`
+--
+ALTER TABLE `tbl_employee_master`
+  MODIFY `emp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+
+--
+-- AUTO_INCREMENT for table `tbl_employee_salary`
+--
+ALTER TABLE `tbl_employee_salary`
+  MODIFY `tes_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=339;
+
+--
+-- AUTO_INCREMENT for table `tbl_employee_voucher`
+--
+ALTER TABLE `tbl_employee_voucher`
+  MODIFY `ev_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=155;
+
+--
+-- AUTO_INCREMENT for table `tbl_expense_voucher`
+--
+ALTER TABLE `tbl_expense_voucher`
+  MODIFY `ev_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=115;
+
+--
+-- AUTO_INCREMENT for table `tbl_expodine_machines`
+--
+ALTER TABLE `tbl_expodine_machines`
+  MODIFY `cm_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT for table `tbl_extra_tax_master`
+--
+ALTER TABLE `tbl_extra_tax_master`
+  MODIFY `amc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `tbl_feedbackrating`
+--
+ALTER TABLE `tbl_feedbackrating`
+  MODIFY `fbr_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_feedback_remark_entry`
+--
+ALTER TABLE `tbl_feedback_remark_entry`
+  MODIFY `tfb_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `tbl_firebase_notification_report`
+--
+ALTER TABLE `tbl_firebase_notification_report`
+  MODIFY `tf_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `tbl_food_cost`
+--
+ALTER TABLE `tbl_food_cost`
+  MODIFY `tfc_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_function_extra_costs`
+--
+ALTER TABLE `tbl_function_extra_costs`
+  MODIFY `fec_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tbl_function_type`
+--
+ALTER TABLE `tbl_function_type`
+  MODIFY `ft_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tbl_function_venue`
+--
+ALTER TABLE `tbl_function_venue`
+  MODIFY `fv_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tbl_generalsettings`
+--
+ALTER TABLE `tbl_generalsettings`
+  MODIFY `be_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tbl_general_settings_log`
+--
+ALTER TABLE `tbl_general_settings_log`
+  MODIFY `tg_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2549;
+
+--
+-- AUTO_INCREMENT for table `tbl_grn_order`
+--
+ALTER TABLE `tbl_grn_order`
+  MODIFY `tg_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT for table `tbl_grn_summary`
+--
+ALTER TABLE `tbl_grn_summary`
+  MODIFY `tgs_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `tbl_hold_data`
+--
+ALTER TABLE `tbl_hold_data`
+  MODIFY `th_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_indent_partial`
+--
+ALTER TABLE `tbl_indent_partial`
+  MODIFY `tip_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_inv_daily_store_stock`
+--
+ALTER TABLE `tbl_inv_daily_store_stock`
+  MODIFY `tis_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_inv_kitchen`
+--
+ALTER TABLE `tbl_inv_kitchen`
+  MODIFY `ti_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+
+--
+-- AUTO_INCREMENT for table `tbl_inv_settings`
+--
+ALTER TABLE `tbl_inv_settings`
+  MODIFY `ti_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tbl_languages`
+--
+ALTER TABLE `tbl_languages`
+  MODIFY `ls_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tbl_ledger_group`
+--
+ALTER TABLE `tbl_ledger_group`
+  MODIFY `tlg_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+
+--
+-- AUTO_INCREMENT for table `tbl_ledger_master`
+--
+ALTER TABLE `tbl_ledger_master`
+  MODIFY `tlm_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=433;
+
+--
+-- AUTO_INCREMENT for table `tbl_ledger_openbal_log`
+--
+ALTER TABLE `tbl_ledger_openbal_log`
+  MODIFY `top_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+
+--
+-- AUTO_INCREMENT for table `tbl_ledger_setting`
+--
+ALTER TABLE `tbl_ledger_setting`
+  MODIFY `tps_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52662;
+
+--
+-- AUTO_INCREMENT for table `tbl_loan_advance`
+--
+ALTER TABLE `tbl_loan_advance`
+  MODIFY `tla_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+
+--
+-- AUTO_INCREMENT for table `tbl_login_restrict_logs`
+--
+ALTER TABLE `tbl_login_restrict_logs`
+  MODIFY `r_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_campaign`
+--
+ALTER TABLE `tbl_loyalty_campaign`
+  MODIFY `lc_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_campaign_group`
+--
+ALTER TABLE `tbl_loyalty_campaign_group`
+  MODIFY `gp_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_group_details`
+--
+ALTER TABLE `tbl_loyalty_group_details`
+  MODIFY `tgp_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_levels`
+--
+ALTER TABLE `tbl_loyalty_levels`
+  MODIFY `ll_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_pointadd_bill`
+--
+ALTER TABLE `tbl_loyalty_pointadd_bill`
+  MODIFY `lob_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=128;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_pointrule`
+--
+ALTER TABLE `tbl_loyalty_pointrule`
+  MODIFY `lyp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_point_transfers`
+--
+ALTER TABLE `tbl_loyalty_point_transfers`
+  MODIFY `lpt_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_redeem_rule`
+--
+ALTER TABLE `tbl_loyalty_redeem_rule`
+  MODIFY `lyr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_reg`
+--
+ALTER TABLE `tbl_loyalty_reg`
+  MODIFY `ly_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_rules`
+--
+ALTER TABLE `tbl_loyalty_rules`
+  MODIFY `lr_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_rules_type`
+--
+ALTER TABLE `tbl_loyalty_rules_type`
+  MODIFY `lrt_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_sendto`
+--
+ALTER TABLE `tbl_loyalty_sendto`
+  MODIFY `ls_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_loyalty_sms_source`
+--
+ALTER TABLE `tbl_loyalty_sms_source`
+  MODIFY `ls_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+
+--
+-- AUTO_INCREMENT for table `tbl_loy_coupon`
+--
+ALTER TABLE `tbl_loy_coupon`
+  MODIFY `tlc_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_menuimage_delete_log`
+--
+ALTER TABLE `tbl_menuimage_delete_log`
+  MODIFY `tmi_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
+--
+-- AUTO_INCREMENT for table `tbl_menuratemaster`
+--
+ALTER TABLE `tbl_menuratemaster`
+  MODIFY `mmr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26276;
+
+--
+-- AUTO_INCREMENT for table `tbl_menuratetakeaway`
+--
+ALTER TABLE `tbl_menuratetakeaway`
+  MODIFY `mta_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4001;
+
+--
+-- AUTO_INCREMENT for table `tbl_menurate_counter`
+--
+ALTER TABLE `tbl_menurate_counter`
+  MODIFY `mrc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1481;
+
+--
+-- AUTO_INCREMENT for table `tbl_menurate_delete_log`
+--
+ALTER TABLE `tbl_menurate_delete_log`
+  MODIFY `tmd_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
+
+--
+-- AUTO_INCREMENT for table `tbl_menusearchtype`
+--
+ALTER TABLE `tbl_menusearchtype`
+  MODIFY `me_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tbl_menustock`
+--
+ALTER TABLE `tbl_menustock`
+  MODIFY `mk_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+
+--
+-- AUTO_INCREMENT for table `tbl_menu_import`
+--
+ALTER TABLE `tbl_menu_import`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_menu_ingredient_detail`
+--
+ALTER TABLE `tbl_menu_ingredient_detail`
+  MODIFY `tmi_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tbl_menu_log`
+--
+ALTER TABLE `tbl_menu_log`
+  MODIFY `tml_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+
+--
+-- AUTO_INCREMENT for table `tbl_menu_preference_kot`
+--
+ALTER TABLE `tbl_menu_preference_kot`
+  MODIFY `tmp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
+
+--
+-- AUTO_INCREMENT for table `tbl_menu_rate_cs_upload`
+--
+ALTER TABLE `tbl_menu_rate_cs_upload`
+  MODIFY `mrc_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_menu_rate_di_upload`
+--
+ALTER TABLE `tbl_menu_rate_di_upload`
+  MODIFY `mmr_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_menu_rate_ta_upload`
+--
+ALTER TABLE `tbl_menu_rate_ta_upload`
+  MODIFY `mta_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_modulemaster`
+--
+ALTER TABLE `tbl_modulemaster`
+  MODIFY `mer_moduleid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+
+--
+-- AUTO_INCREMENT for table `tbl_modulesubmaster`
+--
+ALTER TABLE `tbl_modulesubmaster`
+  MODIFY `mser_submoduleid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=277;
+
+--
+-- AUTO_INCREMENT for table `tbl_monthly_inventory_stock`
+--
+ALTER TABLE `tbl_monthly_inventory_stock`
+  MODIFY `tms_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+
+--
+-- AUTO_INCREMENT for table `tbl_notifications`
+--
+ALTER TABLE `tbl_notifications`
+  MODIFY `tbl_notificationid` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_online_order`
+--
+ALTER TABLE `tbl_online_order`
+  MODIFY `tol_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
+
+--
+-- AUTO_INCREMENT for table `tbl_online_order_counters`
+--
+ALTER TABLE `tbl_online_order_counters`
+  MODIFY `toc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT for table `tbl_online_tax`
+--
+ALTER TABLE `tbl_online_tax`
+  MODIFY `tox_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT for table `tbl_payment_auth_log`
+--
+ALTER TABLE `tbl_payment_auth_log`
+  MODIFY `tp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=224;
+
+--
+-- AUTO_INCREMENT for table `tbl_physical_default`
+--
+ALTER TABLE `tbl_physical_default`
+  MODIFY `tpf_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT for table `tbl_physical_stock`
+--
+ALTER TABLE `tbl_physical_stock`
+  MODIFY `tps_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tbl_pinmode_log`
+--
+ALTER TABLE `tbl_pinmode_log`
+  MODIFY `tpn_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+
+--
+-- AUTO_INCREMENT for table `tbl_portionmaster`
+--
+ALTER TABLE `tbl_portionmaster`
+  MODIFY `pm_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `tbl_preferencemaster`
+--
+ALTER TABLE `tbl_preferencemaster`
+  MODIFY `pmr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT for table `tbl_printersettings_log`
+--
+ALTER TABLE `tbl_printersettings_log`
+  MODIFY `l_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_printertype`
+--
+ALTER TABLE `tbl_printertype`
+  MODIFY `pt_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `tbl_printer_function_log`
+--
+ALTER TABLE `tbl_printer_function_log`
+  MODIFY `tpf_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62308;
+
+--
+-- AUTO_INCREMENT for table `tbl_printer_styles`
+--
+ALTER TABLE `tbl_printer_styles`
+  MODIFY `ps_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `tbl_production`
+--
+ALTER TABLE `tbl_production`
+  MODIFY `tp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `tbl_product_conversion`
+--
+ALTER TABLE `tbl_product_conversion`
+  MODIFY `tpc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tbl_profession_master`
+--
+ALTER TABLE `tbl_profession_master`
+  MODIFY `pr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `tbl_purchase_order`
+--
+ALTER TABLE `tbl_purchase_order`
+  MODIFY `tp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `tbl_purchase_return`
+--
+ALTER TABLE `tbl_purchase_return`
+  MODIFY `tpr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tbl_receipts`
+--
+ALTER TABLE `tbl_receipts`
+  MODIFY `tr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
+-- AUTO_INCREMENT for table `tbl_regenerate_reasons`
+--
+ALTER TABLE `tbl_regenerate_reasons`
+  MODIFY `rr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `tbl_regenrate_log`
+--
+ALTER TABLE `tbl_regenrate_log`
+  MODIFY `re_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_reportmaster`
+--
+ALTER TABLE `tbl_reportmaster`
+  MODIFY `rm_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
+
+--
+-- AUTO_INCREMENT for table `tbl_report_bydate`
+--
+ALTER TABLE `tbl_report_bydate`
+  MODIFY `rbd_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_reprint_details`
+--
+ALTER TABLE `tbl_reprint_details`
+  MODIFY `tr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2632;
+
+--
+-- AUTO_INCREMENT for table `tbl_requisition`
+--
+ALTER TABLE `tbl_requisition`
+  MODIFY `tr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+
+--
+-- AUTO_INCREMENT for table `tbl_reset_bill_log`
+--
+ALTER TABLE `tbl_reset_bill_log`
+  MODIFY `rs_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+
+--
+-- AUTO_INCREMENT for table `tbl_return_payment`
+--
+ALTER TABLE `tbl_return_payment`
+  MODIFY `tr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT for table `tbl_roommaster`
+--
+ALTER TABLE `tbl_roommaster`
+  MODIFY `rm_roomid` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_secretkeymaster`
+--
+ALTER TABLE `tbl_secretkeymaster`
+  MODIFY `sr_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_sms_time_settings`
+--
+ALTER TABLE `tbl_sms_time_settings`
+  MODIFY `tsr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+
+--
+-- AUTO_INCREMENT for table `tbl_staffmaster_logs`
+--
+ALTER TABLE `tbl_staffmaster_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
+
+--
+-- AUTO_INCREMENT for table `tbl_staff_salary_detail`
+--
+ALTER TABLE `tbl_staff_salary_detail`
+  MODIFY `ts_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `tbl_stock_details`
+--
+ALTER TABLE `tbl_stock_details`
+  MODIFY `sd_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+
+--
+-- AUTO_INCREMENT for table `tbl_store_stock`
+--
+ALTER TABLE `tbl_store_stock`
+  MODIFY `ts_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `tbl_store_transfer`
+--
+ALTER TABLE `tbl_store_transfer`
+  MODIFY `tt_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tbl_supplier_voucher`
+--
+ALTER TABLE `tbl_supplier_voucher`
+  MODIFY `sv_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=610;
+
+--
+-- AUTO_INCREMENT for table `tbl_sync_log`
+--
+ALTER TABLE `tbl_sync_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_tableinsertion`
+--
+ALTER TABLE `tbl_tableinsertion`
+  MODIFY `ts_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_table_cloud`
+--
+ALTER TABLE `tbl_table_cloud`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=144;
+
+--
+-- AUTO_INCREMENT for table `tbl_timely_sms_entry`
+--
+ALTER TABLE `tbl_timely_sms_entry`
+  MODIFY `tml_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbl_track_l_details`
+--
+ALTER TABLE `tbl_track_l_details`
+  MODIFY `slno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tbl_unit_master`
+--
+ALTER TABLE `tbl_unit_master`
+  MODIFY `u_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `tbl_urban_charge_tax`
+--
+ALTER TABLE `tbl_urban_charge_tax`
+  MODIFY `tcx_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=607;
+
+--
+-- AUTO_INCREMENT for table `tbl_vendor_master`
+--
+ALTER TABLE `tbl_vendor_master`
+  MODIFY `v_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=238;
+
+--
+-- AUTO_INCREMENT for table `tbl_voucher_delete_log`
+--
+ALTER TABLE `tbl_voucher_delete_log`
+  MODIFY `tvd_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `tbl_wastage`
+--
+ALTER TABLE `tbl_wastage`
+  MODIFY `tw_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `temp_loyalty_reg`
+--
+ALTER TABLE `temp_loyalty_reg`
+  MODIFY `ly_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `tbl_branchmaster`
+--
+ALTER TABLE `tbl_branchmaster`
+  ADD CONSTRAINT `fk_branchmaster_curreny` FOREIGN KEY (`be_base_currency`) REFERENCES `tbl_currency_master` (`c_id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_city`
+--
+ALTER TABLE `tbl_city`
+  ADD CONSTRAINT `fk_city_countryid` FOREIGN KEY (`cy_countryid`) REFERENCES `tbl_country` (`cy_countyid`),
+  ADD CONSTRAINT `fk_city_stateid` FOREIGN KEY (`cy_stateid`) REFERENCES `tbl_state` (`se_stateid`);
+
+--
+-- Constraints for table `tbl_combo_bill_details`
+--
+ALTER TABLE `tbl_combo_bill_details`
+  ADD CONSTRAINT `fk_combo_bill_details` FOREIGN KEY (`cbd_billno`) REFERENCES `tbl_tablebillmaster` (`bm_billno`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_combo_bill_details_ta`
+--
+ALTER TABLE `tbl_combo_bill_details_ta`
+  ADD CONSTRAINT `fk_combo_bill_details_ta` FOREIGN KEY (`cbd_billno`) REFERENCES `tbl_takeaway_billmaster` (`tab_billno`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_credit_master`
+--
+ALTER TABLE `tbl_credit_master`
+  ADD CONSTRAINT `fk_creditmaster_corporateid` FOREIGN KEY (`crd_corporateid`) REFERENCES `tbl_corporatemaster` (`ct_corporatecode`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_creditmaster_credtypeid` FOREIGN KEY (`crd_type`) REFERENCES `tbl_credit_types` (`ct_creditid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_creditmaster_loyalityid` FOREIGN KEY (`crd_guestid`) REFERENCES `tbl_loyalty_reg` (`ly_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_creditmaster_roomid` FOREIGN KEY (`crd_roomid`) REFERENCES `tbl_roommaster` (`rm_roomid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_creditmaster_staffid` FOREIGN KEY (`crd_staffid`) REFERENCES `tbl_staffmaster` (`ser_staffid`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_currency_conv_rate`
+--
+ALTER TABLE `tbl_currency_conv_rate`
+  ADD CONSTRAINT `fk_currency_conv_rate_base` FOREIGN KEY (`cc_base_currency`) REFERENCES `tbl_currency_master` (`c_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_currency_conv_rate_curr` FOREIGN KEY (`cc_currency`) REFERENCES `tbl_currency_master` (`c_id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_departmentmaster`
+--
+ALTER TABLE `tbl_departmentmaster`
+  ADD CONSTRAINT `fk_department_branch` FOREIGN KEY (`der_branch`) REFERENCES `tbl_branchmaster` (`be_branchid`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_designationmaster`
+--
+ALTER TABLE `tbl_designationmaster`
+  ADD CONSTRAINT `fk_designation_branch` FOREIGN KEY (`dr_branch`) REFERENCES `tbl_branchmaster` (`be_branchid`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_feedbackrating`
+--
+ALTER TABLE `tbl_feedbackrating`
+  ADD CONSTRAINT `fk_feedbackrating_feedbackid` FOREIGN KEY (`fbr_fbm_id`) REFERENCES `tbl_feedbackmaster` (`fbm_id`);
+
+--
+-- Constraints for table `tbl_feedbackratingcount`
+--
+ALTER TABLE `tbl_feedbackratingcount`
+  ADD CONSTRAINT `fk_feedratingcount_menuid` FOREIGN KEY (`frc_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_floor_tax`
+--
+ALTER TABLE `tbl_floor_tax`
+  ADD CONSTRAINT `fk_floortax_floorid` FOREIGN KEY (`ft_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_floortax_taxid` FOREIGN KEY (`ft_tax_id`) REFERENCES `tbl_extra_tax_master` (`amc_id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_function_details`
+--
+ALTER TABLE `tbl_function_details`
+  ADD CONSTRAINT `fk_function_type` FOREIGN KEY (`fd_function_type`) REFERENCES `tbl_function_type` (`ft_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_function_venue` FOREIGN KEY (`fd_venue`) REFERENCES `tbl_function_venue` (`fv_id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_kotcountermaster`
+--
+ALTER TABLE `tbl_kotcountermaster`
+  ADD CONSTRAINT `fk_kotcountermater_branchid` FOREIGN KEY (`kr_branchid`) REFERENCES `tbl_branchmaster` (`be_branchid`),
+  ADD CONSTRAINT `fk_kotcountermater_printerid` FOREIGN KEY (`kr_printerid`) REFERENCES `tbl_printersettings` (`pr_id`);
+
+--
+-- Constraints for table `tbl_language_floor`
+--
+ALTER TABLE `tbl_language_floor`
+  ADD CONSTRAINT `fk_language_floor_floor` FOREIGN KEY (`f_floor_id`) REFERENCES `tbl_floormaster` (`fr_floorid`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_language_floor_lang_id` FOREIGN KEY (`f_lang_id`) REFERENCES `tbl_languages` (`ls_id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_language_menu_main`
+--
+ALTER TABLE `tbl_language_menu_main`
+  ADD CONSTRAINT `fk_language_menu_main_catid` FOREIGN KEY (`mm_categoryid`) REFERENCES `tbl_menumaincategory` (`mmy_maincategoryid`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_language_menu_main_langid` FOREIGN KEY (`mm_lang_id`) REFERENCES `tbl_languages` (`ls_id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_language_menu_master`
+--
+ALTER TABLE `tbl_language_menu_master`
+  ADD CONSTRAINT `fk_language_menu_master_langid` FOREIGN KEY (`lm_language_id`) REFERENCES `tbl_languages` (`ls_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_language_menu_master_menuid` FOREIGN KEY (`lm_menu_id`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_language_menu_sub`
+--
+ALTER TABLE `tbl_language_menu_sub`
+  ADD CONSTRAINT `fk_language_menu_sub_langid` FOREIGN KEY (`mm_lang_id`) REFERENCES `tbl_languages` (`ls_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_language_menu_sub_subid` FOREIGN KEY (`mm_sub_category_id`) REFERENCES `tbl_menusubcategory` (`msy_subcategoryid`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_language_portion`
+--
+ALTER TABLE `tbl_language_portion`
+  ADD CONSTRAINT `fk_language_portion_langid` FOREIGN KEY (`lm_language_id`) REFERENCES `tbl_languages` (`ls_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_language_portion_portionid` FOREIGN KEY (`lm_portion_id`) REFERENCES `tbl_portionmaster` (`pm_id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_language_preference`
+--
+ALTER TABLE `tbl_language_preference`
+  ADD CONSTRAINT `fk_language_preference_lang_id` FOREIGN KEY (`l_lang_id`) REFERENCES `tbl_languages` (`ls_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_language_preference_pref_id` FOREIGN KEY (`l_pref_id`) REFERENCES `tbl_preferencemaster` (`pmr_id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_language_staff`
+--
+ALTER TABLE `tbl_language_staff`
+  ADD CONSTRAINT `fk_language_staff_langid` FOREIGN KEY (`s_lang_id`) REFERENCES `tbl_languages` (`ls_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_language_staff_staffid` FOREIGN KEY (`s_staff_id`) REFERENCES `tbl_staffmaster` (`ser_staffid`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_language_table_master`
+--
+ALTER TABLE `tbl_language_table_master`
+  ADD CONSTRAINT `fk_language_table_langid` FOREIGN KEY (`t_lang_id`) REFERENCES `tbl_languages` (`ls_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_language_table_tableid` FOREIGN KEY (`t_table_id`) REFERENCES `tbl_tablemaster` (`tr_tableid`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_logindetails`
+--
+ALTER TABLE `tbl_logindetails`
+  ADD CONSTRAINT `fk_logindetails_branchid` FOREIGN KEY (`ls_branchid`) REFERENCES `tbl_branchmaster` (`be_branchid`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_logindetails_staffid` FOREIGN KEY (`ls_staffid`) REFERENCES `tbl_staffmaster` (`ser_staffid`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_menuimages`
+--
+ALTER TABLE `tbl_menuimages`
+  ADD CONSTRAINT `(` FOREIGN KEY (`mes_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_menumaster`
+--
+ALTER TABLE `tbl_menumaster`
+  ADD CONSTRAINT `fk_menumaster_kotcounter` FOREIGN KEY (`mr_kotcounter`) REFERENCES `tbl_kotcountermaster` (`kr_kotcode`),
+  ADD CONSTRAINT `fk_menumaster_maincatid` FOREIGN KEY (`mr_maincatid`) REFERENCES `tbl_menumaincategory` (`mmy_maincategoryid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_menumaster_subcatid` FOREIGN KEY (`mr_subcatid`) REFERENCES `tbl_menusubcategory` (`msy_subcategoryid`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_menunutitionfacts`
+--
+ALTER TABLE `tbl_menunutitionfacts`
+  ADD CONSTRAINT `fk_menunutrition_menuid` FOREIGN KEY (`mnf_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`);
+
+--
+-- Constraints for table `tbl_menuprefmaster`
+--
+ALTER TABLE `tbl_menuprefmaster`
+  ADD CONSTRAINT `fk_menuprefmaster_menuid` FOREIGN KEY (`mpr_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_menuratemaster`
+--
+ALTER TABLE `tbl_menuratemaster`
+  ADD CONSTRAINT `fk_menurate_dine_menuid` FOREIGN KEY (`mmr_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_menurate_floor` FOREIGN KEY (`mmr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_menurate_portion` FOREIGN KEY (`mmr_portion`) REFERENCES `tbl_portionmaster` (`pm_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_menurate_unit` FOREIGN KEY (`mmr_unit_id`) REFERENCES `tbl_unit_master` (`u_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_menuratetakeaway`
+--
+ALTER TABLE `tbl_menuratetakeaway`
+  ADD CONSTRAINT `fk_menutakeaway_branchid` FOREIGN KEY (`mta_branchid`) REFERENCES `tbl_branchmaster` (`be_branchid`),
+  ADD CONSTRAINT `fk_menutakeaway_menuid` FOREIGN KEY (`mta_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_menutakeaway_portionid` FOREIGN KEY (`mta_portion`) REFERENCES `tbl_portionmaster` (`pm_id`);
+
+--
+-- Constraints for table `tbl_menurate_counter`
+--
+ALTER TABLE `tbl_menurate_counter`
+  ADD CONSTRAINT `fk_menurate_counter_menuid` FOREIGN KEY (`mrc_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_menurate_counter_portion` FOREIGN KEY (`mrc_portion`) REFERENCES `tbl_portionmaster` (`pm_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_menu_discount`
+--
+ALTER TABLE `tbl_menu_discount`
+  ADD CONSTRAINT `fk_menud_discount_id` FOREIGN KEY (`md_discount`) REFERENCES `tbl_discountmaster` (`ds_discountid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_menud_discount_menudis` FOREIGN KEY (`md_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_menu_tax_master`
+--
+ALTER TABLE `tbl_menu_tax_master`
+  ADD CONSTRAINT `fk_menu_tax_master_menuid` FOREIGN KEY (`mtm_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_menu_tax_master_taxid` FOREIGN KEY (`mtm_tax_id`) REFERENCES `tbl_extra_tax_master` (`amc_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_modulesubmaster`
+--
+ALTER TABLE `tbl_modulesubmaster`
+  ADD CONSTRAINT `fk_modulesub_modulemaster` FOREIGN KEY (`mser_moduleid`) REFERENCES `tbl_modulemaster` (`mer_moduleid`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_notifications`
+--
+ALTER TABLE `tbl_notifications`
+  ADD CONSTRAINT `fk_notifications_read_userid` FOREIGN KEY (`tbl_readby`) REFERENCES `tbl_logindetails` (`ls_username`),
+  ADD CONSTRAINT `fk_notifications_tableid` FOREIGN KEY (`tbl_tableid`) REFERENCES `tbl_tablemaster` (`tr_tableid`),
+  ADD CONSTRAINT `fk_notifications_type_billno` FOREIGN KEY (`tbl_billno`) REFERENCES `tbl_tablebillmaster` (`bm_billno`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_online_billdetails`
+--
+ALTER TABLE `tbl_online_billdetails`
+  ADD CONSTRAINT `fk_online_billdetails_master` FOREIGN KEY (`tab_billno`) REFERENCES `tbl_online_billmaster` (`on_billno`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_printersettings`
+--
+ALTER TABLE `tbl_printersettings`
+  ADD CONSTRAINT `fk_kotcountermaster_kotcode` FOREIGN KEY (`pr_kotcode`) REFERENCES `tbl_kotcountermaster` (`kr_kotcode`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_printersettings_branchid` FOREIGN KEY (`pr_branchid`) REFERENCES `tbl_branchmaster` (`be_branchid`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_printersettings_floorid` FOREIGN KEY (`pr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`),
+  ADD CONSTRAINT `fk_printersettings_printertype` FOREIGN KEY (`pr_printertype`) REFERENCES `tbl_printertype` (`pt_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_printersettings_printstyle` FOREIGN KEY (`pr_style`) REFERENCES `tbl_printer_styles` (`ps_id`);
+
+--
+-- Constraints for table `tbl_printersettings_ip`
+--
+ALTER TABLE `tbl_printersettings_ip`
+  ADD CONSTRAINT `fk_printersettings_ip_printid` FOREIGN KEY (`pr_id`) REFERENCES `tbl_printersettings` (`pr_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_regenrate_log`
+--
+ALTER TABLE `tbl_regenrate_log`
+  ADD CONSTRAINT `fk_regenrate_loginid` FOREIGN KEY (`re_loginid`) REFERENCES `tbl_logindetails` (`ls_username`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_regenrate_staffid` FOREIGN KEY (`re_staffid`) REFERENCES `tbl_staffmaster` (`ser_staffid`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_secretkeymaster`
+--
+ALTER TABLE `tbl_secretkeymaster`
+  ADD CONSTRAINT `fk_secretkey_staffid` FOREIGN KEY (`sr_staffid`) REFERENCES `tbl_staffmaster` (`ser_staffid`);
+
+--
+-- Constraints for table `tbl_staffmaster`
+--
+ALTER TABLE `tbl_staffmaster`
+  ADD CONSTRAINT `fk_staffmaster_branchid` FOREIGN KEY (`ser_branchofficeid`) REFERENCES `tbl_branchmaster` (`be_branchid`),
+  ADD CONSTRAINT `fk_staffmaster_defaultfloor` FOREIGN KEY (`ser_defaultfloor`) REFERENCES `tbl_floormaster` (`fr_floorid`),
+  ADD CONSTRAINT `fk_staffmaster_department` FOREIGN KEY (`ser_department`) REFERENCES `tbl_departmentmaster` (`der_departmentid`),
+  ADD CONSTRAINT `fk_staffmaster_designation` FOREIGN KEY (`ser_designation`) REFERENCES `tbl_designationmaster` (`dr_designationid`);
+
+--
+-- Constraints for table `tbl_state`
+--
+ALTER TABLE `tbl_state`
+  ADD CONSTRAINT `fk_state_countyid` FOREIGN KEY (`se_countryid`) REFERENCES `tbl_country` (`cy_countyid`);
+
+--
+-- Constraints for table `tbl_tablebilldetails`
+--
+ALTER TABLE `tbl_tablebilldetails`
+  ADD CONSTRAINT `fk_billdetails_billid` FOREIGN KEY (`bd_billno`) REFERENCES `tbl_tablebillmaster` (`bm_billno`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_billdetails_canclledstaff` FOREIGN KEY (`bd_cancelledby_careof`) REFERENCES `tbl_staffmaster` (`ser_staffid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_billdetails_loginid` FOREIGN KEY (`bd_cancelledlogin`) REFERENCES `tbl_logindetails` (`ls_username`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_billdetails_menuid` FOREIGN KEY (`bd_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_billdetails_portionid` FOREIGN KEY (`bd_portion`) REFERENCES `tbl_portionmaster` (`pm_id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_tablebillmaster`
+--
+ALTER TABLE `tbl_tablebillmaster`
+  ADD CONSTRAINT `fk_billmaster_branchid` FOREIGN KEY (`bm_branchid`) REFERENCES `tbl_branchmaster` (`be_branchid`),
+  ADD CONSTRAINT `fk_billmaster_corpdisccode` FOREIGN KEY (`bm_corporatecode`) REFERENCES `tbl_corporatemaster` (`ct_corporatecode`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_billmaster_discountid` FOREIGN KEY (`bm_discountid`) REFERENCES `tbl_discountmaster` (`ds_discountid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_billmaster_floorid` FOREIGN KEY (`bm_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_billmaster_paymodeid` FOREIGN KEY (`bm_paymode`) REFERENCES `tbl_paymentmode` (`pym_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_billmaster_staffid` FOREIGN KEY (`ter_cancelledby_careof`) REFERENCES `tbl_staffmaster` (`ser_staffid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_billmaster_username` FOREIGN KEY (`ter_cancelledlogin`) REFERENCES `tbl_logindetails` (`ls_username`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_tablebill_extra_tax_details`
+--
+ALTER TABLE `tbl_tablebill_extra_tax_details`
+  ADD CONSTRAINT `fk_tbil_ex_tax_det_billno` FOREIGN KEY (`bet_billno`,`bet_billslno`) REFERENCES `tbl_tablebilldetails` (`bd_billno`, `bd_billslno`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_tbil_ex_tax_det_taxid` FOREIGN KEY (`bet_tax_id`) REFERENCES `tbl_extra_tax_master` (`amc_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_tablebill_extra_tax_master`
+--
+ALTER TABLE `tbl_tablebill_extra_tax_master`
+  ADD CONSTRAINT `fk_tbil_ex_tax_master_bill` FOREIGN KEY (`bem_billno`) REFERENCES `tbl_tablebillmaster` (`bm_billno`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_tbil_ex_tax_master_taxid` FOREIGN KEY (`bem_taxid`) REFERENCES `tbl_extra_tax_master` (`amc_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_tabledetails`
+--
+ALTER TABLE `tbl_tabledetails`
+  ADD CONSTRAINT `fk_tablemaster_floor` FOREIGN KEY (`ts_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`),
+  ADD CONSTRAINT `fk_tablemaster_staffid` FOREIGN KEY (`ts_orderstaff`) REFERENCES `tbl_staffmaster` (`ser_staffid`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_tablemaster_tableid` FOREIGN KEY (`ts_tableid`) REFERENCES `tbl_tablemaster` (`tr_tableid`),
+  ADD CONSTRAINT `fk_tablemaster_username` FOREIGN KEY (`ts_username`) REFERENCES `tbl_logindetails` (`ls_username`);
+
+--
+-- Constraints for table `tbl_tablemaster`
+--
+ALTER TABLE `tbl_tablemaster`
+  ADD CONSTRAINT `fk_tablemaster_branchid` FOREIGN KEY (`tr_branchid`) REFERENCES `tbl_branchmaster` (`be_branchid`),
+  ADD CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`);
+
+--
+-- Constraints for table `tbl_tableorder`
+--
+ALTER TABLE `tbl_tableorder`
+  ADD CONSTRAINT `fk_orderdetails_branchid` FOREIGN KEY (`ter_branchid`) REFERENCES `tbl_branchmaster` (`be_branchid`),
+  ADD CONSTRAINT `fk_orderdetails_menuid` FOREIGN KEY (`ter_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_orderdetails_preferenceid` FOREIGN KEY (`ter_preference`) REFERENCES `tbl_preferencemaster` (`pmr_id`),
+  ADD CONSTRAINT `fk_orderdetails_staffid` FOREIGN KEY (`ter_staff`) REFERENCES `tbl_staffmaster` (`ser_staffid`),
+  ADD CONSTRAINT `fk_orderdetails_username` FOREIGN KEY (`ter_entryuser`) REFERENCES `tbl_logindetails` (`ls_username`),
+  ADD CONSTRAINT `fk_tableorder_waiterid` FOREIGN KEY (`ter_waiter_id`) REFERENCES `tbl_staffmaster` (`ser_staffid`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_tableorder_changes`
+--
+ALTER TABLE `tbl_tableorder_changes`
+  ADD CONSTRAINT `fk_tableorder_changes_loginid` FOREIGN KEY (`ch_cancelledlogin`) REFERENCES `tbl_logindetails` (`ls_username`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_tableorder_changes_staffid` FOREIGN KEY (`ch_cancelledby_careof`) REFERENCES `tbl_staffmaster` (`ser_staffid`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_takeaway_billdetails`
+--
+ALTER TABLE `tbl_takeaway_billdetails`
+  ADD CONSTRAINT `fk_takeawaydetails_billno` FOREIGN KEY (`tab_billno`) REFERENCES `tbl_takeaway_billmaster` (`tab_billno`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_takeawaydetails_menuid` FOREIGN KEY (`tab_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_takeawaydetails_portionid` FOREIGN KEY (`tab_portion`) REFERENCES `tbl_portionmaster` (`pm_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_takeaway_billmaster`
+--
+ALTER TABLE `tbl_takeaway_billmaster`
+  ADD CONSTRAINT `fk_takeaway_billmaster_staffid` FOREIGN KEY (`tab_assignedto`) REFERENCES `tbl_staffmaster` (`ser_staffid`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_takeaway_bill_extra_tax_details`
+--
+ALTER TABLE `tbl_takeaway_bill_extra_tax_details`
+  ADD CONSTRAINT `fk_ta_bil_ex_tax_det_billno` FOREIGN KEY (`tbet_billno`,`tbet_slno`) REFERENCES `tbl_takeaway_billdetails` (`tab_billno`, `tab_slno`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ta_bil_ex_tax_det_taxid` FOREIGN KEY (`tbet_tax_id`) REFERENCES `tbl_extra_tax_master` (`amc_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_takeaway_bill_extra_tax_master`
+--
+ALTER TABLE `tbl_takeaway_bill_extra_tax_master`
+  ADD CONSTRAINT `fk_ta_bil_ex_tax_master_billno` FOREIGN KEY (`tbe_billno`) REFERENCES `tbl_takeaway_billmaster` (`tab_billno`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ta_bil_ex_tax_master_taxid` FOREIGN KEY (`tbe_taxid`) REFERENCES `tbl_extra_tax_master` (`amc_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_temp_tablebilldetails`
+--
+ALTER TABLE `tbl_temp_tablebilldetails`
+  ADD CONSTRAINT `fk_temp_billdetails_billid` FOREIGN KEY (`bd_temp_billno`) REFERENCES `tbl_temp_tablebillmaster` (`bm_temp_billno`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_temp_billdetails_menuid` FOREIGN KEY (`bd_menuid`) REFERENCES `tbl_menumaster` (`mr_menuid`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_temp_billdetails_portionid` FOREIGN KEY (`bd_portion`) REFERENCES `tbl_portionmaster` (`pm_id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_temp_tablebillmaster`
+--
+ALTER TABLE `tbl_temp_tablebillmaster`
+  ADD CONSTRAINT `fk_temp_billmaster_branchid` FOREIGN KEY (`bm_branchid`) REFERENCES `tbl_branchmaster` (`be_branchid`);
+
+--
+-- Constraints for table `tbl_usermodules`
+--
+ALTER TABLE `tbl_usermodules`
+  ADD CONSTRAINT `fk_usermodules_moduleid` FOREIGN KEY (`um_moduleid`) REFERENCES `tbl_modulemaster` (`mer_moduleid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_usermodules_submoduleid` FOREIGN KEY (`um_submoduleid`) REFERENCES `tbl_modulesubmaster` (`mser_submoduleid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_usermodules_username` FOREIGN KEY (`um_username`) REFERENCES `tbl_logindetails` (`ls_username`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `tbl_voucherpayment`
+--
+ALTER TABLE `tbl_voucherpayment`
+  ADD CONSTRAINT `tbl_voucherpayment_staffid` FOREIGN KEY (`vp_approvedby`) REFERENCES `tbl_staffmaster` (`ser_staffid`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

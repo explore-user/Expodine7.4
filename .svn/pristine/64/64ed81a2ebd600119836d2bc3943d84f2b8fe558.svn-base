@@ -1,0 +1,3950 @@
+<?php
+
+include('includes/session.php');  // Check session
+include("database.class.php");
+// DB Connection class
+$database = new Database();
+include('includes/master_settings.php');
+require_once("includes/title_settings.php");
+
+//require_once("includes/menu_settings.php");
+include("api_multiuselanguage_link.php");
+header('Content-Type: text/html; charset=utf-8');
+
+
+if(isset($_REQUEST['set_log']) && $_REQUEST['set_log']=="kotconfirmbylogin") 
+{  
+    $ipset= $_REQUEST['failmsg'];
+    $msg="Print For Ip-".$ipset." was proceeded by ". $_SESSION['expodine_id'];
+    $date_log=date('Y/m/d H:i:s');
+   
+        $insertion['l_log']= mysqli_real_escape_string($database->DatabaseLink,trim($msg));
+        $insertion['l_date_time']= mysqli_real_escape_string($database->DatabaseLink,trim($date_log));
+	$insertid  =  $database->insert('tbl_printersettings_log',$insertion);
+ 
+}
+
+
+if(isset($_REQUEST['set']) && $_REQUEST['set']=="secretkeycheck") 
+{
+	
+//`tbl_secretkeymaster`(`sr_id`, `sr_staffid`, `sr_key`, `sr_password`, `sr_generatedtime`, `sr_expiredtime`, `sr_defaultkey`)
+$result="";
+$sql_table_sel3  = $database->mysqlQuery("SELECT * from tbl_staffmaster  WHERE  ser_staffid ='".$_REQUEST['stafflist']."' AND  ser_employeestatus='Active'"); $rrt='';
+//echo "SELECT * from tbl_staffmaster  WHERE  ser_staffid ='".$_REQUEST['stafflist']."' AND  ser_employeestatus='Active'";die();
+  $num_table3  = $database->mysqlNumRows($sql_table_sel3);
+  if($num_table3)
+  {
+	  while($row = mysqli_fetch_array($sql_table_sel3))
+		{
+		$rrt= $row['ser_cancelwithkey'];
+		}
+  }
+	if($rrt=="Y")
+	{  
+		$result= "yes";
+  }else
+  {
+	  	$result= "no";
+  }
+
+if($result== "yes")
+{
+	if($_REQUEST['secretkey']!='')
+	{ //echo "SELECT * from tbl_secretkeymaster  WHERE sr_staffid='".$_REQUEST['stafflist']."' and sr_key='".$_REQUEST['secretkey']."' AND  sr_expiredtime ='0000-00-00 00:00:00' AND sr_defaultkey='Y'";
+	   $sql_table_sel3  = $database->mysqlQuery("SELECT * from tbl_secretkeymaster  WHERE sr_staffid='".$_REQUEST['stafflist']."' and sr_key='".$_REQUEST['secretkey']."' AND  (sr_expiredtime ='0000-00-00 00:00:00' OR  sr_expiredtime IS NULL) AND sr_defaultkey='Y'"); 
+		$num_table3  = $database->mysqlNumRows($sql_table_sel3);
+		if($num_table3)
+		{
+			  echo "ok";
+		}else
+		{
+			  echo "sorry";
+		}
+	}else
+	{
+		 echo "sorry";
+	}
+}else
+{
+	if($_REQUEST['secretkey']!='')
+	{//echo "SELECT * from tbl_secretkeymaster  WHERE sr_staffid='".$_REQUEST['stafflist']."' and sr_password='".$_REQUEST['secretkey']."' AND  sr_expiredtime ='0000-00-00 00:00:00' AND sr_defaultkey='N'";
+	   $sql_table_sel3  = $database->mysqlQuery("SELECT * from tbl_logindetails  WHERE ls_staffid='".$_REQUEST['stafflist']."' and ls_password='".md5($_REQUEST['secretkey'])."'");
+		$num_table3  = $database->mysqlNumRows($sql_table_sel3);
+		if($num_table3)
+		{
+			  echo "ok";
+		}else
+		{
+			  echo "sorry";
+		}
+	}else
+	{
+		echo "sorry";
+	}
+}
+ 
+}
+
+$sql_login_stf  =  $database->mysqlQuery("select ser_kot_reprint_per from tbl_staffmaster where ser_staffid='".$_SESSION['loginempid_id']."' "); 
+	               $num_login_stf   = $database->mysqlNumRows($sql_login_stf);
+	               if($num_login_stf){
+		          while($result_login_stf  = $database->mysqlFetchArray($sql_login_stf)) 
+		        {
+                      
+                              $kot_reprint_staff=$result_login_stf['ser_kot_reprint_per'];
+                             
+                       } } 
+
+$other_lang=  trim(json_encode($_SESSION['main_language']),'""');
+$opendate=  trim(json_encode($_SESSION['date']),'""');
+$listimage=  trim(json_encode($_SESSION['s_listimage']),'""');
+
+$floorid=  trim(json_encode($_SESSION['floorid']),'""');
+
+
+if (!isset($_SESSION['timeopen'])) {
+    header("location:index.php?msg=1");
+}
+
+
+$_SESSION['orderby'] = "KOT";
+$_SESSION['orderbyvalue'] = "kot";
+$_SESSION['backchecking']="N";
+error_reporting(0);
+$_SESSION['typevalue'] = "Dinein";
+
+if (!isset($_REQUEST['orderid'])) {
+    
+    if (!isset($_SESSION['order_id'])) {
+        header("location:table_selection.php");
+    } else {
+        $orderid = $_SESSION['order_id'];
+        $table_ids = $_REQUEST['tableid'];
+        $tablelist = explode(",", $_REQUEST['tableid']);
+        $asciilist = explode(",", $_REQUEST['asciival']);
+        $tablecount = count($tablelist);
+        $table_names = "";
+        for ($i = 0; $i < $tablecount; $i++) {
+            
+
+             $sql_table = "select tr_tableno from tbl_tablemaster where tr_tableid='" . $tablelist[$i] . "' ";
+            
+             $sql_table1 = $database->mysqlQuery($sql_table);
+             $num_table = $database->mysqlNumRows($sql_table1);
+                if ($num_table) {
+                $result_table = $database->mysqlFetchArray($sql_table1);
+                $table_names.=$result_table['tr_tableno'] . " (" . $asciilist[$i] . ") " . ",";
+            }
+           $tabel_details = $database->show_mastertable_details($tablelist[$i]);
+           if ($i == 0) {
+                $floor_id = $tabel_details['tr_floorid'];
+            }
+        }
+        
+        $_SESSION['floorid_ser'] = $floor_id;
+        $table_names = rtrim($table_names, ",");
+      
+        $stafid = $_REQUEST['staffid'];
+        
+        $sql_staff = "select ser_staffid,ser_firstname,ser_lastname from tbl_staffmaster where ser_staffid='" . $_REQUEST['staffid'] . "' ";
+       
+        $sql_staff1 = $database->mysqlQuery($sql_staff);
+        $num_staff = $database->mysqlNumRows($sql_staff1);
+        if ($num_staff) {
+            $result_staff = $database->mysqlFetchArray($sql_staff1);
+            $staffname =$result_staff['ser_firstname'].' '.$result_staff['ser_lastname'];
+        }
+
+        
+        $sql_menulist = "select ts_dineintime from tbl_tabledetails where ts_orderno='" . $_SESSION['order_id'] . "' ";
+        $sql_menus = $database->mysqlQuery($sql_menulist);
+        $num_menus = $database->mysqlNumRows($sql_menus);
+        if ($num_menus) {
+            while ($result_menus = $database->mysqlFetchArray($sql_menus)) {
+                $tm = $result_menus['ts_dineintime'];
+                $curtime = date("h:i A", strtotime($tm));
+            }
+        }
+    }
+     
+}
+else {
+    
+    $_SESSION['order_id'] = $_REQUEST['orderid'];
+    $orderid = $_SESSION['order_id'];
+
+    $database->mysqlQuery("UPDATE tbl_tabledetails SET ts_in_access='Y' WHERE ts_orderno='" . $_SESSION['order_id'] . "' ");
+
+    $sql_menulist = "select ts_tableid,ts_tableidprefix,ts_dineintime from tbl_tabledetails where ts_orderno='" . $_SESSION['order_id'] . "' order by ts_tableidprefix";
+    $sql_menus = $database->mysqlQuery($sql_menulist);
+    $num_menus = $database->mysqlNumRows($sql_menus);
+    if ($num_menus) {
+        $tableid = "";
+        $tablpref = "";
+        $i = 0;
+        while ($result_menus = $database->mysqlFetchArray($sql_menus)) {
+            if ($i == 0) {
+                $tableid = $result_menus['ts_tableid'];
+                $tablpref = $result_menus['ts_tableidprefix'];
+            } else {
+                $tableid = $tableid . "," . $result_menus['ts_tableid'];
+                $tablpref = $tablpref . "," . $result_menus['ts_tableidprefix'];
+            }
+            $tm = $result_menus['ts_dineintime'];
+            $curtime = date("h:i A", strtotime($tm));
+            $i++;
+        }
+    }
+    $table_ids = $tableid;
+    $tablelist = explode(",", $tableid);
+    $asciilist = explode(",", $tablpref);
+    $tablecount = count($tablelist);
+    $table_names = "";
+    for ($i = 0; $i < $tablecount; $i++) {
+        
+
+            $sql_table = "select tr_tableno from tbl_tablemaster where tr_tableid='" . $tablelist[$i] . "' ";
+             $sql_table1 = $database->mysqlQuery($sql_table);
+             $num_table = $database->mysqlNumRows($sql_table1);
+                if ($num_table) {
+                $result_table = $database->mysqlFetchArray($sql_table1);
+                $table_names.=$result_table['tr_tableno'] . " (" . $asciilist[$i] . ") " . ",";
+            }
+            $tabel_details = $database->show_mastertable_details($tablelist[$i]);
+        
+	
+        if ($i == 0) {
+            $floor_id = $tabel_details['tr_floorid'];
+        }
+    }
+    $_SESSION['floorid_ser'] = $floor_id;
+    $table_names = rtrim($table_names, ",");
+  
+    if (!isset($_REQUEST['staffid'])) {
+        
+        $sql_menulist1 = "select * from tbl_tabledetails where ts_orderno='" . $_SESSION['order_id'] . "' limit 0,1";
+        $sql_menus1 = $database->mysqlQuery($sql_menulist1);
+        $num_menus1 = $database->mysqlNumRows($sql_menus1);
+        if ($num_menus1) {
+            while ($result_menus1 = $database->mysqlFetchArray($sql_menus1)) {
+              
+                $staff = $result_menus1['ts_orderstaff'];
+                $stafid = $staff;
+            }
+        }
+        $sql_staff = "select ser_staffid,ser_firstname,ser_lastname from tbl_staffmaster where ser_staffid='" . $stafid . "' ";
+        $sql_staff1 = $database->mysqlQuery($sql_staff);
+        $num_staff = $database->mysqlNumRows($sql_staff1);
+        if ($num_staff) {
+            $result_staff = $database->mysqlFetchArray($sql_staff1);
+            $staffname =$result_staff['ser_firstname'].' '.$result_staff['ser_lastname'];
+        }
+
+        
+        
+                
+    } else {
+        $stafid = $_REQUEST['staffid'];
+
+        
+        $sql_staff = "select ser_staffid,ser_firstname,ser_lastname from tbl_staffmaster where ser_staffid='" . $stafid . "' ";
+        $sql_staff1 = $database->mysqlQuery($sql_staff);
+        $num_staff = $database->mysqlNumRows($sql_staff1);
+        if ($num_staff) {
+            $result_staff = $database->mysqlFetchArray($sql_staff1);
+            $staffname =$result_staff['ser_firstname'].' '.$result_staff['ser_lastname'];
+        }
+        
+
+    }
+}
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" style="overflow:hidden!important;">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Order</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+            <link rel="shortcut icon" href="img/favicon.ico">
+            <link id="bs-css" href="css/bootstrap-cerulean.min.css" rel="stylesheet">
+            <link href='bower_components/colorbox/example3/colorbox.css' rel='stylesheet'>
+            <link href="css/tabs_cont_1.css" rel="stylesheet">
+            <link href="css/custom.css" rel="stylesheet">
+            <link rel="stylesheet" href="css/table_new.css">
+            <link rel="stylesheet" type="text/css" href="table/css/default.css" />
+            <link rel="stylesheet" type="text/css" href="table/css/component.css" />
+            <link rel="stylesheet" type="text/css" href="btn/default.css" />
+            <link rel="stylesheet" type="text/css" href="btn/component.css" />
+            <link rel="stylesheet" href="css/bootstrap.min.css">
+            <link rel="stylesheet" href="css/font-awesome/4.2.0/css/font-awesome.min.css">
+            <link href="css/sidebar.css" rel="stylesheet">
+            <link href="css/sidebar-bootstrap.css" rel="stylesheet">
+            <link href="css/style_menu_order_table.css" rel="stylesheet" />
+            <link rel="stylesheet" href="js_popup/style.min.css">
+            <link href="website-src/sliding.css" rel="stylesheet" />
+            <link rel="stylesheet" media="screen, projection" href="css/fancySelect.css">   
+            <link rel="stylesheet" href="talb_side/css/reset.css"> 
+            <link rel="stylesheet" href="talb_side/css/style.css"> <!-- Resource style -->
+            <link rel="stylesheet" type="text/css" href="master_style/popup/default.css" />
+            <link rel="stylesheet" type="text/css" href="master_style/popup/component.css" />
+            <link href="css/new_order_style.css" rel="stylesheet"  />
+            <link href="css/loader.css" rel="stylesheet"  />
+            
+            <style>
+               .center_contain_1::-webkit-scrollbar {width: 18px;height: 10px;}
+                #submenu::-webkit-scrollbar {width:20px;height:100vh;}
+                #submenu::-webkit-scrollbar-track {-webkit-box-shadow: inset 0 0 6px rgba(175, 175, 175, 0.3);}
+                .ui-autocomplete::-webkit-scrollbar {width: 18px;height: 10px;}
+                .ordelist_table{cursor:auto !important}
+                .kot_number_list_menuorder{height:47px !important;}
+                .kot_number_list_menuorder::-webkit-scrollbar {width:auto;height: 14px;}
+                /*#boxscroll::-webkit-scrollbar {width: 15px;height: 10px;}
+                .preferance_table_btn { width: 40px;height: 43px;}*/
+                body{overflow:inherit !important; }
+                #content1 {
+                    left: 1%;
+                    right: 1%;
+                    position: absolute;}
+                .tottal_rate_contain {
+    width: 100%;
+    min-width: 110px;
+    float: right;
+    height: 40px;
+    line-height: 40px;
+    font-size: 18px;
+    color: #FFF;
+    font-weight: 400;
+    margin-right: 0;
+    height: 30px;
+    line-height: 30px;
+    padding-right: 1%;
+    font-weight: bold;
+    position: relative;
+        background-color: #f5f5f5;
+    font-family: 'CALIBRIB_0';
+    font-size: 14px;
+    color: #fff;
+    font-size: 16px;
+    text-align: right;
+    margin-top: -15px;
+}
+.quick_navigation_section{display:none}
+.ordelist_table {
+    height: 60vh;
+    min-height: 350px !important;
+}
+                .md-content{top:0 !important;height: 472px;bottom: 0;}
+                .menu-trigger{display:none;}
+                .md-content button{position:absolute;}
+                .main_div_dyc .right_div_cc{height:88vh !important;}
+                .right_div_cc{height: 74vh;min-height: 590px !important;}
+
+                .right_div_cc .ordelist_table{  height: 73vh !important;/*min-height: 445px !important;*/}
+
+
+
+
+
+                @media (min-height:620px)   {
+                    .right_div_cc{height: 92vh !important;}
+                    .center_item_display_cc{height: 92vh !important;}
+                    .left_mn_menu_odr{height: 92vh !important;}
+                    .right_div_cc .ordelist_table{  height: 72vh !important;}
+                }
+                
+                @media (min-height:700px)   {
+                    .right_div_cc{height: 93vh !important;}
+                    .center_item_display_cc{height: 93vh !important;}
+                    .left_mn_menu_odr{height: 93vh !important;}
+                    .right_div_cc .ordelist_table{  height: 76vh !important;}
+                }
+
+
+
+                @media (min-height:900px) {
+                    .right_div_cc{height: 94.5vh !important;}
+                    .center_item_display_cc{height: 94.5vh !important;}
+                    .left_mn_menu_odr{height: 94.5vh !important;}
+                    .right_div_cc .ordelist_table{  height: 81.5vh !important;}
+                    .center_contain_1{ height: 82.5vh !important;}
+                }
+
+                @media (min-height:1050px) {
+                    .right_div_cc{height: 95vh !important;}
+                    .center_item_display_cc{height: 95vh !important;}
+                    .left_mn_menu_odr{height: 95vh !important;}
+                    .right_div_cc .ordelist_table{  height: 83vh !important;}
+                    .center_contain_1{ height: 83vh !important;}
+                }
+
+                html{
+                    background: #191919;  
+                }
+                /* @media (min-height:768px) {.right_div_cc .ordelist_table{  height: 65.5vh !important;} }
+            @media (min-height:800px) {.right_div_cc .ordelist_table{  height: 75vh !important;} }
+            @media (min-height:1050px) {.right_div_cc .ordelist_table{  height: 78vh !important;} } */
+
+.disablegenerate { pointer-events: none; opacity: 0.4; cursor:none;}
+
+.category-list{
+    width: 100%;
+    height: auto;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    background-color: #0A4D68;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.category-list a {
+    color:#fff;
+    white-space: nowrap;
+    text-decoration: none;
+}
+.category-menu, .category-menu-active{
+    list-style: none;
+    padding: 10px;
+    background-color: #0092a1;
+    border-radius: 3px;
+    display: inline-block;
+}
+.category-menu:hover, .category-menu-active:hover{
+    background-color: #0a4d68;
+    box-shadow: rgb(255 255 255 / 42%) 0px 1px 3px 0px, rgb(255 255 255 / 50%) 0px 0px 0px 1px;
+}
+.category-menu-active{
+    background-color:#c03604;
+}
+::-webkit-scrollbar-track
+{
+    height:8px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar
+{
+    height:10px;
+	width: 10px;
+	background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb
+{
+    height:10px;
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #777;
+}
+
+
+
+
+
+                .navbar-brand{margin-top:-13px}
+                .perspective .btn{border: solid 1px #ABABAB !important;}
+                .menu_order_dish_name {max-width: 80%;min-width:20%;width:auto; overflow:hidden;font-weight:bold;
+font-family: 'CALIBRIB_0'; margin-bottom:5px;}
+.menu_order_dish_name:hover{
+    background-color: #bf3200c7;
+    /* font-size: 14px; */
+    color: #fff;
+    transition-duration: 1s;
+    border-radius: 5px;
+    /* font-style: normal; */
+    font-weight: normal;
+    letter-spacing: 0.25px;
+}
+                .portion_txt{    width: 35%;}
+                .quantity_txt { width: 14%;}
+                .ordelist_table{margin-top:0px;}
+                .center_contain_1{padding-bottom:40px;min-height:450px;padding: 10px !important;}
+				.center_contain_1 a{margin:0;width: 170px; min-width: 170px;border-radius: 5px;margin-bottom:7px;margin-right: 7px}
+				.product_text{padding: 0;width: 100% !important;height:100%}
+				.product_text .perspective{margin-left:0;height:100%}
+                                .product_text .perspective .menu_sub_item1 {height:100%}
+				.menu_sub_item1{margin: 0; margin-top: 5px;}
+                .left_main_menu_items li{display:inline}
+                .left_main_menu_items li a{margin-right: 5px;margin-bottom: 5px;padding: 0 35px !important;height: 33px !important;}
+				.product_img{border:0;position:relative;height:auto;width:160px}
+                .md-content{width:510px !important;right:0px;left:0px !important;}
+				.item_price{width:100%;padding:0px 0;font-size:11px;color:#000;text-align:center;display: inline-block;height: auto;}
+                #popup_box .form-control{height:30px;}
+                .kot_btn_disable{pointer-events: none;opacity: 0.4;background-color: #868686 !important;}
+				.multiselect-container{top: auto !important;bottom: 50px !important;padding: 0 !important;}.dropdown-menu:before{top: auto !important;bottom: -7px !important;border: 0 !important;z-index: -1;}.dropdown-menu>li>a{text-align: left !important;padding-left: 30px !important;}.multiselect{height: 40px !important;margin-top: 3px !important;}
+           .orderlist_menu_odr_btn_cc{position: absolute;bottom: 0;left: 0;}
+           #amtdinenew{position: absolute;bottom: 43px;left: -3px;}
+           .rateentrydine::-webkit-input-placeholder { color: black; }
+           .menu_eachpc_head{width: 100%; margin-top: -4px; margin-bottom: 5px; float: left; color: #635655;}
+          .combo_tbl_lst{width: 100%; font-size: 11px;  color: #6d0a21;  line-height: 11px !important;
+    display: inline-block;}
+                #combo_ordering_popup .combo_image_load{margin-top: 15% !important}
+
+ .nw_clr_btn{
+	width: 48px;
+    line-height: 35px;
+    margin-top: 2px;
+    height: 37px;
+    border-bottom: 3px #8a4804 solid;
+    background-color: rgb(208, 115, 19);
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+    color: #fff;
+}
+.menu_order_dish_name span{    display: contents;}
+#boxscroll{overflow: auto !important;}
+#boxscroll::-webkit-scrollbar { width: 5px; height: 13px;}
+.nw_clr_btn:hover{background-color:rgb(0, 218, 218) }
+
+.qty_incr_btn_sec_cc{border:solid 1px #ccc}
+.qty_incr_btn{background-color:#ccc;color:#000}
+.qty_incr_val{color:#000}
+.odr_served .qty_incr_btn{background-color:#ffffff80}
+.menu_sub_item1{ 
+     padding: 4px 0px;
+    width: 160px !important;
+    margin:0;
+/*    height: 100%;*/
+/*    -moz-box-shadow: 3px 3px 6px #9C9C9C;
+    -webkit-box-shadow: 3px 3px 6px #9c9c9c;*/
+/*    box-shadow: 3px 3px 6px #9c9c9c;*/
+    font-weight: bold !important;
+/*    height: 100% !important;*/
+    text-transform: capitalize;
+    font-family: 'CALIBRI_0' !important;
+    font-size: clamp(14px, 2vw + 1.5em, 14px);
+    line-height: 17px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    word-wrap: break-word;
+    white-space: inherit;    
+}
+.menu_sub_item1{
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column
+}
+.ui-menu .ui-menu-item a {
+    text-decoration: none;
+    display: block;
+    padding: 0.2em 0.4em !important;
+    line-height: 1.5;
+    font-size: 16px !important;
+    zoom: 1 !important;
+    border: 0 !important;
+}
+.menu_sub_item1 p{
+    margin: 0;
+    height: auto !important;
+    max-height: 30px    
+}
+.menu_item_contain{
+   width: 100%;
+    max-height: 65vh;
+    /* min-height: 515px; */
+    float: left;
+    overflow: auto;
+    padding: 0.5% 0 0 0.5%;
+    display: flex !important;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 5px;
+    row-gap:5px;
+    border-bottom: 0; 
+    padding: 5px;
+    padding-left: 10px;  
+    padding-top: 15px;
+}
+.center_contain_1{
+    width:100%;
+    height: auto;
+	max-height: 80vh;
+   min-height: inherit;
+	float:left;
+	overflow:auto;
+	  padding: 0.5% 0 0 0.5%;
+          display: flex;
+          align-items: stretch;
+          flex-wrap: wrap;
+           gap:5px;
+          border-bottom: 0
+}
+
+
+@media (min-width:1600px){
+    .menu_sub_item1{
+     font-size:16px;   
+    }  
+}
+
+@media (max-width:1200px){
+    .combo_button_mn_odr {
+        padding-top: 5px;
+    } 
+}
+
+.combo_name_selection_click{
+    list-style: none !important;
+    padding: 10px !important;
+    background-color: #0092a1 !important;
+    border-radius: 3px !important;
+    display: inline-block !important;
+}
+
+
+@media screen and (min-height: 768px) {
+    .tottal_rate_contain{
+        margin-top: 0px;
+    }
+}
+
+
+.menu_1{
+    background-color: white;
+    color: black;
+    line-height: 14px;
+    border-radius: 5px
+}
+.menu_1:active{
+    background-color:#721e35;
+}
+            </style>
+            
+            <script src="js/jquery-1.10.2.min.js"></script>
+            <script src="js/jquery.nicescroll.min.js"></script>
+            <script src="js/dynamic.js"></script>
+            <script src="js/load_popup_fns.js"></script>
+            <script src="js/menu_order.js"></script>
+            <script src="js/load_subcat_menu.js"></script>
+<!--            <script src="js/number_pad.js"></script>-->
+
+       <script src="js/confirm_print.js"></script>
+            
+       <?php  if($_SESSION['s_onscreen_keypad']=='Y'){ ?>  
+       <script src="js/jQKeyboard.js"></script> 
+       <link rel="stylesheet" href="css/jQKeyboard.css" type="text/css" />   
+       <script src="js/onscreen_keypad.js"></script>       
+       <?php } ?>    
+       
+            
+            <script type="text/javascript" language="javascript">
+                history.pushState(null, null, $(location).attr('href'));
+                window.addEventListener('popstate', function () {
+                    history.pushState(null, null, $(location).attr('href'));
+                });
+            </script>
+            
+           
+            <script type="text/javascript">
+                
+   $(document).ready(function ()
+    {
+                      
+           document.getElementById('search').setAttribute('autocomplete', 'off');
+           document.getElementById('search_code').setAttribute('autocomplete', 'off');
+        
+        
+        
+       var url_check=$('#url_check').val();
+    
+       var new_id=url_check.split('check_kot_cancel=');
+       
+       if(new_id[1]=='kot_cancel_front'){
+          $(".kot_cancel_popup_cc").css("display","block");
+          $(".olddiv").addClass("new_overlay");
+          $('.kot_cancel_popup_cc').load('load_kotcancel_popup.php');
+      }
+        
+        
+        
+                  
+           $('#<?=$_SESSION['be_search_focus']?>').focus(); 
+                    
+                   
+                     if($("#check_kot_count").val()>0){
+                      $("#kot_cancel_pop_btn").show();
+                      }else{
+                      $("#kot_cancel_pop_btn").hide();
+                       }
+    
+                    
+                    document.onkeydown = function (evt) {
+                       
+                        evt = evt || window.event;
+                        if (evt.keyCode == 27) {
+                            $('.md-close').click();
+                           $("#search").focus();
+                        }
+                        if (evt.keyCode == 46) // on delete button click
+                        {
+                            $("#valueofsearch_menu").val('');
+                            $("#valueofsearch_portion").val('');
+                            $("#valueofsearch_qty").val('');
+                            $("#search").val('');
+                        }
+                    };
+                });
+
+                $(function () {
+                    $("html").getNiceScroll().hide();
+                    $("#submenu").getNiceScroll().hide();
+                });
+
+            </script>
+          
+            <style>
+                html{overflow:inherit !important}	  
+                .ui-autocomplete{z-index:999999 !important;max-height: 400px;    height: auto; overflow: scroll;}
+            </style>
+            <script type="text/javascript" src="js/jquery-ui-1.10.4.js"></script> 
+           
+            <script type="text/javascript">
+                jQuery(document).ready(function () {
+                    
+                    
+                    
+                   setTimeout(function(){
+                      
+                         $("#search").val('');
+                         $("#search").focus();
+                       
+                   },800);  
+                        
+                    
+                    
+                    var seacrhtype_id = $('#seacrhtype_id').val();
+
+                    if (seacrhtype_id == '1')
+                    {
+                        //****************************************search with name and qty calculation starts***************************************
+                        $("#search").autocomplete({
+                         
+                            minLength: 1,
+                            source: "load_div.php?set=searchname",
+                            focus: function (event, ui) {
+                              //  $("#search").val(ui.item.label2);
+                               // $("#valueofsearch_menu").val(ui.item.id);
+                             //   $("#valueofsearch_portion").val(ui.item.portion);
+                              //  $("#valueofsearch_qty").val(ui.item.qty);
+                                var menunames = $("#valueofsearch_menu").val();
+                                
+                                var tot = $("#valueofsearch_qty").val();
+                                var selval = $("#valueofsearch_portion").val();
+                                //alert(menunames+tot+selval)
+                                if (menunames != "" && tot != 0 && selval != '')
+                                    inputall();
+                                return false;
+                            },
+                            select: function (event, ui) {
+
+                                $("#valueofsearch_menu").val(ui.item.id);
+                                $("#valueofsearch_portion").val(ui.item.portion);
+                                $("#valueofsearch_qty").val(ui.item.qty);
+                                var menunames = $("#valueofsearch_menu").val();
+                                var tot = $("#valueofsearch_qty").val();
+                                var selval = $("#valueofsearch_portion").val();
+                                // alert(menunames+tot+selval)
+                                if (menunames != "" && tot != 0 && selval != '')
+                                    inputall();
+                                //else
+
+
+                               
+                                return false;
+                            }
+
+                        });
+
+                        $("#search").keypress(function (event) {
+                          
+                            if (event.keyCode == 13) {
+                                if ($("#valueofsearch_menu").val() != "")
+                                {
+                                    var menunames = $("#valueofsearch_menu").val();
+                                    //var tot			  =$( "#valueofsearch_qty" ).val();	
+                                    var selval = $("#valueofsearch_portion").val();
+                                    // alert(menunames+tot+selval)
+                                    var strng = ($("#search").val());
+                                    var arr = strng.split('*');
+                                    var tot = arr[1].trim();
+                                    // alert("sdfsdf"+tot+"sdfsdfs");
+                                    if (tot != 0 && selval != 0)
+                                    {
+                                        //alert(tot);
+                                        if (tot.indexOf('.') === -1)
+                                        {
+                                        } else
+                                        {
+                                            var tt = tot.split('.');
+                                            tot = 0;
+                                            tot = tt[0].trim();
+                                        }
+                                        //alert(tot);
+                                        $("#valueofsearch_qty").val(tot);
+                                        $.post("load_div.php", {qtyval: tot, set: 'quantityset'});
+
+                                        if (menunames != "" && tot != 0 && selval != '')
+                                            inputall();
+                                    } else
+                                    {
+                                        $(".loaderror").css("display", "block");
+                                        $(".loaderror").addClass("popup_validate");
+                                        $(".loaderror").text("Quantity or Portion 0");
+                                        $('.loaderror').delay(2000).fadeOut('slow');
+                                    }
+                                } else
+                                {
+                                    //alert("null");
+                                }
+                            } else
+                            {
+                                // alert("not pressed enter");
+                            }
+                            //alert($( "#valueofsearch_menu" ).val()+ $( "#valueofsearch_portion" ).val( )+$( "#valueofsearch_qty" ).val( ))
+                        });
+
+                        function inputall()
+                        { 
+                            var menunames = $("#valueofsearch_menu").val();
+							        
+							
+                            $.post("load_div.php", {menuname: menunames, set: "stockmenu"},
+                                    function (data)
+                                    {
+                                        data = $.trim(data);
+                                        // alert(data)
+                                        if (data == "ok")
+                                        {
+                                            $.post("load_div.php", {menu: menunames, set: 'setmenuids'});
+                                            var tot = $("#valueofsearch_qty").val();
+                                            $.post("load_div.php", {qtyval: tot, set: 'quantityset'});
+                                            var selval = $("#valueofsearch_portion").val();
+                                            $.post("load_div.php", {portionval: selval, set: 'portionset'});
+
+                                            var data = {
+                                                "action": "check",
+                                                "tableid": document.getElementById("table_id").value,
+                                                "floorid": document.getElementById("floor_id").value,
+                                                "stewardid": document.getElementById("steward_id").value,
+                                                "orderid": document.getElementById("order_id").value,
+                                                "branchid": document.getElementById("branch_id").value
+                                            };
+                                            data = $(this).serialize() + "&" + $.param(data);
+                                            $.ajax({
+                                                type: "POST",
+                                                dataType: "json",
+                                                url: "response.php",
+                                                data: data,
+                                                success: function (datas) {
+                                                    var obj = JSON.parse(datas["json"]);
+                                                    var last = obj.msg;
+                                                    //alert(last);
+                                                    if (last == "sorry")
+                                                    {
+                                                        checkinsert = "ok";
+                                                        checkins1("update");
+                                                        /*$("#search").val('');
+                                                         $( "#valueofsearch_menu" ).val('');
+                                                         $( "#valueofsearch_portion" ).val('');
+                                                         $( "#valueofsearch_qty" ).val('');
+                                                         $('.ordelist_table').css("display","block");
+                                                         $('.ordelist_table').load('viewitems.php');
+                                                         $(".loaderror").css("display","block");
+                                                         $(".loaderror").addClass("popup_validate");
+                                                         $(".loaderror").text("Updated");
+                                                         $('.loaderror').delay(2000).fadeOut('slow');*/
+                                                    } else
+                                                    {
+
+                                                        checkinsert = "ok";
+                                                        checkins("add");
+                                                        /*$("#search").val('');
+                                                         $( "#valueofsearch_menu" ).val('');
+                                                         $( "#valueofsearch_portion" ).val('');
+                                                         $( "#valueofsearch_qty" ).val('');
+                                                         $('.ordelist_table').css("display","block");
+                                                         $('.ordelist_table').load('viewitems.php');
+                                                         $(".loaderror").css("display","block");
+                                                         $(".loaderror").addClass("popup_validate");
+                                                         $(".loaderror").text("Added");
+                                                         $('.loaderror').delay(2000).fadeOut('slow');*/
+                                                    }
+                                                }
+                                            });
+                                            data = null;
+                                            function checkins(val)
+                                            {var hidtableordernentry_updated = $("#hidtableordernentry_updated").val();
+							var hidtableordernentry_success = $("#hidtableordernentry_success").val();
+							var hidtableordernentry_rate = $("#hidtableordernentry_rate").val();
+							var hidtableordernentry_billed = $("#hidtableordernentry_billed").val();
+                                                var data1 = {
+                                                    "action": val,
+                                                    "tableid": document.getElementById("table_id").value,
+                                                    "floorid": document.getElementById("floor_id").value,
+                                                    "stewardid": document.getElementById("steward_id").value,
+                                                    "orderid": document.getElementById("order_id").value,
+                                                    "branchid": document.getElementById("branch_id").value
+                                                };
+                                                data1 = $(this).serialize() + "&" + $.param(data1);
+                                                $.ajax({
+                                                    type: "POST",
+                                                    dataType: "json",
+                                                    url: "response.php",
+                                                    data: data1,
+                                                    success: function (data) {
+                                                        var res = data.trim();
+                                                        $("#search").val('');
+                                                        $("#valueofsearch_menu").val('');
+                                                        $("#valueofsearch_portion").val('');
+                                                        $("#valueofsearch_qty").val('');
+                                                        $('.ordelist_table').css("display", "block");
+                                                        $('.ordelist_table').load('viewitems.php');
+
+
+                                                        //$("#search").val('');
+                                                        //$( "#valueofsearch_menu" ).val('');
+                                                        //$( "#valueofsearch_portion" ).val('');
+                                                        //$( "#valueofsearch_qty" ).val('');
+                                                        //$('.ordelist_table').css("display","block");
+                                                        //$('.ordelist_table').load('viewitems.php');
+                                                        $(".loaderror").css("display", "block");
+                                                        $(".loaderror").addClass("popup_validate");
+														   
+														if(res==hidtableordernentry_updated)
+														{ $(".loaderror").text(hidtableordernentry_updated);
+														}else  if(res==hidtableordernentry_success)
+														{ $(".loaderror").text(hidtableordernentry_success);
+														}else if(res==hidtableordernentry_rate)
+														{ $(".loaderror").text(hidtableordernentry_rate);
+														}else if(res==hidtableordernentry_billed)
+														{ $(".loaderror").text(hidtableordernentry_billed);
+														}
+                                                       
+                                                        $('.loaderror').delay(2000).fadeOut('slow');
+                                                    }
+                                                });
+                                                data1 = null;
+                                            }
+                                        } else
+                                        {
+                                            //alert("sorry");
+                                            $("#search").val('');
+                                            $("#valueofsearch_menu").val('');
+                                            $("#valueofsearch_portion").val('');
+                                            $("#valueofsearch_qty").val('');
+                                            $(".loaderror").css("display", "block");
+                                            $(".loaderror").addClass("popup_validate");
+                                            $(".loaderror").text("Sorry- Out Of Stock");
+                                            $('.loaderror').delay(2000).fadeOut('slow');
+                                        }
+                                    });
+                        }
+
+                      
+                    } else if (seacrhtype_id == '2')
+                    {
+                  
+                  
+                  
+                        $("#search").autocomplete({
+                          
+                            minLength: 1,
+                            source: "load_div.php?set=searchnameonly",
+//                            response: function( event, ui ) {
+//                                //alert(ui.content.length);
+//                                console.log(ui.content.length); //in this moment you get count results you 
+//                                if(ui.content.length==1){
+//                                    
+//                                      //$(".ui-corner-all").focus();
+//                                    $.each(ui.content, function (i) {
+//                                        $.each(ui.content[i], function (key, val) {
+//                                            
+//                                       if(key=='label2'){
+//                                           $("#search").val(val);
+//                                       }
+//                                       if(key=='id'){
+//                                          $("#valueofsearch_menu").val(val);
+//                                           var menunames = $("#valueofsearch_menu").val(); 
+//                                           
+//                                           
+//                                $('.mynewpopupload').css("display", "block");
+//                                $(".olddiv").addClass("new_overlay");
+//                                $.post("load_popupmenu.php", {menu: menunames},
+//                                        function (data)
+//                                        {
+//                                            data = $.trim(data);
+//                                            $('.mynewpopupload').html(data);
+//                                            $("#search").val('');
+//                                            $('#search').blur();
+//                                            $("#valueofsearch_menu").val('');
+//                                            $("#search").focus();
+//                                              $(".focussed").focus();
+//                                            
+//
+//                                        });
+//                                data = null;
+//                                       }
+//                                      
+//                                    });
+//                                    
+//                                    
+//                                });
+//                                return false;
+//                               }
+//                          
+//                            },
+                            focus: function (event, ui) {
+                              
+                              //  $("#search").val(ui.item.label2);
+                             //   $("#valueofsearch_menu").val(ui.item.id);
+                                var menunames = $("#valueofsearch_menu").val();
+                               
+                                return false;
+                            },
+                            select: function (event, ui) { 
+
+                                $("#valueofsearch_menu").val(ui.item.id);
+                                var menunames = $("#valueofsearch_menu").val();
+                                $('.mynewpopupload').css("display", "block");
+                                $(".olddiv").addClass("new_overlay");
+                                $.post("load_popupmenu.php", {menu: menunames},
+                                        function (data)
+                                        { // alert(data);
+                                            
+                                            data = $.trim(data);
+                                            $('.mynewpopupload').html(data);
+                                            $("#search").val('');
+                                            $('#search').blur();
+                                            $("#valueofsearch_menu").val('');
+                                            $("#search").focus();
+                                            $(".focussed").focus();
+                                            
+                                            if($('#search_popup_single').val()=='Y'){
+                                     
+                                                $(".enter-qty-act").val('1');
+                                                $('.weight-field').text('1');  
+
+                                                 $(".mynewpopupload").css({
+                                                    "filter": "blur(3px)",
+                                                    "pointer-events": "none"
+                                                  }); 
+
+                                                $('.submit_all').click();
+                                                
+                                                setTimeout(function () {
+                                                    $(".mynewpopupload").css({
+                                                      "filter": "none",
+                                                      "pointer-events": "auto"
+                                                  });
+
+                                                  }, 500);
+                                                
+                                              }
+                                 
+                                            
+                                            
+                                            
+                                        });
+                                data = null;
+                                return false;
+                            }
+
+                        });
+
+
+                        //************************************search with name only ends***************************************
+                    }
+
+
+
+                    //********************search with name only starts**************//
+                    
+                    $("#search_code").autocomplete({
+                        
+                        minLength: 0,
+                        source: "load_div.php?set=searchcode",
+                        focus: function (event, ui) {//alert(ui.item.label2 )
+                            $("#search_code").val(ui.item.label2);
+                            $("#valueofsearch_menu").val(ui.item.id);
+                            var menunames = $("#valueofsearch_menu").val();
+                            return false;
+                        },
+                        select: function (event, ui) {
+
+                            $("#valueofsearch_menu").val(ui.item.id);
+                            var menunames = $("#valueofsearch_menu").val();
+                            $('.mynewpopupload').css("display", "block");
+                            $(".olddiv").addClass("new_overlay");
+                            $.post("load_popupmenu.php", {menu: menunames},
+                                    function (data)
+                                    {
+                                        data = $.trim(data);
+                                        $('.mynewpopupload').html(data);
+                                        $("#search_code").val('');
+                                        $('#search_code').blur();
+                                        $("#valueofsearch_menu").val('');
+                                        $("#search_code").focus();
+                                        $(".focussed").focus();
+
+                                    });
+                            data = null;
+                            return false;
+                        }
+
+                    });
+
+
+                    //***************search with name only ends*****************
+
+
+
+                });
+
+            </script>
+            <script type="text/javascript">
+
+                $(document).ready(function () {
+
+
+                    $('#popupBoxClose').click(function () {
+                        unloadPopupBox();
+                        $(".olddiv").removeClass("new_overlay");
+                    });
+
+                    $('.menu_add_btn_menu_odr').click(function () {
+                        $('#popup_box').show("slide", {direction: "right"}, 500);
+                        $(".olddiv").addClass("new_overlay");
+                    });
+
+                    function unloadPopupBox() {    // TO Unload the Popupbox
+                        // $('#popup_box').fadeOut("slow");
+                        $('#popup_box').hide("slide", {direction: "right"}, 500);
+
+                    }
+
+
+		$("#kot_cancel_pop_btn").click(function(){
+                  
+			$(".kot_cancel_popup_cc").css("display","block");
+			$(".olddiv").addClass("new_overlay");
+                        $('.kot_cancel_popup_cc').load('load_kotcancel_popup.php');
+		});
+		
+		
+//		$("#printer_issue_popup_btn").click(function(){
+//			$(".printer_issue_popup").css("display","block");
+//			$(".olddiv").addClass("new_overlay");
+//		});
+		/**cancel kot script**/
+		
+		
+		
+                
+                $("#close_kot_cnfrm").click(function(){
+			$(".kotcancel_confirm").css("display","none");
+                        $(".olddiv").removeClass("new_overlay");
+			
+		});
+                //
+                $("#closepopup").click(function(){
+                    
+			$(".olddiv").removeClass("new_overlay");
+			$(".kotcancel_reason_popup").css("display","none");
+		});
+                //kotcancel_reason_popup_new_cancel_btn
+                $("#kotcancel_reason_popup_new_cancel_btn").click(function(){
+                        $('#pin').val('');
+			$(".olddiv").removeClass("new_overlay");
+			$(".kotcancel_reason_popup_new").css("display","none");
+                        
+		});
+                
+                
+       $('.kot_cancel_no').click( function() {
+            
+            location.reload(); 
+         });          
+                
+                
+          $('.kot_cancel_ok').click( function() {
+            
+            
+            
+            var msg=$('#kotfailmsg_cancel').html();
+          
+          
+             var dataString_log ='set_log=kotconfirmbylogin&failmsg='+msg;
+             $.ajax({
+             type: "POST",
+             url: "menu_order.php",
+             data: dataString_log,
+             success: function(data) {
+             
+             }
+             });
+            
+             $('.kotconfirmpopup_cancel').css('display','none');   
+             
+               $(".confrmation_overlay").css("display","none");
+               
+               
+               
+                    if($('#hidcancelsecret').val()=="Y")
+                    {
+                        var mode = $('#authorise_with_code').val();
+                        if(mode != 'Y'){
+                            $(' .btn_index_popup_send').css('display','none');
+                            $(".kotcancel_confirm").css("display","none");
+                            $(".olddiv").addClass("new_overlay");
+                            $(".kotcancel_reason_popup").css("display","block");
+                            $('#pin').focus();
+                        }else {
+                           $(".olddiv").addClass("new_overlay");
+                           $(".kotcancel_confirm").css("display","none");
+                           $(".kotcancel_reason_popup_new").css("display","block");
+                           $('#pin').focus();
+                        }
+                    }else
+                    {
+                        $(".kotcancel_confirm").css("display","none");
+			$(".olddiv").removeClass("new_overlay");
+                        var itemslno = $('#itemslno').val();
+                        var orderitem = $('.cnclqty');
+                        var itemqty = '';
+                        var quantity = new Array();
+                        orderitem.each(function(){
+                              itemqty   =  $(this).val();
+                              if(itemqty!='undefined' && itemqty!='' && itemqty!=null){
+                                  quantity.push(itemqty);
+                              }
+                        });
+                        
+                        var cnclrsn = $('.kot_cancel_reason_input');
+                        var itemcnclrsn = '';
+                        var reason = new Array();
+                        cnclrsn.each(function(){
+                              itemcnclrsn   =  $(this).val();
+                              if(itemcnclrsn!='undefined'){
+                                  reason.push(itemcnclrsn);
+                              }
+                        });
+                        
+                        
+                        
+                      var dataString = 'set=cancelitemqty&itemslno='+itemslno+'&itemqty='+quantity+'&reason='+reason;
+                      $.ajax({
+                             type: "POST",
+                             url: "load_bill_history.php",
+                             data: dataString,
+                             success: function(data) {
+                                 $('.ordelist_table').load('viewitems.php');
+                                 
+                                 
+                                       var kotidcanceled=$.trim(data);
+                                                           
+                                                           var kt=kotidcanceled.split("<br />");
+                                                           
+                                                           var kotnew=$.trim(kt);
+                                                           
+                                                           
+                                                           //alert(kotidcanceled);
+//                                                                     $.post("smsvoid.php", {setkot:'smsvoidkot',kotid:kotnew,itemsl:itemslno},
+//                                                                        function(data)
+//                                                                        {
+//                                                                         //alert(data) ;   
+//                                                                        });  
+                                 
+                                 
+                           }
+                      });
+                    }
+         });          
+                   
+                
+    $(".cancelekot_confirm").click(function(){
+                    
+              var floor=$('#floor_id').val();
+               var order=$('#order_id').val();
+             
+      
+            var kot_cancel_print = "kot_cancel_print";
+            //------------
+            $.post("printercheck_1.php", {type:kot_cancel_print,floor:floor,order:order},
+                                               
+            function(data)
+            { 
+            data=$.trim(data); 
+            //alert(data);
+            $(".olddiv").removeClass("new_overlay");
+            if(data !=0)
+            { 
+                                            
+              $('.kotconfirmpopup_cancel').css('display','block');   
+              $('#kotfailmsg_cancel').html(data);
+               $(".confrmation_overlay").css("display","block");
+               
+            //alert(data);
+   			                   
+                                                           
+            }else{
+                   
+                   
+                    if($('#hidcancelsecret').val()=="Y")
+                    {
+                        var mode = $('#authorise_with_code').val();
+                        if(mode != 'Y'){
+                           
+                            $(' .btn_index_popup_send').css('display','none');
+                            $(".kotcancel_confirm").css("display","none");
+                            $(".olddiv").addClass("new_overlay");
+                            $(".kotcancel_reason_popup").css("display","block");
+                            $('#pin').focus();
+                        }else {
+                            //alert('2');
+                           $(".olddiv").addClass("new_overlay");
+                           $(".kotcancel_confirm").css("display","none");
+                           $(".kotcancel_reason_popup_new").css("display","block");
+                           $('#pin').focus();
+                        }
+                    }else
+                    {
+                        $(".kotcancel_confirm").css("display","none");
+			$(".olddiv").removeClass("new_overlay");
+                        var itemslno = $('#itemslno').val();
+                        var orderitem = $('.cnclqty');
+                        var itemqty = '';
+                        var combo_name=new Array();
+                        var combo_qty='';
+                        var quantity = new Array();
+                        orderitem.each(function(){
+                            if(!$(this).hasClass('combo_name')){
+                                itemqty   =  $(this).val();
+                                if(itemqty!='undefined' && itemqty!='' && itemqty!=null){
+                                    quantity.push(itemqty);
+                                }
+                            }
+                            else{
+                                combo_qty=$(this).attr('id').split('txt_combo_');
+                                
+                                combo_name.push({
+                                    combo_qty:$(this).val(),
+                                    combo_count:combo_qty[1],
+                                    reason:$('#reasontxt_'+combo_qty[1]).val()
+                                });
+                            }    
+                          
+                        });
+                        
+                        var combo_name_string=JSON.stringify(combo_name);
+                        
+                        var cnclrsn = $('.mainmenu');
+                        var itemcnclrsn = '';
+                        var reason = new Array();
+                        cnclrsn.each(function(){
+                              itemcnclrsn   =  $(this).val();
+                              if(itemcnclrsn!='undefined'){
+                                  reason.push(itemcnclrsn);
+                              }
+                        });
+                //*********************** ADD On Cancellation values take starts *************************************// 
+                        var addonitemslno=$('#addonitemslno').val();
+                        var addonorderitem = $('.addoncnclqty');
+                        var addonitemqty = '';
+                        var addonquantity = new Array();
+                        addonorderitem.each(function(){
+                              addonitemqty   =  $(this).val();
+                              if(addonitemqty!='undefined' && addonitemqty!='' && addonitemqty!=null){
+                                  addonquantity.push(addonitemqty);
+                              }
+                        });
+                        var addonmenuid = $('#addonallmenus').val();
+                        var addoncnclrsn = $('.addoncancelreason');
+                        var addonitemcnclrsn = '';
+                        var addonreason = new Array();
+                        addoncnclrsn.each(function(){
+                              addonitemcnclrsn   =  $(this).val();
+                              if(addonitemcnclrsn!='undefined'){
+                                  addonreason.push(addonitemcnclrsn);
+                              }
+                        });
+                        var addoncnclkotno = $('#addonkot_no').val();
+                        
+                //*********************** ADD On Cancellation values take Ends *************************************//      
+                        
+                        
+                      var dataString = 'set=cancelitemqty&itemslno='+itemslno+'&itemqty='+quantity+'&reason='+reason+'&addonitemslno='+addonitemslno+
+                              '&addonitemqty='+addonquantity+'&addonmenus='+addonmenuid+'&addonreason='+addonreason+"&addonkotno="+addoncnclkotno+
+                              "&combo_name="+combo_name_string;
+                      $.ajax({
+                             type: "POST",
+                             url: "load_bill_history.php",
+                             data: dataString,
+                             success: function(data) {
+                                
+                                                           $('.ordelist_table').load('viewitems.php');
+                                 
+                                                          var kotidcanceled=$.trim(data);
+                                                     
+                                                           var kt=kotidcanceled.split("<br />");
+                                                           
+                                                           var kotnew=$.trim(kt);
+                                  
+                           }
+                      });
+                    }
+                }
+            });
+		});
+		
+		});
+				
+				
+				
+            </script>
+
+
+
+            <link rel="stylesheet" href="css/jquery-ui-1.8.2.custom.css" />
+            </head>
+    <body style="overflow:hidden !important;" >
+                
+                
+                <div class="olddiv "></div>
+                <div class="" id="blr">
+                    <div id="container">
+                        <?php include "includes/topbar.php"; ?>
+                        
+                    </div> <!--container-->
+                    <div class="col-md-12 top_inform_cc pading_0">
+                      <div class="table_number_top_cc"><?= $_SESSION['menu_order_selected_table'] ?> - <span><?= $table_names ?></span></div>
+                        <div class="table_number_top_cc"><?=$_SESSION['menu_order_selected_dinein']?> - <span><?= $curtime ?></span></div>
+                        <div class="table_number_top_cc"><?= $_SESSION['menu_order_selected_steward'] ?> - <span><?= $staffname ?></span></div>
+                        <input type="hidden" name="decimal" id="decimal" value="<?= $_SESSION['be_decimal'] ?>">
+                         <input type="hidden" value="<?=$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']?>" id="url_check" />
+                         <input type="hidden" name="kot_reprint_staff" id="kot_reprint_staff" value="<?= $kot_reprint_staff ?>" />
+                        <input type="hidden" name="table_id" id="table_id" value="<?= $table_ids ?>" />
+                        <input type="hidden" name="floor_id" id="floor_id" value="<?= $floor_id ?>" />
+                        <input type="hidden" name="steward_id" id="steward_id" value="<?= $stafid ?>" />
+                        <input type="hidden" name="order_id" id="order_id" value="<?= $_SESSION['order_id'] ?>" />
+                        <input type="hidden" name="branch_id" id="branch_id" value="<?= $_SESSION['branchofid'] ?>" />
+                        <input type="hidden" name="seacrhtype_id" id="seacrhtype_id" value="<?= $_SESSION['searchtypeid'] ?>" /> 
+                        <input type="hidden" name="hidcancelsecret" id="hidcancelsecret" value="<?=$_SESSION['s_cancelwithsecret']?>">
+                        <input type="hidden" name="waiter_display" id="waiter_display" value="<?=$_SESSION['be_kotwaiter_name_dis']?>" /> 
+                        <input type="hidden" name="authorise_with_code" id="authorise_with_code" value="<?=$_SESSION['be_authorise_with_code']?>" />
+                        <input type="hidden" id="search_popup_single" value="<?=$_SESSION['search_popup_single']?>">
+                        <div class="menu_add_btn_menu_odr" style="display:none">Menu Add +</div><!--menu_add_btn_menu_odr-->
+
+
+                        <input type="hidden" name="orderconfirm_bktotablesel" id="orderconfirm_bktotablesel" value="<?= $_SESSION['s_orderconfirm_bktotablesel'] ?>" />
+
+
+                    </div><!--top_inform_cc-->
+<!--        <input type="hidden" name="menuapilink" id="menuapilink" value="<?=$apilink?>">            -->
+        <input type="hidden" name="mainlanguage" id="mainlanguage" value="<?= $_SESSION['main_language']?>">
+        <input type="hidden" name="dayopendate" id="dayopendate" value="<?=$_SESSION['date']?>">
+        <input type="hidden" name="floorid" id="floorid" value="<?=$_SESSION['floorid']?>">
+        <input type="hidden" name="listimage" id="listimage" value="<?=$_SESSION['s_listimage']?>">    
+                    <div class="col-md-12 nopadding" style="position: fixed;">
+                        <div class="col-md-12 left_cantainer nopadding main_div_dyc"> <!--main_div_dyc-->
+                        <div id="height_auto" style="  padding-top: 8px;" class="col-md-12 left_main_menu_items pull-left ">
+                            <div id="disable" class=""></div>
+                         
+                              <!--///subcat//-->
+                              
+                   <div style="height:20px;width: 100%;display: none">    
+                    <ul id="load_subcat1" style="height: 40px !important;display: flex;justify-content: center;align-items: center;gap:10px;margin-top: 0px;padding-top: 0px;">
+                    <?php
+                                       
+                    $catid_for_subcat=array();
+                   
+                    $sql_cat = $database->mysqlQuery("select distinct(mr.mr_maincatid) as catid,my.mmy_maincategoryname,my.mmy_maincategoryid,my.mmy_displayorder   from tbl_menumaster as mr LEFT JOIN tbl_menumaincategory as my ON mr.mr_maincatid=my.mmy_maincategoryid where my.mmy_active='Y'    order by my.mmy_displayorder");
+                    
+                    $num_cat = $database->mysqlNumRows($sql_cat);
+                         if ($num_cat) {
+                            while ($result_cat = $database->mysqlFetchArray($sql_cat)) {
+                                 
+                             $sql_cat_r = $database->mysqlQuery("SELECT mr.`mmr_rate` FROM `tbl_menuratemaster` as mr LEFT JOIN tbl_menumaster as ms ON mr.`mmr_menuid`=ms.mr_menuid WHERE ms.mr_maincatid='".$result_cat['catid']."' AND mr.mmr_floorid='".$_SESSION['floorid']."' AND (mr.mmr_rate<>'0' OR mr.mmr_rate IS NOT NULL)");
+                             $num_cat_r = $database->mysqlNumRows($sql_cat_r);
+                             if ($num_cat_r) {
+                                 
+                                 $maincatid=$result_cat['mmy_maincategoryid'];
+                                 
+                                 $catid_for_subcat[]=$maincatid;   
+                                    
+                         }   }}
+                         
+                      
+                                    $k=1;
+                                    $_SESSION['sel_sub_id'] = NULL;
+;
+                                      ?>
+                                    <li ><a style="display: flex; border-radius: 7px !important;justify-content: center;align-items: center;height: 34px !important;width: 50px !important;" <?php if ($k == 1) { ?> class="left_mn_menu_odr_focus" <?php } ?> title="subid_all"><?= $_SESSION['menu_order_all_menulist'] ?></a></li>
+                                    <?php
+                                    	$sql_subcat = $database->mysqlQuery("select distinct(mr.mr_subcatid) as subid,msy_subcategoryid,msy_subcategoryname from tbl_menumaster as mr LEFT JOIN tbl_menusubcategory as ms ON mr.mr_subcatid=ms.msy_subcategoryid where (msy_active='Y' or mr_subcatid is NULL ) and mr.mr_maincatid='" . $catid_for_subcat[0] . "' order by ms.msy_sub_displayorder");
+                                        //echo "select distinct(mr.mr_subcatid) as subid,msy_subcategoryid,msy_subcategoryname from tbl_menumaster as mr LEFT JOIN tbl_menusubcategory as ms ON mr.mr_subcatid=ms.msy_subcategoryid where ms.msy_active='Y' and mr.mr_maincatid='" . $catid1 . "' order by mr.mr_subcatid";
+                                        $num_subcat = $database->mysqlNumRows($sql_subcat);
+                                        if($num_subcat){
+                                            $j = 0;
+                                            while ($result_subcat = $database->mysqlFetchArray($sql_subcat)) {
+						$sub_catname=$result_subcat['msy_subcategoryname'];
+                                                $sub_catid=$result_subcat['subid'];
+                                           
+                                               
+                                            if($_SESSION['main_language']!='english'){
+
+                                                $sql_arabsubcat=$database->mysqlQuery("SELECT mm_name FROM tbl_language_menu_sub left join tbl_languages on ls_id=mm_lang_id WHERE mm_sub_category_id='".$result_subcat['subid']."' and ls_language='".$_SESSION['main_language']."'");
+
+                                                //echo " SELECT mm_name FROM tbl_language_menu_sub left join tbl_languages on ls_id=mm_lang_id WHERE mm_sub_category_id='".$result_subcat['subid']."' and ls_language='".$dat."'";
+                                                $num_arabsubcat = $database->mysqlNumRows($sql_arabsubcat);
+                                                $result_arabsubcat = $database->mysqlFetchArray($sql_arabsubcat);
+                                                $sub_catname=$result_arabsubcat['mm_name'];
+                                                
+                                                
+                                                }
+                                           
+                                            $k++;
+                                            
+                                            if ($sub_catid != "") {
+
+                                                $menusub = $database->show_subcategory_ful_details($sub_catid);
+                                                if ($menusub['msy_subcategoryid'] != "") {
+                                                    
+                                                    ?>  
+                                                    <li ><a style="display: flex;justify-content: center;align-items: center;  
+                                                            width: 100% !important;padding: 0px 13px !important;
+                                                            margin-right: 5px !important;height: 34px !important; 
+                                                            border-radius: 7px !important;" 
+  
+                                                            title="subid_<?= $sub_catid ?>"><?= $sub_catname?></a></li>
+                                                <?php
+                                                }
+                                            }
+                                        
+                                    }
+                            }
+                                    ?>
+
+                                </ul> 
+                            </div>    
+<!--                       ///end///-->
+                            
+                            
+                            
+                        </div><!--left_main_menu_items-->
+                            <div class="left_mn_menu_odr col-md-2 pull-left nopadding" style="padding-top: 50px;background-color: #061827;overflow: auto">
+                            
+                                <?php if( $_SESSION['be_combo_enable']=="Y"){ ?>
+                                    <span class="menu_dish_search_span cct" style="position:absolute;top:0;left:0">
+                                            <?= $_SESSION['menu_order_searchby'] ?>
+                                            <div class="combo_button_mn_odr" id="combo_display_click"><img src="img/combo-ico.png">
+                                                <span><?=$_SESSION['combo_ico_com']?></span></div>
+                                    </span>
+                                    <?php }else{ ?>
+                                  <span class="menu_dish_search_span " style="position:absolute;top:0;left:0">
+                                   
+                                    <div class="" ><img style="margin-top:5px" src="img/mn_ta.png">
+                                    <span>CATEGORIES</span></div>
+                                   
+                                    
+                                       </span>
+                                 <?php } ?>
+                                
+                                     <span  class="menu_dish_search_span mct maincat_click" style="position:absolute;top:0;left:0;display: none;background-color: #f5351b">
+                                      <a href="#">       
+                                    <div class="" ><img style="margin-top:0px" src="img/mn_ta.png">
+                                    <span>CATEGORIES</span></div>
+                                   
+                                     </a>
+                                    </span>
+                             
+                                
+    
+                                
+           <li  onclick="load_best_sell_cat();"><a  style="font-weight:bold;font-size: 15px;color: #4fa0a9;border: solid 2px white;border-radius: 7px;margin-top: -2px;" title="">
+                   BEST SELLING ITEMS
+               </a></li>
+                                                 
+
+                                <!-- <div class="disable_style_1"></div>-->
+                          <div id="disable1" class=""></div>
+                                
+                           <div  id="maincatdiv_new_exp" >
+                                    <!-- <div  class="disable_style_1"></div>-->
+                                    <ul id="submenu" class="menu_item_dy_class category_selection" style="margin-top:35px"> <!--submenu-->
+                            <?php
+                               
+                            $catid_for_subcat=array();
+                            $q=1;
+                               $sql_cat = $database->mysqlQuery("select distinct(mr.mr_maincatid) as catid,my.mmy_maincategoryname,my.mmy_maincategoryid,my.mmy_displayorder   from tbl_menumaster as mr LEFT JOIN tbl_menumaincategory as my ON mr.mr_maincatid=my.mmy_maincategoryid where my.mmy_active='Y'    order by my.mmy_displayorder");
+                    //echo "select distinct(mr.mr_maincatid) as catid,my.mmy_maincategoryname,my.mmy_maincategoryid,my.mmy_displayorder   from tbl_menumaster as mr LEFT JOIN tbl_menumaincategory as my ON mr.mr_maincatid=my.mmy_maincategoryid where mr.mr_active='Y'  order by my.mmy_displayorder";              
+                    $num_cat = $database->mysqlNumRows($sql_cat);
+                         if ($num_cat) {
+                             $j =0;
+                             while ($result_cat = $database->mysqlFetchArray($sql_cat)) {
+                                 
+                                 
+                             $sql_cat_r = $database->mysqlQuery("SELECT mr.`mmr_rate` FROM `tbl_menuratemaster` as mr LEFT JOIN tbl_menumaster as ms ON mr.`mmr_menuid`=ms.mr_menuid WHERE ms.mr_maincatid='".$result_cat['catid']."' AND mr.mmr_floorid='".$_SESSION['floorid']."' AND (mr.mmr_rate<>'0' OR mr.mmr_rate IS NOT NULL)");
+                             //echo "SELECT mr.`mmr_rate` FROM `tbl_menuratemaster` as mr LEFT JOIN tbl_menumaster as ms ON mr.`mmr_menuid`=ms.mr_menuid WHERE ms.mr_maincatid='".$resu['maincategoryid'][$i]."' AND mr.mmr_floorid='".$_SESSION['floorid']."' AND (mr.mmr_rate<>'0' OR mr.mmr_rate IS NOT NULL)";
+                             $num_cat_r = $database->mysqlNumRows($sql_cat_r);
+                             if ($num_cat_r) {
+                                 
+                                 $catname=$result_cat['mmy_maincategoryname'];
+                                 $maincatid=$result_cat['mmy_maincategoryid'];
+                                 
+
+                             if($_SESSION['main_language']!='english'){
+                                 $sql_arabcat=$database->mysqlQuery("SELECT mm_name FROM tbl_language_menu_main left join tbl_languages on ls_id=mm_lang_id WHERE mm_categoryid='".$result_cat['mmy_maincategoryid']."' and ls_language='".$_SESSION['main_language']."'");
+
+                                 //echo " SELECT mm_name FROM tbl_language_menu_main left join tbl_languages on ls_id=mm_lang_id WHERE mm_categoryid='".$result_cat['mmy_maincategoryid']."' and ls_language='".$dat."'";
+                                 $num_arabcat = $database->mysqlNumRows($sql_arabcat);
+                                 $result_arabcat = $database->mysqlFetchArray($sql_arabcat);
+                                 $catname=$result_arabcat['mm_name'];
+                                
+                                
+                                 }
+                                 
+                
+                            
+
+                                    $catid_for_subcat[]=$maincatid;
+                                  
+                                    if ($q == 1) {
+                                    $_SESSION['sel_cat_id'] = $maincatid;
+                                    }
+                                    $menucat = $database->show_category_ful_details($maincatid);
+                                   if ($catname != "") {
+                             ?>
+                            <li><a  <?php if ($q == 1) { ?> class="left_main_menu_items_focus "<?php } ?> title="catid_<?= $maincatid ?>"><?= $catname;?></a></li>
+                            <?php
+                                   $q++;
+                            }
+                               
+        }}}
+                            ?>  
+                            </ul> 
+                            </div> 
+                                
+                                
+                                
+                                
+                               
+                            </div><!--left_mn_menu_odr-->
+                            <div class="center_item_display_cc col-md-8 nopadding" style="padding:0 !important;">
+                                <!-- <div  class="disable_style_2"></div>-->
+                                <div id="disable2" class=""></div>
+                                
+                                
+                                <div class="menu_item_search_cc" style="margin-bottom: 0% !important;  background-color: #073e54;">
+                                    
+                                    <div class="menu_dish_search" style="width:30%;display: none">
+                                        <span style="width:26%;"><?= $_SESSION['menu_order_code'] ?>:</span>
+                                        <input autocomplete="off" style="width:64%;" type="text" class="search_dish_input" placeholder="Search <?= $_SESSION['menu_order_placeholder_code_search'] ?>"  name="search_code" id="search_code" >
+                                          
+                                    </div>
+                                        
+                                    
+                                    <a  href="#"><div style="margin-left: 0.5%; border-radius: 5px 0px 0 5px; position: relative; left: 2px;" class="search_dish_sub_btn"></div></a>
+                                    <div class="menu_dish_search" style="width: 65%;">
+                                        <!-- <span style="width:18%;"><?= $_SESSION['menu_order_name'] ?> :</span> -->
+                                        <input style="width:99%;" autocomplete="off" name="search" id="search" type="text" class="search_dish_input search_code_keypad"    placeholder="NAME - CODE"  onclick="validateSearch"   onmouseover="validateSearch()"  />
+                                        <input type="hidden" name="valueofsearch_menu" id="valueofsearch_menu"  />
+                                        <input type="hidden" name="valueofsearch_portion" id="valueofsearch_portion"  />
+                                        <input type="hidden" name="valueofsearch_qty" id="valueofsearch_qty"  />
+                                    </div>
+                                    
+                                   
+                      
+                                </div><!--menu_item_search_cc-->
+                                
+                                
+                                  <!--   //new subcat div//-->
+                                 
+                                  
+                                   <!--   //srinath code//-->
+                    <div class="menu_item_search_cc ">
+
+                        <ul id="load_subcat" class="category-list" style="justify-content: left;">
+                  
+                     <?php
+                                       
+                    $catid_for_subcat=array();
+                   
+                    $sql_cat = $database->mysqlQuery("select distinct(mr.mr_maincatid) as catid,my.mmy_maincategoryname,my.mmy_maincategoryid,my.mmy_displayorder   from tbl_menumaster as mr LEFT JOIN tbl_menumaincategory as my ON mr.mr_maincatid=my.mmy_maincategoryid where my.mmy_active='Y'    order by my.mmy_displayorder");
+                    
+                    $num_cat = $database->mysqlNumRows($sql_cat);
+                         if ($num_cat) {
+                            while ($result_cat = $database->mysqlFetchArray($sql_cat)) {
+                                 
+                             $sql_cat_r = $database->mysqlQuery("SELECT mr.`mmr_rate` FROM `tbl_menuratemaster` as mr LEFT JOIN tbl_menumaster as ms ON mr.`mmr_menuid`=ms.mr_menuid WHERE ms.mr_maincatid='".$result_cat['catid']."' AND mr.mmr_floorid='".$_SESSION['floorid']."' AND (mr.mmr_rate<>'0' OR mr.mmr_rate IS NOT NULL)");
+                             $num_cat_r = $database->mysqlNumRows($sql_cat_r);
+                             if ($num_cat_r) {
+                                 
+                                 $maincatid=$result_cat['mmy_maincategoryid'];
+                                 
+                                 $catid_for_subcat[]=$maincatid;   
+                                    
+                         }   }}
+                         
+                      
+                                    $k=1;
+                                    $_SESSION['sel_sub_id'] = NULL;
+;
+                                   ?>
+                            
+                            <li id="allsubcat_new_all" class="category-menu category-menu-active" title="subid_all"><a <?php if ($k == 1) { ?>  class="" <?php } ?> > <?= $_SESSION['menu_order_all_menulist'] ?></a></li>
+                         
+                                   <li style="display:none" ><a style="display: flex; border-radius: 7px !important;justify-content: center;align-items: center;height: 34px !important;width: 50px !important;" <?php if ($k == 1) { ?> class="left_mn_menu_odr_focus"<?php } ?> title="subid_all"><?= $_SESSION['menu_order_all_menulist'] ?></a></li>
+                                  
+                                        <?php
+                                        
+                                    	$sql_subcat = $database->mysqlQuery("select distinct(mr.mr_subcatid) as subid,msy_subcategoryid,msy_subcategoryname from tbl_menumaster as mr LEFT JOIN tbl_menusubcategory as ms ON mr.mr_subcatid=ms.msy_subcategoryid where (msy_active='Y' or mr_subcatid is NULL ) and mr.mr_maincatid='" . $catid_for_subcat[0] . "' order by ms.msy_sub_displayorder");
+                                        //echo "select distinct(mr.mr_subcatid) as subid,msy_subcategoryid,msy_subcategoryname from tbl_menumaster as mr LEFT JOIN tbl_menusubcategory as ms ON mr.mr_subcatid=ms.msy_subcategoryid where ms.msy_active='Y' and mr.mr_maincatid='" . $catid1 . "' order by mr.mr_subcatid";
+                                        $num_subcat = $database->mysqlNumRows($sql_subcat);
+                                        if($num_subcat){
+                                            $j = 0;
+                                            while ($result_subcat = $database->mysqlFetchArray($sql_subcat)) {
+						$sub_catname=$result_subcat['msy_subcategoryname'];
+                                                $sub_catid=$result_subcat['subid'];
+                                           
+                                               
+                                                if($_SESSION['main_language']!='english'){
+
+                                                $sql_arabsubcat=$database->mysqlQuery("SELECT mm_name FROM tbl_language_menu_sub left join tbl_languages on ls_id=mm_lang_id WHERE mm_sub_category_id='".$result_subcat['subid']."' and ls_language='".$_SESSION['main_language']."'");
+
+                                                //echo " SELECT mm_name FROM tbl_language_menu_sub left join tbl_languages on ls_id=mm_lang_id WHERE mm_sub_category_id='".$result_subcat['subid']."' and ls_language='".$dat."'";
+                                                $num_arabsubcat = $database->mysqlNumRows($sql_arabsubcat);
+                                                $result_arabsubcat = $database->mysqlFetchArray($sql_arabsubcat);
+                                                $sub_catname=$result_arabsubcat['mm_name'];
+                                                
+                                                }
+                                           
+                                                
+                                            $k++;
+                                            if ($sub_catid != ""){
+
+                                                $menusub = $database->show_subcategory_ful_details($sub_catid);
+                                                if ($menusub['msy_subcategoryid'] != "") {
+                                                    
+                                                    ?>  
+                                                    <li class="category-menu "  id="subcat_new_<?=$sub_catid?>" title="subid_<?=$sub_catid?>"><a  style="" ><?= $sub_catname?></a></li>
+                                                <?php
+                                                }
+                                            }
+                                        
+                                    }
+                            }
+                                    ?>
+
+                                </ul> 
+                           
+                              
+                                </div>
+                                <!--   //new subcat div end//-->
+                                   
+                                 <!--   //srinath end //--> 
+                                
+                                <div class="col-md-12  menu_item_contain" id="load_menuitems" style="">				
+                                    <?php
+                                    $curdate = date("Y-m-d");
+
+                                    ?>
+                                    
+                                 
+                                    <?php    
+                                    $sql_menulist = "select * from tbl_menumaster as mr LEFT JOIN tbl_menumaincategory as mc ON "
+                                            . " mr.mr_maincatid=mc.mmy_maincategoryid left join tbl_menusubcategory as sb on "
+                                            . " sb.msy_subcategoryid=mr.mr_subcatid LEFT JOIN tbl_menustock ON tbl_menustock.mk_menuid=mr.mr_menuid"
+                                            . "	WHERE mr.mr_stock_in_out='Y' and mc.mmy_active='Y' and mr.mr_active='Y' and ( (sb.msy_active='Y' && mr.mr_subcatid!='') || "
+                                            . " (mr.mr_subcatid is null) ) and  mr.mr_maincatid='" . $catid_for_subcat[0] . "'  and "
+                                            . " tbl_menustock.mk_date='" . $_SESSION['date'] . "' GROUP BY mr.mr_menuid  order by mr_menuname ASC ";
+                                    //echo "select * from tbl_menumaster as mr LEFT JOIN tbl_menumaincategory as mc ON mr.mr_maincatid=mc.mmy_maincategoryid  LEFT JOIN tbl_menustock ON tbl_menustock.mk_menuid=mr.mr_menuid	WHERE mc.mmy_active='Y' and mr.mr_active='Y' and  mr.mr_maincatid='" . $catid_for_subcat[0] . "'  and tbl_menustock.mk_date='" . $_SESSION['date'] . "' GROUP BY mr.mr_menuid  order by mr_subcatid ";
+                                    $sql_menus = $database->mysqlQuery($sql_menulist);
+                                    $num_menus = $database->mysqlNumRows($sql_menus);
+                                    if ($num_menus) {
+                                        while ($result_menus = $database->mysqlFetchArray($sql_menus)) {
+                                            
+                                           $menu_name = $result_menus['mr_menuname'];
+                                           $menu_id = $result_menus['mr_menuid'];
+                                            
+                                          $menu_desc=$result_menus['mr_description'];  
+                                          $menu_type_click= $result_menus['mr_unit_type'];
+                                          $stock_in_no=$result_menus['mr_stock_inventory']; 
+                                            
+                                        if($_SESSION['main_language']!='english'){
+
+                                        $sql_arabmenu=$database->mysqlQuery("SELECT lm_menu_name FROM tbl_language_menu_master left join tbl_languages on ls_id=lm_language_id WHERE lm_menu_id='".$result_menus['mr_menuid']."' and ls_language='".$_SESSION['main_language']."'");
+
+                                        //echo " SELECT mm_name FROM tbl_language_menu_sub left join tbl_languages on ls_id=mm_lang_id WHERE mm_sub_category_id='".$result_subcat['subid']."' and ls_language='".$dat."'";
+                                        $num_arabmenu = $database->mysqlNumRows($sql_arabmenu);
+                                        $result_arabmenu = $database->mysqlFetchArray($sql_arabmenu);
+                                        $menu_name=$result_arabmenu['lm_menu_name'];
+                                      
+                                        
+                                        }
+                
+                 
+                                        if ($_SESSION['s_listimage'] == "Y") { 
+                                               $sql_img = "SELECT mes_imagethumb FROM tbl_menuimages where mes_menuid='" . $result_menus['mr_menuid'] . "' limit 0,1";
+                                              $sql_imgs = $database->mysqlQuery($sql_img);
+                                                $num_imgs = $database->mysqlNumRows($sql_imgs);
+                                               if ($num_imgs) {
+                                                    while ($result_imgs = $database->mysqlFetchArray($sql_imgs)) {
+                                                        $image = $result_imgs['mes_imagethumb'];
+                                                        
+                                                    }
+                                                } else {
+                                                     $image = "uploads/default_photo.jpg";
+                                               }
+                                            }
+                                           $portn = "N";
+                                           $sql_menuportion = "select mmr_menuid  from tbl_menuratemaster where  mmr_menuid='" . $result_menus['mr_menuid'] . "' and  mmr_floorid='" . $floorid . "' AND (mmr_rate<>'0' OR mmr_rate IS NOT NULL)";
+                                            $sql_portions = $database->mysqlQuery($sql_menuportion);
+                                            $num_portions = $database->mysqlNumRows($sql_portions);
+                                            if ($num_portions) {
+                                                $portn = "Y";
+                                                
+                                            }
+                                            
+                                           $portnstock = "N";
+                                           $sql_menuportion1 = "SELECT mk_menuid from tbl_menustock  where mk_menuid='$menu_id' AND mk_stock = 'Y'";
+                                            $sql_portions1 = $database->mysqlQuery($sql_menuportion1);
+                                            $num_portions1 = $database->mysqlNumRows($sql_portions1);
+                                            if ($num_portions1) {
+                                                $portnstock = "Y";
+                                               
+                                            } 
+                                             
+                                           $portn_click = "yes";
+                                           $sql_menuportion12 = "SELECT mmr_portion from tbl_menuratemaster  where mmr_menuid='$menu_id' and mmr_floorid='$floorid' ";
+                                            $sql_portions12 = $database->mysqlQuery($sql_menuportion12);
+                                            $num_portions12 = $database->mysqlNumRows($sql_portions12);
+                                            if ($num_portions12>1) {
+                                                
+                                                $portn_click = "no";
+                                            }          
+                                            
+                                           $dyno_rate = "";
+                                           $sql_menuportion127 = "SELECT mr_manualrateentry from tbl_menumaster where mr_menuid='$menu_id' ";
+                                            $sql_portions127 = $database->mysqlQuery($sql_menuportion127);
+                                            $num_portions127 = $database->mysqlNumRows($sql_portions127);
+                                            if ($num_portions127) {
+                                                while ($result_imgs = $database->mysqlFetchArray($sql_portions127)) {
+                                                       
+                                                    if($result_imgs['mr_manualrateentry']=='Y'){
+                                                    $dyno_rate = "yes";
+                                                      }else{
+                                                         $dyno_rate = 'no';
+                                                    }
+                                                    
+                                            }
+                                            }                 
+                                            
+                                            
+//                                    for($m=0;$m<$menu_count;$m++)
+//                                                {
+                                                 
+                                           if ($portn == "Y") {
+                                                
+                                            ?>
+                                    
+                                            <a  typ_pop="<?=$menu_type_click?>" style="position: relative; <?php if($_SESSION['s_listimage'] == "Y"){ ?> <?php } ?>"  <?php  if($dyno_rate !='yes' && $_SESSION['be_single_click_add']=='Y'  &&  $menu_type_click !='Packet' && $menu_type_click !='Loose' && $portn_click=='yes') { ?> onclick="single_cart('<?=$menu_id?>','<?=$floorid?>','<?=$stock_in_no?>')" <?php } ?> data-modal="menuname_<?= $menu_id ?>" class="tab_edt_btn <?php if($menu_type_click =='Packet' || $_SESSION['be_single_click_add']=='N'  || $menu_type_click =='Loose' || $portn_click =='no' || $dyno_rate =='yes'){ ?> md-trigger1 <?php } if ($portnstock == "N") { ?> notinstock <?php } ?> <?php if ($_SESSION['s_listimage'] == "N") { ?> <?php if( $_SESSION['menu_theme']=='Theme_1'){ ?> noimagename <?php }else{ ?> menu_sub_item1 clear_color_<?=$menu_id?> <?php } ?>  <?php } ?> <?php if ($portn == "N") { ?> noportionalert <?php } ?>" href="#" title="menu_<?= $menu_id ?>" <?php if ($_SESSION['s_listimage'] == "N") { ?> style="height:auto !important;" <?php } ?>>
+                                              
+                                                <div title="<?=$menu_desc?>" class="<?php if( $_SESSION['menu_theme']=='Theme_1'){ ?> product_item <?php }else{ ?>  <?php } ?> product_img" <?php if ($_SESSION['s_listimage'] == "N") { ?> style="height:100% !important; <?php if( $_SESSION['menu_theme']=='Theme_2'){ ?> width:auto <?php } ?>" <?php } ?> >
+                                                   
+                                                    
+                                                    <div class="product_text" <?php if( $_SESSION['menu_theme']=='Theme_2'){ ?> style="width:auto;" <?php } ?>>
+                                                        
+                                                           
+                                                    <div class="perspective" <?php if( $_SESSION['menu_theme']=='Theme_2'){ ?> style="width:auto" <?php } ?>>
+                                                            
+                                                    <?php if ($_SESSION['s_listimage'] == "Y") { // image show permission  ?>
+                                                            
+                                                    <div class="product_img">
+							<img src="<?= $image ?>"  />
+                                                    </div>
+                                                    
+                                                    <?php } ?>
+                                                            
+                                                            <?php if ($_SESSION['s_listimage'] == "N") { ?>
+                                                    
+                                                            <button <?php if($_SESSION['s_listimage'] == "Y"){ ?> style="height: auto !important;" <?php } ?> <?php if( $_SESSION['menu_theme']=='Theme_2'){ ?>   style="" <?php } ?> class=" <?php if( $_SESSION['menu_theme']=='Theme_1'){ ?> btn btn-8 btn-8g <?php }else{ ?> menu_sub_item1 menu_1  clear_color_<?=$menu_id?> <?php } ?>" >  <?php if ($_SESSION['be_rate_on_button'] =='Y') { ?>  <p style="height: 24px;margin-bottom: 0px;overflow: hidden;margin-top:0px;line-height: 1.2;"> <?=$menu_name?> </p> <?php } else{ ?> <p <?php if($_SESSION['s_listimage'] == "Y"){ ?> style="margin-top: 52px" <?php } ?> ><?=$menu_name?> </p>    <?php } ?>
+                                                               <?php if ($portnstock == "N") { ?>    
+                                                                </br> <span  style="color:red" >NO STOCK</span>
+                                                            <?php } ?>
+                                                                
+                                                         <?php } else { ?>
+                                                                <button <?php if($_SESSION['s_listimage'] == "Y"){ ?> style="height: auto !important;" <?php } ?> <?php if( $_SESSION['menu_theme']=='Theme_2'){ ?> style="" <?php } ?> class="<?php if( $_SESSION['menu_theme']=='Theme_1'){ ?> btn btn-8 btn-8g <?php }else{ ?> menu_sub_item1 menu_1  clear_color_<?=$menu_id?> <?php } ?> "> <?php if ($_SESSION['be_rate_on_button'] =='Y') { ?>  <p style="height: auto;margin-bottom: 0px;overflow: hidden;line-height: 1.2;"> <?=$menu_name?></p> <?php } else{ ?> <p <?php if($_SESSION['s_listimage'] == "Y"){ ?> style="margin-top: 0px" <?php } ?> ><?=$menu_name?> </p>  <?php } ?>
+                                                                    
+                                                                   <?php if ($portnstock == "N") { ?>    
+                                                                </br> <span  style="color:red" >NO STOCK</span>
+                                                            <?php } ?>
+                                                                     </button>
+                                                              <?php } ?>
+                                                             
+                                                                
+                                                  
+                                                                     
+                                                                
+                            <?php  $rtr=''; $rater=''; 
+                              
+                            $sql_menuportion127 = "SELECT u_name,bu_name,pm_portionshortcode,mmr_rate from tbl_menuratemaster mc left join tbl_portionmaster pm on pm.pm_id=mc.mmr_portion left join tbl_base_unit_master tbu on tbu.bu_id=mc.mmr_base_unit_id left join tbl_unit_master tu on tu.u_id=mc.mmr_unit_id where mc.mmr_menuid='$menu_id'  and mc.mmr_floorid='$floorid' ";
+                                            $sql_portions127 = $database->mysqlQuery($sql_menuportion127);
+                                            $num_portions127 = $database->mysqlNumRows($sql_portions127);
+                                            if ($num_portions127) { 
+                                                while ($result_imgs = $database->mysqlFetchArray($sql_portions127)) {
+                                                   
+                                             $rtr.= ' '.$result_imgs['u_name'].' '.$result_imgs['bu_name'].' '.$result_imgs['pm_portionshortcode'].' : '.$result_imgs['mmr_rate'].' | '; 
+                                                
+                                           
+                           
+                           } } 
+                           
+                           
+                         $rater= explode('|', $rtr) ;
+                           
+                        
+                           ?>  
+                           
+                               
+                  <?php if ($portnstock=="Y" && $_SESSION['be_rate_on_button'] =='Y') { ?>  
+                                                                <span class="item_price"  style="<?php if($_SESSION['s_listimage']=="Y"){ ?>position:absolute;top:130px;padding:5px 0;background-color:#000000b8;left:0;color:#fff;min-height:32px<?php }else{ ?> margin-top:0px;  <?php } ?>" > <?=$rater[0].$rater[1]?> <?=$rater[2].$rater[3]?>
+                                                                                                                </span>
+															<?php } ?> 
+                                                                
+                                                                
+                                                                
+                                                        </div><!--perspective-->
+                                                    </div>   
+                                                </div>
+                                            </a><!--product_item-->
+                                    <?php }} }
+                                    
+                                   ?> 
+                                     
+                                </div>         
+                            </div><!--center_item_display_cc-->
+                            <div class="col-md-4 right_div_cc" style="background-color: #061827 ">
+                                <div class="orderlist_menu_odr_head"><?= $_SESSION['menu_order_orderlist'] ?>
+                                <span style="float:right;cursor: pointer" class="counter_list_action_btn clear_all_di nw_clr_btn" orderno_del_all="<?=$_SESSION['order_id']?>" > <?=$_SESSION['clear_com']?></span>
+                                   
+                                <div class="loaderror" style="display:none;font-size:13px;"></div>
+                                    
+                                </div><!--orderlist_menu_odr_head-->
+
+
+
+                                <!----kot_number_list_menuorder----->
+                                <!--    color: #248435; border: solid 1px #24A22C;--> 
+                                <style>
+                                    .printedkot{color: #248435; border: solid 1px #24A22C;}
+                                </style> 
+                                <div class="ordelist_table" id="boxscroll">
+                                    <?php
+                                    $sql_menulist = "select distinct(ter_kotno) from tbl_tableorder where ter_orderno='" . $_SESSION['order_id'] . "' and  ter_kotno<>'0'  order by ter_slno DESC";
+                                    $sql_menus = $database->mysqlQuery($sql_menulist);
+                                    $num_menus = $database->mysqlNumRows($sql_menus);
+                                    if ($num_menus) {
+                                        ?><div class="kot_number_list_menuorder"><?php
+                                    while ($result_menus = $database->mysqlFetchArray($sql_menus)) {
+                                        //`tbl_kotmaster`(`kr_date`, `kr_kotno`, `kr_print`, `kr_firstprint`, `kr_lastprint`)
+                                        if ($result_menus['ter_kotno'] != "" || $result_menus['ter_kotno'] != 0) {//echo $result_menus['ter_kotno'];
+                                            $kotm = $database->show_kotmaster($result_menus['ter_kotno']);
+                                            $status = $kotm['kr_print'];
+                                                ?>
+                                                    <a href="#" kotid="<?=$result_menus['ter_kotno'] ?>" class="kotnolist kot_listing_num <?php if ($status == 'Y') { ?> printedkot <?php } ?>"><?= $result_menus['ter_kotno'] ?></a>	
+                                                    <input type="hidden" id="kot_nos" value="<?=$result_menus['ter_kotno'] ?>" />
+                                                <?php
+                                            }
+                                        }
+                                        ?> </div><?php }
+                                    ?>
+                                    <?php
+                                    $slnodine=1;
+                                     $icount=0;
+                                     $amt=0;
+                                     $unit_weight_name='';
+                                     $order_unit_weight='';
+                                     $order_packet_or_loose='';
+                                     
+                                     
+               $kot_cancel_btn_check=0;                 
+              $sql_menulist="SELECT ter_orderno from tbl_tableorder where ter_status!='Added'  and ter_orderno='".$_SESSION['order_id']."' ";
+                $sql_menus  =  $database->mysqlQuery($sql_menulist); 
+		$num_menus  = $database->mysqlNumRows($sql_menus);
+		if($num_menus){
+			while($result_menus  = $database->mysqlFetchArray($sql_menus)) 
+                {  $kot_cancel_btn_check++; }}
+                                     
+                                     
+                                     
+                                     $sql_combo_name_list =  $database->mysqlQuery("select cod.cod_count_combo_ordering,cod.cod_combo_pack_id,cod.cod_order_status,cod.cod_combo_total_rate,cod.cod_combo_qty,cod.cod_combo_preference , cn.cn_name,cn.cn_stock_check,cp.cp_pack_name FROM tbl_combo_ordering_details cod
+                                                                            left join tbl_combo_name cn on cn.cn_id = cod.cod_combo_id
+                                                                            left join tbl_combo_packs cp on cp.cp_id = cod.cod_combo_pack_id
+                                                                            where cod.cod_dayclosedate='".$_SESSION['date']."' and cod.cod_orderno='".$_SESSION['order_id']."' group by cod_count_combo_ordering  order by cod.cod_entry_date desc ");
+
+                            $num_combo_name_list = $database->mysqlNumRows($sql_combo_name_list);
+                            if($num_combo_name_list!=NULL){$p=0;
+                                while ($result_combo_name_list = $database->mysqlFetchArray($sql_combo_name_list)) {
+                                    if($result_combo_name_list['cod_combo_qty']>=0){
+                                    $p++; $combo_preference=array();
+                                    $amt=$amt+$result_combo_name_list['cod_combo_total_rate'];
+                                     
+                            ?>                
+                       <div class="preference_table <?php if ($result_combo_name_list['cod_order_status'] == "Added") { ?> combo_added_sec <?php } if ($result_combo_name_list['cod_order_status'] == "Served" || $result_combo_name_list['cod_order_status'] == "Billed" || $result_combo_name_list['cod_order_status'] == "Closed") { ?> odr_served <?php } ?> <?php if ($result_combo_name_list['cod_order_status'] == "Opened") { ?> odr_confirmed <?php } ?> <?php if ($result_combo_name_list['cod_order_status'] == "NotInStock") { ?> odr_notinstock <?php } ?>" id="<?=$p?>" style='cursor:pointer'>
+                    	<div class="menu_order_dishname_cc combo_menu_div" id="<?=$p?>" status="<?=$result_combo_name_list['cod_order_status']?>" combo_pack_id="<?=$result_combo_name_list['cod_combo_pack_id']?>" combo_pack_qty="<?=$result_combo_name_list['cod_combo_qty']?>" cod_count_combo_ordering="<?=$result_combo_name_list['cod_count_combo_ordering']?>">
+                            <div class="menu_order_dish_name"><span style="display: contents;"><?=$slnodine?></span>) <?=$result_combo_name_list['cn_name']?> <?=$result_combo_name_list['cp_pack_name']?></div>
+                                  <div class="menuodr_rate_cc">
+                                    <div class="dine_menu_rate" style="margin-left:5px;"><?=$_SESSION['base_currency']?> : <?=$result_combo_name_list['cod_combo_total_rate']?></div>
+                                    <div class="dine_menu_qty" id="combo_pack_qty_cart">Qty : <?=$result_combo_name_list['cod_combo_qty']?></div>
+                                </div>
+                          </div><!--menu_order_dishname_cc position: relative;  left: -72px;  top: 6px;--> 
+                                <?php if ($result_combo_name_list['cod_order_status']== "Added" || $result_combo_name_list['cod_order_status']== "NotInStock") { ?>
+                                <div class="combo_order_delet_btn <?php if ($result_menus['ter_status'] == "NotInStock") { ?> menu_order_nostock <?php } ?>">
+                                   <a href="#" class="preferance_table_btn" <?php if($result_combo_name_list['cod_order_status']=='Added'){ ?> onclick=" return combo_pack_delete_from_cart('<?=$result_combo_name_list["cod_count_combo_ordering"]?>','<?=$result_combo_name_list["cod_combo_qty"]?>','<?=$result_combo_name_list["cod_combo_pack_id"]?>','<?=$result_combo_name_list["cn_stock_check"]?>')"<?php } ?>><i class="glyphicon glyphicon-remove" style="margin-top: -2px;"></i></a>
+                                </div>
+                                <?php } 
+                                else if ($result_combo_name_list['cod_order_status'] == "Opened") { ?>
+                                                    <div class="menu_order_confirm_btn">
+                                                        <a href="#" class="preferance_table_btn"><i class="glyphicon glyphicon-ok"></i></a>
+                                                    </div>
+                                <?php }
+                               else if ($result_combo_name_list['cod_order_status']== "Served") { ?>
+                               
+                                        <div class="menu_order_confirm_yellow_btn">
+                                            <a style="margin: -45px -650% 0 0;" href="#" class="preferance_table_btn"><i class="glyphicon glyphicon-ok"></i></a>
+                                        </div>
+                                <?php }?>
+                                <div class="combo-preview-secion">
+                                    <span class="menu_eachpc_head">Menus In Each Pack:</span>
+                                        <?php
+                                        $sql_combo_cart_list =  $database->mysqlQuery("select cod.cod_orderno, cod.cod_combo_id, cod.cod_combo_pack_id, cod.cod_slno,cod.cod_combo_qty, cod.cod_combo_total_rate, cod.cod_menu_id, sum(cod.cod_menu_qty) as cod_menu_qty, 
+                                                                                    cod.cod_combo_preference, cod.cod_entry_date, cod.cod_dayclosedate, cod.cod_order_status,cn.cn_name,cp.cp_pack_name,  mm.mr_menuname,mm.mr_menuid,cpm.cpm_menu_sale_type
+                                                                                    FROM tbl_combo_ordering_details cod
+                                                                                    left join tbl_combo_name cn on cn.cn_id = cod.cod_combo_id
+                                                                                    left join tbl_combo_packs cp on cp.cp_id=cod.cod_combo_pack_id
+                                                                                    left join tbl_combo_pack_menus cpm on cpm.cpm_menu_id=cod.cod_menu_id and cpm.cpm_combo_pack_id=cod.cod_combo_pack_id
+                                                                                    left join tbl_menumaster mm on mm.mr_menuid=cod.cod_menu_id
+                                                                                    where cod.cod_dayclosedate='".$_SESSION['date']."' and cod.cod_orderno='".$_SESSION['order_id']."' and cod.cod_count_combo_ordering='".$result_combo_name_list['cod_count_combo_ordering']."' group by cod.cod_menu_id,cod.cod_order_status" ); 
+
+                                        
+                                        
+                                        $num_combo_cart_list = $database->mysqlNumRows($sql_combo_cart_list);
+                                        if($num_combo_cart_list){$i=0;
+                                            while ($result_combo_cart_list = $database->mysqlFetchArray($sql_combo_cart_list)) {                
+                                             $i++;
+                                                if($result_combo_cart_list['cod_combo_preference']!=''){
+                                                    $combo_preference[]=$result_combo_cart_list['cod_combo_preference'];
+                                                }
+                                        ?>
+                                   
+                                <div class="addon-mn-row">
+                                    <div class="addon-preview-secion-mn-1"><span><?=$i?>)</span><span class="cart_menu_list" menu_type="<?=$result_combo_cart_list['cpm_menu_sale_type']?>" id1="<?=$p?>" menuid="<?=$result_combo_cart_list['mr_menuid']?>" menuqty="<?=$result_combo_cart_list['cod_menu_qty']?>"> <?=$result_combo_cart_list['mr_menuname']?></span></div> 
+                                    <div class="addon-preview-secion-qty">Qty:<span class="cart_menu_qty"><?=$result_combo_cart_list['cod_menu_qty']?></span></div>
+                                </div>
+                                    <?php 
+                                        }}
+                                    ?>
+                                </div>
+                          
+                          <?php if(!empty($combo_preference)){ ?>
+                          <div class="menu_order_preference_text" >Pref: <span class="cart_menu_preference" id1="<?=$p?>"><?=implode(',',array_unique($combo_preference))?></span></div>
+                          <?php } ?>
+                             
+                        </div>
+                                    
+                            <?php $slnodine++;}}} ?>                 
+                                
+                            <?php  
+                                     $tot_incl_sub=0; $sl_di_in=1; $stock_inv='N';
+                                    $sql_menulist = "select * from tbl_tableorder where ter_dayclosedate='".$_SESSION['date']."' and "
+                                    . " ter_orderno='" . $_SESSION['order_id'] . "' and ter_addon_slno IS NULL and ter_combo_entry_id IS NULL "
+                                    . " order by ter_slno DESC";
+                                   
+                                    $sql_menus = $database->mysqlQuery($sql_menulist);
+                                    $num_menus = $database->mysqlNumRows($sql_menus);
+                                    if ($num_menus) {$_SESSION['submitbutst']="0"; $sumamnt=0;
+                                        while ($result_menus = $database->mysqlFetchArray($sql_menus)) {
+                                            
+                                             $tot_incl_sub=$tot_incl_sub+($result_menus['ter_qty']*$result_menus['ter_new_rate_incl']); 
+                                             
+                                            $ordered_menuid=trim(json_encode($result_menus['ter_menuid']));
+                                            $order_unit_weight=  $result_menus['ter_unit_weight'];
+                                            $order_packet_or_loose=  $result_menus['ter_unit_type'];
+                                            
+                                            $sql_menulist12 = "select mr.mr_stock_inventory,mr.mr_menuid,mr.mr_menuname from tbl_menumaster "
+                                                    . " as mr WHERE mr.mr_menuid='".$result_menus['ter_menuid']."'";
+                                            
+                                        $sql_menus12 = $database->mysqlQuery($sql_menulist12);
+                                        $num_menus12 = $database->mysqlNumRows($sql_menus12);
+                                        if ($num_menus12) {
+                                        while ($result_menus12 = $database->mysqlFetchArray($sql_menus12)) {
+                                            
+                                           $menu_name12 = $result_menus12['mr_menuname'];
+                                           
+                                           $stock_inv=$result_menus12['mr_stock_inventory'];
+                                           
+                                                if($_SESSION['main_language']!='english'){
+
+                                                $sql_arabmenu=$database->mysqlQuery("SELECT lm_menu_name FROM tbl_language_menu_master left join tbl_languages on ls_id=lm_language_id WHERE lm_menu_id='".$result_menus12['mr_menuid']."' and ls_language='".$_SESSION['main_language']."'");
+
+                                                $num_arabmenu = $database->mysqlNumRows($sql_arabmenu);
+                                                $result_arabmenu = $database->mysqlFetchArray($sql_arabmenu);
+                                                $menu_name12=$result_arabmenu['lm_menu_name'];
+                                               
+                                                }  
+                                                
+                                            }
+                                           
+                                            }
+                                            
+                                            $menunewname=  substr($menu_name12, 0, 30);
+                                            $portion_shortcode='';
+                                            $unit_weight_name='';
+                                            
+                                            
+                                          //portion start///
+                                          if($result_menus['ter_rate_type']=='Portion'){
+                                              
+                                        $sql_menulist31 = "select pm.pm_id,pm.pm_portionname,pm.pm_portionshortcode from tbl_portionmaster"
+                                                . " pm where pm.pm_id='".$result_menus['ter_portion']."'"; 
+                                        
+                                        $sql_menus31 = $database->mysqlQuery($sql_menulist31);
+                                        $num_menus31 = $database->mysqlNumRows($sql_menus31);
+                                        if ($num_menus31) {
+                                        while ($result_menus31 = $database->mysqlFetchArray($sql_menus31)) {
+                                            
+                                           $portion_name = $result_menus31['pm_portionname'];
+                                           $portion_id = $result_menus31['pm_id'];
+                                           $portion_shortcode= '('.$result_menus31['pm_portionshortcode'].')';
+                                           
+                                            if($_SESSION['main_language']!='english'){
+
+                                            $sql_arabportion=$database->mysqlQuery("SELECT lm_portion_name FROM tbl_language_portion left join "
+                                                    . " tbl_languages on ls_id=lm_language_id WHERE lm_portion_id='".$result_menus31['pm_id']."' "
+                                                    . " and ls_language='".$_SESSION['main_language']."'");
+
+                                            
+                                            $num_arabportion = $database->mysqlNumRows($sql_arabportion);
+                                            $result_arabportion = $database->mysqlFetchArray($sql_arabportion);
+                                            $portion_name=$result_arabportion['lm_portion_name'];
+                                           
+                                            
+                                            }
+                                         }}
+                                            }
+                                            else if($result_menus['ter_rate_type']=='Unit'){
+                                                
+                                                if($result_menus['ter_unit_type']=='Packet'){
+                                                    
+                                                    $sql_packet = "select u.u_id,u.u_name from tbl_unit_master u where u.u_id='".$result_menus['ter_unit_id']."'"; 
+                                                    
+                                                    $sql_packet = $database->mysqlQuery($sql_packet);
+                                                    $num_packet= $database->mysqlNumRows($sql_packet);
+                                                    if ($num_packet) {
+                                                    while ($result_packet = $database->mysqlFetchArray($sql_packet)) {
+
+                                                       $unit_weight_name= $order_packet_or_loose.': '.number_format($order_unit_weight,3).' '.$result_packet['u_name'];
+                                                     
+                                                        }
+                                                       }
+                                                    }
+                                            else if($result_menus['ter_unit_type']=='Loose'){
+                                                    
+                                                    $sql_loose = "select bu.bu_id,bu.bu_name from tbl_base_unit_master bu  where bu.bu_id='".$result_menus['ter_base_unit_id']."'"; 
+                                                   
+                                                    $sql_loose = $database->mysqlQuery($sql_loose);
+                                                    $num_loose= $database->mysqlNumRows($sql_loose);
+                                                    if ($num_loose) {
+                                                    while ($result_loose = $database->mysqlFetchArray($sql_loose)) {
+                                                       
+                                                       $unit_weight_name= $order_packet_or_loose.': '.number_format($order_unit_weight,3).' '.$result_loose['bu_name'];
+                                                            
+                                                        }
+                                                       }                                                
+                                                 }
+                                            }
+                                          
+                                          
+                                            $rate = $result_menus['ter_rate'];
+                                            $qty11=$result_menus['ter_qty'];
+                                            $sumamnt=$rate*$qty11;
+                                            $amt+=$rate*$qty11;
+                                            $menu_name = $database->show_menu_ful_details($result_menus['te'. 'r_menuid']);
+                                            if ($result_menus['ter_preference']) {
+                                                $pf = $database->show_prefernce_ful_details($result_menus['ter_preference']);
+                                                $pref =$_SESSION["pmr_".$result_menus['ter_preference']]['preference'];// $pf['pmr_name'];
+                                            } else {
+                                                $pref = "";
+                                            }
+                                            if ($result_menus['ter_preferencetext']) {
+                                                if ($pref != "") {
+                                                    $pf = $result_menus['ter_preferencetext'];
+                                                    $pref = $pref . " , " . $result_menus['ter_preferencetext'];
+                                                } else {
+                                                    $pref = $result_menus['ter_preferencetext'];
+                                                    $pf = $result_menus['ter_preferencetext'];
+                                                }
+                                            } else {
+                                                $pf = "";
+                                            }
+
+                                            $cqrycat = $database->mysqlQuery("SELECT * FROM tbl_portionmaster where pm_id='" . $result_menus['ter_portion'] . "' ");
+                                            $num_cat = $database->mysqlNumRows($cqrycat);
+                                            if ($num_cat) {
+                                                while ($rs = $database->mysqlFetchArray($cqrycat)) {
+                                                    $name = $rs['pm_portionname'];
+                                                }
+                                            } else {
+                                                $name = "";
+                                            }
+                                            $ids="pm_".$result_menus['ter_portion'];
+                                            
+                                            $discount_name=array();
+                                            $discountname = $database->mysqlQuery("SELECT d_discount_remarks FROM tbl_tableorder_discount where d_orderno='".$_SESSION['order_id']."' and d_slno='".$result_menus['ter_slno']."'");
+                                            
+                                            $num_discountname = $database->mysqlNumRows($discountname);
+                                            
+                                            if ($num_discountname) {
+                                                while ($rs_discountname = $database->mysqlFetchArray($discountname)) {
+                                                    $discount_name[] = $rs_discountname['d_discount_remarks'];
+                                                }
+                                            } else {
+                                                $discount_name[] = "";
+                                            }
+                                            
+											
+                                            ?>
+                                    
+                    <div class="preference_table act<?php if ($result_menus['ter_status'] == "Served" || $result_menus['ter_status'] == "Billed" || $result_menus['ter_status'] == "Closed") { ?> odr_served <?php } ?> <?php if ($result_menus['ter_status'] == "Opened") { ?> odr_confirmed <?php } ?> <?php if ($result_menus['ter_status'] == "NotInStock") { ?> odr_notinstock <?php } ?>">
+                                                <div  >
+                                                     <?php if($_SESSION['ser_com_item']=='Y'){ ?>
+                                                    <span  style="padding-right: 13px;float: right; " title="SET AS COMPLIMENTARY ITEM ?" width="3%" ><input title=" SET AS COMPLIMENTARY ITEM?" <?php if ($result_menus['ter_status'] == "Served" || $result_menus['ter_status'] == "Billed" || $result_menus['ter_status'] == "Closed") { ?> disabled <?php } ?> <?php if($result_menus['ter_rate_before_comp']>0){ ?> checked <?php } ?> style="cursor:pointer;" onclick="comp_bill('<?=$result_menus['ter_menuid']?>','<?=$_SESSION['order_id']?>','<?=$result_menus['ter_portion']?>','<?=$result_menus['ter_unit_id']?>','<?=$result_menus['ter_base_unit_id']?>','<?=$result_menus['ter_unit_weight']?>','<?=$result_menus['ter_slno']?>')" type="checkbox" class="comp_bill" id="comp_bill_<?=$result_menus['ter_menuid']."_".$result_menus['ter_slno']?>">  </span>                          
+                                                     <?php } ?>
+                                                    
+                                                    <div style="cursor:pointer;<?php if($result_menus['ter_rate_before_comp']>0){ ?> pointer-events:none <?php } ?>" class="menu_order_dish_name menu_order_dishname_cc"  status="<?= $result_menus['ter_status']?>" portion123="<?=$portion_shortcode?>"  menu="menu_<?= $result_menus['ter_menuid'] ?>"  slno="slno_<?= $result_menus['ter_slno'] ?>"><span style="display: contents;"><?=$sl_di_in++;?> </span> <?=") ".$menunewname // $menu_name['mr_menuname'] ?></div>
+                                                    <div class="portion_name" ><?=$portion_shortcode?></div>
+                                                    <?php if($unit_weight_name!=''){ ?>
+                                                    <div class="unit_view_text" style="margin-left:5px;"><?=$unit_weight_name?></div>
+                                                    <?php }?>
+                                                    <div class="menuodr_rate_cc">
+                                                        
+                                                        <?php  if($_SESSION['incl_bill_format']=='N'){  ?>
+                               <div class="dine_menu_rate" style="margin-left:5px;"><?=$_SESSION['base_currency']?> : <?=number_format($sumamnt,$_SESSION['be_decimal'])?></div>
+                                  <?php }else{ ?>   
+                                <div class="dine_menu_rate" style="margin-left:5px;"><?=$_SESSION['base_currency']?> : <?=number_format(($result_menus['ter_qty']*$result_menus['ter_new_rate_incl']),$_SESSION['be_decimal'])?></div>
+                                  <?php }?>   
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        <!-- <div class="dine_menu_qty" id="qtyview<?= $result_menus['ter_menuid'] . $result_menus['ter_slno'] ?>">Qty : <?= $result_menus['ter_qty'] ?></div> -->
+                                                        <div class="dine_menu_qty" id="combo_pack_qty_cart" >
+                                    
+                                            <?php if($result_menus['ter_status'] != "Served") { ?>                
+                                                            <span class="qty_incr_btn_sec_cc" style="cursor:pointer; margin-top:-5px;">
+                                     
+                                                                <?php if( $_SESSION['be_single_click_add']=='Y' ) { ?>
+                                                                <span  onclick="minus_single('<?=$result_menus['ter_menuid']?>','<?=$_SESSION['order_id']?>','<?=$result_menus['ter_qty']?>','<?=$result_menus['ter_portion']?>','<?=$result_menus['ter_unit_id']?>','<?=$result_menus['ter_base_unit_id']?>','<?=$result_menus['ter_unit_weight']?>','<?=$result_menus['ter_slno']?>');"  class="qty_incr_btn minus_button_di">-</span>
+                                       <?php } ?>
+                                                                <input class="qty_incr_val" readonly type="text" value="<?=$result_menus['ter_qty']?>" >
+                                      
+                                            <?php if( $_SESSION['be_single_click_add']=='Y' ) { ?>
+                                                         
+                                                                    <span  onclick="plus_single('<?=$result_menus['ter_menuid']?>','<?=$_SESSION['order_id']?>','<?=$result_menus['ter_portion']?>','<?=$result_menus['ter_unit_id']?>','<?=$result_menus['ter_base_unit_id']?>','<?=$result_menus['ter_unit_weight']?>','<?=$result_menus['ter_slno']?>');"  class="qty_incr_btn">+</span>
+                                   <?php } ?>
+                                                            </span>                     
+                                           <?php } else{ ?>       
+                                                <span class="qty_incr_btn_sec_cc" style="cursor:pointer; margin-top:-5px;">
+                                        <span   class="qty_incr_btn">-</span>
+                                        <input class="qty_incr_val" readonly type="text" value="<?=$result_menus['ter_qty']?>" >
+                                        <span    class="qty_incr_btn">+</span>
+                                    </span>                                  
+                                                            
+                                                            
+                                         <?php } ?>                            
+                                                            
+                                    </div>
+                                                       
+                                                    </div>
+                                                    <!--<div class="portion_txt"><?//= $resu_portion['portion_name'][0]//$name ?></div>-->
+                                                    <!--<div class="quantity_txt" id="qtyview<?//= $result_menus['ter_menuid'] . $result_menus['ter_slno'] ?>"><?//= $result_menus['ter_qty'] ?></div>-->
+                                                    
+                                                </div><!--menu_order_dishname_cc position: relative;  left: -72px;  top: 6px;--> 
+                                                <?php if ($result_menus['ter_status'] == "Added" || $result_menus['ter_status'] == "NotInStock") { ?>
+                                                <div style="" class="menu_order_delet_btn <?php if ($result_menus['ter_status'] == "NotInStock") { ?> menu_order_nostock <?php } ?>" mid="<?=$result_menus['ter_menuid']?>" id='myid<?= $result_menus['ter_orderno'] ?>' p='tab<?= $result_menus['ter_slno'] ?>'>
+                                                        <a href="#" class="preferance_table_btn" ><i class="glyphicon glyphicon-remove" style="margin-top: -2px;"></i></a>
+                                                    </div>
+                                                <?php } elseif ($result_menus['ter_status'] == "Opened") { ?>
+                                                    <div class="menu_order_confirm_btn">
+                                                        <a href="#" class="preferance_table_btn"><i class="glyphicon glyphicon-ok" style="margin-top: -2px;"></i></a>
+                                                    </div>
+                                                <?php } elseif ($result_menus['ter_status'] == "Served") { ?>
+                                                    <div class="menu_order_confirm_yellow_btn" style="">
+                                                        <a    href="#" class="preferance_table_btn"><i class="glyphicon glyphicon-ok" style="margin-top: -2px;"></i></a>
+                                                    </div>
+                                                <?php } ?> 
+                                               
+                                                <div style="font-size:10px;color: darkred" class="dine_discount_txt"><?php for($s=0;$s<count($discount_name);$s++) {if($s>0){ echo ',';} echo $discount_name[$s]; }?></div>
+                                                <?php if ($pref) { ?> 
+                                    
+                                                    <div class="menu_order_preference_text  viewprefall" id="viewprefall<?= $result_menus['ter_menuid'] . $result_menus['ter_slno'] ?>"><?= $pref ?></div>
+
+                                                <?php } ?>
+                                                   
+                                                <div class="editpref" style="display:none" id="editpref<?= $result_menus['ter_menuid'] . $result_menus['ter_slno'] ?>" >
+
+                                                <div style="width:17%" class="menu_edit_textbox_cc">
+                                                    <span style="float:left; width:100%;line-height:20px;"><?= $_SESSION['menu_order_edit_qty'] ?> :</span>
+                                                    <input type="text" value="<?= $result_menus['ter_qty'] ?>" style="display:none;width: 100%; text-align: center; "   class="qtytextedit pref_dopdown" id="qtytextedit<?= $result_menus['ter_menuid'] . $result_menus['ter_slno'] ?>">
+                                                </div><!---menu_edit_textbox_cc-->
+
+                                                <div style="width:43%" class="menu_edit_textbox_cc">
+                                                    <span style="float:left; width:100%;line-height:20px;"><?= $_SESSION['menu_order_edit_pref'] ?> :</span>
+                                                    <select id="menu_<?= $result_menus['ter_menuid'] . $result_menus['ter_slno'] ?>"  class="pref_dopdown prefdp" name="pref" style="  width: 100%;  height: 35px;  float: left;  border: solid 1px #ccc;"  >
+                                                    <option value="" ><?= $_SESSION['menu_order_edit_selectpref'] ?></option>								
+                                                <?php
+                                                $sql_menuportion = "select * from tbl_menuprefmaster where  mpr_menuid='" . $result_menus['ter_menuid'] . "'";
+                                                $sql_portions = $database->mysqlQuery($sql_menuportion);
+                                                $num_portions = $database->mysqlNumRows($sql_portions);
+                                                if ($num_portions) {
+                                                    while ($result_portions = $database->mysqlFetchArray($sql_portions)) {//`tbl_menuprefmaster`(`mpr_menuid`, `mpr_prefeernce`)
+                                                        $rate_details = $database->show_prefernce_ful_details($result_portions['mpr_prefeernce']);
+                                                        ?>
+                                                        <option value="<?= $result_portions['mpr_prefeernce'] ?>" <?php if ($result_menus['ter_preference'] == $result_portions['mpr_prefeernce']) { ?>  selected<?php } ?>><?=$_SESSION["pmr_".$result_portions['mpr_prefeernce']]['preference']// $rate_details['pmr_name'] ?></option>
+
+                                            <?php }
+                                        }
+                                        ?>
+                                                   </select>	
+                                                    </div>
+
+
+                                                <?php
+                                                $rateentery = 'N';
+                                                $sql_menuportion = "select mr_manualrateentry from tbl_menumaster where  mr_menuid='" . $result_menus['ter_menuid'] . "'";
+                                                $sql_portions = $database->mysqlQuery($sql_menuportion);
+                                                $num_portions = $database->mysqlNumRows($sql_portions);
+                                                if ($num_portions) {
+                                                    while ($result_portions = $database->mysqlFetchArray($sql_portions)) {
+                                                        $rateentery = $result_portions['mr_manualrateentry'];
+                                                    }
+                                                  
+                                                }
+                                                
+                                               
+                                                ?>
+                                                <div style="width:20%" class="menu_edit_textbox_cc">
+                                                    <span style="float:left; width:100%;line-height:20px;"><?= $_SESSION['menu_order_edit_rate'] ?> :</span>
+                                                    <input type="text"  style="width: 100%; text-align: center; "   class=" pref_dopdown" value="<?= $rate ?>" name="rate_value_edit<?= $result_menus['ter_menuid'] . $result_menus['ter_slno'] ?>" id="rate_value_edit<?= $result_menus['ter_menuid'] . $result_menus['ter_slno'] ?>" <?php if ($rateentery == "N") { ?> disabled="disabled" <?php } ?>>
+                                                </div><!---menu_edit_textbox_cc-->
+
+                                                    <a class="confirm_btn updatealledit" style="margin: 20px 5px 0 0;width: 15%;float: right;"  menusid="mn_<?= $result_menus['ter_menuid'] ?>" sl="sl_<?= $result_menus['ter_slno'] ?>"><?= $_SESSION['menu_order_edit_okbutton'] ?></a>
+                                                    <textarea placeholder="<?= $_SESSION['menu_order_placeholder_edit_manualpref'] ?>" class="pref_text_area" name="preftext" id="preftext<?= $result_menus['ter_menuid'] . $result_menus['ter_slno'] ?>" style="height:60px;  border-radius: 5px;
+                                                    padding: 3%;  font-size: 16px;  width:98%;  color: #201B1B !important;background: #FFF; border: solid 0px #666 !important;   margin: 5px 0 8px 5px;"><?= $pf ?></textarea>
+                                                </div>
+                                                  
+                                    <?php
+                                    
+                                    $addon_total=0;
+                                    $sql_addon_menu = "select ter_menuid,ter_qty, ter_total_rate from tbl_tableorder where ter_dayclosedate='".$_SESSION['date']."' and ter_orderno='" . $_SESSION['order_id'] . "' and ter_addon_slno='".$result_menus['ter_slno']."' order by ter_menuid";
+                                    
+                                    $sql_addon_menu1 = $database->mysqlQuery($sql_addon_menu);
+                                    $num_addon_menu1 = $database->mysqlNumRows($sql_addon_menu1);
+                                    if ($num_addon_menu1) {$o=0;
+                                        ?>
+                                            <div class="addon-preview-secion">
+                                            <div class="addon-preview-secion-head">Add on</div>
+                                        <?php
+                                        while ($result_addon_menu = $database->mysqlFetchArray($sql_addon_menu1)) {
+                                            
+                                            $o++;
+                                            $menu_name=$database->show_menu_ful_details($result_addon_menu['ter_menuid']);
+                                            $addon_total=$addon_total+$result_addon_menu['ter_total_rate'];
+                                            ?>
+                               <div class="addon-mn-row">
+                                 <div class="addon-preview-secion-mn-1" ><span><?=$o?>)</span> <?=$menu_name['mr_menuname']?></div> 
+                                 <div class="addon-preview-secion-qty" >Qty:<?=$result_addon_menu['ter_qty']?></div>
+                                 <div class="addon-preview-secion-rate" >Rate: <?=number_format($result_addon_menu['ter_total_rate'],$_SESSION['be_decimal'])?></div>
+                               </div>
+                               <?php } ?>
+                                            
+                               </div>
+                                                    
+                               <?php  } ?>
+                                                    
+                                                    
+                                   <?php
+                                 
+                                   $tax_in1 = $database->mysqlQuery("SELECT tmp_pref_name,tmp_qty FROM tbl_menu_preference_kot where "
+                                   . "tmp_menu=$ordered_menuid and tmp_orderno_bill= '".$_SESSION['order_id']."' ");
+                                   $num_tx1 = $database->mysqlNumRows($tax_in1);
+                                   if($num_tx1) {
+                                              
+                                   ?>
+                                                    
+                                  <div class="addon-preview-secion">
+                                  <div class="addon-preview-secion-head" style="color:#6ABEDF">PREFERENCE</div>
+                                  <?php
+                                  while ($tx_in11 = $database->mysqlFetchArray($tax_in1)) {
+                                  
+                                  ?>
+                                    
+                              
+                               <div class="addon-mn-row">
+                                 <div class="addon-preview-secion-mn-1" ><span></span><?=$tx_in11['tmp_pref_name'].' : '.$tx_in11['tmp_qty']?></div> 
+                                 <div class="addon-preview-secion-qty" ></div>
+                                 <div class="addon-preview-secion-rate" ></div>
+                               </div>
+                               
+                               <?php } ?>
+                               
+                                </div>
+                               
+                               <?php   } ?>                 
+                                                    
+                                                    
+                                <?php  if($stock_inv=='Y') { 
+                                    
+         $qty_weight=0;
+         $sql_general1 =  $database->mysqlQuery("Select sum(ts_qty) as qty ,ts_rate_type, sum(ts_weight) as weight,ts_unit "
+         . " from tbl_store_stock where ts_product='".$result_menus['ter_menuid']."' "); 
+	 $num_general1  = $database->mysqlNumRows($sql_general1);
+		if($num_general1)
+		{
+                 while($result_kotlist  = $database->mysqlFetchArray($sql_general1)) 
+		 {   
+                    
+                if($result_kotlist['ts_unit']=='Nos' || $result_kotlist['ts_unit']=='Single'){
+                           
+                            $qty_weight= $result_kotlist['qty'];   
+                        
+                }else{
+                           
+                 if($result_kotlist['ts_rate_type']=='Packet' && ($result_kotlist['ts_unit']=='KG' || $result_kotlist['ts_unit']=='LTR')){
+                           
+                            $qty_weight= $result_kotlist['qty'];
+                          
+                }else{
+                               
+                            $qty_weight= $result_kotlist['weight'];    
+                            
+                }
+                            
+                }
+                
+                     
+            } }
+                               
+                                  
+                         ?>  
+                                                    
+                         <div class="addon-mn-row" style="color:#db6060;font-weight: bold;font-size: 10px;width: 31%"><?=$qty_weight?> IN STOCK  </div> 
+                         
+                         <?php } ?>                 
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
+                               </div>
+                                           
+                                           <?php 
+                                        
+                                           $slnodine++;
+                                           $amt=$amt+$addon_total;
+      }
+                                   
+      }
+                                    
+                                    
+                                    $sql_menulist = "select ter_orderno from tbl_tableorder where "
+                                    . " ter_dayclosedate='".$_SESSION['date']."' and ter_orderno='" . $_SESSION['order_id'] . "'"
+                                    . " and ter_qty>0 and ter_addon_slno IS NULL and ter_combo_entry_id IS NULL  order by ter_slno DESC";
+                                    
+                                    $sql_menus = $database->mysqlQuery($sql_menulist);
+                                    $num_menus = $database->mysqlNumRows($sql_menus);
+                                    if ($num_menus) {
+                                        while ($result_menus = $database->mysqlFetchArray($sql_menus)) {
+                                            
+                                           $icount++; 
+                                        }
+                                        }  
+                                    
+                                    
+                                    
+                                    if($_SESSION['uae_tax_enable']=='Y'){
+                          
+                                         $amt=$amt/(1+($_SESSION['uae_tax_value']/100));
+                          
+                                    }
+                                    
+                                    $icount+=$p;
+                                    
+                                     if($_SESSION['incl_bill_format']=='N'){ 
+                                    
+                                        echo '<script type="text/javascript">';
+                                        echo '$(document).ready(function(){';
+                                        echo '$(".tal_viewtotal").text(('.$amt.').toFixed('.$_SESSION["be_decimal"].'))';
+                                        echo '});';
+                                        echo '</script>'; 
+                                        
+                                     }else{
+                                         
+                                          echo '<script type="text/javascript">';
+                                        echo '$(document).ready(function(){';
+                                        echo '$(".tal_viewtotal").text(('.$tot_incl_sub.').toFixed('.$_SESSION["be_decimal"].'))';
+                                        echo '});';
+                                        echo '</script>'; 
+                                     }  
+                                         
+                                 
+                                echo '<script type="text/javascript">';
+                                echo '$(document).ready(function(){';
+                                echo '$(".total_itemcount").text('.$icount.')';
+                                echo '});';
+                                echo '</script>';
+				
+				
+                                 
+                                            
+                            ?>
+                            </div>
+                                
+                            <input type="hidden"  value="<?=$kot_cancel_btn_check?>"  id="check_kot_count" >   
+                                
+                                <div id="amtdinenew" class="tottal_rate_contain" style="color:#000;font-size: 16px;text-align:right;z-index: 99;">
+                                    <span style="  margin-left: 2%;float: left;"><?=$_SESSION['items_com']?> : </span><span style=" margin-left: 2%;float: left;" class="total_itemcount">0</span>
+                        	<?= $_SESSION['subtotal_com']?> : <span class="tal_viewtotal">0.00</span><span></span></div>
+                                <input type="hidden" name="order" id="ordermsg1" value="<?= $_SESSION['menu_order_error_alredyconfirm'] ?>">
+                                    <input type="hidden" name="order" id="ordermsg2" value="<?= $_SESSION['menu_order_error_notedit'] ?>">
+                                        <input type="hidden" name="order" id="ordermsg3" value="<?= $_SESSION['menu_order_error_order_deleted'] ?>">
+                                            <div class="orderlist_menu_odr_btn_cc">
+                                                <a style="float:left;width: 30%;" class="confirm_btn" href="#" id="backtotablesel" name="backtotablesel"><?= $_SESSION['menu_order_backbutton'] ?></a> 
+                                                <?php 
+                                                $sql_cncl  =  $database->mysqlQuery("select sm.ser_kot_cancel_permission FROM tbl_logindetails ld
+                                                left join tbl_staffmaster sm on sm.ser_staffid = ld.ls_staffid
+                                                where ld.ls_username = '".$_SESSION['expodine_id']."'"); 
+                                                $num_stf   = $database->mysqlNumRows($sql_cncl);
+                                                if($num_stf)
+                                                {
+                                                    $result_stf  = $database->mysqlFetchArray($sql_cncl);
+                                                    if($result_stf['ser_kot_cancel_permission']=='Y'){ ?>
+                                                <a style="float:left;margin-left:4.5%;width: 30%;display:none"  id="kot_cancel_pop_btn" class="confirm_btn kotcancel" href="#"><div class="kot_cancel_btn"><img width="18px" src="img/close_ico.png"> <?=$_SESSION['menu_order_kotcancel1']?> KOT</div></a>
+                                                <?php }} ?>
+                                                <a id="printer_issue_popup_btn" style="width: 30%;" class="confirm_btn confirmallfdetails" href="#"><?= $_SESSION['menu_order_menu_confirmbutton'] ?></a></div><!--orderlist_menu_odr_head  -->
+                                            </div>
+                                            </div><!--left_cuntainer-->
+                                            </div><!--main_contain-->
+
+                                            </div>
+
+<!-- ************************************************* add new menu item popup starts  ************************************************** -->
+                                            <div style="position:fixed;width:100%;left:0%;top:16%;z-index:99999;right:0" class="mynewpopupload" ></div>
+                                        
+                                            
+ <!-- ************************************************* add new menu item popup ends  ******************************************************* -->
+
+ <input type="hidden" name="hidprintconfrmmsg" id="hidprintconfrmmsg" value="<?=$_SESSION['table_selection_error_printconfirm']?>" />
+                                            <input type="hidden" name="hidkotid" id="hidkotid" value="" />
+                                            <div style="display:none" class="index_popup_1 closeoneclass">
+                                                <div class="index_popup_contant contentmessage">Are you Sure you Want to Cancel This Bill?</div>
+                                                <div class="index_popup_contant">
+                                                    <div class="btn_index_popup"><a href="#" class="closeok"><?= $_SESSION['menu_order_popup_kotprint_ok'] ?></a></div>
+                                                    <div class="btn_index_popup"><a href="#" class="closecancel"><?= $_SESSION['menu_order_popup_kotprint_cancel'] ?></a></div>
+                                                </div>
+                                            </div><!--index_popup_2-->
+
+
+                                            <div id="popup_box"><!-- OUR PopupBox DIV-->
+                                                <h1 class="menu_add_po_head">Menu Add</h1>
+                                                <a id="popupBoxClose">X</a> 
+                                                <div class="menu_add_pop_container">
+                                                    <table class="popup_add_table" width="100%" border="0" cellspacing="5">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style="width:21.5%">Menu Name<span style="color:#F00">*</span></td>
+                                                                <td colspan="3"><input type="text" class="form-control menuname" placeholder="Menu"> </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width:21.5%">Short Code<span style="color:#F00">*</span></td>
+                                                                <td><input type="text" class="form-control shortcodename shortcode" placeholder="Menu Short Code" ></td>
+                                                                <td>Kitchen<span style="color:#F00">*</span></td>
+                                                                <td>
+                                                                    <select data-placeholder="Enter Kitchen" class="form-control add_new_dropdown">
+                                                                        <option value=""></option>
+                                                                        <optgroup label="Kitchen">
+                                                                            <option value="KBP-CT-1">PANTRY</option>
+                                                                            <option value="KBP-CT-2">MAIN KITCHEN</option>
+                                                                        </optgroup>
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width:21.5%">Menu Main Category<span style="color:#F00">*</span></td>
+                                                                <td>
+                                                                    <select data-placeholder="Enter Menu Main Category" class="form-control add_new_dropdown">
+                                                                        <option value=""></option>
+                                                                        <optgroup label="Menu Main Category">
+                                                                            <option >SOUP</option>
+                                                                            <option >NADAN FLAVORES</option>
+                                                                            <option >CHINESE/THAI</option>
+                                                                            <option>BREAKFAST</option>
+                                                                            <option>PASTA</option>
+                                                                            <option >SALAD</option>
+                                                                            <option >STARTERS</option>
+                                                                            <option>CONTINENTAL</option>
+                                                                            <option>TANDOORI OVEN</option>
+                                                                            <option>NORTH INDIAN</option>
+                                                                            <option >BREAD/RICE AND NOODLES</option>
+                                                                            <option >SOUTHERN SPICES</option>
+                                                                            <option >COOLERS/DESERTS</option>
+                                                                        </optgroup>
+                                                                    </select>
+
+                                                                </td>
+                                                                <td>Menu Sub Category</td>
+                                                                <td>
+                                                                    <select data-placeholder="Enter Menu Main Category" class="form-control add_new_dropdown">
+                                                                        <option value=""></option>
+                                                                        <optgroup label="Menu Main Category">
+                                                                            <option >SOUP</option>
+                                                                            <option >NADAN FLAVORES</option>
+                                                                            <option >CHINESE/THAI</option>
+                                                                            <option>BREAKFAST</option>
+                                                                            <option>PASTA</option>
+                                                                            <option >SALAD</option>
+                                                                            <option >STARTERS</option>
+                                                                            <option>CONTINENTAL</option>
+                                                                            <option>TANDOORI OVEN</option>
+                                                                            <option>NORTH INDIAN</option>
+                                                                            <option >BREAD/RICE AND NOODLES</option>
+                                                                            <option >SOUTHERN SPICES</option>
+                                                                            <option >COOLERS/DESERTS</option>
+                                                                        </optgroup>
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Rate</td>
+                                                                <td colspan="2">  
+                                                                    <select data-placeholder="Enter Kitchen" class="form-control add_new_dropdown">
+                                                                        <option value=""></option>
+                                                                        <optgroup label="Kitchen">
+                                                                            <option value="KBP-CT-1">Floor</option>
+                                                                            <option value="KBP-CT-2">Floor</option>
+                                                                        </optgroup>
+                                                                    </select>
+                                                                </td>
+                                                                <td><input type="text" class="form-control menuname" placeholder="Rate"> </td>
+
+                                                            </tr>
+
+                                                        </tbody>
+                                                    </table>
+                                                    <a href="#"><div class="menu_add_pop_sub_btn">Submit</div></a>
+                                                </div><!--mneu_add_pop_container-->
+
+                                            </div><!--popup main div-->
+
+
+                                            <div style="display:none" class="confrmation_overlay"></div>
+                                            
+                                            
+                                            
+          <!--**************************************** KOT Cnacel popup **********************************************-->
+              
+          
+          		<div class="kot_cancel_popup_cc" style="top:0;bottom:0  ">
+                </div><!--kot_cancel_popup_cc-->
+<!--                                    
+                             
+                
+          <!-----************************************* Confitm popup ********************************----->
+        
+         	<div class="kotcancel_confirm">
+            	<div class="kotcancel_confirm_contant_cc">
+                	Are you Sure you Want to Cancel?
+                </div>
+                <div class="index_popup_contant">
+                    <div class="btn_index_popup"><a href="#"  class="cancelekot_confirm">Yes</a></div>
+                    <div class="btn_index_popup"><a href="#" class="closepopup_noeach" id="close_kot_cnfrm">No</a></div>
+                </div>
+            
+            </div> <!--kotcancel_confirm-->
+            
+            <!-------************************** Cancel reason **************************************-->
+            
+           <div class="kotcancel_reason_popup">
+            
+            	<div class="index_popup_contant"><h3 class="sm_pop_head">Cancellation<div style="width: 35%;height: 30px;float: right;"><span style="color:#F00;font-size:15px; text-align:center !important;display:none" id="deatilserror"></span></div></h3></div>
+                    <div class="index_popup_contant contenttext" style="display:inline-block;margin-left:5%;text-align:left;width:100%;height:auto">
+                        <span style="line-height: 40px;width:26%;float:left">Staff Name</span>
+                        <div style="background-color: #fff !important;width: 60%;height:auto;margin-bottom: 15px;" class="btn_index_popup">
+
+                             <select style="float: left;width: 51%;" class="popup_conform_his"  id="stafflist" name="stafflist" >
+           <option value="null" default><?=$_SESSION['bill_history_popup_select_staff']?></option>
+           <?php
+               $sql_login  =  $database->mysqlQuery("select * from tbl_staffmaster WHERE ser_cancelpermission='Y' AND ser_employeestatus='Active'"); 
+                $num_login   = $database->mysqlNumRows($sql_login);
+                if($num_login){
+                    while($result_login  = $database->mysqlFetchArray($sql_login)) 
+                      {
+                       $staffid=$result_login['ser_staffid'];
+
+                        $cancel_stfname =$result_login['ser_firstname'].' '.$result_login['ser_lastname'];
+                        
+                      ?>
+          <option class="popup_conform_his" value="<?=$result_login['ser_staffid']?>" cancelkey="<?=$result_login['ser_cancelwithkey']?>"><?=$cancel_stfname?></option>
+         <?php } } ?>	
+          </select>
+                          <div style="margin-top:0px !important;display:block" class="btn_index_popup_send otp_gent_btn"><a href="#" class="sendotp">Send OTP</a></div>
+                        </div><br>
+                        <span style="line-height: 40px;width:26%;float:left">Enter <span id="typeentery"> </span></span>
+                        <div style="background-color: #fff !important;width: 60%;" class="btn_index_popup">
+                        <input class="popup_conform_his" style="float: left;" type="password" name="secretkey" id="secretkey"></div>
+                        
+                    </div>  
+                <input type="hidden" name="hidenterpaswd" id="hidenterpaswd" value="<?=$_SESSION['completed_order_popup_password']?>"/>
+                        <input type="hidden" name="hidenterotp" id="hidenterotp" value="<?=$_SESSION['completed_order_popup_otp']?>"/>
+                        <input type="hidden" name="hiderrormg" id="hiderrormg" value="<?=$_SESSION['completed_order_error_error_mg']?>"/>
+                           
+                    <?php
+                     $sql_menulist = "select ter_orderno,ter_slno from tbl_tableorder where ter_dayclosedate='".$_SESSION['date']."' and   ter_orderno='".$_SESSION['order_id']."' and ter_status='Served' OR ter_status='Opened' OR ter_status='Ready'";
+        $sql_menus = $database->mysqlQuery($sql_menulist);
+        $num_menus = $database->mysqlNumRows($sql_menus);
+        if ($num_menus) {
+            while ($result_menus = $database->mysqlFetchArray($sql_menus)) { ?>
+                <form method="post" name="staffsubmit">   
+    
+                    <input class="kot_cancel_qty_input qtykotcancel" name="qtychange<?=$result_menus['ter_orderno'].$result_menus['ter_slno']?>" nid="qty_<?=$result_menus['ter_orderno'].$result_menus['ter_slno']?>"  type="hidden" id="hid_qtychange13"/>
+                   <?php }} ?> 
+                    <div class="index_popup_contant" style="margin-top:6px;height: 50px;">
+                        <div style="width: 95px;" class="btn_index_popup"><a href="#" id="submitcancelation" class="submitcancelation">Submit</a></div>
+                        <div style="width: 95px;" class="btn_index_popup"><a href="#" id="closepopup" class="closepopup">Cancel</a></div>
+        </div> 
+                </form> 
+            </div><!--kotcancel_reason_popup-->
+             <!--***************************************** END ***************************************************--> 
+          
+          <!--*********************************** waiter popup ***************************************-->
+          
+          	<div class="waiter_select_popup">
+            	<div class="waiter_select_popup_close_btn"></div>
+            	<div class="waiter_select_popup_headding">Select Waiter</div>
+                <div class="waiter_select_popup_headding_text">Select your waiter for serving</div>
+                <div class="waiter_select_popup_contant">
+                    <?php
+                    $staffid = '';
+                    $waiter = '';
+                    $sql_waiter = "select ser_firstname,sm.ser_staffid FROM tbl_staffmaster sm
+                    left join tbl_designationmaster ds on ds.dr_designationid = sm.ser_designation
+                    where ds.dr_designationname = 'Waiter' and sm.ser_employeestatus = 'Active' and sm.ser_branchofficeid = '1'";
+                    $row_waiter = $database->mysqlQuery($sql_waiter);
+                    $num_waiter = $database->mysqlNumRows($row_waiter);
+                    if ($num_waiter) {
+                        $ct=0;
+                        while ($result_waiter = $database->mysqlFetchArray($row_waiter)) {
+                            $ct++;
+                            $act='';
+                            if($ct==1){
+                                $act = 'waiter_select_btn_act';
+                            }
+                            $waiter = $result_waiter['ser_firstname'];
+                            $staffid = $result_waiter['ser_staffid'];
+                        ?>
+                        <a href="#"><div class="waiter_select_btn <?=$act?>" staff_id = '<?=$staffid?>'><?= $waiter ?></div></a>
+                    <?php
+                    
+                        }
+                    }else{?>
+                        <a href="#"><div class="waiter_select_btn waiter_select_btn_act" staff_id = '<?=$staffid?>'>No waiters found!</div></a>
+                        <?php
+                    }
+                    
+                    ?>
+                	
+                   
+                </div>
+                <div class="waiter_select_popup_ok_btn_cc">
+                	<a class="waiter_select_popup_ok_btn" href="#" id="waiter_popup_ok_btn">OK</a>
+                </div>
+            </div><!--waiter_select_popup-->
+          
+          
+          <!--***************************************** END ***************************************************-->                                  
+          
+<div class="kotcancel_reason_popup_new" style="display:none">
+    <input type="hidden" name="focusedtext" id="focusedtext" />
+ <div class="kotcancel_reason_popup_new_left_cc">
+    <div class="kotcancel_reason_popup_new_head"><img class="auth_head_ico" src="img/alert.png" /> Authorisation</div>
+    <div class="kotcancel_reason_popup_new_textbox_contant">
+    
+    	<!--<div class="kotcancel_reason_popup_new_textbox_cc">
+            <select class="kotcancel_reason_popup_new_textbox_input">
+            	<option>Select Reason</option>
+                <option>Reason 1</option>
+            </select>
+        </div>-->
+        <div style="width: 100%;float: left;height: 20px;line-height: 10px;text-align: center"><span id="pin_error" style="color:red;"></span></div>
+        <div class="kotcancel_reason_popup_new_textbox_cc" style="margin-bottom:10px;">
+            <input style="width:80%;float:left" type="password" class="kotcancel_reason_popup_new_textbox_input" placeholder="CODE" id="pin" onkeypress="pincheck(this.val)" autofocus="true" maxlength="4"/>
+            <span style="height: 47px;" class="login_back_btn calculator_settle_back">&nbsp;</span>
+        </div>
+    </div>
+    <div class="kotcancel_reason_popup_new_textbox_btn_cc">
+        <a href="#"><div class="kotcancel_reason_popup_new_textbox_btn" id="kotcancel_reason_popup_new_cancel_btn">Cancel</div></a>
+    	<a href="#"><div class="kotcancel_reason_popup_new_textbox_btn" id="kotcancel_reason_popup_new_proceed_btn">Proceed</div></a>
+    </div>
+  </div><!--kotcancel_reason_popup_new_left_cc-->
+  <div class="kotcancel_reason_popup_new_right_cc">
+  		<div class="keys settle_key">
+            <span class="calculator_settle">1</span>
+            <span class="calculator_settle">2</span>
+            <span class="calculator_settle">3</span>
+             <!--<span class="calculator_settle_back">&nbsp;</span>-->
+            <span class="calculator_settle">4</span>
+            <span class="calculator_settle">5</span>
+            <span class="calculator_settle">6</span>
+            <span class="calculator_settle">7</span>
+            <span class="calculator_settle">8</span>
+            <span class="calculator_settle">9</span>
+            <span class="calculator_settle">0</span>
+            <span style="width: 46.2%;max-width: inherit;" class="calculator_settle">Clear</span>
+        </div>
+  </div><!--kotcancel_reason_popup_new_right_cc-->
+</div>   
+     
+                                            
+	<!--<div class="printer_issue_popup">
+    	<div class="printer_issue_popup_cont">
+        	<span>132598411 Printer not working </span>
+            <span>
+			  Change to 
+              <select class="printer_issue_popup_cont_dropdown">
+              	<option>New</option>
+                <option>New</option>
+              </select>
+             </span> 
+        </div>
+        <div class="printer_issue_popup_btn_cc">
+       		<a href="#"><div class="printer_issue_popup_cont_submit">Close</div></a>
+            <a href="#"><div class="printer_issue_popup_cont_submit">Submit</div></a>
+        </div>    
+    </div>--><!--printer_issue_popup-->                              
+                                            
+                                            
+         <!--***************************************** END ***************************************************-->                                   
+          
+        <!--***************************************** combo add popup ***************************************************-->                                   
+          
+                <div class="combo-popup-cc" id="combo_ordering_popup" style="display:none">
+                
+                </div>
+                
+        <!--***************************************** combo popup END ***************************************************-->                                   
+
+                                            <input type="hidden" name="hideditedmsg" id="hideditedmsg" value="<?=$_SESSION['menu_order_edit_edited']?>" />
+                                             <input type="hidden" name="hidprintmsg" id="hidprintmsg" value="<?=$_SESSION['menu_order_popup_kotprinted']?>" />
+                                        
+                                             <input type="hidden" name="hidtableordernentry_updated" id="hidtableordernentry_updated" value="<?=$_SESSION['procedures_proc_tableordernentry_updated']?>" />
+                                             <input type="hidden" name="hidtableordernentry_success" id="hidtableordernentry_success" value="<?=$_SESSION['procedures_proc_tableordernentry_success']?>" />
+                                             <input type="hidden" name="hidtableordernentry_rate" id="hidtableordernentry_rate" value="<?=$_SESSION['procedures_proc_tableordernentry_rate']?>" />
+                                             <input type="hidden" name="hidtableordernentry_billed" id="hidtableordernentry_billed" value="<?=$_SESSION['procedures_proc_tableordernentry_billed']?>" />
+                                             
+                                             
+<input type="hidden" value="<?=$_SESSION['menu_order_popup_selectqty'] ?>" name="popup_selectqty" id="popup_selectqty"  />
+
+<input type="hidden" value="<?=$_SESSION['menu_order_popup_addrate'] ?>" name="popup_addrate" id="popup_addrate"  />
+                                            
+                    <style>
+                        .confrmation_overlay{
+                            width:100%;
+                            height:100%;
+                            position:fixed;
+                            z-index:999;
+                            background-color:rgba(0,0,0,0.8);
+                            top:0;
+                        }
+                        .index_popup_1{
+                            width:35%;
+                            height:90px;
+                            position:absolute;
+                            margin:auto;
+                            background-color:#fff;
+                            border-radius:5px;
+                            box-shadow:0 0 5px #ccc;
+                            right:0;
+                            left:0;
+                            top:0;
+                            bottom:0;
+                            z-index:9999;
+                            overflow:hidden;
+                        }
+                        .index_popup_contant{
+                            width:100%;
+                            height:40px;
+                            float:left;
+                            text-align:center;
+                            line-height:40px;
+                            font-size: 16px;
+                        }		
+                        .btn_index_popup{
+                            width:18%;
+                            display:inline-block;
+                            height:25px;
+                            line-height:25px;
+                            background-color: #FF2306;
+                            text-align:center;
+                            margin-right:1%;
+                            border-radius:5px;
+                            transition:all 0.2s ease;
+							height: 37px !important;line-height: 37px !important;background-color: hsl(0, 100%, 41%) !important;
+                        }
+                        .btn_index_popup a{
+                            color:#fff !important;
+                            font-size:15px;	
+                            text-decoration:none;
+                            display:block;
+                        }		
+                        .btn_index_popup:hover{background-color:#333;}	
+                        .btn_index_popup a:hover{color:#fff;}
+
+                    </style>
+
+                    <script src="js/fancySelect.js"></script>
+                    <script src="js/bootstrap.min.js"></script>
+                    <!-- library for cookie management -->
+                    <script src="js/jquery.cookie.js"></script>
+
+                    <script type="text/javascript">
+                        
+                        
+                        
+    $(document).ready(function () {
+//        $('.accordion-header').click(function () {
+//              // arrow animation on click
+//              $(this).children('.arrow').toggleClass('active');
+//              $(this).parent().siblings().children('.accordion-header').children('.arrow').removeClass('active');
+//
+//              // slide down animation body
+//              $.all('.accordion-body').before(this).slideUp('fast').removeClass('active');
+//              $.all('.accordion-body').after(this).before(next('.accordion-header')).slideDown('fast').addClass('active');
+//              $.all('.accordion-body').after(next('.accordion-header')).slideUp('fast').removeClass('active');
+//              //$(this).parent().siblings().children('.accordion-body').slideUp('fast');
+//        });
+    });
+        
+        
+        
+                        
+                        function validateSearch()
+                        {
+                          //$("#search").keyup();
+                        }
+                        
+                  $(document).ready(function(){
+			
+		/* cancel each kot by qty starts */			
+	  $(".tr_clone_add").bind('change',function() {
+		  
+		  
+		 
+		 var letterNumber = /^[0-9]-+$/; 
+		 var  orgnmbr=$(this).val();//alert(orgnmbr);
+		 
+		//if(!isAlphaOrParen(orgnmbr))
+		if (!orgnmbr.match(/[a-zA-Z*]/i)) 
+		//if(orgnmbr.match(new RegExp(^-\d*\.{0,1}\d*$)))
+		 {
+		 var vqtyval=parseInt($(this).val());	//alert(vqtyval);
+		   if(vqtyval!=0 && (vqtyval<0) )//isNaN($(this).val()) ||  && (vqtyval.match(letterNumber))
+		  {
+		 
+		  	
+				
+				
+			  var $tr    = $(this).closest('.tr_clone');
+			  var $clone = $tr.clone();
+			  var valtotext_org   = $tr.attr('qtyval');
+			  var canceldtext=($clone.find(':text').val());
+			  var final=parseInt(valtotext_org) +  parseInt(canceldtext);
+			  if(final>=0) 
+			  {
+				  var portchange=($tr.attr("portionval"))
+				  var menuchange=($tr.attr("menuval"))
+				  var kotchange=($tr.attr("kotval"))
+				  var ordchange=($tr.attr("ordval"))
+				  var rate=($tr.attr("rateval"))
+				   var slno=($tr.attr("slno"))
+				   var uq=(menuchange+portchange+kotchange+ordchange)
+				  var orgval=($("input[id='" + uq + "']").val());//alert(final);
+				 // alert(orgval);
+//				  if(final<=orgval)
+//				  {
+//					  $('.confrimeachcancel').css('display','block');
+//		  				$('.confrmation_overlay').css('display','block');
+//						$tr.removeAttr('qtyval');
+//						$tr.attr('qtyval',final);
+//						var finalrate=final *  rate;
+//						$("span[id='listamouttot" + uq + "']").text(finalrate.toFixed(2))
+//						$tr.after($clone);
+//						$clone.find(':text').val($(this).val());
+//						$clone.find('td:first').text('');
+//						$clone.css('background','#FEC7B4');
+//						$clone.addClass('cancel_clr');
+//						$clone.find('a').addClass('a_demo_four_active');
+//						$clone.find(':text').prop('disabled', true);
+//						var qtychange=($(this).val())
+//						var qtyc	  =	 qtychange.split("-");
+//						$(this).val(final);
+//						var cnct	  =	 canceldtext.split("-");
+//						
+//						var cancelrate=cnct[1] *  rate;
+//						$clone.find('td:last').text(cancelrate);
+//						
+//						var cancelfl=parseFloat($('#cancelrate').text());
+//						var tc=parseFloat(cancelfl) + parseFloat(cancelrate);
+//						$('#cancelrate').text(tc.toFixed(2));
+//						
+//						var totalfl=parseFloat($('#totalrate').text());
+//						var ct=parseFloat(totalfl) - parseFloat(cancelrate);
+//						$('#totalrate').text(ct.toFixed(2));
+//						
+//						var totc=parseFloat(rate) *  parseFloat(qtyc[1]);
+//						if($('#totalcancelrate').val()!="" || $('#totalcancelrate').val()!="0")
+//						{
+//						var fn=parseFloat($('#totalcancelrate').val()) + parseFloat(totc);
+//						}else
+//						{
+//							var fn= parseFloat(totc);
+//						}
+//						 $('#totalcancelrate').val(fn.toFixed(2));
+//						
+//						$('#hid_menuchange').val(menuchange);
+//						$('#hid_portchange').val(portchange);
+//						$('#hid_kotchange').val(kotchange);
+//						$('#hid_ordchange').val(ordchange);
+//						$('#hid_final').val(final);
+//						$('#hid_slno').val(slno);
+//						$('#hid_qtychange').val(vqtyval);
+//				  }else
+//				  {//alert("h");
+//					  $tr.find(':text').val(valtotext_org);
+//					   $(".error_feed").css("display","block");
+//				$(".error_feed").addClass("billgenration_validate");
+//				$(".error_feed").text("Check Quantity");
+//				$(".error_feed").delay(2000).fadeOut('slow');
+//				  }
+			  }
+			  else
+			  {//alert("g");
+				  $tr.find(':text').val(valtotext_org);
+				  $(".error_feed").css("display","block");
+				$(".error_feed").addClass("billgenration_validate");
+				$(".error_feed").text("Check Quantity");
+				$(".error_feed").delay(2000).fadeOut('slow');
+			  }
+		  }else
+		  {
+			  $(".error_feed").css("display","block");
+				$(".error_feed").addClass("billgenration_validate");
+				$(".error_feed").text("Check Quantity");
+				$(".error_feed").delay(2000).fadeOut('slow');
+		  }
+		 }else
+		 {
+			  $(".error_feed").css("display","block");
+				$(".error_feed").addClass("billgenration_validate");
+				$(".error_feed").text("Special characters");
+				$(".error_feed").delay(2000).fadeOut('slow');
+		 }
+	  
+		
+	  });
+	  /* cancel each kot by qty  ends*/			
+
+		});  
+                
+                //kot cancel
+                $('.submitcancelation').click(function () {
+                    
+                
+                    var itemslno = $('#itemslno').val();
+                    //var itemqty =  $('#itemqty').val();
+
+                    var orderitem = $('.cnclqty');
+                    var itemqty = '';
+                    var quantity = new Array();
+                    orderitem.each(function(){
+                          itemqty   =  $(this).val();
+                          if(itemqty!='undefined' && itemqty!='' && itemqty!=null){
+                              quantity.push(itemqty);
+                          }
+                    });
+                    var cnclrsn = $('.kot_cancel_reason_input');
+                    var itemcnclrsn = '';
+                    var reason = new Array();
+                    cnclrsn.each(function(){
+                          itemcnclrsn   =  $(this).val();
+                          if(itemcnclrsn!='undefined'){
+                              reason.push(itemcnclrsn);
+                          }
+                    });
+                
+             
+//				alert(1);
+				var secretkey        =  $('#secretkey').val();
+				var stafflist        =  $('#stafflist').val();
+                                var cancelkey = $('option:selected', '#stafflist').attr('cancelkey');
+                                                
+				// $.post("load_bill_history.php", {secretkey:secretkey,stafflist:stafflist,set:'secretkeycheck'},
+					
+                                        
+                                        var dataString = 'set=secretkeycheck&secretkey='+secretkey+'&stafflist='+stafflist;
+                                                $.ajax({
+                                                       type: "POST",
+                                                       url: "menu_order.php",
+                                                       data: dataString,
+                                                       success:function(data)
+					{ //alert(data);
+                                         var data1=data.split("<");
+                                        data=$.trim(data1[0]);
+                                        //alert(data);
+                                        if(data=="ok")
+					{  
+//                                            alert(2);
+                                            $(".kotcancel_reason_popup").css("display","none");
+                                            $(".olddiv").removeClass("new_overlay");
+						var staff=($('#stafflist').val())
+						 
+                                                var dataString = 'set=cancelitemqty&itemslno='+itemslno+'&itemqty='+quantity+'&reason='+reason+'&secretkey='+secretkey+'&cancelkey='+cancelkey;
+                                                $.ajax({
+                                                       type: "POST",
+                                                       url: "load_bill_history.php",
+                                                       data: dataString,
+                                                       success: function(data) {
+                                                          // alert(data);
+                                                            $('.ordelist_table').load('viewitems.php');
+                                                            $(".loaderror").css("display", "block");
+                                                            $(".loaderror").addClass("popup_validate");
+                                                            $(".loaderror").text("KOT Cancellation Successfull");
+                                                            $('.loaderror').delay(2000).fadeOut('slow');
+                                                           
+                                                           var kotidcanceled=$.trim(data);
+                                                           
+                                                           var kt=kotidcanceled.split("<br />");
+                                                           
+                                                           var kotnew=$.trim(kt);
+                                                           
+                                                           
+                                                           //alert(kotidcanceled);
+//                                                                     $.post("smsvoid.php", {setkot:'smsvoidkot',kotid:kotnew,itemsl:itemslno},
+//                                                                        function(data)
+//                                                                        {
+//                                                                         //alert(data) ;   
+//                                                                        }); 
+
+                                                           
+                                                       }
+                                                });
+                                                
+						   $('.loadcanceldetails').css('display','none');
+						 $('.confrmation_overlay').css('display','none');
+                                                 
+                                             
+                                       
+                                                 
+                                                 
+                                                 
+					}else
+					{
+//                                            alert('Incorrect Password');
+                                            //$(".olddiv").addClass("new_overlay");
+                                            //$(".kotcancel_reason_popup").css("display","block");
+						var tp='';
+						var stafflist       = $("#stafflist").find('option:selected').attr('cancelkey');//alert(stafflist);
+						var psd=$("#hidenterpaswd").val();
+						var otp=$("#hidenterotp").val();
+						var err=$("#hiderrormg").val();
+						if(stafflist=='Y')
+						{
+							tp=otp;
+						}else
+						{
+							tp=psd;
+						}
+                                                
+                                                $('.loadcanceldetails').css('display','none');
+						 $('.confrmation_overlay').css('display','none');
+						$("#deatilserror").css("display","block");
+						$("#deatilserror").text(tp+" "+ err+"!!");
+						$("#deatilserror").delay(2000).fadeOut('slow');
+					}
+                                       
+				 }  }); 
+                                 
+                                   
+                  
+                
+
+	 }); 
+          jQuery('#pin').keyup(function (e) { 
+            this.value = this.value.replace(/[^0-9\.]/g,'');
+            if(!Number(this.value)||($(this).val().length <4)){
+                
+                    $('#pin_error').css("display",'block');
+                    $('#pin_error').text('CODE NOT REGISTERED');
+                    $('#pin_error').delay(2000).fadeOut('slow');
+               
+               
+            }
+        });
+       
+//          function pincheck(evt) {
+//                evt = (evt) ? evt : window.event;
+//                var charCode = (evt.which) ? evt.which : evt.keyCode;
+//                if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+//                    $('#pin_error').css("display",'block');
+//                    $('#pin_error').text('ENTER VALID NUMBERS');
+//                    $('#pin_error').delay(2000).fadeOut('slow');
+//                    
+//                    return false;
+//                }
+//                return true;
+//            }
+       
+         //------------------
+         $('#stafflist').change(function () {
+		var stafflist       = $("#stafflist").find('option:selected').attr('cancelkey');//alert(stafflist);
+            //	alert(stafflist); 
+		var psd=$("#hidenterpaswd").val();
+		var otp=$("#hidenterotp").val();
+                
+               if(stafflist=='Y')
+		{
+			$(' #typeentery ').text(otp);
+			$(' .btn_index_popup_send ').css('display','block');
+			$(' .btn_index_popup_send a').css('display','block');
+		}else
+		{
+			$(' #typeentery ').text(psd);
+			$(' .btn_index_popup_send').css('display','none');
+			$(' .btn_index_popup_send a').css('display','block');
+		}
+		
+	 
+	 
+	 });
+         
+          //--send OTP starts
+        
+        $('.sendotp').click(function (e) {//alert("j");
+             e.stopImmediatePropagation();
+   
+  
+		var stafflist       =  $('#stafflist').val();//alert(stafflist);
+		stafflist=$.trim(stafflist);
+                $.post("load_payments_takeaway.php", {stafflist:stafflist,set:'sendotp'},
+			function(data)
+			{
+			data=$.trim(data);
+			$("#deatilserror").css("display","block");
+			$("#deatilserror").text("OTP Sent..");
+			$("#deatilserror").delay(5000).fadeOut('slow');
+			//alert(data);
+			});
+//	 
+	 
+	 });
+         //--send OTP end
+         
+                // kot cancel end
+                       
+                       
+        //--------------change item count starts-----------------
+        function chg_item_cnt_inc(sl,menuid,qty,menutype){
+            
+            if(menutype==''){
+                if($("#txt_"+sl).val()<qty){
+                    $("#txt_"+sl).val(parseInt($("#txt_"+sl).val())+1);
+
+                }
+            }
+            else if(menutype=='addon'){
+                if($("#addontxt_"+sl+'_'+menuid).val()<qty){
+                    $("#addontxt_"+sl+'_'+menuid).val(parseInt($("#addontxt_"+sl+'_'+menuid).val())+1);
+
+                }
+            }
+        }
+        
+        function chg_combo_item_cnt_inc(combo_qty,comb_order_count){
+            
+            
+                if($("#txt_combo_"+comb_order_count).val()<combo_qty){
+                    $("#txt_combo_"+comb_order_count).val(parseInt($("#txt_combo_"+comb_order_count).val())+1);
+
+                }
+        }
+        
+        
+        
+        
+        function chg_item_cnt_dcr(sl,menuid,menutype){
+            if(menutype==''){
+                if($("#txt_"+sl).val()>0){
+                    $("#txt_"+sl).val(parseInt($("#txt_"+sl).val())-1);
+
+                }
+            }
+            else if(menutype=='addon'){
+                if($("#addontxt_"+sl+'_'+menuid).val()>0){
+                    $("#addontxt_"+sl+'_'+menuid).val(parseInt($("#addontxt_"+sl+'_'+menuid).val())-1);
+
+                }
+                
+            }
+        }
+        
+        
+        function chg_comb_item_cnt_dcr(combo_qty,comb_order_count){
+            
+                if($("#txt_combo_"+comb_order_count).val()>0){
+                    $("#txt_combo_"+comb_order_count).val(parseInt($("#txt_combo_"+comb_order_count).val())-1);
+
+                }
+        }
+        //--------------change item count end-----------------
+		
+		
+//		$(".confirmallfdetails").click(function(){
+//			$(".waiter_select_popup").css("display","block");
+//			$(".confrmation_overlay").css("display","block");
+//		});
+		$(".waiter_select_popup_close_btn").click(function(){
+			$(".waiter_select_popup").css("display","none");
+			$(".confrmation_overlay").css("display","none");
+		});
+                //number pad starts
+                /* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+$('.calculator_settle').click( function(event) {
+            //alert('hujyguyi');
+		event.stopImmediatePropagation();
+                $('#focusedtext').val('pin');
+		var focused=$('#focusedtext').val();
+               //alert(focused);
+		var calval=($(this).text());//alert(focused);alert(calval);
+		
+		var org=$('#'+focused).val();
+                //alert(org.length);
+			if(calval>=0)
+			{   
+                            if(org.length < 4){
+				if(org==0)
+				{
+					 $('#'+focused).val(calval);
+				}else if(org>0)
+				{
+					$('#'+focused).val(org+calval);
+				  
+				}else if(org<0)
+				{
+					$('#'+focused).val(org+calval);
+				}
+                            }
+//                            
+			}else if(calval=="Clear")
+			{
+				$('#'+focused).val("");
+			}else if(calval==".")
+			{
+				$('#'+focused).val(org+".");
+			}
+			$('#'+focused).change();
+		$('#'+focused).focus();
+		
+		
+		
+	});
+        
+        $('.calculator_settle_back').click( function(event) {
+            var str =$('#pin').val();
+            str = str.substring(0, str.length - 1);
+            $('#pin').val(str);
+            input.innerHTML=$('#pin').val();
+            $('#pin').focus();
+        });
+       
+
+
+                //number pad end
+                
+ //--------------------------proceed starts
+ $('#pin').keypress(function(ev){
+     
+    if(ev.keyCode == 13){
+        ev.stopImmediatePropagation();
+        $('#kotcancel_reason_popup_new_proceed_btn').trigger('click');
+    }});
+ 
+
+ $('#kotcancel_reason_popup_new_proceed_btn').click( function(event) { 
+     
+                    event.stopImmediatePropagation();
+ 
+                    var itemslno = $('#itemslno').val();
+                        var orderitem = $('.cnclqty');
+                        var itemqty = '';
+                        var combo_count='';
+                        var stock_check='';
+                        var combo_name=new Array();
+                        var quantity = new Array();
+                        orderitem.each(function(){
+                              if(!$(this).hasClass('combo_name')){
+                                itemqty   =  $(this).val();
+                                if(itemqty!='undefined' && itemqty!='' && itemqty!=null){
+                                    quantity.push(itemqty);
+                                }
+                            }
+                            else{    
+                                combo_count=$(this).attr('id').split('txt_combo_');
+                                stock_check=$(this).attr('stock_check');
+                                //alert($(this).val())
+                                //alert($('#reasontxt_'+combo_count[1]));
+                                combo_name.push({
+                                    combo_qty:$(this).val(),
+                                    combo_count:combo_count[1],
+                                    reason:$('#reasontxt_'+combo_count[1]).val(),
+                                    stock_check:stock_check
+                                });
+                            } 
+                        });
+                        var combo_name_string=JSON.stringify(combo_name);
+                        //alert(combo_name_string);
+                        var cnclrsn = $('.mainmenu');
+                        var itemcnclrsn = '';
+                        var reason = new Array();
+                        cnclrsn.each(function(){
+                              itemcnclrsn   =  $(this).val();
+                              if(itemcnclrsn!='undefined'){
+                                  reason.push(itemcnclrsn);
+                              }
+                        });
+                         
+                //*********************** ADD On Cancellation values take starts *************************************// 
+                        var addonitemslno=$('#addonitemslno').val();
+                        var addonorderitem = $('.addoncnclqty');
+                        var addonitemqty = '';
+                        var addonkot_num='';
+                        var addonquantity = new Array();
+                        
+                       
+                        addonorderitem.each(function(){
+                             var obj = {};
+                              addonitemqty   =  $(this).val();
+                              addonkot_num=$(this).attr('addonkot_num');
+                             
+                              if(addonitemqty!='undefined' && addonitemqty!='' && addonitemqty!=null){
+                                  addonquantity.push(addonitemqty);
+                              }
+                    
+                        });
+                         
+                       
+                        
+                        var addonmenuid = $('#addonallmenus').val();
+                        var addoncnclrsn = $('.addoncancelreason');
+                        var addonitemcnclrsn = '';
+                        var addonreason = new Array();
+                        addoncnclrsn.each(function(){
+                              addonitemcnclrsn   =  $(this).val();
+                              if(addonitemcnclrsn!='undefined'){
+                                  addonreason.push(addonitemcnclrsn);
+                              }
+                        });
+                        var addoncnclkotno = $('#addonkot_no').val();
+                        
+                       
+                //*********************** ADD On Cancellation values take Ends *************************************//  
+                
+             
+//				alert(1);
+				var pin =  $('#pin').val();
+                                if(pin !=''){
+				$.post("load_div.php", {pin:pin,type:'authpincheck',set:'pincheck',action:'kotcancel'},
+					function(data)
+					{
+					data=$.trim(data);
+                                        if(data!="NO")
+					{ 
+                                           var spl=data.split('*');
+                                          
+                                       if(spl[4]=='kotcancel:Y'){ 
+                                           
+                                             
+                                            data=$.trim(data);
+                                            //alert(data)
+                                            $(".kotcancel_reason_popup_new").css("display","none");
+                                            $(".olddiv").removeClass("new_overlay");
+						
+                                           var dataString = 'set=cancelitemqty&itemslno='+itemslno+'&itemqty='+quantity+'&reason='+reason+'&stafflist='+spl[0]+'&addonitemslno='+addonitemslno+'&addonitemqty='+addonquantity+'&addonreason='+addonreason+'&addonmenus='+addonmenuid+"&addonkotno="+addoncnclkotno+"&combo_name="+combo_name_string;
+                                          //  alert(dataString) ;
+                                            $.ajax({
+                                                       type: "POST",
+                                                       url: "load_div.php",
+                                                       data: dataString,
+                                                       success: function(data) {
+                                                            $('.ordelist_table').load('viewitems.php');
+                                                            $(".loaderror").css("display", "block");
+                                                            $(".loaderror").addClass("popup_validate");
+                                                            $(".loaderror").text("KOT Cancellation Successfull");
+                                                            $('.loaderror').delay(2000).fadeOut('slow');
+                                                            
+                                                            
+                                                            
+                                                            var kotidcanceled=$.trim(data);
+                                                           
+                                                           var kt=kotidcanceled.split("<br />");
+                                                           
+                                                           var kotnew=$.trim(kt);
+                                                           
+                                                           
+                                                           //alert(kotidcanceled);
+//                                                                     $.post("smsvoid.php", {setkot:'smsvoidkot',kotid:kotnew,itemsl:itemslno},
+//                                                                        function(data)
+//                                                                        {
+//                                                                         //alert(data) ;   
+//                                                                        }); 
+                                                       }
+                                                });
+                                                $('#pin').val('');
+//						   $('.loadcanceldetails').css('display','none');
+//						 $('.confrmation_overlay').css('display','none');
+                                        }else{
+                                               $("#pin_error").css("display","block");
+						$("#pin_error").text("No Permission!");
+						$("#pin_error").delay(2000).fadeOut('slow');
+                                                $("#pin").val('');
+                                                $('#pin').focus();
+                                        }      
+					}else
+					{
+                                                $("#pin_error").css("display","block");
+						$("#pin_error").text("CODE NOT REGISTERED!");
+						$("#pin_error").delay(2000).fadeOut('slow');
+                                                $("#pin").val('');
+                                                $('#pin').focus();
+					}
+                                       
+				 }); 
+                             }else{
+                                 $("#pin_error").css("display","block");
+						$("#pin_error").text("ENTER PIN");
+						$("#pin_error").delay(2000).fadeOut('slow');
+                                                $("#pin").val('');
+                                                $('#pin').focus();
+                             }
+                                 
+                                   
+                  
+                
+
+	 }); 
+         
+         
+         
+       function single_cart(mn,p,stk){
+           
+           
+                // $('.center_item_display_cc').addClass('disablegenerate') ;
+           
+                event.stopImmediatePropagation();
+                         
+                //  $('.clear_color_'+mn).addClass('take_item_active5'); 
+             
+                $('#preftext').val('');
+             
+                var dataString2 = 'set=check_single_click_cart&mode=DI&menuid='+mn+"&partner="+p+"&stk="+stk;
+				
+                                $.ajax({
+				type: "POST",
+				url: "load_index.php",
+				data: dataString2,
+				success: function(data2) {
+                                    
+                if($.trim(data2) !='no' && $.trim(data2) !='nostock') {
+                                  
+                var decimal=$('#decimal').val();                      
+                var det=$.trim(data2).split('*');         
+                var rate= parseFloat(det[0]).toFixed(decimal); 
+                var portion= parseFloat(det[1]); 
+                
+            
+                var dataString2 = 'set=set_all_in_single&qtyval=1&menu='+mn+"&rateval="+rate+"&portionval="+portion;
+		
+                                $.ajax({
+				type: "POST",
+				url: "load_div.php",
+				data: dataString2,
+				success: function(data2) {  
+                                  
+                            var tableid=$('#table_id').val();
+                            var floorid=$('#floorid').val();
+                            var stewardid=$('#steward_id').val();
+                            var orderid=$('#order_id').val();
+                            var branchid=$('#branch_id').val();
+                
+                
+          var  dataString = 'action=add&tableid='+tableid+"&floorid="+floorid+"&stewardid="+stewardid+"&orderid="+orderid+"&branchid="+branchid+
+          "&ratetype=Portion&unittype=&unittype=&unitweight=&baseunitweight=&unitid=&baseunitid=&addon=";
+  
+                            $.ajax({
+				type: "POST",
+				url: "response.php",
+				data: dataString,
+				success: function(data) { 
+                                
+                                
+                               // $('.center_item_display_cc').removeClass('disablegenerate') ;
+                     
+             //if($.trim(data)=='ErrorError'){
+             if ($.trim(data).indexOf("ErrorError") !== -1) {      
+                // single_cart(mn,p);
+                var ord=$('#order_id').val();
+                          
+                var dataString2 = 'set=single_click_cart_qty&mode=DI&menuid='+mn+"&type=plus&order_id="+ord+"&portion="+portion+"&unit=&base=&baseweight=";
+			
+                $.ajax({
+		type: "POST",
+		url: "load_index.php",
+		data: dataString2,
+		success: function(data2){
+                                    
+                $('.ordelist_table').css("display","block");
+                $('.ordelist_table').load('viewitems.php');
+                                       
+                $(".loaderror").css("display", "block");
+                $(".loaderror").addClass("popup_validate");
+                $(".loaderror").text("ITEM ADDED ");
+                $('.loaderror').delay(500).fadeOut('slow'); 
+                
+               }   
+                                    
+               });     
+                
+               }
+                                   
+                // $('.menu_sub_item1').removeClass('take_item_active5');  
+                $('.ordelist_table').css("display","block");
+                $('.ordelist_table').load('viewitems.php');
+                                         
+                $(".loaderror").css("display", "block");
+                $(".loaderror").addClass("popup_validate");
+                $(".loaderror").text("ITEM ADDED ");
+                $('.loaderror').delay(500).fadeOut('slow'); 
+                                       
+                                       
+                return true;
+                $(".md-close").click();
+                
+                }
+                
+                });
+                   
+                   
+                }
+                });
+                   
+                }else{
+                        
+                  $('.alert_error_popup_all_in_one').show();
+                  
+                  if($.trim(data2)=='nostock'){
+                            
+                            $('.alert_error_popup_all_in_one').text('NO STOCK IN INVENTORY');
+                        
+                  }else{
+                            
+                            $('.alert_error_popup_all_in_one').text('PLS ADD RATE ');  
+                 }
+                        
+                   $('.alert_error_popup_all_in_one').delay(1000).fadeOut('slow');  
+                        
+                   setTimeout(function(){
+                     location.reload(); 
+                   },1000);  
+                      
+                        
+                  }
+                   
+                  }
+                  
+                });          
+               
+      $('#search').focus();
+   
+   }   
+       
+       
+  function minus_single(mn,ord,qty,p,u,b,bw,sl){
+       
+        $(".minus_button_di").css('pointer-events','none');
+         
+       if(qty >=2 ){     
+                var dataString2 = 'set=single_click_cart_qty&mode=DI&menuid='+mn+"&type=minus&order_id="+ord+"&portion="+p+"&unit="+u+
+                        "&base="+b+"&baseweight="+bw+'&sl_no='+sl;
+				//alert(dataString);
+                            $.ajax({
+				type: "POST",
+				url: "load_index.php",
+				data: dataString2,
+				success: function(data2) {
+                                    
+                                                            $(".loaderror").css("display", "block");
+                                                            $(".loaderror").addClass("popup_validate");
+                                                            $(".loaderror").text("QTY CHANGED");
+                                                            $('.loaderror').delay(500).fadeOut('slow');
+                           
+
+                           
+              $(".minus_button_di").css('pointer-events','inherit');
+                  
+              $('.ordelist_table').load('viewitems.php');
+        
+        
+         }
+        });
+        
+        }else{
+         
+                        $('.alert_error_popup_all_in_one').show();
+                                    
+                        $('.alert_error_popup_all_in_one').text('MINIMUM QTY IS ONE');
+                        $('.alert_error_popup_all_in_one').delay(1000).fadeOut('slow');
+                        $(".minus_button_di").css('pointer-events','inherit');        
+        }
+        
+      $('#search').focus();
+      
+     }  
+     
+   function plus_single(mn,ord,p,u,b,bw,sl){
+       
+       
+        var dataString1 = 'set=check_plus_cart_stock&menuid='+mn+"&qty=1&weight=1&mode=di&type=plus&mode_in=Edit";
+	var request=  $.ajax({
+	type: "POST",
+	url: "load_index.php",
+	data: dataString1,
+	success: function(data) { 
+            //counter_menu_popup alert(data);
+            if($.trim(data)=='OK'){
+       
+            
+                var dataString2 = 'set=single_click_cart_qty&mode=DI&menuid='+mn+"&type=plus&order_id="+ord+"&portion="+p+"&unit="+u+"&base="+b+"&baseweight="+bw+'&sl_no='+sl;
+				//alert(dataString);
+                            $.ajax({
+				type: "POST",
+				url: "load_index.php",
+				data: dataString2,
+				success: function(data2) {
+                          
+                           $(".loaderror").css("display", "block");
+                           $(".loaderror").addClass("popup_validate");
+                           $(".loaderror").text("QTY CHANGED");
+                           $('.loaderror').delay(500).fadeOut('slow');
+
+                           $('.ordelist_table').load('viewitems.php');
+                             
+        
+        
+         }
+        });
+        
+   $('#search').focus();
+   
+   
+   }else{
+                        $('.alert_error_popup_all_in_one').show();
+                        
+                        $('.alert_error_popup_all_in_one').text('NO STOCK IN INVENTORY');
+                       
+                        $('.alert_error_popup_all_in_one').delay(1000).fadeOut('slow');  
+            
+        }
+                          
+        }
+        });    
+   
+   }   
+       
+       
+   function comp_bill(mn,ord,p,u,b,bw,sl){
+          
+        var check = confirm("MARKED ITEM WILL BE COMPLIMENTARY . NO RATE WILL BE INCLUDED IN BILL ?");
+	if(check==true)
+	{
+    
+       if($("#comp_bill_"+mn+'_'+sl).prop('checked') == true){
+            var chk='yes';
+        }else{
+             var chk='no';
+        }
+        
+       var matches =  $('.comp_bill:checkbox:not(":checked")').length;
+      
+      if(matches>0){
+        
+                var dataString2 = 'set=comp_item_setup&mode=DI&menuid='+mn+"&type=plus&order_id="+ord+"&portion="+p+
+                        "&unit="+u+"&base="+b+"&baseweight="+bw+"&sl_no="+sl+"&chk="+chk;
+				
+                            $.ajax({
+				type: "POST",
+				url: "load_index.php",
+				data: dataString2,
+				success: function(data2) {
+                     
+                     location.reload();
+                          
+                 }
+    });
+    
+            }else{
+              
+                $("#comp_bill_"+mn+'_'+sl).attr('checked',false);
+                 
+                $('.loyalty_cs_pop_overlay1').hide(); 
+                alert('ONE ITEM SHOULD BE THERE FOR BILL PRINT WITH RATE ')
+            }
+     
+        }else{
+          
+            location.reload();
+        }
+    
+    } 
+       
+ //--------------------------proceed end///////////
+ 
+ 
+ function load_best_sell_cat(){
+    
+     $('#load_subcat').html('');
+    
+          $('#load_menuitems').html('<img src="img/ajax-loaders/ajax-loader.gif" height="70px" style="margin:auto"  />');
+	   $('#load_menuitems').css("vertical-align","middle");
+	   $('#load_menuitems').css("display","flex");
+           
+	 var  dataString = 'set=best_selling_cat';
+	   var request= $.ajax({
+			type: "POST",
+			url: "load_div.php",
+			data: dataString,
+			success: function(data) {
+				 $('#load_menuitems').html(data);
+				 $('#load_menuitems').css("text-align","left");
+				 $('#load_menuitems').css("display","inherit");
+			}
+	 	 });
+}
+ 
+ 
+                        
+                    </script>
+<!--                 //kot popup dinein net fail//-->
+    <div style="display:none;height: auto;top: 20%; bottom: inherit; padding: 14px 0;" class="index_popup_1 closeoneclass kotconfirmpopup">
+        <span id="kotfailmsg" style="text-align: center;width: 100%;float: left ;padding-top: 7px;color:red;font-weight: bold"></span>
+ 	<div class="index_popup_contant">Continue Without Print ?</div>
+    <div class="index_popup_contant">
+        <div style="background-color: green !important" class="btn_index_popup"><a href="#" class="confirmkotok">Yes</a></div>
+        <div class="btn_index_popup"><a href="#" class="confirmkotclose">No</a></div>
+    </div>
+ </div>
+                    
+<!--       ///kot reprint  popup dinein net fail//             -->
+    <div style="display:none;height: 160px;" class="index_popup_1 closeoneclass kotconfirmpopup_reprint">
+        <span id="kotfailmsg_reprint" style="text-align: center;width: 100%;float: left ;padding-top: 7px;color:red;font-weight: bold"></span>
+ 	<div class="index_popup_contant">Continue Without Print ?</div>
+       <div class="index_popup_contant">
+    	<div style="background-color: green !important" class="btn_index_popup"><a href="#" class="confirmkotok_reprint">Yes</a></div>
+        <div class="btn_index_popup"><a href="#" class="confirmkotclose_reprint">No</a></div>
+    </div>
+ </div>                
+                
+<!--          <<<<kot canccel popup dinein net fail>>>          -->
+                    <div style="display:none;height: 160px;" class="index_popup_1 closeoneclass kotconfirmpopup_cancel">
+        <span id="kotfailmsg_cancel" style="text-align: center;width: 100%;float: left ;padding-top: 7px;color:red;font-weight: bold"></span>
+ 	<div class="index_popup_contant">Continue Without Print ?</div>
+    <div class="index_popup_contant">
+    	<div style="background-color: green !important" class="btn_index_popup"><a href="#" class="kot_cancel_ok">Yes</a></div>
+        <div class="btn_index_popup"><a href="#" class="kot_cancel_no">No</a></div>
+    </div>
+ </div>
+
+<style> .loyalty_cs_pop_overlay{
+    width:100%;
+	height:100%;
+	position:absolute;
+	z-index:999;
+	background-color: rgb(0 0 0 / 80%);
+    top:0;
+    display:flex;
+    align-items:center;
+    justify-content: center;
+ }
+ .loyalty_cs_pop_overlay img{width:150px}
+    </style>
+    <div class="loyalty_cs_pop_overlay" style="display: none "><img src="img/ajax-loaders/lm.gif"></div>
+
+    
+    
+    
+      <style>
+.stck_add_btn{width: 20px; height: 20px; display: inline-block;background-color: #738a77; border-radius: 50%; color: #fff !important; margin-left: 5px;}
+.stok_add_popup_sec{width:100%;height:100%;position:fixed;left:0;top:0;z-index:9999999999;background-color:rgba(0,0,0,0.9)}
+.stok_add_popup{width:250px;height:150px;position:absolute;left:0;right:0;top:20%;background-color:#fff;margin:auto;border-radius:10px;}
+.stok_add_popup_hd{width:100%;height:auto;float:left;font-size:18px;color:#242424;text-align:center;padding:20px 0;position:relative}
+.stok_add_popup_cnt{width:100%;height:auto;float:left;padding:10px;}
+.stock_add_txtbx{width:60%;height:35px;float:left;border:solid 1px #ccc;padding-left:6px}
+.stock_add_btn{width:38%;float:right;height:35px;text-align:center;line-height:35px;background-color:#738a77;color:#fff;border-radius:5px;}
+.stok_add_popup_cls{width:20px;height:20px;position:absolute;right:5px;top:5px}
+ </style>
+    
+      <div class="stok_add_popup_sec" style="display:none" id="otp_pop">  
+        
+        <div class="stok_add_popup" style="width:300px;height: 160px">
+        <div class="stok_add_popup_hd">  
+            <strong style="font-size: 13px " id="name_dis_new"></strong> 
+            <a href="#" onclick="$('#otp_pop').hide();"><div class="stok_add_popup_cls">
+            <img width="100%" src="img/black_cross.png" alt=""></div></a></div>
+        
+        <div class="stok_add_popup_cnt" id="cus_div">
+            <span style="font-size:10px;font-weight: bold;color: darkred">ENTER OTP PROVIDED BY OUTLET OWNER ? </span>  &nbsp; <br>
+            <input style="width:56%;margin-right: 20px;border-radius: 5px;"  maxlength="10" type="password" class="stock_add_txtbx" id="code_otp" placeholder="OTP"> &nbsp;&nbsp;
+           
+       <a id="go_item_cancel" onclick="go_otp();" href="#"><div   style="width:30%" class="stock_add_btn">GO</div></a>
+            
+        </div>
+        
+    </div>
+   </div>
+    
+    </body>
+    
+</html>

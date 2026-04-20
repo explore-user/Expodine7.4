@@ -1,0 +1,218 @@
+
+/********************************
+ * generic als elements styling
+ ********************************/
+.als-container {
+	position: relative;
+	width: 100%;
+	margin: 0px auto;
+}
+
+.als-viewport {
+	position: relative;
+	overflow: hidden;
+	margin: 0px auto;
+}
+
+.als-wrapper {
+	position: relative;
+	list-style: none;
+	padding-left: 0;
+        white-space: nowrap;
+    overflow: auto;
+    margin: 0;
+        width: 100%;
+}
+
+.als-item {
+	position: relative;
+	display: inline-block;
+	text-align: center;
+	cursor: pointer;
+        margin-left: -3px;
+        margin-bottom: -6px;
+	/*float: left;*/
+}
+
+.als-prev, .als-next {
+	position: absolute;
+	cursor: pointer;
+	clear: both;
+}
+
+
+/**************************
+ * specific als elements
+ * styling for #lista1
+ **************************/
+
+#lista1 {
+	margin: 0 !important;
+}
+
+#lista1 .als-item {
+	
+
+	min-width: 107px;
+}
+
+#lista1 .als-item img {
+	position: relative;
+	display: block;
+	vertical-align: middle;
+	margin-bottom: 8px;
+}
+
+#lista1 .als-prev, #lista1 .als-next {
+	top: 8px;
+	width: 15px;
+	height: 22px;
+}
+
+#lista1 .als-prev {
+	left: 11px;
+}
+
+#lista1 .als-next {
+	right: 10px;
+}
+
+/************************
+ * specific als element
+ * styling for #lista2
+ ***********************/
+
+#lista2 {
+	margin-bottom: 80px;
+}
+
+#lista2 .als-item {
+	margin: 10px 0px;
+	min-height: 140px;
+	min-width: 128px;
+}
+
+#lista2 .als-item img {
+	position: relative;
+	display: block;
+	vertical-align: middle;
+	margin-bottom: 8px;
+}
+
+#lista2 .als-prev, #lista2 .als-next {
+	left: 470px;
+	width: 22px;
+	height: 15px;
+}
+
+#lista2 .als-prev {
+	top: -25px;
+}
+
+#lista2 .als-next {
+	bottom: -20px;
+}
+
+#lista2 .als-item {
+	vertical-align: middle;
+}
+
+/*********************
+ * footer style
+ ********************/
+
+#footer {
+	width: 928px;
+	margin: 0 auto;
+	padding: 5px 15px;
+	border: 1px dashed #000;
+	border-radius: 10px;
+}
+
+#footer p {
+	position: relative;
+	margin: 5px auto 10px auto;
+	width: 960px;
+	font-size: 12px;
+}
+
+#footer p.ultimo {
+	margin-bottom: 5px;
+}
+
+.als-item a {
+    display: block;
+    border: solid 1px #E0E0E0;
+    border-bottom: 0;
+}
+
+.new_tab_btn {
+    width: 100%;
+    height: 36px;
+    margin-top: 3px;
+    float: left;
+    color: #fff;
+    padding: 0 3px 0 3px;
+    line-height: 37px;
+    font-size: 15px;
+    text-align: center;
+   font-family: 'CALIBRI_0';
+    font-weight: lighter;
+    background-color: #191919;
+    /* border-bottom: 3px solid #17aa56 !important; */
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
+}
+#new_tab_btn {
+    width: 100%;
+    height: auto;
+    /* margin-top: 3px; */
+    /* float: left; */
+    color: #fff;
+    /* padding: 0 3px 0 3px;
+    line-height: 37px; */
+    font-size: 15px;
+    text-align: center;
+   font-family: 'CALIBRI_0';
+    font-weight: lighter;
+    background-color: #191919;
+    /* border-bottom: 3px solid #17aa56 !important; */
+    /* border-top-right-radius: 2px;
+    border-top-left-radius: 2px; */
+}
+.als-container {
+    background-color: #F9F9F9;
+    border: 1px #D7D7D7 solid;
+	    border-bottom: 3px solid #F5351B !important;
+}
+
+.active_btn_1 {
+    background-color: #890000 !important;
+    height: 34px !important;
+    margin-top: 5px !important;
+    font-weight: bold !important;
+	font-family: 'CALIBRIB_0' !important;
+    border-bottom: 3px solid #941C27 !important;
+    -moz-border-radius-topleft: 10px !important;
+    -moz-border-radius-topright: 10px;
+    -moz-border-radius-bottomleft: 0px;
+    -moz-border-radius-bottomright: 0px;
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 0px;
+    -webkit-border-bottom-right-radius: 0px;
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+}
+
+.active_btn_3 {
+    background-color: #465738 !important;
+    /* height: 34px !important; */
+    margin-top: 0px !important;
+    font-weight: bold !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    font-family: 'CALIBRIB_0' !important;
+}

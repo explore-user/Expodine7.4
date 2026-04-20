@@ -1,0 +1,22 @@
+<?php
+
+define("HOST_NAME","192.168.0.139");
+define("USER_NAME","root");
+define("PASSWORD","explore@4123");
+define("DATABASE_NAME","expodine");
+define("DATABASE_NAME_REPORT","expodine");
+
+////////*** CLOUD CONNECTION SETUP [ URBANPIPER - QR CODE - ED REPORTS ]***//////
+
+define("HOST_NAME_CLOUD","52.15.128.230");
+define("USER_NAME_CLOUD","adminedreports");
+define("PASSWORD_CLOUD","Kev23rJbN");
+define("DATABASE_NAME_QR","test_expodine");
+define("DATABASE_NAME_URBAN","urban_test");
+define("DATABASE_NAME_MAIN","expodine_report_main");
+
+
+?>
+
+
+

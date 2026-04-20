@@ -1,0 +1,104 @@
+Tuesday June  12-06-2018 12:10:04 PM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`mylastdb`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in D:\wamp\www\expodine_4.0.6\src\install\install_db.class.php:29
+Stack trace:
+#0 D:\wamp\www\expodine_4.0.6\src\install\step-second.php(326): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Tuesday June  12-06-2018 12:15:46 PM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`new123`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in D:\wamp\www\expodine_4.0.6\src\install\install_db.class.php:29
+Stack trace:
+#0 D:\wamp\www\expodine_4.0.6\src\install\step-second.php(326): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Tuesday June  12-06-2018 07:32:41 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`jeshina`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in D:\wamp64\www\4.0.7\src\install\install_db.class.php:29
+Stack trace:
+#0 D:\wamp64\www\4.0.7\src\install\step-second.php(326): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Tuesday June  12-06-2018 07:50:25 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`jeshina`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in D:\wamp64\www\4.0.7\src\install\install_db.class.php:29
+Stack trace:
+#0 D:\wamp64\www\4.0.7\src\install\step-second.php(326): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Tuesday June  12-06-2018 08:11:13 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`jeshina`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in D:\wamp64\www\4.0.7\src\install\install_db.class.php:29
+Stack trace:
+#0 D:\wamp64\www\4.0.7\src\install\step-second.php(326): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Thursday June  24-06-2021 05:23:17 AM Caught exception: Exception: PROCEDURE panoor.proc_menu_import does not exist in D:\wamp\www\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 D:\wamp\www\expodine\src\install\step-second.php(333): install_dbconnection->throw_ex('PROCEDURE panoo...')
+#1 {main}
+Thursday June  24-06-2021 05:44:23 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`panoor`.`tbl_printersettings`, CONSTRAINT `fk_printersettings_printertype` FOREIGN KEY (`pr_printertype`) REFERENCES `tbl_printertype` (`pt_id`) ON UPDATE CASCADE) in D:\wamp\www\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 D:\wamp\www\expodine\src\install\step-second.php(333): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Thursday June  24-06-2021 05:58:12 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`panoor`.`tbl_printersettings`, CONSTRAINT `fk_printersettings_printertype` FOREIGN KEY (`pr_printertype`) REFERENCES `tbl_printertype` (`pt_id`) ON UPDATE CASCADE) in D:\wamp\www\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 D:\wamp\www\expodine\src\install\step-second.php(333): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Thursday March  24-03-2022 10:38:37 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`excel1`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(345): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Thursday March  24-03-2022 11:08:13 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(345): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Thursday March  24-03-2022 11:08:32 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(345): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Thursday March  24-03-2022 11:09:33 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(339): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Thursday March  24-03-2022 11:16:58 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(339): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Thursday March  24-03-2022 11:17:54 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(339): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Friday March  25-03-2022 05:33:15 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`expodine_exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(339): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Friday March  25-03-2022 05:36:00 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`expodine_exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(339): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Friday March  25-03-2022 05:37:01 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`expodine_exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(339): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Friday March  25-03-2022 05:40:18 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`expodine_exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(340): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Friday March  25-03-2022 05:40:28 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`expodine_exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(340): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Friday March  25-03-2022 05:40:52 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`expodine_exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(340): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Friday March  25-03-2022 05:41:12 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`expodine_exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(342): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Friday March  25-03-2022 05:41:41 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`expodine_exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(342): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Friday March  25-03-2022 05:46:29 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`expodine_exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(343): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Friday March  25-03-2022 05:49:58 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`expodine_exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(343): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Friday March  25-03-2022 05:50:12 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`expodine_exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(343): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}
+Friday March  25-03-2022 05:55:24 AM Caught exception: Exception: Cannot add or update a child row: a foreign key constraint fails (`expodine_exc`.`tbl_tablemaster`, CONSTRAINT `fk_tablemaster_floorid` FOREIGN KEY (`tr_floorid`) REFERENCES `tbl_floormaster` (`fr_floorid`)) in C:\Apache24\htdocs\expodine\src\install\install_db.class.php:29
+Stack trace:
+#0 C:\Apache24\htdocs\expodine\src\install\step-second.php(343): install_dbconnection->throw_ex('Cannot add or u...')
+#1 {main}

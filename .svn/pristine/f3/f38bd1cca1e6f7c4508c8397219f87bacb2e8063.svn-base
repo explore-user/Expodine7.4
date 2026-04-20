@@ -1,0 +1,1317 @@
+<?php
+//include('includes/session.php');		
+session_start();
+include("../database.class.php"); 
+$database	= new Database();
+
+?>
+<!doctype html>
+<html ng-app="website">
+<head>
+<meta charset="utf-8">
+<title>Voucher</title>
+<meta name="description" content="">
+<link href="../images/favicon.png" rel="shortcut icon">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<link rel="shortcut icon" href="img/favicon.ico">
+<link rel="stylesheet" href="../master_style/themify-icons.css" type="text/css" /><!-- Icons -->
+<link href="../css/menu_master_style.css" rel="stylesheet">
+<link id="bs-css" href="../css/bootstrap-cerulean.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../master_style/website.css" type="text/css">
+<link rel="stylesheet" href="../master_style/responsive.css" type="text/css" /><!-- Responsive -->	
+<link rel="stylesheet" href="../css/normal.css" type="text/css" /><!-- Responsive -->
+<link rel="stylesheet" href="../master_style/demo.css">	
+<link rel="stylesheet" href="../master_style/table_style.css">	
+<link rel="stylesheet" type="text/css" href="../master_style/default.css" />
+<link rel="stylesheet" type="text/css" href="../master_style/component.css" />
+<link rel="stylesheet" type="text/css" href="../master_style/popup/default.css" />
+<link rel="stylesheet" type="text/css" href="../master_style/popup/component.css" />
+ <link href="../master_style/app.css" rel="stylesheet" type="text/css">
+ <link rel="stylesheet" type="text/css" media="screen" href="../css/als_demo.css" />
+ 
+ <link rel="stylesheet" href="../css/style_date.css">
+  <link href="../loyalty/assets/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
+
+
+ 
+ 
+ <script src="../js/jquery-1.10.2.min.js"></script>
+<script src="../master_style/js/modernizr.custom.js"></script>
+<style>#ascrail2002{z-index: 9999999999999999999 !important;left:2px !important } 
+.ui-autocomplete{z-index:999999 !important;}.upload_view_img{bottom: 42px;float: right;height: 66px;position: relative;}
+    .table_report thead th{height:25px;}.tablesorter tbody{height: 79vh !important;}
+    .alert_popup_sec_cc{width:100%;height:100%;position:absolute;left:0;background-color:rgba(0,0,0,0.5) !important;top:0;z-index:999}
+    .alert_popup{width:310px;height:140px;position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;background-color:#fff;border-radius:10px}
+    .alert_popup_contant{width:100%;height:auto;float:left;padding:10px;color:#242424;font-size:22px;text-align:center;padding-top:30px;}
+    .alert_popup_contant_btn{width:100px;height:32px;display:inline-block;margin-top:30px;background-color:#c41515;color:#fff;line-height:35px;font-size:14px;opacity:0.8}
+    .alert_popup_contant_btn.yes{background-color:#0d9613;margin-left:10px}
+    .alert_popup_contant_btn:hover{opacity:1}
+    .row_active_vendor{background-color: lightpink}
+    .type_vend{
+        position: absolute;
+    height: 63%;
+    width: 100px;
+    top: -13%;
+    left: -27px;
+    pointer-events: none;
+    opacity: 0.5;
+
+}
+.lab_sts{
+        position: absolute;
+    height: 63%;
+    width: 100px;
+    top: -13%;
+    left: 0px;
+    pointer-events: none;
+    opacity: 1.5;
+
+}
+</style>
+<script type="text/javascript" src="../js/jquery-ui-1.8.2.custom.min.js"></script> 
+<script src="../js/jquery-1.10.2.js"></script>
+
+<style>
+.new_overlay{
+	 width:100%;
+	 height:100%;
+	 background-color:rgba(0,0,0,0.8);
+	 position:fixed;
+	 z-index:999;
+	 height: 100%;
+	
+	 }
+.tablesorter tbody{min-height:460px;height: 70vh;}	
+.contant_table_cc{height:auto;} 
+.md-content button{width: 120px;padding: 0;height: 33px;margin: 3px 2px;}	
+.form-control{height: 32px;padding: 0 12px;} 
+.form_name_cc{height: 33px;line-height: 17px;width: 40%;text-align: left;}
+.first_form_contain{padding:0.3%;}
+.md-content h3{margin-bottom:10px;}
+.form_textbox_cc {width:59%;}
+.md-content .first_form_contain {margin-bottom: 6px;}
+.tablesorter td{min-width:130px;}
+.tablesorter th{min-width:130px;max-width:inherit !important;}
+/*.tablesorter tr{display:block;}*/
+.tablesorter tbody{overflow:visible !important}
+.md-trigger_vouc img{width:23px;}
+
+.add_printer_drop{height:41px}
+ /*pagination */
+ .pagination>li>a, .pagination>li>span{
+color: #000;/* box-shadow: 0px 0px 5px #ccc; */background-color:/* #FFEFDD*/rgba(245, 178, 27, 0.20);border: 1px solid #C1C1C1;font-weight: bold;}
+.pagination>li>a:hover,.pagination>li>span:hover,.pagination>li>a:focus,.pagination>li>span:focus,.pagination>li>.active{background-color:bisque}
+
+.pagination{margin:0;margin:5px 5px 5px 0;float:right}
+.pagination > li > a, .pagination > li > span {padding: 6px 16px;color: #000000;background-color: rgba(222, 184, 135, 0.42);border: 1px solid rgba(175, 137, 88, 0.69)}
+.pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus{background-color:#A0522D;border-color: #A0522D;color:#fff;}
+.pagination> li > a:hover{background-color:#A0522D;border-color: #A0522D;color:#fff;}
+#container{background-color:rgb(237, 237, 237) !important}
+.ledger_head_sec{background:#fff; width:100%; height:auto; margin:0 0 5px 1px;padding-right:4px; border:1px #e5e5e5 solid;float:left;padding:10px;}.ledger_head{width:100%;height:auto;float:left;margin-top:0px;margin-bottom:5px;}
+.acc_add_box{padding-right: 5px;padding-left: 0px;margin-bottom:5px;width:15%;float:left}
+.ledger_list_sec{width:100%;height:auto;float:left;padding:8px;background-color:#fff;margin-bottom:15px;border:1px #e5e5e5 solid;}
+.ledger_list_scr{width:100%;height:auto;float:left;height:67vh;float:left;margin-top:5px;margin-bottom:25px;}
+.ledger_list_scr table{width:100%;height:auto;float:left}
+.ledger_list_scr table td{border: solid 1px #DAD4D4;color: #333; text-align: center; font-size: 14px; height: 31px; vertical-align: middle;
+font-family: 'CALIBRI_0';}
+.ledger_list_scr table thead{background-color:#333}.ledger_list_scr table thead td{color:#fff}
+.printer_add_text_boxes_cc input{width:100% !important}
+.printer_add_text_boxes_cc .bar{width:100%}
+.printer_add_popup .md-content > .div{display:inline-block;width:100%;padding:10px;}
+.printer_add_text_boxes_cc .group{width:100%;margin-left:0;}
+.printer_add_text_boxes_cc input:focus ~ label, input:valid ~ label{    color: #414141;}
+.md-show .md-overlay { opacity: 1;display: block;}
+.printer_add_text_boxes_cc .group{margin-bottom:20px}
+</style>
+
+<link rel="stylesheet" href="../css/jquery-ui.css">
+<script src="../js/jquery-ui.js"></script>
+<link rel="stylesheet" href="../css/style_date.css">
+
+</head>
+<body>
+     <input type="hidden" value="<?=$_SESSION['be_decimal']?>" id='decimal' >
+     <input type="hidden" value="<?=$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']?>" id="url_check" >
+<div class="olddiv "></div> 
+<div id="blr" class="container nopaddding">
+ <?php  include "includes/topbar_master.php"; ?>
+ <?php include "includes/left_menu_account.php"; ?>
+<div class="mian">
+	<div class="view-container">
+		<div style=" top: 58px;"  id="container">
+			<div class="breadcrumbs">
+				<ul>
+					<li><a href="../index.php" style="cursor:pointer"><i class="ti-home"></i></a>/</li>
+					<li><a style="cursor:pointer">Accounts</a></li>
+				</ul>
+            </div><!-- breadcrumbs -->
+
+
+            <div class="col-md-12">                        
+                      <div style="margin-bottom:0;background: #fff;" class="cc_new">
+                          <div style="border: 0 !important " id="lista1" class="als-container">
+                               <h3 style="float: left;margin-top: 10px;margin-left: 10px;font-weight: bold">SUPPLIER VOUCHERS</h3>
+ 
+                           <div style="width: 320px;float: right;top: 3px;height: 33px;margin: 8px 10px;display: flex;gap:10px;margin-right: 20px; " class="search_btn_member_invoice filte_new_box_btn">
+                               <a onclick="print_voucher();" style="background-color:darkred;margin:0;line-height: 32px;width: 50%"  href="#">PRINT</a>
+                               <a onclick="excel_voucher();" style="background-color:darkred;margin:0;line-height: 32px;width: 50%"  href="#">EXCEL</a>
+                               <a  id="same_page" style="background-color:#314b6b;margin:0;line-height: 32px;width: 50%"  href="supplier.php">GO BACK</a>                          
+                               <a  id="pl_page" style="background-color:#314b6b;margin:0;line-height: 32px;display: none;width: 50%"  href="load_ledger_sheet.php?redirect=redirect_account&from=<?php echo $_GET['from']; ?>&to=<?php echo $_GET['to']; ?>">GO BACK</a>
+                           </div>
+                      </div>
+                    </div>
+           </div>
+                
+            
+
+                <div class="content-sec">
+                	<div style="  padding: 2px;margin-top:10px;" class="col-lg-12 col-md-12 main_cc">
+                     
+                        
+
+                        <div class="col-md-12" style="padding:0 5px;">
+                            <div class="ledger_head_sec" style="">  
+                                <!-- <h3 class="ledger_head" style="font-size: 14px;">Filter  <span id="error_ledger" style="float:right;color:black;display: none;font-size: 14px;background-color: #ff4229;border-radius: 5px "></span></h3> -->
+
+                              
+                                <div class="acc_add_box" style="width:18%;">
+                                    <label style="margin: 0;">Supplier Name</label>
+                                    <input type="text" class="form-control filte_new_box" id="search_name" onkeyup="search_vendor();" name="" >
+                                </div>
+                                 <div class="acc_add_box" style="width:15%;">
+                                    <label style="margin: 0;">Invoice No</label>
+                                    <input type="text" class="form-control filte_new_box" id="search_inv_no" onkeyup="search_vendor();" name="" >
+                                </div>
+
+                                        
+                                <?php if (isset($_GET['from']))
+                                {
+                                    $fdate = $_GET['from'];
+                                }else{
+                                    $fdate=date('Y-m-d');
+                                }
+                                
+                                if (isset($_GET['to']))
+                                {
+                                    $tdate = $_GET['to'];
+                                }else{
+                                    $tdate=date('Y-m-d');
+                                }
+                                ?>
+                                
+                               <div class="acc_add_box" style="width:10%;">
+                                    <label style="margin: 0;">From Date  </label>
+                                    <input type="text" class="form-control filte_new_box" value=<?=$fdate;?>  autocomplete="off" id="search_date" onchange="datechange();" name="" >
+                                </div>
+                                 <div class="acc_add_box" style="width:10%;">
+                                    <label style="margin: 0;">To Date  </label>
+                                    <input type="text" class="form-control filte_new_box" value=<?=$tdate;?>  autocomplete="off" id="search_date_to" onchange="datechange();" name="" >
+                                </div>
+                                
+                                <div class="acc_add_box" style="width:10%;">
+                                    <label style="margin: 0;">Type  </label>
+                                    
+                                    <select class="form-control filte_new_box"  id="search_purchase_type" onchange="search_vendor();"> 
+                                         <option value=""> Select</option>
+                                    <option value="Normal">Normal Purchase</option>
+                                     <option value="Stock">Stock Purchase</option>
+                                </select>
+                                    
+                                   
+                                </div>
+                                
+                                
+                                <div class="acc_add_box" style="width:10%;">
+                                    <label style="margin: 0;">Payment  </label>
+                                    
+                                    <select class="form-control filte_new_box"  id="search_payment_type" onchange="search_vendor();"> 
+                                         <option value=""> Select</option>
+                                    <option value="paid">PAID</option>
+                                     <option value="notpaid">PENDING</option>
+                                </select>
+                                    
+                                   
+                                </div>
+                                
+                                <div class="acc_add_box" style="width:10%;">
+                                    <label style="margin: 0;">Tax Type </label>
+                                    
+                                    <select class="form-control filte_new_box"  id="search_tax_type" onchange="search_vendor();"> 
+                                         <option value=""> Select</option>
+                                    <option value="nonvat">NON VAT</option>
+                                     <option value="vat">VAT</option>
+                                </select>
+                                    
+                                   
+                                </div>
+                                
+                                
+                                
+                                   <div style="width: 100px;margin-top: 20px !important;height: 30px;margin: 8px 10px" class="search_btn_member_invoice filte_new_box_btn">
+                                       <a  id="same_page" style="background-color:darkred;margin:0;line-height: 32px;"  href="voucher_view.php">REFRESH</a>
+                                 </div>
+                                <!-- <div style="margin-left:2%;width: 18%;" class="search_btn_member_invoice filte_new_box_btn">
+                                <a id="add_btn_ledger"  style="margin-top:0"  href="#">Filter</a>
+                            </div>   -->
+
+                            <div class="ledger_list_sec" style="position:relative">
+                             
+                                   
+                             
+<div class="ledger_list_scr">
+    <table class="acc_table_scroll">
+        <thead>
+            <tr>
+                <td style=" min-width: 61px; max-width: 61px">SL</td>
+                <td style=" min-width: 100px; max-width: 100px;">Action</td>
+                <td style=" min-width: 150px; max-width: 150px;">Supplier Name</td>
+                <td style=" min-width: 100px; max-width: 100px"> Date</td>
+                <td style="min-width:200px; max-width: 200px">Particulars</td>
+                <td style=" min-width: 80px; max-width: 80px">Invoice No</td>
+                <td style=" min-width: 80px; max-width: 80px">Subtotal</td>
+                <td style=" min-width: 80px; max-width: 80px">Tax Amount</td>
+                <td style=" min-width: 80px; max-width: 80px">Invoice Amt</td>
+                <td style=" min-width: 80px; max-width: 80px">Paid </td>
+                <td style=" min-width: 80px; max-width: 80px">Crdt Amt </td>
+                <td style=" min-width: 80px; max-width: 80px"> Type</td>                                               
+                <td style=" min-width: 200px; max-width: 200px">Address</td>                                               
+                <td style="min-width:70px; max-width: 70px">Entry Date</td>
+                <td style="min-width:70px; max-width: 70px">Voucher Id</td>
+                <td style="min-width:70px; max-width: 70px">From Acc</td>
+                <td style="min-width:70px; max-width: 70px">Return Amt </td>                                               
+            </tr>
+        </thead>
+        <tbody id="load_vendor_data"></tbody>
+    </table>
+</div>
+                                <div>
+                                <div id="show_text"></div>
+                                <div id="show_pagination" style="position: absolute;bottom: 7px;right: 6px;"></div>
+                                </div>
+                            </div>
+                        </div>                     
+                    </div><!--main_cc-->
+                </div><!--main content-sec-->
+		</div>
+	</div>
+</div>
+</div><!--container-->
+
+<div  class="md-modal md-effect-16 printer_add_popup return_div" id="modal-18" style="top:0;width:100%;height:100%">
+			<div style="width:800px;top:3%;margin:auto;left:0;right:0" class="md-content">
+                <h3 id='pop_head3' style="margin-bottom:0">RETURN ENTRY  </h3>
+                <div onclick="return close_voucher();"  style="background-color:transparent;top: 3px;"  class="md-close close_staff_pop"><img src="img/close_ico.png"></div>
+				
+                <div class="div">
+
+                <div class="col-lg-12 col-md-12 no-padding printer_add_text_boxes_cc add_supplier_cnt" style="margin-bottom:5px;">
+
+                        
+                        <div class="col-md-4">
+                            <div class="group" id="prn_div">   
+                                <input readonly type="text" style="font-weight:bold;color: #af0000;text-transform: uppercase" value="" id="r_vendor_id"  >   
+                                 <span  style="color:darkred" class="type_vend"></span>
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label id="lab_grp"> </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="group" id="prn_div">   
+                                <input type="text"  id="r_date"  >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label id="lab_grp"></label>
+                             <span style="color:black"  class="lab_sts">Date</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="group" id="prn_div">   
+                            <input type="text" id="r_invoice" readonly >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                          
+                              <span style="color:black" class="lab_sts">Invoice No</span>
+                            </div>
+                        </div>
+                        
+
+                        <div class="col-md-4">
+                            <div class="group" id="prn_div">      
+                                <select class="add_printer_drop" id="r_to"> 
+                                    <option value="">Select</option>
+                                  <?php 
+                    $sql_kotlist  =  $database->mysqlQuery("SELECT tlm_id,tlm_ledger_name from tbl_ledger_master tl left join tbl_ledger_group tg on tl.tlm_group=tg.tlg_id where ( tl.tlm_vendor_id!='' or tg.tlg_name='Cash in Hand' OR tg.tlg_name='Bank Accounts')  "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {?>
+                               <option value="<?=$result_kotlist['tlm_id'] ?> "><?=$result_kotlist['tlm_ledger_name'] ?> </option>
+                              <?php 
+                               }
+                                    }?>
+                                </select>
+                                <label style="top:-5px;color: #414141;font-size: 14px" id="lab_grp">To ACC</label>
+                            </div>
+                        </div>
+                            
+                            <div class="col-md-4" id="bal_div" >
+                            <div class="group" id="prn_div">   
+                                <input type="text" id="r_amount"  value="0" readonly onkeypress="return numdot(event);"  >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>                         
+                              <span style="color:black" class="lab_sts">Return Amount</span>
+                            </div>
+                        </div> 
+                              
+                            
+                        <div class="col-md-12">
+                            <div class="group" id="prn_div">   
+                            <input type="text" id="r_remarks"  >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label id="lab_grp">Particulars</label>
+                            </div>
+                        </div>
+                        <input type="hidden" id="r_voucher" > 
+                            <a onclick="return  return_submit();" href="#"><button style="position:relative;top:2px;float:right;right:5px;height: 42px;" class="md-save">SUBMIT</button></a>
+                        </div>
+                </div>
+
+    </div>
+
+</div>
+
+<div  class="md-modal md-effect-16 printer_add_popup voucher_div" id="modal-18" style="top:0;width:100%;height:100%">
+			<div style="width:800px;top:3%;margin:auto;left:0;right:0" class="md-content">
+                            <h3 id='pop_head' style="margin-bottom:0"> EDIT SUPPLIER VOUCHER </h3>
+                            <div onclick="return close_voucher();"  style="background-color:transparent;top: 3px;"  class="md-close close_staff_pop"><img src="img/close_ico.png"></div>
+				
+                <div class="div">
+
+                        <div class="col-lg-12 col-md-12 no-padding printer_add_text_boxes_cc add_supplier_cnt" style="margin-bottom:5px;">
+
+                        
+                        <div class="col-md-4">
+                            <div class="group" id="prn_div">   
+                                <input readonly type="text" style="font-weight:bold;color: #af0000;text-transform: uppercase" value=" " id="vendor_id"  >   
+                                 <span  style="color:darkred" class="type_vend"></span>
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label id="lab_grp"> </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="group" id="prn_div">   
+                                <input type="text"  class="v_date" id="date_voucher"  >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label id="lab_grp"></label>
+                             <span style="color:black"  class="lab_sts">Date</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="group" id="prn_div">   
+                                <input type="text" id="v_address"  readonly>   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label id="lab_grp"></label>
+                            <span style="color:black" class="lab_sts">Address</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="group" id="prn_div">   
+                            <input type="text" id="v_invoice" readonly >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                          
+                              <span style="color:black" class="lab_sts">Invoice No</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="group" id="prn_div">   
+                                <input type="text" id="v_invoice_amount" onkeyup="return valid_paid();" readonly onkeypress="return numdot(this,event);" maxlength="10"  >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                          
+                              <span style="color:black" class="lab_sts">Invoice Amount</span>
+                            </div>
+                        </div>
+                            
+                            
+                            <div class="col-md-4">
+                            <div class="group" id="prn_div">   
+                                <input type="text" id="v_discount"   onkeypress="return numdot(this,event);" maxlength="10"  >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                          
+                              <span style="color:black" class="lab_sts">Discount Amount</span>
+                            </div>
+                        </div>
+                            
+                            
+                            <div class="col-md-4" id="return_div_new" style="display:none">
+                            <div class="group" id="prn_div">   
+                                <input type="text" id="v_return" readonly  onkeypress="return numdot(this,event);" maxlength="10"  >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                          
+                              <span style="color:black" class="lab_sts">Return Amount</span>
+                            </div>
+                        </div>
+                            
+                            
+                        <div class="col-md-4">
+                            <div class="group" id="prn_div">      
+                                <select class="add_printer_drop" id="v_from" onchange="check_ledger_balance();" > 
+                                    <option value="">From Acc</option>
+                                  <?php 
+                    $sql_kotlist  =  $database->mysqlQuery("SELECT tlm_id,tlm_ledger_name from tbl_ledger_master tl left join tbl_ledger_group tg on tl.tlm_group=tg.tlg_id where (tg.tlg_name='Cash in Hand' OR tg.tlg_name='Bank Accounts')  "); 
+					$num_kotlist  = $database->mysqlNumRows($sql_kotlist);
+					if($num_kotlist){
+						  while($result_kotlist  = $database->mysqlFetchArray($sql_kotlist)) 
+							  {?>
+                    <option value="<?=$result_kotlist['tlm_id'] ?> "><?=$result_kotlist['tlm_ledger_name'] ?> </option>
+                                        
+                                                      <?php 
+                                                  }
+                                                  }
+                                                ?>
+                                </select>
+                            </div>
+                        </div>
+                            
+                            <div class="col-md-4" id="bal_div1" style="display:block">
+                            <div class="group" id="prn_div">   
+                                <input type="text" id="v_balance" value="0" readonly onkeypress="return numdot(event);"  >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                           
+                              <span style="color:black" class="lab_sts">Balance To Pay</span>
+                            </div>
+                        </div> 
+                            
+                        <div class="col-md-4">
+                            <div class="group" id="prn_div">   
+                            <input type="text" id="v_paid_amount" onkeyup="return valid_paid();" onkeypress="return numdot(this,event);"  >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                           
+                              <span style="color:black" class="lab_sts">Paid Amount</span>
+                            </div>
+                        </div>
+                            <div class="col-md-4">
+                            <div class="group" id="prn_div">   
+                                <input type="text" id="v_credit_amount"  maxlength="10" readonly  >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <span style="color:black" class="lab_sts">Credit Amount </span>
+                           
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="group" id="prn_div">   
+                            <input type="text" id="v_trn_detail"  >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label id="lab_grp">TRN Details</label>
+                            </div>
+                        </div>
+
+                           <div class="col-md-4">
+                            <div class="group" id="prn_div">      
+                                <select class="add_printer_drop" id="v_purchase_type" disabled> 
+                                    <option value="Normal">Normal Purchase</option>
+                                     <option value="Stock">Stock Purchase</option>
+                                </select>
+                            </div>
+                        </div> 
+                            
+                        <div class="col-md-12">
+                            <div class="group" id="prn_div">   
+                            <input type="text" id="v_remarks"  >   
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label id="lab_grp">Particulars</label>
+                            </div>
+                        </div>
+                            <a onclick="return  update_suplier_voucher();" href="#"><button style="position:relative;top:2px;float:right;right:5px;height: 42px;" class="md-save">UPDATE</button></a>
+                        </div>
+                </div>
+
+    </div>
+
+</div>
+
+
+
+
+     
+  <div class="md-overlay"></div>               
+                 
+  <strong class="alert_error_popup" style="display: none" id="error_pop"> </strong>
+         
+<script src="../master_style/js/classie.js"></script>
+<script src="../master_style/js/modalEffects.js"></script>
+<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="../js/jquery.cookie.js"></script>
+<script src="../loyalty/assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript" src="../js/jquery.tablesorter.js"></script>
+<script type="text/javascript" id="js">
+</script>
+<script type="text/javascript">
+
+    //calender//
+$(document).ready(function () {
+    search_vendor();     
+    var url_check=$('#url_check').val();
+    var firstParameterValue = getFirstParameter(url_check);
+   // var new_id=url_check.split('redirect=');
+   
+   if(firstParameterValue=='profit_loss'){
+       $('#same_page').hide();
+       $('#pl_page').show();
+   }else{
+       $('#pl_page').hide();
+         $('#same_page').show();
+     }           
+                
+     $( "#search_date_to").datepicker({
+               changeMonth: true,
+               changeYear: true,
+               format: 'yyyy-mm-dd',
+               endDate: '+0d',
+               autoclose: true
+              });
+                
+     $( "#search_date").datepicker({
+               changeMonth: true,
+               changeYear: true,
+               format: 'yyyy-mm-dd',
+               endDate: '+0d',
+               autoclose: true
+            });
+           
+           
+         $("#date_voucher").datepicker({
+               changeMonth: true,
+               changeYear: true,
+               format: 'yyyy-mm-dd',
+               endDate: '+0d',
+               autoclose: true
+           });
+            $( "#r_date").datepicker({
+               changeMonth: true,
+               changeYear: true,
+               format: 'yyyy-mm-dd',
+               endDate: '+0d',
+               autoclose: true
+           });
+        });          
+
+ function getFirstParameter(url) {
+  var queryString = url.split('?')[1]; // Extract the query string from the URL
+  var ampersandExists = checkAmpersandExist(url);
+  if(ampersandExists==true){
+  var parameters = queryString.split('&'); // Split the query string into individual parameters
+
+  if (parameters.length > 0) {
+    var firstParameter = parameters[0].split('=')[1]; // Get the value of the first parameter
+    return decodeURIComponent(firstParameter); // Decode the parameter value if needed
+  }
+  }
+  return null; // Return null if there are no parameters
+}
+    
+
+function checkAmpersandExist(url) { //checking & exist in url
+  return url.indexOf('&') !== -1;
+}
+
+    function numdot(item,evt) {
+    evt = (evt) ? evt : window.event;
+    var charCode = (evt.which) ? evt.which : evt.keyCode;
+    if (charCode==46)
+    {
+        var regex = new RegExp(/\./g)
+        var count = $(item).val().match(regex).length;
+        if (count > 1)
+        {
+            return false;
+        }
+    }
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        return false;
+    }
+    return true;
+}
+  
+function print_voucher()
+{    
+   var v_name=$('#search_name').val();
+   var v_date=$('#search_date').val();
+   var search_date_to=$('#search_date_to').val();
+   var search_inv_no=$('#search_inv_no').val();
+   var search_type=$('#search_purchase_type').val();
+   var search_payment_type=$('#search_payment_type').val();
+   var search_tax_type=$('#search_tax_type').val();
+   window.open("a4_accounts_voucher.php?set=vendor_voucher_report&v_name="+v_name+"&fromdt="+v_date+"&todt="+search_date_to+"&search_inv_no="+search_inv_no+"&search_type="+search_type+"&search_payment_type="+search_payment_type+"&search_tax_type="+search_tax_type+"#print",'_blank');
+}
+
+function excel_voucher()
+{    
+   var v_name=$('#search_name').val();
+   var v_date=$('#search_date').val();
+   var search_date_to=$('#search_date_to').val();
+   var search_inv_no=$('#search_inv_no').val();
+   var search_type=$('#search_purchase_type').val();
+   var search_payment_type=$('#search_payment_type').val();
+   var search_tax_type=$('#search_tax_type').val();
+   window.location="excel_accounts_voucher.php?set=vendor_voucher_report&v_name="+v_name+"&fromdt="+v_date+"&todt="+search_date_to+"&search_inv_no="+search_inv_no+"&search_type="+search_type+"&search_payment_type="+search_payment_type+"&search_tax_type="+search_tax_type;
+}
+
+    function check_ledger_balance()
+    {
+    var v_from=$('#v_from').val();
+    var data_v="set=check_ledger_balance&ledger="+v_from;
+    $.ajax({
+			type: "POST",
+			url: "load_accounts_data.php",
+			data: data_v,
+			success: function(msg)
+			{      
+        if($.trim(msg)!='ok'){                 
+         $('#v_from').val('');            
+         $('#error_pop_v').show();
+         $('#error_pop_v').text('NO BALANCE IN LEDGER');
+         $('#v_from').focus();
+         $('#error_pop_v').delay(2000).fadeOut('slow');         
+                  }    
+                        }
+                    });
+    }
+    
+function search_vendor(n)
+{ 
+   var v_name=$('#search_name').val();
+   var v_date=$('#search_date').val();
+   var search_date_to=$('#search_date_to').val();
+   var search_inv_no=$('#search_inv_no').val();
+   var search_type=$('#search_purchase_type').val();
+   var search_payment_type=$('#search_payment_type').val();
+   var search_tax_type=$('#search_tax_type').val();
+   var data_v="set=search_vendor_voucher&v_name="+v_name+"&fromdt="+v_date+"&todt="+search_date_to+"&search_inv_no="+search_inv_no+"&search_type="+search_type+"&search_payment_type="+search_payment_type+"&search_tax_type="+search_tax_type;
+   
+//    if($('#search_date').val()!='' && $('#search_date_to').val()!=''){
+//       $('.confrmation_overlay_proce').css('display','block');
+//       $('.confrmation_overlay_proce').html('<img src="img/ajax-loaders/fetch.gif" />'); 
+//    }
+   if(!n)
+        {
+          n=1;
+        }
+
+    $.ajax({
+			type: "POST",
+			url: "load_accounts_data.php?page="+n,
+			data: data_v,
+            dataType: 'json',
+			success: function(msg)
+			{        
+            $('#load_vendor_data').html(msg.data);  
+            $('#show_text').html(msg.show);
+            $('#show_pagination').html(msg.pagination);  
+            $('.confrmation_overlay_proce').css('display','none');   
+            }
+        });
+}
+
+
+function datechange()
+{
+   if($('#search_date').val()!='' && $('#search_date_to').val()!=''){
+      $('.confrmation_overlay_proce').css('display','block');
+      $('.confrmation_overlay_proce').html('<img src="img/ajax-loaders/fetch.gif" />'); 
+      search_vendor();
+   }
+}
+function close_voucher(){
+    //location.reload();   
+    $('.voucher_div').removeClass('md-show');
+    $('.return_div').removeClass('md-show');
+    $('#error_pop_v').hide();
+    
+}
+
+
+function return_submit(){ 
+ var vid= $('#r_vendor_id').attr('ven_id');
+ var inv= $('#r_invoice').val();
+  var amt=$('#r_amount').val();
+  var date=$('#r_date').val();
+  var part=$('#r_remarks').val();
+  var to_acc=$('#r_to').val();
+ var sv_id= $('#r_voucher').val();
+
+ if(date !='' && to_acc!='' && part!='')
+       {           
+     $.ajax({
+			type: "POST",
+			url: "load_accounts_data.php",
+			data: "set=return_pay&inv="+inv+"&vendor="+vid+"&amt="+amt+"&date="+date+"&part="+part+"&to_acc="+to_acc+"&sv_id="+sv_id,
+			success: function(msg)
+			{ 
+                         $('#error_pop_v').show();
+                         $('#error_pop_v').css('background-color', '#549056');
+                         $('#error_pop_v').text('RETURN SUCCESSFULL');
+                         $('#error_pop_v').delay(2000).fadeOut('slow');
+                      
+                         setTimeout(function(){                            
+                        // location.reload(); 
+                        $('.return_div').removeClass('md-show');
+                        search_vendor();                          
+                        }, 500);                            
+                        }
+                    });
+                }
+    else{
+        $('#error_pop_v').show(); 
+        if(date==''){             
+              $('#error_pop_v').text('ENTER RETURN DATE');
+              $('#r_date').focus();
+         }
+         else if(to_acc==''){            
+              $('#error_pop_v').text('ENTER TO ACC');
+              $('#r_to').focus();
+         }
+         else if(part==''){              
+              $('#error_pop_v').text('ENTER PARTICULAR');
+              $('#r_remarks').focus();
+         }
+         else{
+           $('#error_pop_v').delay(2000).fadeOut('slow'); 
+         }
+         
+    }  
+}
+
+function return_pay(id,inv,vid,amt,vname){
+    
+    $("#r_date").val('');
+    $("#r_to").val('');
+    $("#r_remarks").val('');
+    
+   $.ajax({
+			type: "POST",
+			url: "load_accounts_data.php",
+			data: "set=return_pay_check&inv="+inv+"&vendor="+vid+"&amt="+amt+"&sv_id="+id,
+			success: function(msg)
+			{                           
+    if($.trim(msg)=='Yes'){                           
+       $('.return_div').addClass('md-show');    
+       $('#r_invoice').prop("readonly", true);                   
+                         
+  $('#r_vendor_id').attr('ven_id',vid);
+  $('#r_vendor_id').val(vname);  
+  $('#r_voucher').val(id);
+ 
+  $('#r_invoice').val(inv);
+  $('#r_amount').val(amt);
+
+        }else{
+            $('#error_pop_v').show();
+                         $('#error_pop_v').css('background-color', 'red');
+                         $('#error_pop_v').text('PAID ALREADY');
+                         $('#error_pop_v').delay(2000).fadeOut('slow');
+        }
+    }
+                    });      
+}
+
+
+
+function add_bal_pay(inv,vid){
+
+       $.ajax({
+			type: "POST",
+			url: "load_accounts_data.php",
+			data: "set=check_credit_pay&edit_inv="+inv+"&vendor="+vid,
+			success: function(msg1)
+			{
+                //(msg1);
+     if($.trim(msg1)!='no'){
+       $('.voucher_div').addClass('md-show');
+        $('#bal_div').show();
+      $('#pop_head').text('BALANCE PAY');
+      
+      
+       $.ajax({
+			type: "POST",
+			url: "load_accounts_data.php",
+			data: "set=check_return_pay_vendor&edit_inv="+inv+"&vendor="+vid,
+			success: function(msg12)
+			{
+     // alert(msg12);
+     $('#return_div_new').show();
+      $('#v_return').val($.trim(msg12));
+      
+    }
+    });
+     
+     
+     
+    $.ajax({
+			type: "POST",
+			url: "load_accounts_data.php",
+			data: "set=add_balance_voucher&edit_inv="+inv+"&vendor="+vid,
+			success: function(msg)
+			{
+                      //   alert(msg);
+                       var ed1=$.trim(msg);
+                       
+                       var ed=ed1.split('*');
+           $('#v_invoice').prop("readonly", true);                   
+                         
+         $('#v_discount').prop("readonly", true); 
+         $('#v_paid_amount').val('');       
+         $('#v_paid_amount').prop("readonly", false);  
+   $('#vendor_id').attr('voucher_bal_add',inv);
+  $('#vendor_id').val(ed[0]);
+  $('#vendor_id').attr('vendor_id_set',ed[1]);
+ // $('.v_date').val(ed[2]);
+  $('#v_address').val(ed[3]);
+  $('#v_invoice').val(inv);
+  $('#v_invoice_amount').val(ed[5]);
+ // $('#v_from').val(ed[6]);
+ // $('#v_paid_amount').val(ed[7]);
+  //$('#v_trn_detail').val(ed[8]);
+  //$('#v_remarks').val(ed[9]);
+  // $('#v_credit_amount').val(ed[10]);
+   $('.type_vend').text(ed[11]);
+    $('#vendor_id').attr('vendor_typ_set',ed[11]);   
+    
+    
+    var rt= $('#v_return').val();
+   //alert(ed[14]);
+   
+   $.ajax({
+			type: "POST",
+			url: "load_accounts_data.php",
+			data: "set=check_return_pay_vendor&edit_inv="+inv+"&vendor="+vid,
+			success: function(msg12)
+			{
+   
+     
+       $('#v_balance').val(ed[14]-$.trim(msg12));
+    }
+    });
+    
+     
+     
+     
+     
+     $('#v_purchase_type').val(ed[13]);
+      $('#v_discount').val(ed[12]);
+                        }
+                    });
+                    
+        }else{
+             $('#error_pop_v').show();
+        
+              
+               $('#error_pop_v').text('ALREADY PAID ALL CREDITS');
+               $('#v_from').focus(); 
+                $('#error_pop_v').delay(2000).fadeOut('slow');
+        }
+                     }
+                    });
+       
+}
+
+function edit_vendor(vid){
+    $('.voucher_div').addClass('md-show');
+    $('#pop_head').text('EDIT SUPPLIER VOUCHER');
+    $('#return_div_new').hide();
+    $('#bal_div').hide();
+    $.ajax({
+			type: "POST",
+			url: "load_accounts_data.php",
+			data: "set=edit_vendor_voucher&edit_id="+vid,
+			success: function(msg)
+			{
+                            
+                       var ed1=$.trim(msg);
+                       
+                       var ed=ed1.split('*');
+       
+     $('#v_paid_amount').prop("readonly", true);    
+      $('.v_date').prop("readonly", true);    
+     $('.v_date').css('pointer-events','none');
+     
+   $('#vendor_id').attr('voucher_update_id',vid);
+  $('#vendor_id').val(ed[0]);
+  $('#vendor_id').attr('vendor_id_set',ed[1]);
+  $('.v_date').val(ed[2]);
+  $('#v_address').val(ed[3]);
+  $('#v_invoice').val(ed[4]);
+  $('#v_invoice_amount').val(ed[5]);
+  $('#v_from').val(ed[6]);
+  $('#v_paid_amount').val(ed[7]);
+  $('#v_trn_detail').val(ed[8]);
+  $('#v_remarks').val(ed[9]);
+   $('#v_credit_amount').val(ed[10]);
+  $('.type_vend').text(ed[11]);
+   $('#v_discount').val(ed[12]);
+    $('#v_purchase_type').val(ed[13]);
+   $('#vendor_id').attr('vendor_typ_set',ed[11]);                            
+                        }
+                    });
+       
+}
+
+
+
+function update_suplier_voucher()
+{   
+  var bal_pay=parseFloat($('#v_balance').val());
+
+  if(bal_pay>0)
+  { 
+  var v_date=$('.v_date').val();
+  var v_address=$('#v_address').val();
+  var v_inv=$('#v_invoice').val();
+  var v_inv_amount=$('#v_invoice_amount').val();
+  var v_from=$('#v_from').val();
+  var v_paid_amt=$('#v_paid_amount').val();
+  var v_trn_detail=$('#v_trn_detail').val();
+  var v_remark=$('#v_remarks').val();  
+  var v_credit_amount=$('#v_credit_amount').val();
+  var update_id=$('#vendor_id').attr('vendor_id_set'); 
+  var vendor_typ=$('#vendor_id').attr('vendor_typ_set');  
+  var v_purchase_type=$('#v_purchase_type').val();
+  var discount= $('#v_discount').val();
+   
+   
+    if(v_inv_amount!='' && v_date!=''  && v_paid_amt!='' &&  v_inv!='' && v_remark!=''){
+        
+       if(v_from =='' && v_paid_amt>0)
+       {
+            $('#error_pop_v').show();
+            $('#error_pop_v').text('SELECT FROM ACC');
+            $('#v_from').focus(); 
+            $('#error_pop_v').delay(2000).fadeOut('slow');
+             exit; 
+        }
+        var data_v="set=update_vendor_balance&v_date="+v_date+"&v_address="+v_address+"&v_inv="+v_inv+"&v_inv_amount="+v_inv_amount+"&v_from="+v_from+
+          "&v_paid_amt="+v_paid_amt+"&v_trn_detail="+v_trn_detail+"&v_remark="+v_remark+"&update_id="+update_id+"&v_credit_amount="+v_credit_amount+"&vendor_typ="+vendor_typ+"&v_purchase_type="+v_purchase_type+"&discount="+discount;
+        
+        $.ajax({
+			type: "POST",
+			url: "load_accounts_data.php",
+			data: data_v,
+			success: function(msg)
+			{                           
+                $('#error_pop_v').show();
+                $('#error_pop_v').css('background-color', '#549056');
+                $('#error_pop_v').text('PAID SUCCESSFULLY');
+                $('#error_pop_v').delay(2000).fadeOut('slow');
+                $('.voucher_div').removeClass('md-show');
+                search_vendor();  
+               // setTimeout(function(){
+                $.ajax({
+                type: "POST",
+                url: "load_ledger.php",
+                data: "set=open_ledger_daywise&date="+v_date,
+                success: function(msg1)
+                {
+                                     
+                $.ajax({
+                type: "POST",
+                url: "load_ledger.php",
+                data: "set=close_ledger_daywise&date="+v_date,
+                success: function(msg)
+                {
+                                  
+                }
+                });    
+                }
+                });
+                //search_vendor();
+               // }, 500); 
+            }
+            });
+        
+        
+        
+        
+        
+    }else{
+        
+       $('#error_pop_v').show();
+       
+        
+        
+         if(v_paid_amt==''){
+              
+               $('#error_pop_v').text('ENTER PAID AMOUNT');
+               $('#v_paid_amount').focus();
+          }
+        
+         
+        
+           if(v_remark==''){
+              
+               $('#error_pop_v').text('ENTER PARTICULARS');
+               $('#v_remarks').focus();
+          }
+          
+          if(v_date==''){
+              
+               $('#error_pop_v').text('ENTER DATE');
+               $('.v_date').focus();
+          }
+          
+          
+        $('#error_pop_v').delay(2000).fadeOut('slow');
+      
+      
+            }
+      
+      
+  }else{
+  
+  var v_date=$('.v_date').val();
+  var v_address=$('#v_address').val();
+  var v_inv=$('#v_invoice').val();
+  var v_inv_amount=$('#v_invoice_amount').val();
+  var v_from=$('#v_from').val();
+  var v_paid_amt=$('#v_paid_amount').val();
+  var v_trn_detail=$('#v_trn_detail').val();
+  var v_remark=$('#v_remarks').val();  
+  
+  var v_credit_amount=$('#v_credit_amount').val();
+   
+   var update_id=$('#vendor_id').attr('voucher_update_id'); 
+    var vendor_typ=$('#vendor_id').attr('vendor_typ_set');  
+    var v_purchase_type=$('#v_purchase_type').val();
+    
+    var discount= $('#v_discount').val();
+    
+    if(v_inv_amount!='' && v_date!=''  && v_paid_amt!='' &&  v_inv!='' && v_remark!=''){
+        
+       if(v_from =='' ){
+        
+            
+                $('#error_pop_v').show();
+        
+              
+               $('#error_pop_v').text('SELECT FROM ACC');
+               $('#v_from').focus(); 
+                $('#error_pop_v').delay(2000).fadeOut('slow');
+               exit;  
+        }
+        if(vendor_typ=='Normal'){
+
+            if(parseFloat(v_paid_amt) != parseFloat(v_inv_amount)){
+                
+                $('#error_pop_v').show();
+        
+              
+               $('#error_pop_v').text('PAID AMOUNT IS NOT EQUAL TO INVOICE AMOUNT');
+               $('#v_paid_amount').focus(); 
+                $('#error_pop_v').delay(2000).fadeOut('slow');
+               exit;
+            }
+            
+        }
+        
+        var data_v="set=update_vendor_voucher&v_date="+v_date+"&v_address="+v_address+"&v_inv="+v_inv+"&v_inv_amount="+v_inv_amount+"&v_from="+v_from+
+          "&v_paid_amt="+v_paid_amt+"&v_trn_detail="+v_trn_detail+"&v_remark="+v_remark+"&update_id="+update_id+"&v_credit_amount="+v_credit_amount+"&v_purchase_type="+v_purchase_type+"&discount="+discount;
+        
+        $.ajax({
+			type: "POST",
+			url: "load_accounts_data.php",
+			data: data_v,
+			success: function(msg)
+			{
+                         $('#error_pop_v').show();
+                         $('#error_pop_v').css('background-color', '#549056');
+                         $('#error_pop_v').text('UPDATED SUCCESSFULLY');
+                         $('#error_pop_v').delay(2000).fadeOut('slow');
+                         $('.voucher_div').removeClass('md-show');
+                         setTimeout(function(){                           
+                            search_vendor();                                                   
+                        }, 500); 
+                             
+                             
+                        }
+                    });
+        
+        
+        
+        
+        
+    }else{
+        
+       $('#error_pop_v').show();
+       
+        
+        
+         if(v_paid_amt==''){
+              
+               $('#error_pop_v').text('ENTER PAID AMOUNT');
+               $('#v_paid_amount').focus();
+          }
+        
+         
+        
+        
+          if(v_inv_amount==''){
+              
+               $('#error_pop_v').text('ENTER INVOICE AMOUNT');
+               $('#v_invoice_amount').focus();
+          }
+          
+          
+          if(v_inv==''){
+              
+               $('#error_pop_v').text('ENTER INVOICE NUMBER');
+               $('#v_invoice').focus();
+          }
+          
+          
+           if(v_remark==''){
+              
+               $('#error_pop_v').text('ENTER PARTICULARS');
+               $('#v_remarks').focus();
+          }
+          
+          
+           if(v_date==''){
+              
+               $('#error_pop_v').text('SELECT DATE');
+               $('.v_date').focus();
+          }
+          
+        $('#error_pop_v').delay(2000).fadeOut('slow');
+    }
+    
+    
+        }
+        
+        
+}
+
+
+function valid_paid(){
+    
+     var decimal=$('#decimal').val();
+    
+     var v_invoice_amount=parseFloat($('#v_invoice_amount').val());
+ 
+     var v_paid_amount=parseFloat($('#v_paid_amount').val());
+   
+   
+   if(v_paid_amount==0){
+       
+       $('#v_paid_amount').val('');
+   }
+   var bal_pay=parseFloat($('#v_balance').val());
+
+   if(bal_pay >0 ){
+       if(v_paid_amount> bal_pay){
+       $('#v_paid_amount').val('');
+        $('#error_pop_v').show();
+        $('#v_credit_amount').val('');
+        
+               $('#error_pop_v').text('  PAID AMOUNT SHOULD BE LESS THAN BALANCE AMOUNT ');
+               $('#v_paid_amount').focus();
+               $('#error_pop_v').delay(2000).fadeOut('slow');
+   }else{
+       
+       var credit_amt=(bal_pay-v_paid_amount).toFixed(decimal);
+       
+       $('#v_credit_amount').val(credit_amt);
+       
+   }
+ 
+       
+       
+   }
+       
+       else{
+        
+      
+   
+       if(v_paid_amount> v_invoice_amount){
+       $('#v_paid_amount').val('');
+        $('#error_pop_v').show();
+        $('#v_credit_amount').val('');
+        
+               $('#error_pop_v').text(' INVALID PAID AMOUNT ');
+               $('#v_paid_amount').focus();
+               $('#error_pop_v').delay(2000).fadeOut('slow');
+   }else{
+       
+       var credit_amt=(v_invoice_amount-v_paid_amount).toFixed(decimal);
+       
+       $('#v_credit_amount').val(credit_amt);
+       
+   }
+ 
+   if(v_invoice_amount=='' || v_invoice_amount=='0' || isNaN(v_invoice_amount)){
+       $('#v_paid_amount').val('');
+        $('#error_pop_v').show();
+        
+        
+               $('#error_pop_v').text(' ENTER INVOICE AMOUNT FIRST ');
+              // $('#v_invoice_amount').focus();
+               $('#error_pop_v').delay(2000).fadeOut('slow');
+   }
+   }
+   
+}
+
+
+function delete_supplier_voucher(vid){
+     
+      var confirm1=confirm(" DELETE VOUCHER ?");
+      if(confirm1===true){
+          $('#error_pop_v').show();
+                         $('#error_pop_v').css('background-color', 'red');
+                         $('#error_pop_v').text('DELETING');
+                         $('#error_pop_v').delay(5000).fadeOut('slow');
+      $.ajax({
+			type: "POST",
+			url: "load_accounts_data.php",
+			data: "set=delete_supplier_voucher&vid="+vid,
+			success: function(msg)
+			{
+                          //location.reload();
+                          search_vendor();  
+                        }
+                    });
+                }
+}
+</script>
+
+<div style="position:fixed;width:auto;right: 20px;bottom:20px;z-index:99999;background-color: #f00;color: white;padding: 10px 20px;display: none;font-size: 15px" id="error_pop_v"> </div>
+
+<div style="display:none" class="confrmation_overlay_proce"></div>
+<style>
+      .confrmation_overlay_proce{
+	width:100%;
+	height:100%;
+	position:fixed;
+	z-index:999;
+	background-color:rgba(0,0,0,0.8);
+	top:0;
+	text-align:center;
+	line-height: 40;
+		}
+.confrmation_overlay_proce img{width:100px;height:100px;}
+    </style>
+
+</body>
+</html>

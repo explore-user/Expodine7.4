@@ -1,0 +1,409 @@
+.right_potion_mn {
+  width: 100% !important;
+  }
+.position_mn_cc li a {
+  width: 47%;
+  margin: 1.5% 1%;
+  height: 49px;
+  border-radius:5px;
+    position: relative;
+  text-align: left;
+  padding-left: 27px;
+  font-size: 19px;
+  color: #E7E7E7;
+  border:0px;
+  margin-bottom:1.1%;
+  }
+.caclulator_btn {
+  margin: 0.8%;
+  width: 23%;
+}
+.position_mn_cc ul {
+  width: 100%;
+  height: 101px;
+overflow: inherit;
+}
+.position_mn_cc li {
+   margin: 0 0 0 0 !important; 
+}
+.md-content > div ul li{padding:0;}
+.position_mn_cc{ 
+  height: 242px;
+  
+    float: left;
+	width: 100%;  
+	  padding-top: 4%;
+	/*padding-left: 5%;*/}
+.md-content > div ul {
+  margin: 5px;}
+  
+.md-modal {  min-width: 40%;width: 41vw;}
+.md-content > div{padding:0px;}
+.md-content h3{background-color:#000;  font-size: 1.5em;}
+.quantity_head2 {
+  margin: 12px 0 3px 0;
+  width: 52%;}
+  .take_away_cc {
+  width: 48%;
+  height: auto;
+  min-height: 80px;
+  float: right;}
+  .quantity_calculation_cc {
+  width: 51%}
+  .position_mn_cc_1 {
+  width: 100%;
+  height: auto;
+  margin-right: 8px;
+  float: left;}
+  
+ .md-content > div p{padding:0;margin-top:3px;position: relative;  left: -6px;width: 102%;} 
+ .switch label {
+  width: 100%;
+  height:67px;
+  margin-bottom:5px;}
+  .cb-disable.selected{margin-left:0px;height:67px;line-height:67px;}
+  .cb-disable.selected span{height:67px;line-height:67px;}
+  .md-content {
+  color: #fff;
+  background: #000;
+  }
+  .prefrence_drop_down_cc{min-height:inherit}
+  .right_potion_mn{min-height:50vh !important;height:auto !important;}
+  .prefrence_drop_down_cc {
+  width:100%;
+  margin-top:2px;
+}
+.prefrence_submit_buton_cc {
+  width: 48%;
+  height: auto;
+  float: right;
+}
+button {
+  border: none;
+  padding: 0em 1.2em;
+  line-height:40px;
+}
+.cb-enable span{
+	  height: 67px;
+  line-height:60px;
+	}
+.potion_mn_hd{margin-left:-2% !important;}	
+.right_div_cc {
+  width: 28% !important;
+    padding-top: 0px !important;
+}
+.center_item_display_cc {
+  width: 59.2% !important;
+    border-right: solid 5px #B83404;
+}
+
+.ordelist_table {
+   height: 61vh;
+  min-height: 473px !important;
+}
+.orderlist_menu_odr_btn_cc {
+  width:100%;
+   border-top: 1px solid #B83404;
+  margin-left:0px;
+  padding-left:1px;
+  
+}
+.confirm_btn{
+	  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #EF3F00), color-stop(100%, #892A08));
+  background-image: -webkit-linear-gradient(#EF3F00, #892A08);
+  background-image: -moz-linear-gradient(#EF3F00, #892A08);
+  background-image: -o-linear-gradient(#EF3F00, #892A08);
+  background-image: linear-gradient(#EF3F00, #892A08);
+    box-shadow: 1px 1px 8px #808080 !important;
+	}
+.confirm_btn:focus{color:#fff;}	
+  .menu_order_dish_name {
+  width: 63%;}
+.right_potion_mn{background-color:transparent !important;} 
+.md-close{  background-color: #620B0B !important;float:right;/*border-radius:50px;*/  margin: -5px -5px 0 0 !important;  width: 60px;height: 40px;text-align:center;padding-left: 13px !important;   border-bottom-left-radius: 12px;
+ padding: 0em 0.5em !important;}
+.md-close:hover{background-color:rgba(255,255,255,0.3) !important;}
+.md-show.md-effect-16 .md-content{   height: 100%;float: left;}
+.md-modal{position:absolute;}
+.take_mode_select_cc{
+	width:100%;
+	height:50px;
+	float:left;
+	background-color:#191919;
+	margin-top:5px;
+	}
+.position_mn_cc li a	{font-family:inherit !important;font-size: 15px;}
+.no-padding{padding-left:0 !important;padding-right:0 !important}	
+.md-content button{  font-size:0.5em !important;}
+.takeawy_mode_text_cc{
+	width:20%;
+	height:50px;
+	float:left;
+	line-height:50px;
+	text-align:center;
+	color:#fff;
+	font-size:16px;
+	border-right:1px #666 solid;
+	}
+.take_btn_cc{
+	  width:49%;
+  margin: 0.5%;
+	height:40px;
+  margin-top: 5px;
+  border-radius: 3px;
+   	border-radius:8px;
+    background-color: #272727;
+  border: solid 1px #353535;
+	line-height:40px;
+	text-align:center;
+	cursor:pointer;
+	color:#fff;
+	font-size:17px;
+	float:left;
+	  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.8);
+	}
+.take_btn_cc_act{  
+background-color: #620B0B ;
+ -moz-box-shadow: inset 0px 0px 13px #000000 !important;
+  -webkit-box-shadow: inset 0px 0px 13px #000000 !important;
+  box-shadow: inset 0px 0px 13px #000000 !important;
+    border-bottom: 4px solid #fff !important;
+
+}		
+
+.popup_potion_main{
+	width:100%;
+	height:auto;
+	padding:2%;
+	float:left;
+	}
+.popup_potion_cc{
+	width:49.2%;
+	  min-height: 276px;
+	float:left;
+	height: 276px;
+	background-color:rgba(255,255,255,0.1);
+	}
+.popup_quarter_cc{
+	width:49.2%;
+	  min-height: 265px;
+	  height: 276px;
+	float:right;
+	background-color:rgba(255,255,255,0.1);
+	}
+.popup_potion_head{	
+	width:100%;
+	height:35px;
+	float:left;
+  	background-color: #b90504;
+	line-height:35px;
+	text-align:center;
+	color:#fff;
+	font-size:17px;
+	}
+.position_mn_cc_focus{  background-color: #620B0B !important;  border-bottom: 4px solid #fff !important;}	
+.position_mn_cc_focus .portion_view_btn{height:45px;}
+.portion_view_btn{
+	width:30%;
+	height:48px;
+	position:absolute;
+	right:0;
+	text-align:center;
+	font-size:13.5px;
+	color:#fff;
+	border-left:1px solid #565656;
+	}
+.keys{width:100%;
+height:auto;
+float:left;padding:5%;}	
+	
+.keys span, .top span.clear {
+	float: left;
+	position: relative;
+	top: 0;
+	cursor: pointer;
+	width:30%;
+	height:45px;
+	background: rgba(78, 94, 104, 0.4);
+	border-radius: 3px;
+	box-shadow: 0px 4px rgba(0, 0, 0, 0.8);
+	  margin: 0 3% 4% 0;
+	color: #fff;
+	font-size: 15px;
+	line-height: 44px;
+	text-align: center;
+	/* prevent selection of text inside keys */
+	user-select: none;
+	/* Smoothing out hover and active states using css3 transitions */
+	transition: all 0.2s ease;
+	-moz-transition: all 0.2s ease;
+	-webkit-transition: all 0.2s ease;
+	-o-transition: all 0.2s ease;
+	-ms-transition: all 0.2s ease;
+}
+.position_mn_cc li a{background: rgba(78, 94, 104, 0.4)}
+
+/* Remove right margins from operator keys */
+/* style different type of keys (operators/evaluate/clear) differently */
+.keys span.operator {
+	background: #FFF0F5;
+	margin-right: 0;
+}
+.keys span.clear{background: rgba(78, 94, 104, 0.4) !important;color:#fff !important;}
+.keys div.eval {
+	background: #F5351B !important;
+  box-shadow: 0px 4px #AD1A07 ;
+	float: left;
+  position: relative;
+    padding: 5.5%;
+  top: 0;
+  cursor: pointer;
+  width: 80px;
+  height: 50px;
+  background: white;
+  border-radius: 3px;
+  box-shadow: 0px 4px rgba(0, 0, 0, 0.8);
+  margin: 0 12px 11px 0;
+  color: #fff;
+  line-height: 50px;
+  text-align: center;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+.keys div.eval:hover{    background-color: #620B0B !important;color:#fff}
+
+.keys span.clear {
+  box-shadow: 0px 4px #000;
+	color: #000;
+	  clear: inherit;
+	    width: 64%;
+}
+.keys span.clear:hover{   background-color: #620B0B !important;color:#fff}
+
+/* Some hover effects */
+.keys span:hover {
+	background: #c5103d;
+	box-shadow: 0px 4px #570E21;
+	color: #fff;
+}
+
+.keys span.eval:hover {
+	background: #fff;
+	box-shadow: 0px 4px #717a33;
+	color: #ffffff;
+}
+
+.top span.clear:hover {
+	  background-color: #620B0B !important;
+	box-shadow: 0px 4px #d3545d;
+	color: white;
+}
+
+/* Simulating "pressed" effect on active state of the keys by removing the box-shadow and moving the keys down a bit */
+.keys span:active {
+	box-shadow: 0px 0px #6b54d3;
+	top: 4px;
+}
+
+.keys span.eval:active {
+	box-shadow: 0px 0px #717a33;
+	top: 4px;
+}
+
+.top span.clear:active {
+	top: 4px;
+	box-shadow: 0px 0px #d3545d;
+}
+
+.keys div.eval:active {
+	box-shadow: 0px 0px #717a33;
+	top: 4px;
+}	
+	
+.pref_right_btn{
+	padding:5px 10px;
+	width:49%;
+	height:35px;
+	float:right;
+	  margin-top: 2px;
+	}
+.listiing_select_cc{width:49%;float: right;}	
+.pref_text_area {
+  height:94px;
+  border-radius:5px;
+  padding:3%;
+  font-size:16px;
+  width:99%;
+	background: #2D3337;
+  color:#fff !important;
+  border:solid 0px #666 !important;
+    margin-top: 5px;
+
+}	
+	
+.pref_right_btn{  line-height:33px;  height: 43px;  box-shadow: 0px 4px rgba(86, 23, 0, 1);	transition:all 0.3s ease;}	
+.pref_right_btn:active{  line-height:33px;  height: 43px;  box-shadow: 0px 0px rgba(86, 23, 0, 1);margin-top:4px !important;}
+.pref_right_btn:hover{background-color:rgba(255,255,255,0.2);color:#fff;}
+.pref_right_btn:focus{text-decoration:none;color:#fff;}
+.listiing_select_cc .fancy-select div.trigger{
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #2D3337), color-stop(100%, #2D3337));
+  background-image: -webkit-linear-gradient(#2D3337, #2D3337) !important;
+  background-image: -moz-linear-gradient(#2D3337, #2D3337) !important;
+  background-image: -o-linear-gradient(#2D3337, #191919) !important;
+  background-image: linear-gradient(#2D3337, #2D3337) !important;
+  border: 1px solid #2D3337 !important;	
+    color: #FFF !important;
+	  width:100%;
+	  margin-top:5px;
+	  height:40px;
+	  line-height: 40px;
+	  font-weight: lighter;
+	}
+.listiing_select_cc .fancy-select ul.options{width:100%;top:50px;}	
+.listiing_select_cc{height:50px;}	
+.right_div_cc{margin-left:0px;  
+  border: solid 5px #B83404;
+background-color: #E3E3E3;
+  margin: 0 0.5% 0 0.5%;
+    padding: 0px 0px 5px 0 !important;
+	  height: 76.7vh;
+	  min-height:590px;
+  }
+  .left_cantainer{background-color:#191919}
+	
+.preference_table{background-image:none !important;  border: solid 1px #ccc;background-color:#fff;}	
+.product_item button{margin:0px !important}
+.top_inform_cc{  border-top: 1px #E0E0E0 solid;}
+.hotel_bran_name{
+  width: 43%;
+  text-align: right;
+  height: 50px;
+  float: left;
+  line-height: 50px;
+  color: #FFF;
+  font-family: lato;
+  font-weight: lighter;
+  font-size: 26px;
+  padding-left: 10px;
+	}
+.hotel_bran_name span{
+	font-size:23px;
+	color: #ccc;
+	}	
+.table_number_top_cc{font-weight:lighter;  font-size: 16px;}
+
+.listiing_select_cc .fancy-select ul.options li {
+  height: 36px;
+  line-height: 36px;
+  font-weight:lighter;
+  }
+ .listiing_select_cc .fancy-select ul.options.overflowing.open{max-height:300px !important;bottom:40px !important;} 
+.listiing_select_cc .fancy-select ul.options{max-height:300px !important;}	
+.listiing_select_cc .fancy-select select:focus + div.trigger{box-shadow:none !important;}
+.listiing_select_cc .fancy-select select:active + div.trigger{box-shadow:none !important;margin-top:1px !important;border:solid 0px !important; }
+
+.odr_1_active{  background-color: #D4982D;
+  border: solid 1px #120501;}
+.menu_order_delet_btn{
+	   z-index: 99 !important;
+	 } 

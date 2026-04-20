@@ -1,0 +1,83 @@
+<?php
+
+session_start();
+include("database.class.php"); 
+$database	= new Database();
+
+//$folder = "C:\\Apache24\\htdocs\\expodine\\util\\APP";   // your folder name
+//$zipname = "myfolder.zip";
+//
+//$zip = new ZipArchive();
+//
+//if ($zip->open($zipname, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+//
+//    foreach (glob($folder."/*") as $file) {
+//        if (is_file($file)) {
+//            $zip->addFile($file, basename($file));
+//        }
+//    }
+//
+//    $zip->close();
+//}
+//
+///* force download */
+//header("Content-Type: application/zip");
+//header("Content-Disposition: attachment; filename=".$zipname);
+//readfile($zipname);
+
+//unlink($zipname); // delete zip after download
+
+
+
+
+
+
+
+//test print///
+//     require_once("Escpos.php");
+//     require('printlogo/I18N/Arabic.php');
+//     $Arabic = new I18N_Arabic('Glyphs');  
+//     
+//          $printers='';
+//         // $a='127.0.0.1';
+//          //$b='BILL';     
+//          
+//          $a='192.168.0.169';
+//          $b='9100';  
+//          
+//          if($b=='9100'){
+//	         $connector = new NetworkPrintConnector($a, $b);
+//                 $printers = new Escpos($connector);	
+//        }else{
+//                 $printer="\\\\".$a."\\".$b;
+//		 $connector = new FilePrintConnector($printer);
+//		 $printers = new Escpos($connector); 
+//        }
+//        $printers -> setJustification(Escpos::JUSTIFY_CENTER);
+//	$printers -> selectPrintMode(Escpos::MODE_DOUBLE_HEIGHT);
+//	$printers -> selectPrintMode(Escpos::MODE_DOUBLE_WIDTH);
+//	$printers -> setEmphasis(true);
+//	$printers -> setTextSize(2,2);
+//	$printers -> text('Test print');
+//      
+//        $printers -> feed();$printers -> feed();     $printers -> feed(); $printers -> feed();$printers -> feed();
+//        $printers -> feed();
+//	$printers -> setTextSize(1, 2);
+//	$printers -> selectPrintMode();
+//	$printers -> feed();
+//	$printers -> cut();
+//	$printers -> close();
+
+ ?>
+<script src="js/jquery-1.10.2.min.js"></script>
+<script src="master_style/js/modernizr.custom.js"></script>
+<script type="text/javascript">
+    
+     $(document).ready(function() { 
+         
+    
+     });
+     
+ </script>
+
+ 

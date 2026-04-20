@@ -1,0 +1,700 @@
+<?php
+
+session_start();
+include("DB/database.class.php"); // DB Connection class
+$database	= new Database();
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+    <link rel="shortcut icon" href="img/favicon.ico">
+
+        <title>Home</title>
+
+        <!--Morris Chart CSS --> 
+
+        <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+        <link href="assets/css/core.css" rel="stylesheet" type="text/css">
+        <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
+        <link href="assets/css/responsive.css" rel="stylesheet" type="text/css">
+        <!-- HTML5 Shiv and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="assets/js/modernizr.min.js"></script>
+        
+<style>.form-horizontal .control-label{text-align:left;font-size:18px;color:#333}.form-control{background-color: #f1f1f1;}
+	.content-page{margin-left: 0 !important;}
+        .loader-new{width: 100%;height: 100%;position: absolute;left: 0;top: 0;background-color: rgba(230, 229, 229, 0.8);text-align: center;padding-top: 15%;z-index: 99999;}
+	.alert-popup-new{width: 100%;height:100%;position: absolute;top: 0;left: 0;z-index: 99;background-color: rgba(230, 220, 220, 0.9);z-index: 99999; }
+        .alert-popup-text{width: 420px;height: 100px;position: absolute;background-color: #fff;margin: auto;left: 0;right: 0;top: 0;bottom: 0;color: #f00;text-align: center;padding: 17px;font-size: 19px;  box-shadow: 5px 6px 5px #ccc;align-items: center;display: flex;justify-content: center;border-radius: 5px}
+</style>
+
+    </head>
+
+<body class="fixed-left" style="" cz-shortcut-listen="true" onload="disableBackButton();">
+    <div class="loader-new" style="display:none"><img src="images/loader.gif"></div>
+    
+    
+    <?php
+                    $localhost=mysqli_connect(HOST_NAME, USER_NAME, PASSWORD,DATABASE_NAME);
+
+		$sql_kots="Select * From tbl_track_l";
+		
+                $sql_kotss  =  mysqli_query($localhost,$sql_kots); 
+		$num_kots  = mysqli_num_rows($sql_kotss);
+		if($num_kots){	 
+		while($result_kots  = mysqli_fetch_array($sql_kotss)) 
+				{    
+                              
+                                
+                                 $login=$result_kots['l_logged_status'];
+                                
+                                }}
+			?>
+                    <input type="hidden" id="login" value="<?=$login?>" >
+    
+    
+    
+    
+    <!-- Begin page -->
+    <div id="wrapper">
+
+        
+        
+        
+        
+        <!-- Top Bar Start -->
+        <div class="topbar">
+
+            <!-- LOGO -->
+            <div class="topbar-left">
+                <div class="text-center">
+                    <a href="#" class="logo"><i class="icon-magnet icon-c-logo"></i><span><img src="images/comp_logo.png" width="200"></span></a>
+                   
+                </div>
+            </div>
+
+            <!-- Button mobile view to collapse sidebar menu -->
+            <div class="navbar navbar-default" role="navigation">
+                <div class="container">
+                    <div class="">
+                        <div class="pull-left">
+                           
+                            <span class="clearfix"></span>
+                        </div>
+
+
+                        <ul class="nav navbar-nav navbar-right pull-right">
+                            
+                            
+                            
+                            <li class="dropdown top-menu-item-xs">
+                                <a href="#" class="dropdown-toggle profile waves-effect waves-light" data-toggle="dropdown" aria-expanded="false"><img src="images/user_ico.png" class="img-circle"> </a>
+                                <ul class="dropdown-menu">
+                                    
+                                    <li><a href="javascript:void(0)" onclick="confirmation()"><i class="ti-power-off m-r-10 text-danger"></i> Logout</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        <!-- Top Bar End -->
+
+
+
+
+
+
+       
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="container">
+                    <!--<div class="col-sm-12">
+                            <h4 class="page-title">Daily Wise</h4>
+                        </div>-->
+                        
+                    <div class="col-sm-12 mt-10">
+                        <input type="hidden" id="decimal" value="2">
+                        <div class="card-box crd_n_bx">
+                           <div class="date_enter_section">
+                            <h4 class="page-title date_view_n">From</h4>
+                            <div class="form-group date_view_n width_textbox_date" style="margin-left:5px;margin-right:10px;width: 12%;">
+                                <input type="text"  value="<?=date("Y-m-01")?>" autocomplete="off" class="form-control " placeholder="from" id="datepickerfrom" style="font-size:16px; ">
+            </div>
+                            <h4 class="page-title date_view_n">To</h4>
+                            <div class="form-group date_view_n width_textbox_date" style="margin-left:5px;width: 12%;">
+                                <input type="text" value="<?=date("Y-m-15")?>"  autocomplete="off" class="form-control " placeholder="To" id="datepickerto" style="font-size:16px">
+                            </div>
+                             
+                            <div class="form-group date_view_n top_date_sub_btn" style="margin-left:15px;width:auto;">
+                            
+                                <a href="#" class="save_and_proceed"> <div class="proceed_btn" onclick="return submit_first();" id="submit">Submit</div></a>
+                               
+                          </div>
+                             <strong id='error_msg_track' style="float:right;color: red;display: none"></strong>
+                         </div>
+                             
+                            <div class="form-group date_view_n right_box_new" style="margin-right:10px;float:right;min-width: 20%;">
+                            <h4 class="text-dark text-center sale_txt_hd">Maximum Input Value</h4>
+                                <h2 class="text-primary text-center cash_rpt cash_txt_hd"><span id="maxreduce_amount">0</span></h2>
+            </div>
+                            
+                            <div class="form-group date_view_n right_box_new" style="margin-right:10px;float:right;min-width: 20%;">
+                            <h4 class="text-dark text-center sale_txt_hd">Cash Total</h4>
+                                <h2 class="text-primary text-center cash_rpt cash_txt_hd"><span id="totalsale">0</span></h2>
+            </div>
+                             
+                            </div>
+                        
+                        </div>
+                        
+                    
+                      
+                        
+                     
+                     
+                     <div class="col-sm-12">
+                            <div class="card-box" style="display: inline-block;width: 100%;">
+                                <h4 class="m-t-0 m-b-30 header-title" style="font-size: 23px;color: #000;text-align: center;"><b></b></h4>
+                                                                   
+                                <form class="form-horizontal">
+                                
+                                <div class="form-group">
+                                  <label class="col-sm-2 control-label">***</label>
+                                  <div class="col-sm-2">
+                                      <select class="form-control optiontype" style="font-size:22px;height: 50px;font-weight:bolder;">
+                                          <option value="V" selected>Value</option>
+                                          
+                                      </select>
+                                  </div>
+                                  
+                                  <span class="percentbox" style="display:none">
+                                  <div class="col-sm-2">
+                                  <input type="text" class="form-control percentvalue" placeholder="%" style="font-size:22px;height: 50px;font-weight:bolder;">
+                                  </div>
+                                      
+                                  <div class="col-sm-6">
+                                  <input type="text" class="form-control percentfinal" placeholder="" style="font-size:22px;height: 50px;font-weight:bolder;">
+                                  </div>
+                                  </span>
+                                  
+                                  <div class="col-sm-8 valuebox" style="display: block;">
+                                  <input type="text" class="form-control valuetored" placeholder="Value" style="font-size:22px;height: 50px;font-weight:bolder;" onkeypress="return numonly(event)">
+                                  </div>
+                                  
+                              </div>
+                              
+                              <div class="form-group" style="display:none">
+                                  <label class="col-sm-4 control-label">Total After</label>
+                                  <div class="col-sm-8">
+                                      <input type="text" class="form-control reducedval" placeholder="Value" style="font-size:22px;height: 50px;font-weight:bolder;">
+                                  </div>
+                              </div>
+                               
+                              
+                             <a href="#" class="save_and_proceed"> <div class="proceed_btn" id="proceed_btn"> Proceed</div></a>
+                             
+                             <p style="width: auto;float: left;font-size: 10px;color: red;padding-right: 15px;line-height: 34px;margin-bottom: 0;align-items: center;display: flex;    font-weight: bold;"> * Warning : Do this process after 5 days of starting a new month. </p> <br>
+                              
+                              <p style="width: auto;float: left;font-size: 10px;color: red;padding-right: 15px;line-height: 34px;margin-bottom: 0;align-items: center;display: flex;    font-weight: bold;margin-right: 410px;"> * Warning : This Process May Take Time. Please do after or before working hours . </p>
+                              
+                             <p style="width: auto;float: right;font-size: 20px;color: #9a0202;padding-right: 15px;line-height: 34px;margin-bottom: 0;align-items: center;display: flex;"> New Estimated Approx Total : <span class="cash_rpt" style="position: relative;left: 6px" id="approx_reduction"></span></p>
+                             
+                             </form>
+                                
+                             </div>
+                             
+                     </div>        
+                     
+                </div>
+                 <!-- container -->
+            </div> <!-- content -->
+
+           
+
+        </div>
+
+
+       
+
+    </div>
+    <!-- END wrapper -->
+
+    <div class="alert-popup-new" style="display:none">
+        <div class="alert-popup-text alert-text"> </div>
+    </div>
+
+
+<div class="confirm_popup_container" style="display: none">
+       
+   <div class="reduse_confirm_popup">
+           <div class="reduse_confirm_popup_head">Confirm 
+               <a href="#"></a><div class="reduse_confirm_popup_close"><a href="#"><img src="images/close.png" <="" div=""></a>
+           </div>
+           <div class="reduse_confirm_popup_contant">
+               Warning: Data removed cannot be retrived back. Please Check  To Proceed
+           </div>
+           <div class="reduse_confirm_popup_checkbox">
+               <div class="checkbox checkbox-primary">
+                <input id="checkbox1" type="checkbox">
+                <label for="checkbox1">
+                    I Agree
+                </label>
+            </div>
+       
+               <a href="#"><div class="reduse_confirm_popup_sub_btn final_confirm">Reduce</div></a>
+               
+           </div>
+           
+   </div>	
+       
+</div><!--confirm_popup_container-->  
+
+
+
+
+
+
+    <script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script> 
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="js/jquery-1.10.2.js"></script>
+    <link rel="stylesheet" href="css/jquery-ui.css">
+      <script src="js/jquery-ui.js"></script>
+      
+      <link rel="stylesheet" href="css/style_date.css">
+    <script src="assets/js/bootstrap.min.js"></script>
+      <script src="assets/js/jquery.app.js"></script>
+    <script>
+        
+   
+                function disableBackButton(){
+                
+                var login=$('#login').val();
+                
+               
+                
+                if(login=='Y'){
+           history.pushState(null, null, 'index.php');
+    window.addEventListener('popstate', function () {
+    history.pushState(null, null, 'index.php');
+});
+
+
+                }else{
+      alert('NO PERMISSION . LOG IN FIRST ')
+    window.location.href='logout.php';
+
+                }
+                
+                
+                
+        }
+        
+        
+        
+        
+        
+
+        $(".reduse_confirm_popup_close").click(function(){
+            $(".confirm_popup_container").hide();
+        });
+        
+        
+    $("#datepickerfrom").datepicker({
+        
+        changeMonth: true,
+               changeYear: true,
+              dateFormat: 'yy-mm-dd',
+              maxDate: -3
+        
+     
+    });
+$("#datepickerto").datepicker({
+     changeMonth: true,
+               changeYear: true,
+               dateFormat: 'yy-mm-dd',
+               maxDate: -3
+     
+    });
+    //$(document).ready(function() {
+  
+$("#datepickerto").change(function () {
+    
+    
+    var today = new Date();
+var dd = String(today.getDate()).padStart(2, '0');
+var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+var yyyy = today.getFullYear();
+
+today = yyyy + '-' + mm + '-' + dd;
+    
+     
+            var datefrom=$("#datepickerfrom").val();
+            var dateto=$("#datepickerto").val();
+            
+           if(dateto==today){
+               $("#datepickerto").val('');
+               $('#error_msg_track').show();
+                $('#error_msg_track').text('Cant Select Today');
+                 $("#error_msg_track").delay(1500).fadeOut('slow');
+               
+           } 
+            
+            
+            
+            
+            $('.modeselect').removeAttr("checked")
+            $('input:radio[name=modeselect]')[0].checked=true;
+            if(datefrom=='')
+            {
+                $("#datepickerfrom").css("border-color","#F00");//border-color:#F00
+            }else
+            { 
+                $("#datepickerto").css("border-color","#E3E3E3");
+                togettotalsale(datefrom,dateto,"ALL","input");
+                
+                 
+            }
+      
+      
+      });
+      
+      
+$("#datepickerfrom").change(function () {
+    
+    
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+    
+     
+            var datefrom1=$("#datepickerfrom").val();
+            var dateto=$("#datepickerto").val();
+            
+           if(datefrom1==today){
+               
+               $("#datepickerfrom").val('');
+               $('#error_msg_track').show();
+               $('#error_msg_track').text('Cant Select Today');
+               $("#error_msg_track").delay(1500).fadeOut('slow');
+           } 
+    
+    
+     // $("input").find('.modeselect'.attr('value','ALL')).attr('checked','checked');
+      
+        /*var selected_activities =$('.modeselect');
+              var ids = new Array();
+              selected_activities.each(function(){
+                    var id_str   =  $(this).attr("value");
+                    if(id_str=="ALL")
+                    {*/
+                        $('.modeselect').removeAttr("checked")
+                        $('input:radio[name=modeselect]')[0].checked=true;//.attr("checked","true")
+                /*	}
+                });*/
+      
+      
+            var datefrom=$("#datepickerfrom").val();
+            var d = new Date();
+            var mth=(d.getMonth()+1);
+            if(mth<10) mth="0"+mth;
+            var strDate = d.getDate()+ "-" + (mth) + "-" +d.getFullYear()  ;
+            $("#datepickerto").val(strDate);
+            var dateto=$("#datepickerto").val();
+            
+            if(datefrom=='')
+            {
+                $("#datepickerfrom").css("border-color","#F00");//border-color:#F00
+            }else
+            {$("#datepickerfrom").css("border-color","#E3E3E3");
+                togettotalsale(datefrom,dateto,"ALL","input");
+                
+            }
+      
+      
+      });
+      
+$(".percentvalue").on('change', function() {
+        var  percentvalue=$(this).val();
+        var percentof=$('#alltypes').text();
+        $('.percentfinal').val(percentcalc(percentvalue,percentof));
+});
+    $(".percentvalue").keyup(function() {
+        var  percentvalue=$(this).val();//alert(percentvalue);
+        if(percentvalue<=100){
+        var reducevalue = parseFloat($('#maxreduce_amount').text())*parseFloat(percentvalue)/100;
+        }
+        else{
+            $('.alert-popup-new').css('display','block');
+            $('.alert-text').text('Max allowded 100%');
+                setTimeout(function(){ 
+                    $('.alert-popup-new').css('display','none');
+                }, 3000);
+            $(".percentvalue").val('');
+            $('#approx_reduction').text('');
+        }
+        if($.isNumeric( reducevalue )){
+        $('.percentfinal').val(reducevalue.toFixed(0));
+        $('#approx_reduction').text((parseFloat($('#totalsale').text())-parseFloat(reducevalue)).toFixed(2));
+        }
+        else{
+            $('.percentfinal').val('');
+        }
+        
+    });
+    
+   
+        $('.percentbox').css('display','none');
+            $('.valuebox').css('display','block');
+   
+    
+    
+$(".optiontype").on('change', function() {
+        $('.reducedval').val('');
+        if($(this).val()=="P")
+        {
+            $('.percentbox').css('display','block');
+    $('.valuebox').css('display','none');
+        }
+        else
+        {
+            $('.percentbox').css('display','none');
+            $('.valuebox').css('display','block');
+        }
+        $('#approx_reduction').text('');
+});
+        $(".valuetored").on('change', function() {
+            var percentof=$('#alltypes').text();
+    var percentfinal=$(this).val();
+    var final=parseInt(percentof) - (parseInt(percentfinal));
+    $('.reducedval').val(final);
+            $('.reducedval').css("border-color","#E3E3E3"); 
+        });
+        $(".valuetored").keyup(function() {
+            
+            if($('.valuetored').val()>parseFloat($('#maxreduce_amount').text().replace(',',''))){
+                $('.alert-popup-new').css('display','block');
+                $('.alert-text').text('Max allowded Value Up to "Maximum Input Value"');
+                setTimeout(function(){ 
+                    $('.alert-popup-new').css('display','none');
+                }, 2000);
+                $('.valuetored').val('');
+                $('#approx_reduction').text('');
+            }
+            else{
+             $('#approx_reduction').text((parseFloat($('#totalsale').text())-parseFloat($('.valuetored').val())).toFixed(2));
+         }
+         
+         
+    });
+    
+    
+    
+    $("#proceed_btn").click(function() {
+       
+       
+            if($('.valuetored').val()){
+                var reduceval=$('.valuetored').val();
+            }
+            else if($('.percentfinal').val()){
+                var reduceval=$('.percentfinal').val();
+            }
+            
+            if(reduceval!='' && reduceval>0 ){
+                 $(".confirm_popup_container").show();
+                 $('#checkbox1').attr('checked',false);
+ 
+            }
+            else{
+                alert(" Enter Value");
+                return false;
+            }
+    }); 
+    
+    
+   $('#submit').click(function(){
+            
+            var decimal=$('#decimal').val();
+            var datefrom=$('#datepickerfrom').val();
+            var dateto=$('#datepickerto').val();
+            $('#approx_reduction').text('');
+            
+           // Convert the dates to Date objects
+    var startDate = new Date(datefrom);
+    var endDate = new Date(dateto);
+
+    // Calculate the difference in milliseconds
+    var differenceInTime = endDate - startDate;
+
+    // Convert milliseconds to days
+    var  differenceInDays = differenceInTime / (1000 * 60 * 60 * 24);
+    
+    var days =parseInt(differenceInDays)+parseInt(1);
+          
+         
+            if(datefrom!='' && dateto!='' && days<32){
+                
+                $('.loader-new').css('display','block');
+               
+                var dataString = 'set=get_reducable_amount&datefrom='+datefrom+'&dateto='+dateto;
+           
+                $.ajax({
+                type: "POST",
+                url: "load_track.php",
+                data: dataString,
+                success: function(data1) {
+      
+        
+        
+                       $('.loader-new').css('display','none');
+                        data1=$.trim(data1).split(',');
+                         
+                        if(data1[0]>0 || data1[1]>0){
+                            
+                           // alert(data1[0]);     alert(data1[1]); 
+                            
+                            
+                            $('#totalsale').text(parseFloat(data1[0].replace(',','')).toFixed(decimal));
+                            $('#maxreduce_amount').text(parseFloat(data1[1].replace(',','')).toFixed(decimal));
+                        }
+                        else{
+                            
+                            $('.alert-popup-new').css('display','block');
+                            $('.alert-text').text('SUCCESSFULL');
+                            setTimeout(function(){ 
+                                $('.alert-popup-new').css('display','none');
+                                
+                            }, 2000);
+                        }
+                    }
+                });
+            }else{
+                
+                 $('#error_msg_track').show();
+                 
+                 if(days<17){
+                 $('#error_msg_track').text('Select Dates');
+             }else{
+                $('#error_msg_track').text('Maximum date gap is 31 days ');  
+             }
+                 $("#error_msg_track").delay(1500).fadeOut('slow');
+                 return false;
+            }
+        });
+        
+        
+    $('.final_confirm').click(function(){
+            
+            if($('#checkbox1').is(':checked')){
+                
+                $(".confirm_popup_container").hide();
+                $('.loader-new').css('display','block');
+                var decimal=$('#decimal').val();
+                var max_reducible=parseFloat($('#maxreduce_amount').text().replace(',',''));
+                
+                if($('.valuetored').val()){
+                    var reduceval=$('.valuetored').val();
+                }
+                else if($('.percentfinal').val()){
+                    var reduceval=$('.percentfinal').val();
+                }
+                
+                var reduce_to=parseFloat($('#approx_reduction').text().replace(',',''));
+                var datefrom=$('#datepickerfrom').val();
+                var dateto=$('#datepickerto').val();
+                
+                alert('PLEASE WAIT . IT MAY TAKE SOME TIME FOR THE PROCESS . DONT EXIT OR CLOSE. CLICK OK TO CONTINUE...');
+      
+                    var dataString; 
+                    dataString ='set=amount_reduce&datefrom='+datefrom+'&dateto='+dateto+'&reduceval='+reduce_to;
+             
+                        $.ajax({
+                        type: "POST",
+                        url: "load_track.php",
+                        data: dataString,
+                        success: function(data2) {
+                            
+                            // alert(data2);
+                            // var data3=data2.split(',');
+                            
+                            $('.loader-new').css('display','none');
+                            $('.alert-popup-new').css('display','block');
+                            $('.alert-text').text($.trim(data2));
+                            
+                            alert('SUCCESSFULLY ADJUSTED AMOUNT');
+                            
+                            setTimeout(function(){ 
+                                
+                                $('.alert-popup-new').css('display','none');
+                                $('#datepickerfrom').val(datefrom);
+                                $('#datepickerto').val(dateto);
+                                $('.valuetored').val('');
+                                $('.percentvalue').val('');
+                                $('.percentfinal').val('');
+                                $('.optiontype').val('V');
+                                $('#submit').click();
+                                
+                            }, 5000);
+                            
+                       }
+                    });
+                    
+                   
+                    
+                    
+            }else{
+                
+                alert('Please Check To Proceed');
+                $('#checkbox1').focus();
+            }
+        });
+    
+    </script>
+    
+     <script>
+function confirmation()
+{   
+    var check = confirm("Are you sure you want to logout?");
+    if(check===true)
+    {
+    window.location="logout.php";
+    }
+
+}
+           
+function numonly(evt)
+{
+evt = (evt) ? evt : window.event;
+var charCode = (evt.which) ? evt.which : evt.keyCode;
+if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+   
+   return false;
+ 
+}
+return true;
+}
+</script>
+
+</div>
+    
+
+</body>
+</html>

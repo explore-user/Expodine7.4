@@ -1,0 +1,88 @@
+@font-face {
+    font-family: 'yu_gothicregular';
+    src: url('../fonts/yugothic-webfont.eot');
+    src: url('../fonts/yugothic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/yugothic-webfont.woff2') format('woff2'),
+         url('../fonts/yugothic-webfont.woff') format('woff'),
+         url('../fonts/yugothic-webfont.ttf') format('truetype'),
+         url('../fonts/yugothic-webfont.svg#yu_gothicregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+body{margin:0;padding:0;background-image:url(../img/intro_bg.jpg);background-size:100%;}
+.intro_main_container{
+	width:100%;
+	height:auto;
+	float:left;
+	}
+.intro_main_menu_container{
+	width: 780px;
+	height:auto;
+	margin:auto;
+	}
+.left_pos_menu_container{
+	width:180px;
+	height:auto;
+	float:left;
+	}	
+	
+.center_company_logo_container{
+	width:230px;
+	height:auto;
+	float:left;
+	margin: 0 12%;
+	}
+.right_inventory_menu_container{
+	width:180px;
+	height:auto;
+	float:left;
+	}
+.menu_left_line{
+	width:1px;
+	height:250px;
+	margin:auto;
+	background-color:rgba(255,255,255,0.5);
+	}
+.intro_menu_ico_bg{
+	width:150px;
+	height:150px;
+	margin:auto;
+	cursor:pointer;
+	-moz-transition:all 1s ease;
+	-webkit-transition:all 1s ease;
+	transition:all 1s ease;
+	}
+.intro_menu_ico_bg:hover{
+	 -webkit-transform: rotateY(360deg); /* Safari */
+   	  transform: rotateY(360deg);
+	 -moz-transform: rotateY(360deg);
+	}	
+.intro_menu_text{
+	width:100%;
+	height:30px;
+	float:left;
+	line-height:30px;
+	font-family: 'CALIBRI_0';
+	font-size:23px;
+	color:#fff;
+	text-align:center;
+	}
+.intro_center_comp_logo{
+	width:157px;
+	height:160px;
+	margin:auto;
+	text-align:center;
+	margin-top:300px;
+	}
+.intro_center_comp_logo img{
+	width:100%;
+	}	
+.intro_comp_logo_text{
+	width:100%;
+	height:auto;
+	float:left;
+	text-align:center;
+	}	
+.intro_comp_logo_text img{
+	width: 58%;
+	}						

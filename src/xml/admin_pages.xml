@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<translations>
+  <language >
+  	<number lang="english">0</number>
+  </language>
+  <language >
+  	<number lang="arabic">1</number>
+  </language>
+
+  
+  
+  
+  
+  <error lang="english">
+   <logout>Logout Successfully </logout>
+  </error>  
+  <error lang="arabic">
+   <logout>خروج بنجاح</logout>
+  </error>
+   
+</translations>
+
